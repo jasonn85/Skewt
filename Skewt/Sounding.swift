@@ -47,11 +47,13 @@ internal extension LosslessStringConvertible {
     /// Initialize a LosslessStringConvertible? (Int/Double/etc.) from String, returning nil
     /// if it is the sounding data unavailable value sentinel ("99999")
     init?(fromSoundingString s: String) {
-        guard s != emptyValue else {
+        let trimmed = s.trimmingCharacters(in: .whitespaces)
+        
+        guard trimmed != emptyValue else {
             return nil
         }
         
-        self.init(s.trimmingCharacters(in: .whitespaces))
+        self.init(trimmed)
     }
 }
 
@@ -200,7 +202,7 @@ extension Sounding {
         var result: [String: Int] = [:]
         
         stride(from: 0, to: columns.count - 1, by: 2).forEach {
-            let key = columns[$0]
+            let key = columns[$0].trimmingCharacters(in: .whitespaces)
             if let value = Int(fromSoundingString: columns[$0 + 1]) {
                 result[key] = value
             }
