@@ -298,8 +298,8 @@ extension LevelDataPoint {
         self.type = type
         self.pressure = pressure
         self.height = height
-        self.temperature = temperature
-        self.dewPoint = dewPoint
+        self.temperature = temperature / 10.0
+        self.dewPoint = dewPoint / 10.0
         self.windDirection = windDirection
         self.windSpeed = windSpeed
     }
