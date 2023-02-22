@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
+		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
@@ -35,6 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
+		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtApp.swift; sourceTree = "<group>"; };
 		96A8F5E4299DAC3E0021A170 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -117,6 +121,8 @@
 			isa = PBXGroup;
 			children = (
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
+				962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */,
+				962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */,
 			);
 			path = SkewtTests;
 			sourceTree = "<group>";
@@ -243,6 +249,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,
+				962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
