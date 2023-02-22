@@ -270,11 +270,16 @@ extension StationInfoAndOther {
 struct LevelDataPoint {
     let type: DataPointType
     let pressure: Double
-    let height: Int
-    let temperature: Double
-    let dewPoint: Double
-    let windDirection: Int
-    let windSpeed: Int
+    let height: Int?
+    let temperature: Double?
+    let dewPoint: Double?
+    let windDirection: Int?
+    let windSpeed: Int?
+    
+    // Does this point contain at least temperature and dew point so it can be plotted?
+    func isPlottable() -> Bool {
+        temperature != nil && dewPoint != nil
+    }
 }
 
 extension LevelDataPoint {
@@ -287,21 +292,26 @@ extension LevelDataPoint {
             throw SoundingParseError.lineTypeMismatch(text)
         }
         
-        guard let pressure = Double(fromSoundingString: columns[0]),
-              let height = Int(fromSoundingString: columns[1]),
-              let temperature = Double(fromSoundingString: columns[2]),
-              let dewPoint = Double(fromSoundingString: columns[3]),
-              let windDirection = Int(fromSoundingString: columns[4]),
-              let windSpeed = Int(fromSoundingString: columns[5]) else {
+        guard let pressure = Double(fromSoundingString: columns[0]) else {
             throw SoundingParseError.unparseableLine(text)
         }
             
         self.type = type
         self.pressure = pressure
-        self.height = height
-        self.temperature = temperature / 10.0
-        self.dewPoint = dewPoint / 10.0
-        self.windDirection = windDirection
-        self.windSpeed = windSpeed
+        self.height = Int(fromSoundingString: columns[1])
+        self.windDirection = Int(fromSoundingString: columns[4])
+        self.windSpeed = Int(fromSoundingString: columns[5])
+        
+        if let temperature = Int(fromSoundingString: columns[2]) {
+            self.temperature = Double(temperature) / 10.0
+        } else {
+            self.temperature = nil
+        }
+        
+        if let dewPoint = Int(fromSoundingString: columns[3]) {
+            self.dewPoint = Double(dewPoint) / 10.0
+        } else {
+            self.dewPoint = nil
+        }
     }
 }
