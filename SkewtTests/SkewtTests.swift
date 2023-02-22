@@ -15,6 +15,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(Double(fromSoundingString: "3.14159"), 3.14159)
         XCTAssertNil(Int(fromSoundingString: "99999"), "99999 is recognized as a nil value")
         XCTAssertNil(Double(fromSoundingString: "99999"), "99999 is recognized as a nil value")
+        XCTAssertNil(Int(fromSoundingString: "  99999"), "99999 with leading whitespace is recognized as nil")
     }
     
     func testSoundingDataColumnSlicing() {
