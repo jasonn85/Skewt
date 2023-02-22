@@ -231,13 +231,13 @@ extension Sounding {
         let stationIdAndOtherLines = remainingLines.filterByDataPointType([.stationIdAndOther])
         let dataLines = remainingLines.filterByDataPointType([.surfaceLevel, .significantLevel, .mandatoryLevel])
         
-        guard stationIdLines.count == 1, stationIdAndOtherLines.count == 1 else {
-            throw SoundingParseError.duplicateStationInfo
-        }
-        
         guard let typeString = headerLine.components(separatedBy: .whitespaces).first,
               let type = SoundingType(rawValue: typeString) else {
             throw SoundingParseError.missingHeaders
+        }
+        
+        guard stationIdLines.count == 1, stationIdAndOtherLines.count == 1 else {
+            throw SoundingParseError.duplicateStationInfo
         }
         
         self.type = type

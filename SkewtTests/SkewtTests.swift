@@ -192,6 +192,20 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.stationId, "SAN")
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
+        
+        let lines = s.components(separatedBy: .newlines)
+        let linesMinusHeader = [lines[0]] + lines[2...]
+        let missingHeader = linesMinusHeader.joined(separator: "\n")
+        
+        do {
+            let _ = try Sounding(fromText: missingHeader)
+            XCTFail("Parsing a sounding with no header should throw an error")
+        } catch SoundingParseError.missingHeaders {
+            return
+        } catch {
+            XCTFail("Parsing a sounding with no header should throw a SoundingParseError.missingHeaders, "
+                    + "not a \(String(describing: error))")
+        }
     }
     
     func testGlobalsParsing() {
