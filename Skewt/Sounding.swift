@@ -215,7 +215,7 @@ struct StationInfo {
     let wmoId: Int
     let latitude: Double
     let longitude: Double
-    let altitude: Double
+    let altitude: Int
 }
 
 extension StationInfo {
@@ -230,7 +230,7 @@ extension StationInfo {
               let wmoId = Int(fromSoundingString: columns[1]),
               let latitude = Double(fromSoundingString: columns[2]),
               let longitude = Double(fromSoundingString: columns[3]),
-              let altitude = Double(fromSoundingString: columns[4]) else {
+              let altitude = Int(fromSoundingString: columns[4]) else {
             throw SoundingParseError.unparseableLine(text)
         }
               
