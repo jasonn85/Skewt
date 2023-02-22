@@ -11,6 +11,47 @@ import Foundation
 fileprivate let columnWidth = 7
 fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB format
 
+/// A rawindsonde sounding
+struct Sounding {
+    let stationInfo: StationInfo
+    let timestamp: Date
+    let description: String
+    
+    let stationId: String
+    let windSpeedUnit: WindSpeedUnit
+    let radiosondeCode: RadiosondeCode?
+    
+    let cape: Int?  // Convective Available Potential Energy in J/Kg
+    let cin: Int?  // Convective Inhibition in J/Kg
+    let helicity: Int?  // Storm-relative helicity in m^2/s^2
+    let precipitableWater: Int?  // Precipitable water in model column in Kg/m^2
+    
+    let data: [LevelDataPoint]
+}
+
+struct StationInfo {
+    let wbanId: Int
+    let wmoId: Int
+    let latitude: Double
+    let longitude: Double
+    let altitude: Int
+}
+
+struct LevelDataPoint {
+    let type: DataPointType
+    let pressure: Int
+    let height: Int?
+    let temperature: Double?
+    let dewPoint: Double?
+    let windDirection: Int?
+    let windSpeed: Int?
+    
+    // Does this point contain at least temperature and dew point so it can be plotted?
+    func isPlottable() -> Bool {
+        temperature != nil && dewPoint != nil
+    }
+}
+
 enum SoundingParseError: Error {
     case empty
     case missingHeaders
@@ -36,7 +77,13 @@ enum DataPointType: Int {
     case surfaceLevel = 9
 }
 
-enum RadiosondeType: Int {
+struct StationInfoAndOther {
+    let stationId: String
+    let radiosondeType: RadiosondeCode?
+    let windSpeedUnit: WindSpeedUnit
+}
+
+enum RadiosondeCode: Int {
     case vizA = 10
     case vizB = 11
     case sdc = 12
@@ -158,24 +205,7 @@ internal extension Sequence where Element == String {
     }
 }
 
-struct Sounding {
-    let stationInfo: StationInfo
-    let timestamp: Date
-    let description: String
-    
-    let stationId: String
-    let windSpeedUnit: WindSpeedUnit
-    let type: RadiosondeType?
-    
-    let cape: Int?  // Convective Available Potential Energy in J/Kg
-    let cin: Int?  // Convective Inhibition in J/Kg
-    let helicity: Int?  // Storm-relative helicity in m^2/s^2
-    let precipitableWater: Int?  // Precipitable water in model column in Kg/m^2
-    
-    let data: [LevelDataPoint]
-}
-
-/// Initializing a Sounding from text
+/// Initializing a Sounding from multiline text
 extension Sounding {
     init(fromText text: String) throws {
         let lines = text.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }.map { String($0) }
@@ -208,21 +238,14 @@ extension Sounding {
         
         let stationInfoAndOther = try StationInfoAndOther(fromText: stationIdAndOtherLines[0])
         stationId = stationInfoAndOther.stationId
-        type = stationInfoAndOther.radiosondeType
+        radiosondeCode = stationInfoAndOther.radiosondeType
         windSpeedUnit = stationInfoAndOther.windSpeedUnit
         
         data = try dataLines.map { try LevelDataPoint(fromText: $0) }
     }
 }
 
-struct StationInfo {
-    let wbanId: Int
-    let wmoId: Int
-    let latitude: Double
-    let longitude: Double
-    let altitude: Int
-}
-
+// Initializing StationInfo from a line of text
 extension StationInfo {
     init(fromText text: String) throws {
         let (type, columns) = try text.soundingTypeAndColumns()
@@ -247,12 +270,7 @@ extension StationInfo {
     }
 }
 
-struct StationInfoAndOther {
-    let stationId: String
-    let radiosondeType: RadiosondeType?
-    let windSpeedUnit: WindSpeedUnit
-}
-
+// Initializing StationInfoAndOther from a line of text
 extension StationInfoAndOther {
     init(fromText text: String) throws {
         let (type, columns) = try text.soundingTypeAndColumns()
@@ -262,7 +280,7 @@ extension StationInfoAndOther {
         }
         
         stationId = columns[1].trimmingCharacters(in: .whitespaces)
-        radiosondeType = RadiosondeType(rawValue: Int(columns[4]) ?? 0)
+        radiosondeType = RadiosondeCode(rawValue: Int(columns[4]) ?? 0)
         
         guard let windSpeedUnit = WindSpeedUnit(rawValue: columns[5].trimmingCharacters(in: .whitespaces)) else {
             throw SoundingParseError.unparseableLine(text)
@@ -272,22 +290,9 @@ extension StationInfoAndOther {
     }
 }
 
-struct LevelDataPoint {
-    let type: DataPointType
-    let pressure: Int
-    let height: Int?
-    let temperature: Double?
-    let dewPoint: Double?
-    let windDirection: Int?
-    let windSpeed: Int?
-    
-    // Does this point contain at least temperature and dew point so it can be plotted?
-    func isPlottable() -> Bool {
-        temperature != nil && dewPoint != nil
-    }
-}
-
+// Initializing a data point from a line of text
 extension LevelDataPoint {
+    // Row types that contain sounding data that can be parsed as a LevelDataPoint
     static let types: [DataPointType] = [.mandatoryLevel, .significantLevel, .surfaceLevel]
     
     init(fromText text: String) throws {
