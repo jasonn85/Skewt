@@ -104,11 +104,12 @@ internal extension String {
 /// e.g. "Op40        22     15      Feb    2023"
 internal extension String {
     func dateFromHeaderLine() throws -> Date {
-        let columns = soundingColumns()
-        let dateString = [columns[1], columns[2], columns[3], columns[4]]
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .joined(separator: " ")
-
+        // Discard the first column and join the others with single spaces
+        // Note that the column spacing in this line is infuriatingly different than all the other lines
+        //  in sounding data.
+        let components = components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        let dateString = components[1...].joined(separator: " ")
+        
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         dateFormatter.dateFormat = "HH dd MMM yyyy"
