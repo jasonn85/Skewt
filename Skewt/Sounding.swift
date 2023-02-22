@@ -51,7 +51,7 @@ internal extension LosslessStringConvertible {
             return nil
         }
         
-        self.init(s)
+        self.init(s.trimmingCharacters(in: .whitespaces))
     }
 }
 
