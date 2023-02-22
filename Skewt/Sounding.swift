@@ -269,7 +269,7 @@ extension StationInfoAndOther {
 
 struct LevelDataPoint {
     let type: DataPointType
-    let pressure: Double
+    let pressure: Int
     let height: Int?
     let temperature: Double?
     let dewPoint: Double?
@@ -292,7 +292,7 @@ extension LevelDataPoint {
             throw SoundingParseError.lineTypeMismatch(text)
         }
         
-        guard let pressure = Double(fromSoundingString: columns[0]) else {
+        guard let pressure = Int(fromSoundingString: columns[0]) else {
             throw SoundingParseError.unparseableLine(text)
         }
             
