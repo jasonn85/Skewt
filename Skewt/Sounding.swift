@@ -43,7 +43,7 @@ enum RadiosondeType: Int {
 }
 
 // Adding an init? that treats "99999" sentinel as nil when parsing values from String
-fileprivate extension LosslessStringConvertible {
+internal extension LosslessStringConvertible {
     /// Initialize a LosslessStringConvertible? (Int/Double/etc.) from String, returning nil
     /// if it is the sounding data unavailable value sentinel ("99999")
     init?(fromSoundingString s: String) {
@@ -56,7 +56,7 @@ fileprivate extension LosslessStringConvertible {
 }
 
 /// Parsing columns of static width from sounding data
-fileprivate extension String {
+internal extension String {
     /// Returns column slices of a fixed width, including whitespace characters
     private func slices(ofLength l: Int) -> [Substring] {
         var i = self.startIndex
@@ -102,7 +102,7 @@ fileprivate extension String {
 
 /// Parsing date (date and hour) from the type/time line of sounding data
 /// e.g. "Op40        22     15      Feb    2023"
-fileprivate extension String {
+internal extension String {
     func dateFromHeaderLine() throws -> Date {
         let columns = soundingColumns()
         let dateString = [columns[1], columns[2], columns[3], columns[4]]
@@ -121,7 +121,7 @@ fileprivate extension String {
     }
 }
 
-fileprivate extension Sequence where Element == String {
+internal extension Sequence where Element == String {
     /// Filters an Array of Strings based on a parseable sounding data type in the first column
     func filterByDataPointType(_ types: [DataPointType]) -> [Element] {
         return filter {
@@ -192,8 +192,8 @@ extension Sounding {
     
     /// Dictionary of values from a line of key/value tuples
     ///
-    /// e.g. "    CAPE      0    CIN      0  Helic  99999     PW  99999"
-    /// produces ["CAPE": 0, "CIN": 0]
+    /// e.g. "    CAPE     10    CIN      0  Helic  99999     PW  99999"
+    /// produces ["CAPE": 10, "CIN": 0]
     static private func globalsFromText(_ s: String) -> [String: Int] {
         let columns = s.soundingColumns()
         var result: [String: Int] = [:]
