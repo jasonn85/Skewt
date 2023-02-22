@@ -179,11 +179,12 @@ class SkewtTests: XCTestCase {
         }
     }
     
-    func testFileParsing() throws {
+    func testOp40Parsing() throws {
         let bundle = Bundle(for: type(of: self))
         let fileUrl = bundle.url(forResource: "san-op40-1", withExtension: "txt")!
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
+        let lines = s.components(separatedBy: .newlines)
         
         let sounding = try Sounding(fromText: s)
         XCTAssertEqual(sounding.type, .op40)
@@ -194,7 +195,10 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
         
-        let lines = s.components(separatedBy: .newlines)
+        let linesMinusGlobals = lines[0...1] + lines[3...]
+        let minusGlobals = linesMinusGlobals.joined(separator: "\n")
+        let _ = try Sounding(fromText: minusGlobals)
+        
         let linesMinusHeader = [lines[0]] + lines[2...]
         let missingHeader = linesMinusHeader.joined(separator: "\n")
         
