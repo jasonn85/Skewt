@@ -14,6 +14,7 @@ fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB for
 /// A rawindsonde sounding
 struct Sounding {
     let stationInfo: StationInfo
+    let type: SoundingType
     let timestamp: Date
     let description: String
     
@@ -35,6 +36,14 @@ struct StationInfo {
     let latitude: Double
     let longitude: Double
     let altitude: Int
+}
+
+enum SoundingType: String {
+    case op40 = "Op40"
+    case bak40 = "Bak40"
+    case nam = "NAM"
+    case gfs = "GFS"
+    case raob = "RAOB"
 }
 
 struct LevelDataPoint {
@@ -226,6 +235,12 @@ extension Sounding {
             throw SoundingParseError.duplicateStationInfo
         }
         
+        guard let typeString = headerLine.components(separatedBy: .whitespaces).first,
+              let type = SoundingType(rawValue: typeString) else {
+            throw SoundingParseError.missingHeaders
+        }
+        
+        self.type = type
         try timestamp = headerLine.dateFromHeaderLine()
         
         let globals = globalsLine.globals()

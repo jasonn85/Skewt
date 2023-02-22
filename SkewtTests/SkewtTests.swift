@@ -185,6 +185,8 @@ class SkewtTests: XCTestCase {
         let s = String(data: d, encoding: .utf8)!
         
         let sounding = try Sounding(fromText: s)
+        XCTAssertEqual(sounding.type, .op40)
+        XCTAssertEqual(sounding.description, "Op40 analysis valid for grid point 6.9 nm / 66 deg from SAN:")
         XCTAssertEqual(sounding.data.count, 62)
         XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 62)
         XCTAssertEqual(sounding.stationId, "SAN")
