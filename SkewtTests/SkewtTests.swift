@@ -191,4 +191,16 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
     }
+    
+    func testGlobalsParsing() {
+        let a = "   CAPE      0    CIN      0  Helic  99999     PW  99999".globals()
+        XCTAssertEqual(a["CAPE"], 0)
+        XCTAssertEqual(a["CIN"], 0)
+        XCTAssertNil(a["Helic"])
+        XCTAssertNil(a["PW"])
+        
+        let b = "   CAPE    170    CIN      1  Helic  99999     PW  99999".globals()
+        XCTAssertEqual(b["CAPE"], 170)
+        XCTAssertEqual(b["CIN"], 1)
+    }
 }

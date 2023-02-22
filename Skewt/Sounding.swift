@@ -124,6 +124,27 @@ internal extension String {
     }
 }
 
+// Parsing key/value tuples from sounding data
+internal extension String {
+    /// Dictionary of values from a line of key/value tuples
+    ///
+    /// e.g. "    CAPE     10    CIN      0  Helic  99999     PW  99999"
+    /// produces ["CAPE": 10, "CIN": 0]
+    func globals() -> [String: Int] {
+        let columns = soundingColumns()
+        var result: [String: Int] = [:]
+        
+        stride(from: 0, to: columns.count - 1, by: 2).forEach {
+            let key = columns[$0].trimmingCharacters(in: .whitespaces)
+            if let value = Int(fromSoundingString: columns[$0 + 1]) {
+                result[key] = value
+            }
+        }
+        
+        return result
+    }
+}
+
 internal extension Sequence where Element == String {
     /// Filters an Array of Strings based on a parseable sounding data type in the first column
     func filterByDataPointType(_ types: [DataPointType]) -> [Element] {
@@ -177,7 +198,7 @@ extension Sounding {
         
         try timestamp = headerLine.dateFromHeaderLine()
         
-        let globals = Sounding.globalsFromText(globalsLine)
+        let globals = globalsLine.globals()
         cape = globals["CAPE"]
         cin = globals["CIN"]
         helicity = globals["Helic"]
@@ -191,24 +212,6 @@ extension Sounding {
         windSpeedUnit = stationInfoAndOther.windSpeedUnit
         
         data = try dataLines.map { try LevelDataPoint(fromText: $0) }
-    }
-    
-    /// Dictionary of values from a line of key/value tuples
-    ///
-    /// e.g. "    CAPE     10    CIN      0  Helic  99999     PW  99999"
-    /// produces ["CAPE": 10, "CIN": 0]
-    static private func globalsFromText(_ s: String) -> [String: Int] {
-        let columns = s.soundingColumns()
-        var result: [String: Int] = [:]
-        
-        stride(from: 0, to: columns.count - 1, by: 2).forEach {
-            let key = columns[$0].trimmingCharacters(in: .whitespaces)
-            if let value = Int(fromSoundingString: columns[$0 + 1]) {
-                result[key] = value
-            }
-        }
-        
-        return result
     }
 }
 
