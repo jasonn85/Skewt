@@ -108,6 +108,14 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(stationInfo.longitude, -117.06)
         XCTAssertEqual(stationInfo.altitude, 9)
         
+        // Lat/long mushed together like happens with ROAB data
+        let mushedInfo = try StationInfo(fromText: "      1   3190  72293  32.87N117.15W   134   1103")
+        XCTAssertEqual(stationInfo.wbanId, 3190)
+        XCTAssertEqual(stationInfo.wmoId, 72293)
+        XCTAssertEqual(stationInfo.latitude, 32.87)
+        XCTAssertEqual(stationInfo.longitude, -117.15)
+        XCTAssertEqual(stationInfo.altitude, 134)
+        
         do {
             let _ = try StationInfo(fromText: "      4   2500  10313   -525   -574    256     36")
             XCTFail("Parsing a data point line as a station ID line should throw an error")
