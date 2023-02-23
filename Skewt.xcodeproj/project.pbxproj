@@ -19,6 +19,7 @@
 		96A8F60D299DAC680021A170 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* Sounding.swift */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
+		96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05929A72D61006D23BE /* ord-gfs-1.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		96A8F60C299DAC680021A170 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
+		96F4B05929A72D61006D23BE /* ord-gfs-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ord-gfs-1.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
+				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */,
 				962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */,
 			);
@@ -258,6 +261,7 @@
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,
+				96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */,
 				962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

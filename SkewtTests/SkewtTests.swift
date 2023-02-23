@@ -251,6 +251,22 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 39)
     }
     
+    func testGfsParsing() throws {
+        let bundle = Bundle(for: type(of: self))
+        let fileUrl = bundle.url(forResource: "ord-gfs-1", withExtension: "txt")!
+        let d = try Data(contentsOf: fileUrl)
+        let s = String(data: d, encoding: .utf8)!
+        
+        let sounding = try Sounding(fromText: s)
+        XCTAssertEqual(sounding.type, .gfs)
+        XCTAssertEqual(sounding.description, "GFS analysis valid for grid point 4.6 nm / 285 deg from ORD:")
+        XCTAssertEqual(sounding.stationId, "ORD")
+        XCTAssertEqual(sounding.cape, 0)
+        XCTAssertEqual(sounding.cin, 0)
+        XCTAssertEqual(sounding.data.count, 31)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 26)
+    }
+    
     func testGlobalsParsing() {
         let a = "   CAPE      0    CIN      0  Helic  99999     PW  99999".globals()
         XCTAssertEqual(a["CAPE"], 0)
