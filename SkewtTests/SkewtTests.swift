@@ -105,7 +105,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(stationInfo.wbanId, 23062)
         XCTAssertEqual(stationInfo.wmoId, 72290)
         XCTAssertEqual(stationInfo.latitude, 32.78)
-        XCTAssertEqual(stationInfo.longitude, 117.06)
+        XCTAssertEqual(stationInfo.longitude, -117.06)
         XCTAssertEqual(stationInfo.altitude, 9)
         
         do {

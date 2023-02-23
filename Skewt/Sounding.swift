@@ -290,7 +290,8 @@ extension StationInfo {
         self.wbanId = wbanId
         self.wmoId = wmoId
         self.latitude = latitude
-        self.longitude = longitude
+        // Assume western hemisphere
+        self.longitude = longitude < 0 ? longitude : -longitude
         self.altitude = altitude
     }
 }
