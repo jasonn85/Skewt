@@ -176,6 +176,15 @@ class SkewtTests: XCTestCase {
         XCTAssertNil(blanks.windDirection)
         XCTAssertNil(blanks.windSpeed)
         
+        let windLine = "      6    262  24384  99999  99999     40     10   1235     88     90"
+        let wind = try LevelDataPoint(fromText: windLine)
+        XCTAssertFalse(wind.isPlottable())
+        XCTAssertEqual(wind.type, .windLevel)
+        XCTAssertNil(wind.temperature)
+        XCTAssertNil(wind.dewPoint)
+        XCTAssertEqual(wind.windDirection, 40)
+        XCTAssertEqual(wind.windSpeed, 10)
+        
         let stationIdLine = "      1  23062  72290  32.78 117.06      9  99999"
         do {
             let _ = try LevelDataPoint(fromText: stationIdLine)
