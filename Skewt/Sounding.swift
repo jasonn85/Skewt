@@ -234,7 +234,8 @@ extension Sounding {
         let stationIdAndOtherLines = dataLines.filter(byDataTypes:[.stationIdAndOther])
         let soundingDataLines = dataLines.filter(byDataTypes:[.surfaceLevel, .significantLevel, .mandatoryLevel])
         
-        guard let typeString = headerLine.components(separatedBy: .whitespaces).first,
+        guard let typeString = headerLine.trimmingCharacters(in: .whitespaces)
+            .components(separatedBy: .whitespaces).first,
               let type = SoundingType(rawValue: typeString) else {
             throw SoundingParseError.missingHeaders
         }
