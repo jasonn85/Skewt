@@ -221,6 +221,20 @@ class SkewtTests: XCTestCase {
         }
     }
     
+    func testRaobParsing() throws {
+        let bundle = Bundle(for: type(of: self))
+        let fileUrl = bundle.url(forResource: "nkx-raob-1", withExtension: "txt")!
+        let d = try Data(contentsOf: fileUrl)
+        let s = String(data: d, encoding: .utf8)!
+
+        let sounding = try Sounding(fromText: s)
+        XCTAssertEqual(sounding.type, .raob)
+        XCTAssertEqual(sounding.description, "RAOB sounding valid at:")
+        XCTAssertEqual(sounding.data.count, 176)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 110)
+        XCTAssertEqual(sounding.stationId, "NKX")
+    }
+    
     func testGlobalsParsing() {
         let a = "   CAPE      0    CIN      0  Helic  99999     PW  99999".globals()
         XCTAssertEqual(a["CAPE"], 0)
