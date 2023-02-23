@@ -235,6 +235,22 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.stationId, "NKX")
     }
     
+    func testNamParsing() throws {
+        let bundle = Bundle(for: type(of: self))
+        let fileUrl = bundle.url(forResource: "iad-nam-1", withExtension: "txt")!
+        let d = try Data(contentsOf: fileUrl)
+        let s = String(data: d, encoding: .utf8)!
+        
+        let sounding = try Sounding(fromText: s)
+        XCTAssertEqual(sounding.type, .nam)
+        XCTAssertEqual(sounding.description, "NAM analysis valid for grid point 8.8 nm / 330 deg from IAD:")
+        XCTAssertEqual(sounding.stationId, "IAD")
+        XCTAssertEqual(sounding.cape, 0)
+        XCTAssertEqual(sounding.cin, 0)
+        XCTAssertEqual(sounding.data.count, 39)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 39)
+    }
+    
     func testGlobalsParsing() {
         let a = "   CAPE      0    CIN      0  Helic  99999     PW  99999".globals()
         XCTAssertEqual(a["CAPE"], 0)
