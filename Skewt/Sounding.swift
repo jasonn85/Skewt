@@ -102,7 +102,7 @@ enum RadiosondeCode: Int {
 internal extension LosslessStringConvertible {
     /// Initialize a LosslessStringConvertible? (Int/Double/etc.) from String, returning nil
     /// if it is the sounding data unavailable value sentinel ("99999")
-    init?(fromSoundingString s: String) {
+    init?(fromSoundingString s: any StringProtocol) {
         let trimmed = s.trimmingCharacters(in: .whitespaces)
         
         guard trimmed != emptyValue else {
@@ -276,25 +276,38 @@ extension Sounding {
 // Initializing StationInfo from a line of text
 extension StationInfo {
     init(fromText text: String) throws {
-        let (type, columns) = try text.soundingTypeAndColumns()
+        // Use regex for StationInfo parsing because the station info line breaks the format of fixed
+        // width columns for N/S/E/W suffixes on latitude/longitude; that suffix spills into the next
+        // column. Regex for this one case felt better than rewriting the column parsing to handle this.
+        let pattern = /\s*1\s+(\d+)\s+(\d+)\s+([\d.]+)([NS]?)\s*([\d.]+)([EW]?)\s+(\d+)\s+(\d+).*/
         
-        guard type == .stationId else {
-            throw SoundingParseError.lineTypeMismatch(text)
-        }
-        
-        guard let wbanId = Int(fromSoundingString: columns[0]),
-              let wmoId = Int(fromSoundingString: columns[1]),
-              let latitude = Double(fromSoundingString: columns[2]),
-              let longitude = Double(fromSoundingString: columns[3]),
-              let altitude = Int(fromSoundingString: columns[4]) else {
+        guard let result = try? pattern.wholeMatch(in: text),
+              let wbanId = Int(fromSoundingString: result.1),
+              let wmoId = Int(fromSoundingString: result.2),
+              var latitude = Double(fromSoundingString: result.3),
+              var longitude = Double(fromSoundingString: result.5),
+              let altitude = Int(fromSoundingString: result.7) else {
+            if let lineType = text.soundingDataType(), lineType != .stationId {
+                throw SoundingParseError.lineTypeMismatch(text)
+            }
+            
             throw SoundingParseError.unparseableLine(text)
         }
-              
+        
+        // Only assume southern hemisphere (negative latitude) if an S is present
+        if result.4 == "S" {
+            latitude = -latitude
+        }
+        
+        // Only assume eastern hemisphere (positive longitude) if a "E" is present
+        if result.6 != "E" {
+            longitude = -longitude
+        }
+
         self.wbanId = wbanId
         self.wmoId = wmoId
         self.latitude = latitude
-        // Assume western hemisphere
-        self.longitude = longitude < 0 ? longitude : -longitude
+        self.longitude = longitude
         self.altitude = altitude
     }
 }
