@@ -232,9 +232,7 @@ extension Sounding {
         let dataLines = lines[firstDataIndex...]
         let stationIdLines = dataLines.filter(byDataTypes:[.stationId])
         let stationIdAndOtherLines = dataLines.filter(byDataTypes:[.stationIdAndOther])
-        let soundingDataLines = dataLines.filter(byDataTypes:[.surfaceLevel, .significantLevel,
-                                                              .mandatoryLevel, .windLevel,
-                                                              .maximumWindLevel])
+        let soundingDataLines = dataLines.filter(byDataTypes:LevelDataPoint.types)
         
         guard let typeString = headerLine.trimmingCharacters(in: .whitespaces)
             .components(separatedBy: .whitespaces).first,
@@ -335,7 +333,9 @@ extension StationInfoAndOther {
 // Initializing a data point from a line of text
 extension LevelDataPoint {
     // Row types that contain sounding data that can be parsed as a LevelDataPoint
-    static let types: [DataPointType] = [.mandatoryLevel, .significantLevel, .surfaceLevel]
+    static let types: [DataPointType] = [.surfaceLevel, .significantLevel,
+                                         .mandatoryLevel, .windLevel,
+                                         .maximumWindLevel]
     
     init(fromText text: String) throws {
         let (type, columns) = try text.soundingTypeAndColumns()
