@@ -94,9 +94,9 @@ class SkewtTests: XCTestCase {
         let all = [stationIdLine, stationAndOthersLine, mandatoryLineWithBlanks,
                    mandatoryLine, significantLine, surfaceLine, garbageLine]
         
-        XCTAssertEqual(all.filterByDataPointType([.stationId]), [stationIdLine])
-        XCTAssertEqual(all.filterByDataPointType([.stationIdAndOther]), [stationAndOthersLine])
-        XCTAssertEqual(all.filterByDataPointType([.mandatoryLevel, .significantLevel, .surfaceLevel]),
+        XCTAssertEqual(all.filter(byDataTypes: [.stationId]), [stationIdLine])
+        XCTAssertEqual(all.filter(byDataTypes: [.stationIdAndOther]), [stationAndOthersLine])
+        XCTAssertEqual(all.filter(byDataTypes: [.mandatoryLevel, .significantLevel, .surfaceLevel]),
                        [mandatoryLineWithBlanks, mandatoryLine, significantLine, surfaceLine])
     }
     

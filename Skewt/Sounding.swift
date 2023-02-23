@@ -201,16 +201,20 @@ internal extension String {
     }
 }
 
-internal extension Sequence where Element == String {
+internal extension Collection where Element == String {
     /// Filters an Array of Strings based on a parseable sounding data type in the first column
-    func filterByDataPointType(_ types: [DataPointType]) -> [Element] {
-        return filter {
+    func filter(byDataTypes types: [DataPointType]) -> [Element] {
+        filter {
             guard let type = $0.soundingDataType() else {
                 return false
             }
 
             return types.contains(type)
         }
+    }
+    
+    func firstIndexContainingData() -> Self.Index? {
+        firstIndex(where: { $0.soundingDataType() != nil })
     }
 }
 
@@ -219,17 +223,16 @@ extension Sounding {
     init(fromText text: String) throws {
         let lines = text.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }.map { String($0) }
         
-        guard lines.count >= 3 else {
+        guard let firstDataIndex = lines.firstIndexContainingData() else {
             throw SoundingParseError.empty
         }
         
         description = lines[0]
         let headerLine = lines[1]
-        let globalsLine = lines[2]
-        let remainingLines = lines[3...]
-        let stationIdLines = remainingLines.filterByDataPointType([.stationId])
-        let stationIdAndOtherLines = remainingLines.filterByDataPointType([.stationIdAndOther])
-        let dataLines = remainingLines.filterByDataPointType([.surfaceLevel, .significantLevel, .mandatoryLevel])
+        let dataLines = lines[firstDataIndex...]
+        let stationIdLines = dataLines.filter(byDataTypes:[.stationId])
+        let stationIdAndOtherLines = dataLines.filter(byDataTypes:[.stationIdAndOther])
+        let soundingDataLines = dataLines.filter(byDataTypes:[.surfaceLevel, .significantLevel, .mandatoryLevel])
         
         guard let typeString = headerLine.components(separatedBy: .whitespaces).first,
               let type = SoundingType(rawValue: typeString) else {
@@ -243,11 +246,18 @@ extension Sounding {
         self.type = type
         try timestamp = headerLine.dateFromHeaderLine()
         
-        let globals = globalsLine.globals()
-        cape = globals["CAPE"]
-        cin = globals["CIN"]
-        helicity = globals["Helic"]
-        precipitableWater = globals["PW"]
+        if firstDataIndex > 2 {
+            let globals = lines[2].globals()
+            cape = globals["CAPE"]
+            cin = globals["CIN"]
+            helicity = globals["Helic"]
+            precipitableWater = globals["PW"]
+        } else {
+            cape = nil
+            cin = nil
+            helicity = nil
+            precipitableWater = nil
+        }
         
         stationInfo = try StationInfo(fromText: stationIdLines[0])
         
@@ -256,7 +266,7 @@ extension Sounding {
         radiosondeCode = stationInfoAndOther.radiosondeType
         windSpeedUnit = stationInfoAndOther.windSpeedUnit
         
-        data = try dataLines.map { try LevelDataPoint(fromText: $0) }
+        data = try soundingDataLines.map { try LevelDataPoint(fromText: $0) }
     }
 }
 
