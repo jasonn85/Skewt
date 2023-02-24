@@ -48,7 +48,7 @@ enum SoundingType: String {
 
 struct LevelDataPoint {
     let type: DataPointType
-    let pressure: Int
+    let pressure: Double
     let height: Int?
     let temperature: Double?
     let dewPoint: Double?
@@ -111,6 +111,10 @@ internal extension LosslessStringConvertible {
         
         self.init(trimmed)
     }
+}
+
+internal extension Int {
+    func doubleFromTenths() -> Double { Double(self) / 10.0 }
 }
 
 /// Parsing columns of static width from sounding data
@@ -349,21 +353,11 @@ extension LevelDataPoint {
         }
             
         self.type = type
-        self.pressure = pressure
+        self.pressure = pressure.doubleFromTenths()
         self.height = Int(fromSoundingString: columns[1])
+        self.temperature = Int(fromSoundingString: columns[2])?.doubleFromTenths()
+        self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths()
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
-        
-        if let temperature = Int(fromSoundingString: columns[2]) {
-            self.temperature = Double(temperature) / 10.0
-        } else {
-            self.temperature = nil
-        }
-        
-        if let dewPoint = Int(fromSoundingString: columns[3]) {
-            self.dewPoint = Double(dewPoint) / 10.0
-        } else {
-            self.dewPoint = nil
-        }
     }
 }
