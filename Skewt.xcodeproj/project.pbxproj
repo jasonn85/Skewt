@@ -20,6 +20,8 @@
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
 		96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05929A72D61006D23BE /* ord-gfs-1.txt */; };
+		96F4B05E29A80396006D23BE /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05D29A80396006D23BE /* State.swift */; };
+		96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05F29A804E1006D23BE /* SoundingRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +58,8 @@
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
 		96F4B05929A72D61006D23BE /* ord-gfs-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ord-gfs-1.txt"; sourceTree = "<group>"; };
+		96F4B05D29A80396006D23BE /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		96F4B05F29A804E1006D23BE /* SoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,9 +112,11 @@
 			children = (
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
+				96F4B05D29A80396006D23BE /* State.swift */,
+				96A8F60C299DAC680021A170 /* Sounding.swift */,
+				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
 				96A8F5E6299DAC3F0021A170 /* Assets.xcassets */,
 				96A8F5E8299DAC3F0021A170 /* Preview Content */,
-				96A8F60C299DAC680021A170 /* Sounding.swift */,
 			);
 			path = Skewt;
 			sourceTree = "<group>";
@@ -282,6 +288,8 @@
 			files = (
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
+				96F4B05E29A80396006D23BE /* State.swift in Sources */,
+				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
