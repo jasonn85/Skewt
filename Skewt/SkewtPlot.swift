@@ -131,7 +131,7 @@ extension SkewtPlot {
             let surfaceX = x(forSurfaceTemperature: t)
             
             if surfaceX >= size.width {
-                continue
+                break
             }
             
             path.move(to: CGPoint(x: surfaceX, y: size.height))
