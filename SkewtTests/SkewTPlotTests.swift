@@ -88,8 +88,6 @@ RAOB sounding valid at:
     }
     
     func testIsobarNonLinearScale() {
-        // TODO: Verify that the boundaries, esepcially starting at a weird number like 1050, don't break this test
-        
         let height = 100.0
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: height, height: height))
         let sortedIsobars = plot.isobarPaths.sorted(by: { $0.boundingBox.origin.y > $1.boundingBox.origin.y })
@@ -115,5 +113,16 @@ RAOB sounding valid at:
         plot.isothermPaths.forEach {
             XCTAssertTrue($0.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
         }
+    }
+    
+    /// A roughly square plot should have twice as many isotherms as fill the X axis
+    func testIsothermCount() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        let singleAxisCount = Int((plot.surfaceTemperatureRange.upperBound
+                                   - plot.surfaceTemperatureRange.lowerBound)
+                                  / plot.isothermSpacing)
+        let expectedCount = (singleAxisCount * 2 - 2)...(singleAxisCount * 2 + 2)
+        
+        XCTAssertTrue(expectedCount.contains(plot.isobarPaths.count))
     }
 }
