@@ -28,22 +28,60 @@ struct SkewtPlot {
     let adiabatSpacing: CGFloat
     let isobarSpacing: CGFloat
     
+    private let skewSlope = 1.0  // This could maybe vary in future for different aspect ratios
+    
     var temperaturePath: CGPath? {
-        //TODO
-        return nil
+        guard let data = sounding?.data.filter({ $0.isPlottable }),
+              data.count > 0 else {
+            return nil
+        }
         
-//        guard let sounding = sounding else {
-//            return nil
-//        }
+        let path = CGMutablePath()
+        path.move(to: point(pressure: data[0].pressure, temperature: data[0].temperature!))
+        
+        data[1...].forEach {
+            path.addLine(to: point(pressure: $0.pressure, temperature: $0.temperature!))
+        }
+        
+        return path
     }
     
     var dewPointPath: CGPath? {
-        // TODO
-        return nil
+        guard let data = sounding?.data.filter({ $0.isPlottable }),
+              data.count > 0 else {
+            return nil
+        }
         
-//        guard let sounding = sounding else {
-//            return nil
-//        }
+        let path = CGMutablePath()
+        path.move(to: point(pressure: data[0].pressure, temperature: data[0].dewPoint!))
+        
+        data[1...].forEach {
+            path.addLine(to: point(pressure: $0.pressure, temperature: $0.dewPoint!))
+        }
+        
+        return path
+    }
+}
+
+// MARK: - Coordinate calculations (skew and log magic)
+extension SkewtPlot {
+    func y(forPressure pressure: Double) -> CGFloat {
+        let lp = log10(pressure)
+        let max = log10(pressureRange.upperBound)
+        let min = log10(pressureRange.lowerBound)
+        let p = ((lp - min) / (max - min))
+        
+        return p * size.height
+    }
+    
+    func point(pressure: Double, temperature: Double) -> CGPoint {
+        let y = y(forPressure: pressure)
+        let surfaceX = ((temperature - surfaceTemperatureRange.lowerBound)
+                        / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
+                        * size.width)
+        let skewedX = surfaceX + ((size.height - y) * skewSlope)
+        
+        return CGPoint(x: skewedX, y: y)
     }
 }
 
@@ -70,9 +108,11 @@ extension SkewtPlot {
         isobars.formUnion(stride(from: bottomLine, to: pressureRange.lowerBound, by: -isobarSpacing))
         
         return isobars.map {
-            var path = CGMutablePath()
-            path.move(to: CGPoint(x: 0.0, y: $0))
-            path.addLine(to: CGPoint(x: size.width, y: $0))
+            let path = CGMutablePath()
+            let y = y(forPressure: $0)
+            path.move(to: CGPoint(x: 0.0, y: y))
+            path.addLine(to: CGPoint(x: size.width, y: y))
+            
             return path
         }
     }
