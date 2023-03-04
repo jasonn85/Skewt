@@ -23,6 +23,7 @@
 		96F4B05E29A80396006D23BE /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05D29A80396006D23BE /* State.swift */; };
 		96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05F29A804E1006D23BE /* SoundingRequest.swift */; };
 		96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06529B165D0006D23BE /* SkewtPlot.swift */; };
+		96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		96F4B05D29A80396006D23BE /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		96F4B05F29A804E1006D23BE /* SoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequest.swift; sourceTree = "<group>"; };
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
+		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 		96A8F5F2299DAC3F0021A170 /* SkewtTests */ = {
 			isa = PBXGroup;
 			children = (
+				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
@@ -303,6 +306,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
+				96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
