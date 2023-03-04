@@ -125,4 +125,25 @@ RAOB sounding valid at:
         
         XCTAssertTrue(expectedCount.contains(plot.isobarPaths.count))
     }
+    
+    func testDataToCoordinateAndBack() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+
+        let data = sounding.data.filter({ $0.isPlottable }).first!
+        let expected = (pressure: data.pressure, temperature: data.temperature!)
+        let pointFromPlot = plot.point(pressure: expected.pressure, temperature: expected.temperature)
+        let recalculatedData = plot.pressureAndTemperature(atPoint: pointFromPlot)
+        XCTAssertEqual(recalculatedData.pressure, expected.pressure)
+        XCTAssertEqual(recalculatedData.temperature, expected.temperature)
+    }
+    
+    func testCoordinateToPointAndBack() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+
+        let data = sounding.data.filter({ $0.isPlottable }).last!
+        let point = plot.point(pressure: data.pressure, temperature: data.temperature!)
+        let dataFromPoint = plot.pressureAndTemperature(atPoint: point)
+        let recalculatedPoint = plot.point(pressure: dataFromPoint.pressure, temperature: dataFromPoint.temperature)
+        XCTAssertEqual(point, recalculatedPoint)
+    }
 }
