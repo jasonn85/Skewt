@@ -18,24 +18,38 @@ struct SkewtPlotView: View {
                 let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
                 let plot = SkewtPlot(sounding: sounding, size: squareSize)
                 
-                Path(plot.temperaturePath!)
-                    .stroke(lineWidth: 2.0)
-                    .foregroundColor(.red)
-                
-                Path(plot.dewPointPath!)
-                    .stroke(lineWidth: 2.0)
-                    .foregroundColor(.blue)
-                
-                ForEach(plot.isobarPaths, id: \.self) { isobar in
-                    Path(isobar)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.gray)
-                }
-                
-                ForEach(plot.isothermPaths, id: \.self) { isotherm in
-                    Path(isotherm)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.gray)
+                HStack() {
+                    Spacer()
+                    
+                    VStack() {
+                        Spacer()
+                        
+                        ZStack() {
+                            Path(plot.temperaturePath!)
+                                .stroke(lineWidth: 3.0)
+                                .foregroundColor(.red)
+                            
+                            Path(plot.dewPointPath!)
+                                .stroke(lineWidth: 3.0)
+                                .foregroundColor(.blue)
+                            
+                            ForEach(plot.isobarPaths, id: \.self) { isobar in
+                                Path(isobar)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            ForEach(plot.isothermPaths, id: \.self) { isotherm in
+                                Path(isotherm)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.gray)
+                            }
+                        }.frame(width: smallestDimension, height: smallestDimension)
+                        
+                        Spacer()
+                    }
+                    
+                    Spacer()
                 }
             }
         default:
