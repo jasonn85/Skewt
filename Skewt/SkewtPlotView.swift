@@ -14,7 +14,9 @@ struct SkewtPlotView: View {
         switch state.soundingState {
         case .ready(let sounding):
             GeometryReader { geometry in
-                let plot = SkewtPlot(sounding: sounding, size: geometry.size)
+                let smallestDimension = min(geometry.size.width, geometry.size.height)
+                let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
+                let plot = SkewtPlot(sounding: sounding, size: squareSize)
                 
                 Path(plot.temperaturePath!)
                     .stroke(lineWidth: 2.0)
