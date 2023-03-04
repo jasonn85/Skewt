@@ -113,7 +113,7 @@ RAOB sounding valid at:
         XCTAssertTrue(plot.isothermPaths.count > 0)
         
         plot.isothermPaths.forEach {
-            XCTAssertTrue($0.isPositiveSlope)
+            XCTAssertTrue($0.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
         }
     }
 }

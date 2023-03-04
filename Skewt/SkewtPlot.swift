@@ -122,8 +122,25 @@ extension SkewtPlot {
     }
     
     var isothermPaths: [CGPath] {
-        // TODO
-        return []
+        let firstIsotherm = ceil(surfaceTemperatureRange.lowerBound / isothermSpacing) * isothermSpacing
+        
+        var paths: [CGPath] = []
+
+        for t in stride(from: firstIsotherm, through: surfaceTemperatureRange.upperBound, by: isothermSpacing) {
+            let path = CGMutablePath()
+            let surfaceX = x(forSurfaceTemperature: t)
+            
+            if surfaceX >= size.width {
+                continue
+            }
+            
+            path.move(to: CGPoint(x: surfaceX, y: size.height))
+            path.addLine(to: CGPoint(x: size.width, y: size.height - size.width + surfaceX))
+            
+            paths.append(path)
+        }
+        
+        return paths
     }
     
     var dryAdiabatPaths: [CGPath] {
