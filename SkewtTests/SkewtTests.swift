@@ -146,7 +146,7 @@ class SkewtTests: XCTestCase {
     func testDataPointParsing() throws {
         let mandatoryLine = "      4   2500  10313   -525   -574    256     36"
         let mandatory = try LevelDataPoint(fromText: mandatoryLine)
-        XCTAssertTrue(mandatory.isPlottable())
+        XCTAssertTrue(mandatory.isPlottable)
         XCTAssertEqual(mandatory.type, .mandatoryLevel)
         XCTAssertEqual(mandatory.pressure, 250.0)
         XCTAssertEqual(mandatory.height, 10313)
@@ -157,7 +157,7 @@ class SkewtTests: XCTestCase {
         
         let significantLine = "      5   2331  10762   -553   -602    235     36"
         let significant = try LevelDataPoint(fromText: significantLine)
-        XCTAssertTrue(significant.isPlottable())
+        XCTAssertTrue(significant.isPlottable)
         XCTAssertEqual(significant.type, .significantLevel)
         XCTAssertEqual(significant.pressure, 233.1)
         XCTAssertEqual(significant.height, 10762)
@@ -168,7 +168,7 @@ class SkewtTests: XCTestCase {
         
         let mandatoryLineWithBlanks = "      4   8500  99999  99999  99999  99999  99999"
         let blanks = try LevelDataPoint(fromText: mandatoryLineWithBlanks)
-        XCTAssertFalse(blanks.isPlottable())
+        XCTAssertFalse(blanks.isPlottable)
         XCTAssertEqual(blanks.type, .mandatoryLevel)
         XCTAssertEqual(blanks.pressure, 850.0)
         XCTAssertNil(blanks.temperature)
@@ -178,7 +178,7 @@ class SkewtTests: XCTestCase {
         
         let windLine = "      6    262  24384  99999  99999     40     10   1235     88     90"
         let wind = try LevelDataPoint(fromText: windLine)
-        XCTAssertFalse(wind.isPlottable())
+        XCTAssertFalse(wind.isPlottable)
         XCTAssertEqual(wind.type, .windLevel)
         XCTAssertNil(wind.temperature)
         XCTAssertNil(wind.dewPoint)
@@ -207,7 +207,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.type, .op40)
         XCTAssertEqual(sounding.description, "Op40 analysis valid for grid point 6.9 nm / 66 deg from SAN:")
         XCTAssertEqual(sounding.data.count, 62)
-        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 62)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 62)
         XCTAssertEqual(sounding.stationId, "SAN")
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
@@ -240,7 +240,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.type, .raob)
         XCTAssertEqual(sounding.description, "RAOB sounding valid at:")
         XCTAssertEqual(sounding.data.count, 176)
-        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 110)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 110)
         XCTAssertEqual(sounding.stationId, "NKX")
     }
     
@@ -257,7 +257,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
         XCTAssertEqual(sounding.data.count, 39)
-        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 39)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 39)
     }
     
     func testGfsParsing() throws {
@@ -273,7 +273,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
         XCTAssertEqual(sounding.data.count, 31)
-        XCTAssertEqual(sounding.data.filter({ $0.isPlottable() }).count, 26)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 26)
     }
     
     func testGlobalsParsing() {

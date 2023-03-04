@@ -56,7 +56,7 @@ struct LevelDataPoint {
     let windSpeed: Int?
     
     // Does this point contain at least temperature and dew point so it can be plotted?
-    func isPlottable() -> Bool {
+    var isPlottable: Bool {
         temperature != nil && dewPoint != nil
     }
 }
