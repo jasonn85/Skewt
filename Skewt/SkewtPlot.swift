@@ -74,11 +74,15 @@ extension SkewtPlot {
         return p * size.height
     }
     
+    func x(forSurfaceTemperature temperature: Double) -> CGFloat {
+        ((temperature - surfaceTemperatureRange.lowerBound)
+         / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
+         * size.width)
+    }
+    
     func point(pressure: Double, temperature: Double) -> CGPoint {
         let y = y(forPressure: pressure)
-        let surfaceX = ((temperature - surfaceTemperatureRange.lowerBound)
-                        / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
-                        * size.width)
+        let surfaceX = x(forSurfaceTemperature: temperature)
         let skewedX = surfaceX + ((size.height - y) * skewSlope)
         
         return CGPoint(x: skewedX, y: y)
