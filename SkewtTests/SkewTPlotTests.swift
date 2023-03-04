@@ -90,15 +90,16 @@ RAOB sounding valid at:
     func testIsobarNonLinearScale() {
         // TODO: Verify that the boundaries, esepcially starting at a weird number like 1050, don't break this test
         
-        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
-        let sortedIsobars = plot.isobarPaths.sorted(by: { $0.boundingBox.origin.y < $1.boundingBox.origin.y })
+        let height = 100.0
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: height, height: height))
+        let sortedIsobars = plot.isobarPaths.sorted(by: { $0.boundingBox.origin.y > $1.boundingBox.origin.y })
         
-        var lastY = 0.0
+        var lastY = height
         var lastDy = 0.0
         
         sortedIsobars[1...].forEach {
             let y = $0.boundingBox.origin.y
-            let dy = y - lastY
+            let dy = lastY - y
             XCTAssertTrue(dy > lastDy)  // Each isobar is farther than the last
             
             lastDy = dy
