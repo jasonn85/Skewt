@@ -22,6 +22,7 @@
 		96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05929A72D61006D23BE /* ord-gfs-1.txt */; };
 		96F4B05E29A80396006D23BE /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05D29A80396006D23BE /* State.swift */; };
 		96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05F29A804E1006D23BE /* SoundingRequest.swift */; };
+		96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */; };
 		96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06529B165D0006D23BE /* SkewtPlot.swift */; };
 		96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */; };
 /* End PBXBuildFile section */
@@ -62,6 +63,7 @@
 		96F4B05929A72D61006D23BE /* ord-gfs-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ord-gfs-1.txt"; sourceTree = "<group>"; };
 		96F4B05D29A80396006D23BE /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		96F4B05F29A804E1006D23BE /* SoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequest.swift; sourceTree = "<group>"; };
+		96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlotView.swift; sourceTree = "<group>"; };
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
 		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 			children = (
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
+				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96F4B05D29A80396006D23BE /* State.swift */,
 				96A8F60C299DAC680021A170 /* Sounding.swift */,
@@ -297,6 +300,7 @@
 				96F4B05E29A80396006D23BE /* State.swift in Sources */,
 				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
+				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
