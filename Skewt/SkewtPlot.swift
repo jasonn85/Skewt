@@ -66,12 +66,15 @@ struct SkewtPlot {
 // MARK: - Coordinate calculations (skew and log magic)
 extension SkewtPlot {
     public func y(forPressure pressure: Double) -> CGFloat {
-        let lp = log10(pressure)
-        let max = log10(pressureRange.upperBound)
-        let min = log10(pressureRange.lowerBound)
-        let p = ((lp - min) / (max - min))
-        
-        return p * size.height
+        log10(pressure / pressureRange.lowerBound)
+        / log10(pressureRange.upperBound / pressureRange.lowerBound)
+        * size.height
+    }
+    
+    public func pressure(atY y: CGFloat) -> Double {
+        pressureRange.lowerBound
+        * pow(10.0,
+              y * log10(pressureRange.upperBound / pressureRange.lowerBound) / size.height)
     }
     
     public func x(forSurfaceTemperature temperature: Double) -> CGFloat {
