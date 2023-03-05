@@ -123,7 +123,8 @@ RAOB sounding valid at:
                                   / plot.isothermSpacing)
         let expectedCount = (singleAxisCount * 2 - 2)...(singleAxisCount * 2 + 2)
         
-        XCTAssertTrue(expectedCount.contains(plot.isobarPaths.count))
+        XCTAssertTrue(expectedCount.contains(plot.isobarPaths.count),
+                      "Expecting \(String(describing: expectedCount)) isotherms, found \(plot.isobarPaths.count)")
     }
     
     func testDataToCoordinateAndBack() {
