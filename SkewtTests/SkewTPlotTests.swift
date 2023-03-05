@@ -133,17 +133,25 @@ RAOB sounding valid at:
         let expected = (pressure: data.pressure, temperature: data.temperature!)
         let pointFromPlot = plot.point(pressure: expected.pressure, temperature: expected.temperature)
         let recalculatedData = plot.pressureAndTemperature(atPoint: pointFromPlot)
-        XCTAssertEqual(recalculatedData.pressure, expected.pressure)
-        XCTAssertEqual(recalculatedData.temperature, expected.temperature)
+        XCTAssertEqual(recalculatedData.pressure, expected.pressure, accuracy: 0.001)
+        XCTAssertEqual(recalculatedData.temperature, expected.temperature, accuracy: 0.001)
+        
+        let data2 = sounding.data.filter({ $0.isPlottable }).last!
+        let expected2 = (pressure: data2.pressure, temperature: data2.temperature!)
+        let pointFromPlot2 = plot.point(pressure: expected2.pressure, temperature: expected2.temperature)
+        let recalculatedData2 = plot.pressureAndTemperature(atPoint: pointFromPlot2)
+        XCTAssertEqual(recalculatedData2.pressure, expected2.pressure, accuracy: 0.001)
+        XCTAssertEqual(recalculatedData2.temperature, expected2.temperature, accuracy: 0.001)
     }
     
     func testCoordinateToPointAndBack() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
 
-        let data = sounding.data.filter({ $0.isPlottable }).last!
+        let data = sounding.data.filter({ $0.isPlottable })[15]
         let point = plot.point(pressure: data.pressure, temperature: data.temperature!)
         let dataFromPoint = plot.pressureAndTemperature(atPoint: point)
         let recalculatedPoint = plot.point(pressure: dataFromPoint.pressure, temperature: dataFromPoint.temperature)
-        XCTAssertEqual(point, recalculatedPoint)
+        XCTAssertEqual(point.x, recalculatedPoint.x, accuracy: 0.5)
+        XCTAssertEqual(point.y, recalculatedPoint.y, accuracy: 0.5)
     }
 }

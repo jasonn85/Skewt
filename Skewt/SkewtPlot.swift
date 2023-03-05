@@ -92,8 +92,12 @@ extension SkewtPlot {
     }
     
     public func pressureAndTemperature(atPoint point: CGPoint) -> (pressure: Double, temperature: Double) {
-        // TODO
-        return (0.0, 0.0)
+        let skewedX = point.x - ((size.height - point.y) * skewSlope)
+        let temperature = ((skewedX / size.width)
+                            * (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
+                            + surfaceTemperatureRange.lowerBound)
+        
+        return (pressure: pressure(atY: point.y), temperature: temperature)
     }
 }
 
