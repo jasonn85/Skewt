@@ -105,6 +105,43 @@ RAOB sounding valid at:
         }
     }
     
+    func testIsothermGeneration() {
+        let squarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        
+        let bottomLeft = CGPoint(x: 0.0, y: 100.0)
+        let squareTopRight = CGPoint(x: 100.0, y: 0.0)
+        let middleBottom = CGPoint(x: 50.0, y: 100.0)
+        let middleLeft = CGPoint(x: 0.0, y: 50.0)
+        let middleRight = CGPoint(x: 100.0, y: 50.0)
+        let middleTop = CGPoint(x: 50.0, y: 0.0)
+        let (_, bottomLeftTemp) = squarePlot.pressureAndTemperature(atPoint: bottomLeft)
+        let fullLine = squarePlot.isotherm(forTemperature: bottomLeftTemp)
+        let (_, middleTemp) = squarePlot.pressureAndTemperature(atPoint: middleBottom)
+        let halfAcrossLine = squarePlot.isotherm(forTemperature: middleTemp)
+        let (_, halfOffLeftTemp) = squarePlot.pressureAndTemperature(atPoint: CGPoint(x: -50.0, y: 100.0))
+        let halfOffLeftLine = squarePlot.isotherm(forTemperature: halfOffLeftTemp)
+        
+        XCTAssertEqual(fullLine.0, bottomLeft)
+        XCTAssertEqual(fullLine.1, squareTopRight)
+        XCTAssertEqual(halfAcrossLine.0, middleBottom)
+        XCTAssertEqual(halfAcrossLine.1, middleRight)
+        XCTAssertEqual(halfOffLeftLine.0, middleLeft)
+        XCTAssertEqual(halfOffLeftLine.1, middleTop)
+        
+        let skewedUpSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, skewSlope: 2.0)
+        let steepFromBottomLeft = skewedUpSquarePlot.isotherm(forTemperature: bottomLeftTemp)
+        let steepFromBottomMiddle = skewedUpSquarePlot.isotherm(forTemperature: middleTemp)
+        XCTAssertEqual(steepFromBottomLeft.0, bottomLeft)
+        XCTAssertEqual(steepFromBottomLeft.1, middleTop)
+        XCTAssertEqual(steepFromBottomMiddle.0, middleBottom)
+        XCTAssertEqual(steepFromBottomMiddle.1, squareTopRight)
+        
+        let skewedDownSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, skewSlope: 0.5)
+        let shallowFromBottomLeft = skewedDownSquarePlot.isotherm(forTemperature: bottomLeftTemp)
+        XCTAssertEqual(shallowFromBottomLeft.0, bottomLeft)
+        XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
+    }
+    
     func testIsothermSkew() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
         
@@ -123,7 +160,7 @@ RAOB sounding valid at:
                                   / plot.isothermSpacing)
         let expectedCount = (singleAxisCount * 2 - 2)...(singleAxisCount * 2 + 2)
         
-        XCTAssertTrue(expectedCount.contains(plot.isobarPaths.count),
+        XCTAssertTrue(expectedCount.contains(plot.isothermPaths.count),
                       "Expecting \(String(describing: expectedCount)) isotherms, found \(plot.isobarPaths.count)")
     }
     

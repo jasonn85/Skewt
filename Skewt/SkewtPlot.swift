@@ -28,7 +28,7 @@ struct SkewtPlot {
     let adiabatSpacing: CGFloat
     let isobarSpacing: CGFloat
     
-    private let skewSlope = 1.0  // This could maybe vary in future for different aspect ratios
+    let skewSlope: CGFloat
     
     var temperaturePath: CGPath? {
         guard let data = sounding?.data.filter({ $0.isPlottable }),
@@ -106,6 +106,7 @@ extension SkewtPlot {
     init(sounding: Sounding?, size: CGSize) {
         self.sounding = sounding
         self.size = size
+        skewSlope = 1.0
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
         pressureRange = defaultPressureRange
@@ -118,6 +119,8 @@ extension SkewtPlot {
 
 // MARK: - Isopleth paths
 extension SkewtPlot {
+    typealias Line = (CGPoint, CGPoint)
+
     var isobarPaths: [CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
         let bottomLine = floor(pressureRange.upperBound / isobarSpacing) * isobarSpacing
@@ -133,26 +136,36 @@ extension SkewtPlot {
         }
     }
     
+    /// Calculates the isotherm line and then crops it to our bounds
+    func isotherm(forTemperature temperature: Double) -> Line {
+        let surfaceX = x(forSurfaceTemperature: temperature)
+        
+        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: size.height + (surfaceX * skewSlope)) : nil
+        let intersectingRightY = size.height - ((size.width - surfaceX) * skewSlope)
+        let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: size.width, y:intersectingRightY) : nil
+        let intersectingTop = intersectingRight == nil ? CGPoint(x: size.height / skewSlope + surfaceX, y: 0.0) : nil
+        
+        let start = intersectingLeft ?? CGPoint(x: surfaceX, y: size.height)
+        let end = intersectingRight ?? intersectingTop!
+        
+        return (start, end)
+    }
+    
     var isothermPaths: [CGPath] {
-        let firstIsotherm = ceil(surfaceTemperatureRange.lowerBound / isothermSpacing) * isothermSpacing
+        let margin = 5.0
+        let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin,
+                                                                                  y: size.height - margin))
+        let firstIsotherm = ceil(topLeftTemperature / isothermSpacing) * isothermSpacing
+        let lastIsotherm = floor(bottomRightTemperature / isothermSpacing) * isothermSpacing
         
-        var paths: [CGPath] = []
-
-        for t in stride(from: firstIsotherm, through: surfaceTemperatureRange.upperBound, by: isothermSpacing) {
+        return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing).map {
+            let isotherm = isotherm(forTemperature: $0)
             let path = CGMutablePath()
-            let surfaceX = x(forSurfaceTemperature: t)
-            
-            if surfaceX >= size.width {
-                break
-            }
-            
-            path.move(to: CGPoint(x: surfaceX, y: size.height))
-            path.addLine(to: CGPoint(x: size.width, y: size.height - size.width + surfaceX))
-            
-            paths.append(path)
+            path.move(to: isotherm.0)
+            path.addLine(to: isotherm.1)
+            return path
         }
-        
-        return paths
     }
     
     var dryAdiabatPaths: [CGPath] {
