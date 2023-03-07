@@ -14,6 +14,7 @@ fileprivate let defaultPressureRange = 100...1050.0
 fileprivate let defaultAdiabatSpacing = 10.0
 fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
+fileprivate let defaultSkewSlope = 1.0
 
 struct SkewtPlot {
     let sounding: Sounding?
@@ -106,7 +107,7 @@ extension SkewtPlot {
     init(sounding: Sounding?, size: CGSize) {
         self.sounding = sounding
         self.size = size
-        skewSlope = 1.0
+        skewSlope = defaultSkewSlope
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
         pressureRange = defaultPressureRange
