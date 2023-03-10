@@ -28,7 +28,7 @@ struct Temperature: Comparable {
     public static let standardSeaLevel = Temperature(15.0, unit: .celsius)
     public static let seaLevelLapseRatePerFoot = Temperature(-0.0019812, unit: .celsius)
     
-    private static let kelvinToCelsiusDelta = 273.15
+    private static let celsiusToKelvinDelta = 273.15
     
     init(_ value: Double, unit: TemperatureUnit = .celsius) {
         self.value = value
@@ -47,17 +47,17 @@ struct Temperature: Comparable {
         case .fahrenheit:
             return Temperature((self.value - 32.0) * 5.0 / 9.0, unit: .celsius).inUnit(unit)
         case .kelvin:
-            return Temperature(self.value - Temperature.kelvinToCelsiusDelta, unit: .celsius).inUnit(unit)
+            return Temperature(self.value - Temperature.celsiusToKelvinDelta, unit: .celsius).inUnit(unit)
         }
         
         // Now we're Celsius, so...
         switch unit {
         case .celsius:
-            return self // unreachable
+            return self  // unreachable
         case .fahrenheit:
             return Temperature(self.value * 9.0 / 5.0 + 32.0, unit: .fahrenheit)
         case .kelvin:
-            return Temperature(self.value + Temperature.kelvinToCelsiusDelta, unit: .kelvin)
+            return Temperature(self.value + Temperature.celsiusToKelvinDelta, unit: .kelvin)
         }
     }
     
