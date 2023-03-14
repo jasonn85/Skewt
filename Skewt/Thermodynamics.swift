@@ -7,13 +7,16 @@
 
 import Foundation
 
-typealias Pressure = Double   // Pressure in millibars
-typealias Altitude = Double   // Altitude in feet
+public typealias Pressure = Double   // Pressure in millibars
+public typealias Altitude = Double   // Altitude in feet
 
-//
-//extension Pressure {
-//    static let standardSeaLevelMb = 1013.25
-//}
+extension Double {
+    public static let universalGasConstant = 8.3144598  // J / (mol * K)
+    public static let gravitationalAcceleration = 9.80665  // m / s^2
+    public static let airMolarMass = 0.0289644  // kg / mol
+    public static let seaLevelLapseRate = -0.0065  // K / m
+    public static let metersPerFoot = 0.3048
+}
 
 enum TemperatureUnit {
     case celsius
@@ -26,8 +29,7 @@ struct Temperature: Comparable {
     let unit: TemperatureUnit
     
     public static let standardSeaLevel = Temperature(15.0, unit: .celsius)
-    public static let seaLevelLapseRatePerFoot = Temperature(-0.0019812, unit: .celsius)
-    
+        
     private static let celsiusToKelvinDelta = 273.15
     
     init(_ value: Double, unit: TemperatureUnit = .celsius) {
@@ -67,5 +69,17 @@ struct Temperature: Comparable {
     
     static func < (lhs: Temperature, rhs: Temperature) -> Bool {
         return lhs.value < rhs.inUnit(lhs.unit).value
+    }
+}
+
+extension Pressure {
+    static let standardSeaLevel: Pressure = 1013.25
+    
+    public static func standardPressure(atAltitude altitude: Altitude) -> Pressure {
+        let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
+        let exponent = -gravitationalAcceleration * airMolarMass / (universalGasConstant * seaLevelLapseRate)
+        let numerator = referenceTemperature + (altitude * metersPerFoot * seaLevelLapseRate)
+        
+        return Pressure.standardSeaLevel * pow(numerator / referenceTemperature, exponent)
     }
 }

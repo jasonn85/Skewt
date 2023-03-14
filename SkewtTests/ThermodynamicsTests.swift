@@ -25,6 +25,7 @@ final class ThermodynamicsTests: XCTestCase {
     func testConversions() {
         XCTAssertEqual(bodyTempC.inUnit(.fahrenheit).value, bodyTempF.value)
         XCTAssertEqual(absoluteZeroC.inUnit(.kelvin).value, absoluteZeroK.value)
+        XCTAssertEqual(Temperature.standardSeaLevel.inUnit(.kelvin).value, 288.15)
     }
     
     func testCrossUnitEquality() {
@@ -39,5 +40,12 @@ final class ThermodynamicsTests: XCTestCase {
         XCTAssertTrue(bodyTempF > zeroC)
         XCTAssertTrue(zeroC > absoluteZeroK)
         XCTAssertTrue(zeroF < zeroC)
+    }
+    
+    func testStandardPressure() {
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 0.0), Pressure.standardSeaLevel)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 5_000), 843.2108, accuracy: 1.0)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 10_000), 697.5961, accuracy: 1.0)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 36_089), 226.3206, accuracy: 1.0)
     }
 }
