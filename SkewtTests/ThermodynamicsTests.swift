@@ -43,9 +43,16 @@ final class ThermodynamicsTests: XCTestCase {
     }
     
     func testStandardPressure() {
-        XCTAssertEqual(Pressure.standardPressure(atAltitude: 0.0), Pressure.standardSeaLevel)
-        XCTAssertEqual(Pressure.standardPressure(atAltitude: 5_000), 843.2108, accuracy: 1.0)
-        XCTAssertEqual(Pressure.standardPressure(atAltitude: 10_000), 697.5961, accuracy: 1.0)
-        XCTAssertEqual(Pressure.standardPressure(atAltitude: 36_089), 226.3206, accuracy: 1.0)
+        let pressureTolerace = 1.0
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 0.0), Pressure.standardSeaLevel, accuracy: pressureTolerace)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 5_000), 843.2108, accuracy: pressureTolerace)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 10_000), 697.5961, accuracy: pressureTolerace)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: 36_089), 226.3206, accuracy: pressureTolerace)
+        
+        let altitudeTolerance = 50.0
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: Pressure.standardSeaLevel), 50.0, accuracy: altitudeTolerance)
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: 843.2108), 5_000, accuracy: altitudeTolerance)
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: 697.5961), 10_000, accuracy: altitudeTolerance)
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: 226.3206), 36_089, accuracy: altitudeTolerance)
     }
 }
