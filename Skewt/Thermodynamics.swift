@@ -24,6 +24,7 @@ enum TemperatureUnit {
     case kelvin
 }
 
+/// Temperature (double precision), representable and comparable across C, F, and K
 struct Temperature: Comparable {
     let value: Double
     let unit: TemperatureUnit
@@ -75,6 +76,7 @@ struct Temperature: Comparable {
 extension Pressure {
     static let standardSeaLevel: Pressure = 1013.25
     
+    /// Pressure at a given altitude in the International Standard Atmosphere
     public static func standardPressure(atAltitude altitude: Altitude) -> Pressure {
         let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
         let exponent = -gravitationalAcceleration * airMolarMass / (universalGasConstant * seaLevelLapseRate)
@@ -85,6 +87,7 @@ extension Pressure {
 }
 
 extension Altitude {
+    /// Pressure altitude for a given pressure in the International Standard Atmosphere
     public static func standardAltitude(forPressure pressure: Pressure) -> Altitude {
         let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
         let exponent = universalGasConstant * seaLevelLapseRate / (-gravitationalAcceleration * airMolarMass)
