@@ -85,14 +85,12 @@ extension Pressure {
 }
 
 extension Altitude {
-    private static let feetPerMeter = 3.28084
-    
     public static func standardAltitude(forPressure pressure: Pressure) -> Altitude {
         let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
         let exponent = universalGasConstant * seaLevelLapseRate / (-gravitationalAcceleration * airMolarMass)
         let base = pressure / Pressure.standardSeaLevel
 
         let heightInMeters = referenceTemperature * (pow(base, exponent) - 1.0) / seaLevelLapseRate
-        return heightInMeters * feetPerMeter
+        return heightInMeters / metersPerFoot
     }
 }
