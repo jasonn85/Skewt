@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629E30429BBB07100C2904E /* Thermodynamics.swift */; };
+		9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */; };
 		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
@@ -42,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9629E30429BBB07100C2904E /* Thermodynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thermodynamics.swift; sourceTree = "<group>"; };
+		9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermodynamicsTests.swift; sourceTree = "<group>"; };
 		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +116,7 @@
 			children = (
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
+				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
 				96F4B05D29A80396006D23BE /* State.swift */,
 				96A8F60C299DAC680021A170 /* Sounding.swift */,
 				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
@@ -133,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
+				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
@@ -291,6 +297,7 @@
 				96F4B05E29A80396006D23BE /* State.swift in Sources */,
 				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
+				9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +305,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
