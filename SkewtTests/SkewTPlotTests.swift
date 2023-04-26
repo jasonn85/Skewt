@@ -61,6 +61,34 @@ extension CGPath {
         
         return points
     }
+    
+    var bottomPoint: CGPoint? {
+        return componentEndPoints.sorted(by: { $0.y < $1.y }).first
+    }
+}
+
+extension Array where Element == CGPath {
+    /// Whether the starting points of each path in the array are ordered left to right (then bottom to top if points start at the same X)
+    var isInOrderLeftToRight: Bool {
+        var lastPoint = CGPoint(x: -.infinity, y: -.infinity)
+        
+        for bottomPoint in map({ $0.bottomPoint }) {
+            guard let bottomPoint = bottomPoint else {
+                continue
+            }
+            
+            let dx = bottomPoint.x - lastPoint.x
+            let dy = bottomPoint.y - lastPoint.y
+            
+            guard dx > 0 || (dx == 0 && dy > 0) else {
+                return false
+            }
+            
+            lastPoint = bottomPoint
+        }
+        
+        return true
+    }
 }
 
 final class SkewTPlotTests: XCTestCase {
@@ -168,22 +196,7 @@ RAOB sounding valid at:
     
     func testIsothermOrderLeftToRight() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
-        var lastPoint = CGPoint(x: -.infinity, y: -.infinity)
-        
-        for isotherm in plot.isothermPaths {
-            let bottomPoint = isotherm.componentEndPoints.sorted(by: { $0.y < $1.y }).first!
-            print("Isotherm bottom point at \(bottomPoint)")
-            
-            let dx = bottomPoint.x - lastPoint.x
-            let dy = bottomPoint.y - lastPoint.y
-            
-            guard dx > 0 || (dx == 0 && dy > 0) else {
-                XCTFail("Isotherms should be in left-to-right order")
-                return
-            }
-            
-            lastPoint = bottomPoint
-        }
+        XCTAssertTrue(plot.isothermPaths.isInOrderLeftToRight, "Isotherm paths should be provided in order, left-to-right")
     }
     
     func testIsothermSkew() {
