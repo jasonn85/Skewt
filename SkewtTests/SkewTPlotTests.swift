@@ -166,6 +166,22 @@ RAOB sounding valid at:
         XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
     }
     
+    func testIsothermOrderLeftToRight() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        var lastX = -Double.infinity
+        
+        for isotherm in plot.isothermPaths {
+            let bottomPoint = isotherm.componentEndPoints.sorted(by: { $0.y < $1.y }).first!
+            
+            guard bottomPoint.x > lastX else {
+                XCTFail("Isotherms should be in left-to-right order")
+                return
+            }
+            
+            lastX = bottomPoint.x
+        }
+    }
+    
     func testIsothermSkew() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
         
