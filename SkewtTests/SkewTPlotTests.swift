@@ -8,23 +8,28 @@
 import XCTest
 @testable import Skewt
 
+extension CGPathElement {
+    var numberOfPoints: Int {
+        switch self.type {
+        case .moveToPoint, .addLineToPoint:
+            return 1
+        case .addQuadCurveToPoint:
+            return 2
+        case .addCurveToPoint:
+            return 3
+        case .closeSubpath:
+            return 0
+        default:
+            return 0
+        }
+    }
+}
+
 extension CGPath {
     /// Tests that all linear pieces of the path draw a positive slope.
     /// Ignores curved elements.
     var isPositiveSlope: Bool {
-        var points: [CGPoint] = []
-                
-        applyWithBlock {
-            let element = $0.pointee
-            
-            guard element.type == .moveToPoint || element.type == .addLineToPoint else {
-                return
-            }
-            
-            let point = Array(UnsafeBufferPointer(start: element.points, count: 1))[0]
-            points.append(point)
-        }
-        
+        let points = componentEndPoints
         var lastX = -CGFloat.infinity
         
         for point in points.sorted(by: { $0.y > $1.y }) {
@@ -36,6 +41,25 @@ extension CGPath {
         }
         
         return true
+    }
+    
+    /// The last point in each path element
+    var componentEndPoints: [CGPoint] {
+        var points: [CGPoint] = []
+                
+        applyWithBlock {
+            let element = $0.pointee
+            let pointCount = element.numberOfPoints
+            
+            guard pointCount > 0 else {
+                return
+            }
+            
+            let lastPoint = Array(UnsafeBufferPointer(start: element.points, count: pointCount)).last!
+            points.append(lastPoint)
+        }
+        
+        return points
     }
 }
 
