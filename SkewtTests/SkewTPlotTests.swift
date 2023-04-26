@@ -168,17 +168,21 @@ RAOB sounding valid at:
     
     func testIsothermOrderLeftToRight() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
-        var lastX = -Double.infinity
+        var lastPoint = CGPoint(x: -.infinity, y: -.infinity)
         
         for isotherm in plot.isothermPaths {
             let bottomPoint = isotherm.componentEndPoints.sorted(by: { $0.y < $1.y }).first!
+            print("Isotherm bottom point at \(bottomPoint)")
             
-            guard bottomPoint.x > lastX else {
+            let dx = bottomPoint.x - lastPoint.x
+            let dy = bottomPoint.y - lastPoint.y
+            
+            guard dx > 0 || (dx == 0 && dy > 0) else {
                 XCTFail("Isotherms should be in left-to-right order")
                 return
             }
             
-            lastX = bottomPoint.x
+            lastPoint = bottomPoint
         }
     }
     
