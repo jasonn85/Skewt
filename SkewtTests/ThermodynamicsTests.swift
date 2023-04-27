@@ -55,4 +55,20 @@ final class ThermodynamicsTests: XCTestCase {
         XCTAssertEqual(Altitude.standardAltitude(forPressure: 697.5961), 10_000, accuracy: altitudeTolerance)
         XCTAssertEqual(Altitude.standardAltitude(forPressure: 226.3206), 36_089, accuracy: altitudeTolerance)
     }
+    
+    func testDryAdiabaticLapse() {
+        let tolerance = 0.1
+        
+        // Identity
+        for t in [-30.0, -15.0, 0.0, 15.0, 50.0] {
+            XCTAssertEqual(Temperature(t).raiseDryParcel(from: 0.0, to: 0.0).value, t)
+        }
+        
+        let standardTemperature = Temperature(15.0)
+        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 1_000.0).value, 12.01, accuracy: tolerance)
+        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 5_000.0).value, 0.06, accuracy: tolerance)
+        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 5_000.0, to: 10_000.0).value, 0.06, accuracy: tolerance)
+        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 10_000.0).value, -14.87, accuracy: tolerance)
+        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 10_000.0, to: 20_000.0).value, -14.87, accuracy: tolerance)
+    }
 }

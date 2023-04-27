@@ -73,6 +73,17 @@ struct Temperature: Comparable {
     }
 }
 
+// Dry lapse
+extension Temperature {
+    private static let lapseRatePerFoot = 0.00298704
+    
+    func raiseDryParcel(from a1: Altitude, to a2: Altitude) -> Temperature {
+        let dA = a2 - a1
+        let dT = Temperature.lapseRatePerFoot * dA
+        return Temperature(self.inUnit(.celsius).value - dT)
+    }
+}
+
 extension Pressure {
     static let standardSeaLevel: Pressure = 1013.25
     
