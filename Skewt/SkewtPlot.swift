@@ -174,9 +174,14 @@ extension SkewtPlot {
     var dryAdiabatPaths: [CGPath] {
         let margin = adiabatSpacing * 0.25
         let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
-        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
+        
+        // Find a value near the top-right for a dry adiabat, then lower a parcel from there to find the adiabat starting point at 0 altitude
+        let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: margin))
+        let topRightAltitude = Altitude.standardAltitude(forPressure: topRightPressure)
+        let lastAdiabatStartingTemperature = Temperature(topRightTemperature).raiseDryParcel(from: topRightAltitude, to: 0.0).value
+        
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
-        let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
+        let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
         return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).map {
             dryAdiabat(fromTemperature: $0, dy: 1.0)
