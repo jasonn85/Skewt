@@ -183,7 +183,7 @@ extension SkewtPlot {
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
-        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).map {
+        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).compactMap {
             dryAdiabat(fromTemperature: $0, dy: 1.0)
         }
     }
@@ -194,23 +194,36 @@ extension SkewtPlot {
         return []
     }
     
-    private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath {
+    private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
         let path = CGMutablePath()
         let initialY = size.height
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
         var temp = Temperature(startingTemperature)
-        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY))
+        
+        let firstPoint = CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY)
+        if bounds.contains(firstPoint) {
+            path.move(to: firstPoint)
+        }
         
         for y in stride(from: initialY - dy, to: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let altitude = Altitude.standardAltitude(forPressure: pressure)
             temp = temp.raiseDryParcel(from: lastAltitude, to: altitude)
+            let point = point(pressure: pressure, temperature: temp.value)
             
-            path.addLine(to: point(pressure: pressure, temperature: temp.value))
+            if bounds.contains(point) {
+                if path.isEmpty {
+                    path.move(to: point)
+                } else {
+                    path.addLine(to: point)
+                }
+            }
+            
             lastAltitude = altitude
         }
                          
-        return path
+        return !path.isEmpty ? path : nil
     }
 }
 
