@@ -152,6 +152,7 @@ extension SkewtPlot {
         return (start, end)
     }
     
+    /// CGPaths for isotherms, sorted left to right
     var isothermPaths: [CGPath] {
         let margin = 5.0
         let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
@@ -169,14 +170,42 @@ extension SkewtPlot {
         }
     }
     
+    /// CGPaths for dry adiabats, sorted left to right
     var dryAdiabatPaths: [CGPath] {
+        let margin = adiabatSpacing * 0.25
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
+        let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
+        let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
+        
+        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).map {
+            dryAdiabat(fromTemperature: $0, dy: 1.0)
+        }
+    }
+    
+    /// CGPaths for moist adiabats, sorted left to right
+    var moistAdiabatPaths: [CGPath] {
         // TODO
         return []
     }
     
-    var moistAdiabatPaths: [CGPath] {
-        // TODO
-        return []
+    private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath {
+        let path = CGMutablePath()
+        let initialY = size.height
+        var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
+        var temp = Temperature(startingTemperature)
+        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY))
+        
+        for y in stride(from: initialY - dy, to: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let altitude = Altitude.standardAltitude(forPressure: pressure)
+            temp = temp.raiseDryParcel(from: lastAltitude, to: altitude)
+            
+            path.addLine(to: point(pressure: pressure, temperature: temp.value))
+            lastAltitude = altitude
+        }
+                         
+        return path
     }
 }
 

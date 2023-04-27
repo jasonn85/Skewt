@@ -221,6 +221,24 @@ RAOB sounding valid at:
                       "Expecting \(String(describing: expectedCount)) isotherms, found \(plot.isobarPaths.count)")
     }
     
+    func testAdiabatOrder() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        XCTAssertTrue(plot.dryAdiabatPaths.isInOrderLeftToRight, "Dry adiabats should be provided in order, left-to-right")
+        XCTAssertTrue(plot.moistAdiabatPaths.isInOrderLeftToRight, "Moist adiabats should be provided in order, left-to-right")
+    }
+    
+    func testAdiabatCount() {
+        // It's not yet defined if/how many dry adiabats should be drawn from off screen right, so just
+        // ensure that we have at least enough to cover the bottom.
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        let singleAxisCount = Int((plot.surfaceTemperatureRange.upperBound
+                                   - plot.surfaceTemperatureRange.lowerBound)
+                                  / plot.adiabatSpacing) - 2
+        
+        XCTAssertTrue(plot.dryAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) dry adiabats")
+        XCTAssertTrue(plot.moistAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) moist adiabats")
+    }
+    
     func testDataToCoordinateAndBack() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
 
