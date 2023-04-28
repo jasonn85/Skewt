@@ -85,18 +85,14 @@ final class ThermodynamicsTests: XCTestCase {
         let tolerance = 0.2
         let seaLevel = Pressure.standardSeaLevel
         
-        XCTAssertEqual(AirParcel(temperature: Temperature(-10.0), pressure: seaLevel).moistLapseRate,
-                       7.7,
-                       accuracy: tolerance)
-        XCTAssertEqual(AirParcel(temperature: Temperature(5.0), pressure: seaLevel).moistLapseRate,
-                       5.9,
-                       accuracy: tolerance)
-        XCTAssertEqual(AirParcel(temperature: Temperature(15.0), pressure: seaLevel).moistLapseRate,
-                       4.8,
-                       accuracy: tolerance)
-        XCTAssertEqual(AirParcel(temperature: Temperature(30.0), pressure: seaLevel).moistLapseRate,
-                       3.6,
-                       accuracy: tolerance)
+        let pm10 = AirParcel(temperature: Temperature(-10.0), pressure: seaLevel)
+        XCTAssertEqual(pm10.moistLapseRate, 7.7, accuracy: tolerance)
+        let p5 = AirParcel(temperature: Temperature(5.0), pressure: seaLevel)
+        XCTAssertEqual(p5.moistLapseRate, 5.9, accuracy: tolerance)
+        let p15 = AirParcel(temperature: Temperature(15.0), pressure: seaLevel)
+        XCTAssertEqual(p15.moistLapseRate, 4.8, accuracy: tolerance)
+        let p30 = AirParcel(temperature: Temperature(30.0), pressure: seaLevel)
+        XCTAssertEqual(p30.moistLapseRate, 3.6, accuracy: tolerance)
 
     }
 }
