@@ -140,15 +140,15 @@ struct AirParcel {
         let p = pressure.inPascals
         
         let vaporPressure = temperature.saturatedVaporPressure
-        let mixingRatio = (Double.gasConstantRatioDryAirToWaterVapor * vaporPressure
+        let mixingRatio = (.gasConstantRatioDryAirToWaterVapor * vaporPressure
                            / (p - vaporPressure))
-        let numerator = 1.0 + ((Double.heatOfWaterVaporization * mixingRatio)
-                               / (Double.specificGasConstantDryAir * t))
-        let denominator = (Double.specificHeatDryAirConstantPressure
-                           + ((pow(Double.heatOfWaterVaporization, 2) * mixingRatio)
-                              / (Double.specificGasConstantWaterVapor * pow(t, 2))))
+        let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
+                               / (.specificGasConstantDryAir * t))
+        let denominator = (.specificHeatDryAirConstantPressure
+                           + ((pow(.heatOfWaterVaporization, 2) * mixingRatio)
+                              / (.specificGasConstantWaterVapor * pow(t, 2))))
         
-        return 1000.0 * Double.gravitationalAcceleration * numerator / denominator
+        return 1000.0 * .gravitationalAcceleration * numerator / denominator
     }
 }
 
