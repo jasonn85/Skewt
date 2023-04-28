@@ -121,6 +121,8 @@ extension SkewtPlot {
 // MARK: - Isopleth paths
 extension SkewtPlot {
     typealias Line = (CGPoint, CGPoint)
+    
+    private static let adiabatDY = 1.0
 
     var isobarPaths: [CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
@@ -184,7 +186,7 @@ extension SkewtPlot {
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
         return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).compactMap {
-            dryAdiabat(fromTemperature: $0, dy: 1.0)
+            dryAdiabat(fromTemperature: $0, dy: SkewtPlot.adiabatDY)
         }
     }
     
