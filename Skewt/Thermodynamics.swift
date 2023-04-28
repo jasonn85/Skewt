@@ -22,6 +22,7 @@ extension Double {
     public static let specificHeatDryAirConstantPressure = 1003.5  // J / (kg * K)
     
     public static let metersPerFoot = 0.3048
+    public static let feetPerKm = 3280.84
 }
 
 enum TemperatureUnit {
@@ -135,6 +136,7 @@ struct AirParcel {
     let temperature: Temperature
     let pressure: Pressure
     
+    /// Lapse rate for a parcel of moist air in C/km
     var moistLapseRate: Double {
         let t = temperature.inUnit(.kelvin).value
         let p = pressure.inPascals
@@ -149,6 +151,15 @@ struct AirParcel {
                               / (.specificGasConstantWaterVapor * pow(t, 2))))
         
         return 1000.0 * .gravitationalAcceleration * numerator / denominator
+    }
+    
+    func raiseParcel(from a1: Altitude, to a2: Altitude) -> Temperature {
+        let dA = a2 - a1
+        let lapseRateCPerKm = moistLapseRate
+        let lapseRate = lapseRateCPerKm / .feetPerKm
+        let dT = lapseRate * dA
+        
+        return Temperature(temperature.inUnit(.celsius).value - dT)
     }
 }
 

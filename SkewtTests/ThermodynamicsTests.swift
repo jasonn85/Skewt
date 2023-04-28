@@ -84,15 +84,19 @@ final class ThermodynamicsTests: XCTestCase {
     func testMoistAdiabaticLapse() {
         let tolerance = 0.2
         let seaLevel = Pressure.standardSeaLevel
+        let feetPerKilometer = 3280.84
         
         let pm10 = AirParcel(temperature: Temperature(-10.0), pressure: seaLevel)
         XCTAssertEqual(pm10.moistLapseRate, 7.7, accuracy: tolerance)
+        XCTAssertEqual(pm10.raiseParcel(from: 0.0, to: feetPerKilometer).value, -17.7, accuracy: tolerance)
         let p5 = AirParcel(temperature: Temperature(5.0), pressure: seaLevel)
         XCTAssertEqual(p5.moistLapseRate, 5.9, accuracy: tolerance)
+        XCTAssertEqual(p5.raiseParcel(from: 0.0, to: feetPerKilometer).value, -0.9, accuracy: tolerance)
         let p15 = AirParcel(temperature: Temperature(15.0), pressure: seaLevel)
         XCTAssertEqual(p15.moistLapseRate, 4.8, accuracy: tolerance)
+        XCTAssertEqual(p15.raiseParcel(from: 0.0, to: feetPerKilometer).value, 10.2, accuracy: tolerance)
         let p30 = AirParcel(temperature: Temperature(30.0), pressure: seaLevel)
         XCTAssertEqual(p30.moistLapseRate, 3.6, accuracy: tolerance)
-
+        XCTAssertEqual(p30.raiseParcel(from: 0.0, to: feetPerKilometer).value, 26.4, accuracy: tolerance)
     }
 }
