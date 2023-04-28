@@ -192,8 +192,16 @@ extension SkewtPlot {
     
     /// CGPaths for moist adiabats, sorted left to right
     var moistAdiabatPaths: [CGPath] {
-        // TODO
-        return []
+        let margin = adiabatSpacing * 0.25
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
+
+        let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
+        let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
+
+        return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing).map {
+            moistAdiabat(fromTemperature: $0, dy: SkewtPlot.adiabatDY)
+        }        
     }
     
     private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
@@ -226,6 +234,32 @@ extension SkewtPlot {
         }
                          
         return !path.isEmpty ? path : nil
+    }
+    
+    private func moistAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let path = CGMutablePath()
+        let initialY = size.height
+        var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
+        var temp = Temperature(startingTemperature)
+        
+        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY))
+        
+        for y in stride(from: initialY - dy, through: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let altitude = Altitude.standardAltitude(forPressure: pressure)
+            let parcel = AirParcel(temperature: temp, pressure: pressure)
+            temp = parcel.raiseParcel(from: lastAltitude, to: altitude)
+            let point = point(pressure: pressure, temperature: temp.value)
+            
+            if bounds.contains(point) {
+                path.addLine(to: point)
+            }
+            
+            lastAltitude = altitude
+        }
+        
+        return path
     }
 }
 
