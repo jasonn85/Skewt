@@ -19,6 +19,7 @@ extension Double {
     public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
     public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
     public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor
+    public static let specificHeatDryAirConstantPressure = 1003.5  // J / (kg * K)
     
     public static let metersPerFoot = 0.3048
 }
@@ -112,8 +113,13 @@ extension Temperature {
     }
 }
 
+/// Pressure in millibars
 extension Pressure {
     static let standardSeaLevel: Pressure = 1013.25
+    
+    var inPascals: Double {
+        self * 100.0
+    }
     
     /// Pressure at a given altitude in the International Standard Atmosphere
     public static func standardPressure(atAltitude altitude: Altitude) -> Pressure {
@@ -122,6 +128,27 @@ extension Pressure {
         let numerator = referenceTemperature + (altitude * metersPerFoot * seaLevelLapseRate)
         
         return Pressure.standardSeaLevel * pow(numerator / referenceTemperature, exponent)
+    }
+}
+
+struct AirParcel {
+    let temperature: Temperature
+    let pressure: Pressure
+    
+    var moistLapseRate: Double {
+        let t = temperature.inUnit(.kelvin).value
+        let p = pressure.inPascals
+        
+        let vaporPressure = temperature.saturatedVaporPressure
+        let mixingRatio = (Double.gasConstantRatioDryAirToWaterVapor * vaporPressure
+                           / (p - vaporPressure))
+        let numerator = 1.0 + ((Double.heatOfWaterVaporization * mixingRatio)
+                               / (Double.specificGasConstantDryAir * t))
+        let denominator = (Double.specificHeatDryAirConstantPressure
+                           + ((pow(Double.heatOfWaterVaporization, 2) * mixingRatio)
+                              / (Double.specificGasConstantWaterVapor * pow(t, 2))))
+        
+        return 1000.0 * Double.gravitationalAcceleration * numerator / denominator
     }
 }
 

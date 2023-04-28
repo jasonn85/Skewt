@@ -80,4 +80,23 @@ final class ThermodynamicsTests: XCTestCase {
         XCTAssertEqual(Temperature(15.0).saturatedVaporPressure, 1_704.0, accuracy: tolerance)
         XCTAssertEqual(Temperature(40.0).saturatedVaporPressure, 7_377.0, accuracy: tolerance)
     }
+    
+    func testMoistAdiabaticLapse() {
+        let tolerance = 0.2
+        let seaLevel = Pressure.standardSeaLevel
+        
+        XCTAssertEqual(AirParcel(temperature: Temperature(-10.0), pressure: seaLevel).moistLapseRate,
+                       7.7,
+                       accuracy: tolerance)
+        XCTAssertEqual(AirParcel(temperature: Temperature(5.0), pressure: seaLevel).moistLapseRate,
+                       5.9,
+                       accuracy: tolerance)
+        XCTAssertEqual(AirParcel(temperature: Temperature(15.0), pressure: seaLevel).moistLapseRate,
+                       4.8,
+                       accuracy: tolerance)
+        XCTAssertEqual(AirParcel(temperature: Temperature(30.0), pressure: seaLevel).moistLapseRate,
+                       3.6,
+                       accuracy: tolerance)
+
+    }
 }
