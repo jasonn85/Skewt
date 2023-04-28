@@ -42,13 +42,20 @@ struct SkewtPlotView: View {
                             ForEach(plot.isothermPaths, id: \.self) { isotherm in
                                 Path(isotherm)
                                     .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.red)
                             }
                             
                             ForEach(plot.dryAdiabatPaths, id: \.self) { adiabat in
                                 Path(adiabat)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.blue)
+                            }
+                            
+                            
+                            ForEach(plot.moistAdiabatPaths, id: \.self) { adiabat in
+                                Path(adiabat)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.orange)
                             }
                             
                         }.frame(width: smallestDimension, height: smallestDimension)
