@@ -71,4 +71,13 @@ final class ThermodynamicsTests: XCTestCase {
         XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 10_000.0).value, -14.87, accuracy: tolerance)
         XCTAssertEqual(standardTemperature.raiseDryParcel(from: 10_000.0, to: 20_000.0).value, -14.87, accuracy: tolerance)
     }
+    
+    func testWaterVaporPressure() {
+        let tolerance = 1.0
+        
+        XCTAssertEqual(Temperature(-20.0).saturatedVaporPressure, 125.4, accuracy: tolerance)
+        XCTAssertEqual(Temperature(0.0).saturatedVaporPressure, 610.7, accuracy: tolerance)
+        XCTAssertEqual(Temperature(15.0).saturatedVaporPressure, 1_704.0, accuracy: tolerance)
+        XCTAssertEqual(Temperature(40.0).saturatedVaporPressure, 7_377.0, accuracy: tolerance)
+    }
 }

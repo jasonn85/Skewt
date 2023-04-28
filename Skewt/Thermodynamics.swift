@@ -15,6 +15,11 @@ extension Double {
     public static let gravitationalAcceleration = 9.80665  // m / s^2
     public static let airMolarMass = 0.0289644  // kg / mol
     public static let seaLevelLapseRate = -0.0065  // K / m
+    public static let heatOfWaterVaporization = 2_501_000.0  // J / kg
+    public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
+    public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
+    public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor
+    
     public static let metersPerFoot = 0.3048
 }
 
@@ -81,6 +86,29 @@ extension Temperature {
         let dA = a2 - a1
         let dT = Temperature.lapseRatePerFoot * dA
         return Temperature(self.inUnit(.celsius).value - dT)
+    }
+}
+
+// Moist lapse
+extension Temperature {
+    // Saturated vapor pressure in Pa
+    var saturatedVaporPressure: Double {
+        let t = self.inUnit(.kelvin).value
+        
+        // Vapor pressure implementation from...
+        //  Hardy, B., 1998, ITS-90 Formulations for Vapor Pressure, Frostpoint Temperature,
+        //  Dewpoint Temperature, and Enhancement Factors in the Range –100 to +100 °C,
+        //  The Proceedings of the Third International Symposium on Humidity & Moisture, London, England
+        return exp(
+            (-2.8365744e3 / pow(t, 2))
+            - (6.028076559e3 / t)
+            + 1.954263612
+            - (2.737830188e-2 * t)
+            + (1.6261698e-5 * pow(t, 2))
+            + (7.0229056e-10 * pow(t, 3))
+            - (1.8680009e-13 * pow(t, 4))
+            + (2.7150305 * log(t))
+        )
     }
 }
 
