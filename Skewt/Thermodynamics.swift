@@ -19,10 +19,10 @@ extension Double {
     public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
     public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
     public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor
-    public static let specificHeatDryAirConstantPressure = 1003.5  // J / (kg * K)
+    public static let specificHeatDryAirConstantPressure = 1_003.5  // J / (kg * K)
     
     public static let metersPerFoot = 0.3048
-    public static let feetPerKm = 3280.84
+    public static let feetPerKm = 3_280.84
 }
 
 enum TemperatureUnit {
@@ -91,7 +91,7 @@ extension Temperature {
     }
 }
 
-// Moist lapse
+// Vapor pressure
 extension Temperature {
     // Saturated vapor pressure in Pa
     var saturatedVaporPressure: Double {
@@ -130,6 +130,10 @@ extension Pressure {
         
         return Pressure.standardSeaLevel * pow(numerator / referenceTemperature, exponent)
     }
+    
+    public func vaporPressure(withMixingRatio mixingRatio: Double) -> Double {
+        return mixingRatio * self.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
+    }
 }
 
 struct AirParcel {
@@ -139,11 +143,7 @@ struct AirParcel {
     /// Lapse rate for a parcel of moist air in C/km
     var moistLapseRate: Double {
         let t = temperature.inUnit(.kelvin).value
-        let p = pressure.inPascals
-        
-        let vaporPressure = temperature.saturatedVaporPressure
-        let mixingRatio = (.gasConstantRatioDryAirToWaterVapor * vaporPressure
-                           / (p - vaporPressure))
+        let mixingRatio = saturatedMixingRatio
         let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
                                / (.specificGasConstantDryAir * t))
         let denominator = (.specificHeatDryAirConstantPressure
@@ -160,6 +160,13 @@ struct AirParcel {
         let dT = lapseRate * dA
         
         return Temperature(temperature.inUnit(.celsius).value - dT)
+    }
+    
+    /// Mixing ratio in g/kg
+    var saturatedMixingRatio: Double {
+        let vaporPressure = temperature.saturatedVaporPressure
+        return (.gasConstantRatioDryAirToWaterVapor * vaporPressure
+                / (pressure.inPascals - vaporPressure))
     }
 }
 

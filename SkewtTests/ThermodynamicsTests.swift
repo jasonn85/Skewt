@@ -99,4 +99,24 @@ final class ThermodynamicsTests: XCTestCase {
         XCTAssertEqual(p30.moistLapseRate, 3.6, accuracy: tolerance)
         XCTAssertEqual(p30.raiseParcel(from: 0.0, to: feetPerKilometer).value, 26.4, accuracy: tolerance)
     }
+    
+    func testSeaLevelSaturatedMixingRatio() {
+        let tolerance = 0.01
+        
+        let expectedMixingRatioBySeaLevelTemperatureC = [
+            -20.0: 0.78,
+             -10.0: 1.77,
+             0.0: 3.77,
+             10.0: 7.66,
+             20.0: 14.91,
+             30.0: 28.02,
+             40.0: 51.43,
+             50.0: 93.42,
+        ]
+        
+        for (t, mr) in expectedMixingRatioBySeaLevelTemperatureC {
+            let parcel = AirParcel(temperature: Temperature(t, unit: .celsius), pressure: .standardSeaLevel)
+            XCTAssertEqual(parcel.saturatedMixingRatio, mr / 1000.0, accuracy: tolerance)
+        }
+    }
 }
