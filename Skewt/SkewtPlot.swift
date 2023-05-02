@@ -180,7 +180,8 @@ extension SkewtPlot {
         // Find a value near the top-right for a dry adiabat, then lower a parcel from there to find the adiabat starting point at 0 altitude
         let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: margin))
         let topRightAltitude = Altitude.standardAltitude(forPressure: topRightPressure)
-        let lastAdiabatStartingTemperature = Temperature(topRightTemperature).raiseDryParcel(from: topRightAltitude, to: 0.0).value
+        let lastAdiabatStartingTemperature = Temperature(topRightTemperature)
+            .temperatureOfDryParcelRaised(from: topRightAltitude, to: 0.0).value
         
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
@@ -219,7 +220,7 @@ extension SkewtPlot {
         for y in stride(from: initialY - dy, to: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let altitude = Altitude.standardAltitude(forPressure: pressure)
-            temp = temp.raiseDryParcel(from: lastAltitude, to: altitude)
+            temp = temp.temperatureOfDryParcelRaised(from: lastAltitude, to: altitude)
             let point = point(pressure: pressure, temperature: temp.value)
             
             if bounds.contains(point) {
@@ -248,8 +249,7 @@ extension SkewtPlot {
         for y in stride(from: initialY - dy, through: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let altitude = Altitude.standardAltitude(forPressure: pressure)
-            let parcel = AirParcel(temperature: temp, pressure: pressure)
-            temp = parcel.raiseParcel(from: lastAltitude, to: altitude)
+            temp = temp.temperatureOfSaturatedParcelRaised(from: lastAltitude, to: altitude, pressure: pressure)
             let point = point(pressure: pressure, temperature: temp.value)
             
             if bounds.contains(point) {

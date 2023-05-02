@@ -61,15 +61,24 @@ final class ThermodynamicsTests: XCTestCase {
         
         // Identity
         for t in [-30.0, -15.0, 0.0, 15.0, 50.0] {
-            XCTAssertEqual(Temperature(t).raiseDryParcel(from: 0.0, to: 0.0).value, t)
+            XCTAssertEqual(Temperature(t).temperatureOfDryParcelRaised(from: 0.0, to: 0.0).value, t)
         }
         
         let standardTemperature = Temperature(15.0)
-        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 1_000.0).value, 12.01, accuracy: tolerance)
-        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 5_000.0).value, 0.06, accuracy: tolerance)
-        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 5_000.0, to: 10_000.0).value, 0.06, accuracy: tolerance)
-        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 0.0, to: 10_000.0).value, -14.87, accuracy: tolerance)
-        XCTAssertEqual(standardTemperature.raiseDryParcel(from: 10_000.0, to: 20_000.0).value, -14.87, accuracy: tolerance)
+        let expectedTemperatureByAltitudeRange = [
+            0.0...1_000.0: 12.01,
+            0.0...5_000.0: 0.06,
+            5_000.0...10_000.0: 0.06,
+            0.0...10_000.0: -14.87,
+            10_000...20_000.0: -14.87
+        ]
+        
+        for (altitudeRange, expectedTemperature) in expectedTemperatureByAltitudeRange {
+            XCTAssertEqual(standardTemperature.temperatureOfDryParcelRaised(from: altitudeRange.lowerBound,
+                                                                            to: altitudeRange.upperBound).value,
+                           expectedTemperature,
+                           accuracy: tolerance)
+        }
     }
     
     func testWaterVaporPressure() {
@@ -83,21 +92,25 @@ final class ThermodynamicsTests: XCTestCase {
     
     func testMoistAdiabaticLapse() {
         let tolerance = 0.2
-        let seaLevel = Pressure.standardSeaLevel
         let feetPerKilometer = 3280.84
         
-        let pm10 = AirParcel(temperature: Temperature(-10.0), pressure: seaLevel)
-        XCTAssertEqual(pm10.moistLapseRate, 7.7, accuracy: tolerance)
-        XCTAssertEqual(pm10.raiseParcel(from: 0.0, to: feetPerKilometer).value, -17.7, accuracy: tolerance)
-        let p5 = AirParcel(temperature: Temperature(5.0), pressure: seaLevel)
-        XCTAssertEqual(p5.moistLapseRate, 5.9, accuracy: tolerance)
-        XCTAssertEqual(p5.raiseParcel(from: 0.0, to: feetPerKilometer).value, -0.9, accuracy: tolerance)
-        let p15 = AirParcel(temperature: Temperature(15.0), pressure: seaLevel)
-        XCTAssertEqual(p15.moistLapseRate, 4.8, accuracy: tolerance)
-        XCTAssertEqual(p15.raiseParcel(from: 0.0, to: feetPerKilometer).value, 10.2, accuracy: tolerance)
-        let p30 = AirParcel(temperature: Temperature(30.0), pressure: seaLevel)
-        XCTAssertEqual(p30.moistLapseRate, 3.6, accuracy: tolerance)
-        XCTAssertEqual(p30.raiseParcel(from: 0.0, to: feetPerKilometer).value, 26.4, accuracy: tolerance)
+        let expectedSeaLevelMoistLapseRateByTemperature = [
+            -10.0: 7.7,
+             5.0: 5.9,
+             15.0: 4.8,
+             30.0: 3.6
+        ]
+        
+        for (temperatureValue, expectedLapseRate) in expectedSeaLevelMoistLapseRateByTemperature {
+            let temperature = Temperature(temperatureValue, unit: .celsius)
+            let lapseRate = moistLapseRate(withTemperature: temperature, pressure: .standardSeaLevel)
+            XCTAssertEqual(lapseRate, expectedLapseRate, accuracy: tolerance)
+            XCTAssertEqual(temperature.temperatureOfSaturatedParcelRaised(from: 0.0,
+                                                                          to: feetPerKilometer,
+                                                                          pressure: .standardSeaLevel).value,
+                           temperatureValue - lapseRate,
+                           accuracy: tolerance)
+        }
     }
     
     func testSeaLevelSaturatedMixingRatio() {
@@ -115,8 +128,8 @@ final class ThermodynamicsTests: XCTestCase {
         ]
         
         for (t, mr) in expectedMixingRatioBySeaLevelTemperatureC {
-            let parcel = AirParcel(temperature: Temperature(t, unit: .celsius), pressure: .standardSeaLevel)
-            XCTAssertEqual(parcel.saturatedMixingRatio, mr / 1000.0, accuracy: tolerance)
+            let mixingRatio = saturatedMixingRatio(withTemperature: Temperature(t, unit: .celsius), pressure: .standardSeaLevel)
+            XCTAssertEqual(mixingRatio, mr / 1000.0, accuracy: tolerance)
         }
     }
 }

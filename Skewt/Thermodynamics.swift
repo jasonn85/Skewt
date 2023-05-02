@@ -25,14 +25,14 @@ extension Double {
     public static let feetPerKm = 3_280.84
 }
 
-enum TemperatureUnit {
+public enum TemperatureUnit {
     case celsius
     case fahrenheit
     case kelvin
 }
 
 /// Temperature (double precision), representable and comparable across C, F, and K
-struct Temperature: Comparable {
+public struct Temperature: Comparable {
     let value: Double
     let unit: TemperatureUnit
     
@@ -71,11 +71,11 @@ struct Temperature: Comparable {
         }
     }
     
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.value == rhs.inUnit(lhs.unit).value
     }
     
-    static func < (lhs: Temperature, rhs: Temperature) -> Bool {
+    public static func < (lhs: Temperature, rhs: Temperature) -> Bool {
         return lhs.value < rhs.inUnit(lhs.unit).value
     }
 }
@@ -84,9 +84,20 @@ struct Temperature: Comparable {
 extension Temperature {
     private static let lapseRatePerFoot = 0.00298704
     
-    func raiseDryParcel(from a1: Altitude, to a2: Altitude) -> Temperature {
+    func temperatureOfDryParcelRaised(from a1: Altitude, to a2: Altitude) -> Temperature {
         let dA = a2 - a1
         let dT = Temperature.lapseRatePerFoot * dA
+        return Temperature(self.inUnit(.celsius).value - dT)
+    }
+    
+    func temperatureOfSaturatedParcelRaised(from a1: Altitude,
+                                            to a2: Altitude,
+                                            pressure: Pressure) -> Temperature {
+        let dA = a2 - a1
+        let lapseRateCPerKm = moistLapseRate(withTemperature: self, pressure: pressure)
+        let lapseRate = lapseRateCPerKm / .feetPerKm
+        let dT = lapseRate * dA
+        
         return Temperature(self.inUnit(.celsius).value - dT)
     }
 }
@@ -114,6 +125,29 @@ extension Temperature {
     }
 }
 
+public func vaporPressure(withPressure pressure: Pressure, mixingRatio: Double) -> Double {
+    return mixingRatio * pressure.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
+}
+
+public func saturatedMixingRatio(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
+    let vaporPressure = temperature.saturatedVaporPressure
+    return (.gasConstantRatioDryAirToWaterVapor * vaporPressure
+            / (pressure.inPascals - vaporPressure))
+}
+
+/// Lapse rate for a saturated parcel in C/km
+public func moistLapseRate(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
+    let t = temperature.inUnit(.kelvin).value
+    let mixingRatio = saturatedMixingRatio(withTemperature: temperature, pressure: pressure)
+    let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
+                           / (.specificGasConstantDryAir * t))
+    let denominator = (.specificHeatDryAirConstantPressure
+                       + ((pow(.heatOfWaterVaporization, 2) * mixingRatio)
+                          / (.specificGasConstantWaterVapor * pow(t, 2))))
+    
+    return 1000.0 * .gravitationalAcceleration * numerator / denominator
+}
+
 /// Pressure in millibars
 extension Pressure {
     static let standardSeaLevel: Pressure = 1013.25
@@ -129,44 +163,6 @@ extension Pressure {
         let numerator = referenceTemperature + (altitude * metersPerFoot * seaLevelLapseRate)
         
         return Pressure.standardSeaLevel * pow(numerator / referenceTemperature, exponent)
-    }
-    
-    public func vaporPressure(withMixingRatio mixingRatio: Double) -> Double {
-        return mixingRatio * self.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
-    }
-}
-
-struct AirParcel {
-    let temperature: Temperature
-    let pressure: Pressure
-    
-    /// Lapse rate for a parcel of moist air in C/km
-    var moistLapseRate: Double {
-        let t = temperature.inUnit(.kelvin).value
-        let mixingRatio = saturatedMixingRatio
-        let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
-                               / (.specificGasConstantDryAir * t))
-        let denominator = (.specificHeatDryAirConstantPressure
-                           + ((pow(.heatOfWaterVaporization, 2) * mixingRatio)
-                              / (.specificGasConstantWaterVapor * pow(t, 2))))
-        
-        return 1000.0 * .gravitationalAcceleration * numerator / denominator
-    }
-    
-    func raiseParcel(from a1: Altitude, to a2: Altitude) -> Temperature {
-        let dA = a2 - a1
-        let lapseRateCPerKm = moistLapseRate
-        let lapseRate = lapseRateCPerKm / .feetPerKm
-        let dT = lapseRate * dA
-        
-        return Temperature(temperature.inUnit(.celsius).value - dT)
-    }
-    
-    /// Mixing ratio in g/kg
-    var saturatedMixingRatio: Double {
-        let vaporPressure = temperature.saturatedVaporPressure
-        return (.gasConstantRatioDryAirToWaterVapor * vaporPressure
-                / (pressure.inPascals - vaporPressure))
     }
 }
 
