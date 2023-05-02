@@ -63,7 +63,7 @@ extension CGPath {
     }
     
     var bottomPoint: CGPoint? {
-        return componentEndPoints.sorted(by: { $0.y < $1.y }).first
+        return componentEndPoints.sorted(by: { $0.y < $1.y }).last
     }
 }
 
@@ -80,7 +80,7 @@ extension Array where Element == CGPath {
             let dx = bottomPoint.x - lastPoint.x
             let dy = bottomPoint.y - lastPoint.y
             
-            guard dx > 0 || (dx == 0 && dy > 0) else {
+            guard dx > 0.0 || (abs(dx) < 1.0 && dy < 0.0) else {
                 return false
             }
             
