@@ -16,9 +16,11 @@ extension Double {
     public static let airMolarMass = 0.0289644  // kg / mol
     public static let seaLevelLapseRate = -0.0065  // K / m
     public static let heatOfWaterVaporization = 2_501_000.0  // J / kg
+    public static let vaporPressureAt0C = 0.611  // kPa
+    public static let latentHeatOfDeposition = 2.83e6  // J / kg
     public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
     public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
-    public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor
+    public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor  // ~0.622
     public static let specificHeatDryAirConstantPressure = 1_003.5  // J / (kg * K)
     
     public static let metersPerFoot = 0.3048
@@ -80,7 +82,7 @@ public struct Temperature: Comparable {
     }
 }
 
-// Dry lapse
+// Lapsing
 extension Temperature {
     private static let lapseRatePerFoot = 0.00298704
     
@@ -125,6 +127,20 @@ extension Temperature {
     }
 }
 
+// Mixing ratio
+extension Temperature {
+    public static func temperature(forMixingRatio mixingRatio: Double, pressure: Pressure) -> Temperature {
+        let t0 = Temperature(0.0, unit: .celsius).inUnit(.kelvin).value
+        let mixingRatioInGPerG = mixingRatio / 1000.0
+        let logTerm = log((mixingRatioInGPerG * pressure.inKilopascals)
+                          / (.vaporPressureAt0C * (mixingRatioInGPerG + .gasConstantRatioDryAirToWaterVapor)))
+        
+        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .latentHeatOfDeposition) * logTerm)
+
+        return Temperature(resultInKelvin, unit: .kelvin)
+    }
+}
+
 public func vaporPressure(withPressure pressure: Pressure, mixingRatio: Double) -> Double {
     return mixingRatio * pressure.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
 }
@@ -154,6 +170,10 @@ extension Pressure {
     
     var inPascals: Double {
         self * 100.0
+    }
+    
+    var inKilopascals: Double {
+        self / 10.0
     }
     
     /// Pressure at a given altitude in the International Standard Atmosphere

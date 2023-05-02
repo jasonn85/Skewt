@@ -132,4 +132,25 @@ final class ThermodynamicsTests: XCTestCase {
             XCTAssertEqual(mixingRatio, mr / 1000.0, accuracy: tolerance)
         }
     }
+    
+    func testTemperatureFromMixingRatio() {
+        let tolerance = 5.0
+        
+        let expectedTemperatureBySeaLevelMixingRatio = [
+            0.78: -20.0,
+            1.77: -10.0,
+            3.77: 0.0,
+            7.66: 10.0,
+            14.91: 20.0,
+            28.02: 30.0,
+        ]
+        
+        for (mixingRatio, expectedTemperature) in expectedTemperatureBySeaLevelMixingRatio {
+            let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: .standardSeaLevel)
+            XCTAssertEqual(temperature.inUnit(.celsius).value,
+                           expectedTemperature,
+                           accuracy: tolerance)
+        }
+        
+    }
 }
