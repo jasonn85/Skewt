@@ -15,6 +15,7 @@ fileprivate let defaultAdiabatSpacing = 10.0
 fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
 fileprivate let defaultSkewSlope = 1.0
+fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0, 20.0]
 
 struct SkewtPlot {
     let sounding: Sounding?
@@ -25,9 +26,10 @@ struct SkewtPlot {
     let pressureRange: ClosedRange<Double>
     
     // Isopleth display parameters
-    let isothermSpacing: CGFloat
-    let adiabatSpacing: CGFloat
-    let isobarSpacing: CGFloat
+    let isothermSpacing: Double  // in C
+    let adiabatSpacing: Double  // in C
+    let isobarSpacing: Double  // in mb
+    let isohumes: [Double]  // in g/kg
     
     let skewSlope: CGFloat
     
@@ -115,6 +117,7 @@ extension SkewtPlot {
         adiabatSpacing = defaultAdiabatSpacing
         isothermSpacing = defaultIsothermSpacing
         isobarSpacing = defaultIsobarSpacing
+        isohumes = defaultIsohumes
     }
 }
 
@@ -122,7 +125,8 @@ extension SkewtPlot {
 extension SkewtPlot {
     typealias Line = (CGPoint, CGPoint)
     
-    private static let adiabatDY = 1.0
+    // Granularity for calculating non-linear isopleths (adiabats and isohumes)
+    private static let isoplethDY = 1.0
 
     var isobarPaths: [CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
@@ -187,7 +191,7 @@ extension SkewtPlot {
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
         return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).compactMap {
-            dryAdiabat(fromTemperature: $0, dy: SkewtPlot.adiabatDY)
+            dryAdiabat(fromTemperature: $0, dy: SkewtPlot.isoplethDY)
         }
     }
     
@@ -201,8 +205,12 @@ extension SkewtPlot {
         let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
 
         return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing).map {
-            moistAdiabat(fromTemperature: $0, dy: SkewtPlot.adiabatDY)
+            moistAdiabat(fromTemperature: $0, dy: SkewtPlot.isoplethDY)
         }        
+    }
+    
+    var isohumePaths: [CGPath] {
+        isohumes.map { isohume(forMixingRatio: $0, dy: SkewtPlot.isoplethDY) }
     }
     
     private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
@@ -257,6 +265,31 @@ extension SkewtPlot {
             }
             
             lastAltitude = altitude
+        }
+        
+        return path
+    }
+    
+    private func isohume(forMixingRatio mixingRatio: Double, dy: CGFloat) -> CGPath {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let path = CGMutablePath()
+        
+        let initialPressure = pressure(atY: size.height)
+        let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: initialPressure)
+            .inUnit(.celsius)
+            .value
+        path.move(to: point(pressure: initialPressure, temperature: temperature))
+        
+        for y in stride(from: size.height - dy, through: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: pressure)
+                .inUnit(.celsius)
+                .value
+            let point = point(pressure: pressure, temperature: temperature)
+            
+            if bounds.contains(point) {
+                path.addLine(to: point)
+            }
         }
         
         return path

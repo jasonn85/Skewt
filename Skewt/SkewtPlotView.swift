@@ -58,6 +58,12 @@ struct SkewtPlotView: View {
                                     .foregroundColor(.orange)
                             }
                             
+                            ForEach(plot.isohumePaths, id: \.self) { adiabat in
+                                Path(adiabat)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.gray)
+                            }
+                            
                         }.frame(width: smallestDimension, height: smallestDimension)
                         
                         Spacer()
