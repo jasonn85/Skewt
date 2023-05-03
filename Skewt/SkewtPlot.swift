@@ -186,7 +186,7 @@ extension SkewtPlot {
         let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: margin))
         let topRightAltitude = Altitude.standardAltitude(forPressure: topRightPressure)
         let lastAdiabatStartingTemperature = Temperature(topRightTemperature)
-            .temperatureOfDryParcelRaised(from: topRightAltitude, to: 0.0).value
+            .temperatureOfDryParcelRaised(from: topRightAltitude, to: 0.0).value(inUnit: .celsius)
         
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
@@ -228,7 +228,7 @@ extension SkewtPlot {
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
         var temp = Temperature(startingTemperature)
         
-        let firstPoint = CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY)
+        let firstPoint = CGPoint(x: x(forSurfaceTemperature: temp.value(inUnit: .celsius)), y: initialY)
         if bounds.contains(firstPoint) {
             path.move(to: firstPoint)
         }
@@ -237,7 +237,7 @@ extension SkewtPlot {
             let pressure = pressure(atY: y)
             let altitude = Altitude.standardAltitude(forPressure: pressure)
             temp = temp.temperatureOfDryParcelRaised(from: lastAltitude, to: altitude)
-            let point = point(pressure: pressure, temperature: temp.value)
+            let point = point(pressure: pressure, temperature: temp.value(inUnit: .celsius))
             
             if bounds.contains(point) {
                 if path.isEmpty {
@@ -260,13 +260,13 @@ extension SkewtPlot {
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
         var temp = Temperature(startingTemperature)
         
-        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value), y: initialY))
+        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value(inUnit: .celsius)), y: initialY))
         
         for y in stride(from: initialY - dy, through: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let altitude = Altitude.standardAltitude(forPressure: pressure)
             temp = temp.temperatureOfSaturatedParcelRaised(from: lastAltitude, to: altitude, pressure: pressure)
-            let point = point(pressure: pressure, temperature: temp.value)
+            let point = point(pressure: pressure, temperature: temp.value(inUnit: .celsius))
             
             if bounds.contains(point) {
                 path.addLine(to: point)
@@ -284,15 +284,13 @@ extension SkewtPlot {
         
         let initialPressure = pressure(atY: size.height)
         let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: initialPressure)
-            .inUnit(.celsius)
-            .value
+            .value(inUnit: .celsius)
         path.move(to: point(pressure: initialPressure, temperature: temperature))
         
         for y in stride(from: size.height - dy, through: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: pressure)
-                .inUnit(.celsius)
-                .value
+                .value(inUnit: .celsius)
             let point = point(pressure: pressure, temperature: temperature)
             
             if bounds.contains(point) {

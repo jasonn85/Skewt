@@ -35,7 +35,7 @@ public enum TemperatureUnit {
 
 /// Temperature (double precision), representable and comparable across C, F, and K
 public struct Temperature: Comparable {
-    let value: Double
+    private let value: Double
     let unit: TemperatureUnit
     
     public static let standardSeaLevel = Temperature(15.0, unit: .celsius)
@@ -47,7 +47,11 @@ public struct Temperature: Comparable {
         self.unit = unit
     }
     
-    public func inUnit(_ unit: TemperatureUnit) -> Temperature {
+    public func value(inUnit unit: TemperatureUnit) -> Double {
+        return self.inUnit(unit).value
+    }
+    
+    private func inUnit(_ unit: TemperatureUnit) -> Temperature {
         if unit == self.unit {
             return self
         }
@@ -153,7 +157,7 @@ public func saturatedMixingRatio(withTemperature temperature: Temperature, press
 
 /// Lapse rate for a saturated parcel in C/km
 public func moistLapseRate(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
-    let t = temperature.inUnit(.kelvin).value
+    let t = temperature.value(inUnit: .kelvin)
     let mixingRatio = saturatedMixingRatio(withTemperature: temperature, pressure: pressure)
     let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
                            / (.specificGasConstantDryAir * t))
@@ -178,7 +182,7 @@ extension Pressure {
     
     /// Pressure at a given altitude in the International Standard Atmosphere
     public static func standardPressure(atAltitude altitude: Altitude) -> Pressure {
-        let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
+        let referenceTemperature = Temperature.standardSeaLevel.value(inUnit: .kelvin)
         let exponent = -gravitationalAcceleration * airMolarMass / (universalGasConstant * seaLevelLapseRate)
         let numerator = referenceTemperature + (altitude * metersPerFoot * seaLevelLapseRate)
         
@@ -189,7 +193,7 @@ extension Pressure {
 extension Altitude {
     /// Pressure altitude for a given pressure in the International Standard Atmosphere
     public static func standardAltitude(forPressure pressure: Pressure) -> Altitude {
-        let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
+        let referenceTemperature = Temperature.standardSeaLevel.value(inUnit: .kelvin)
         let exponent = universalGasConstant * seaLevelLapseRate / (-gravitationalAcceleration * airMolarMass)
         let base = pressure / Pressure.standardSeaLevel
 

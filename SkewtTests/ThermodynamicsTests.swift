@@ -17,15 +17,15 @@ final class ThermodynamicsTests: XCTestCase {
     private let absoluteZeroC = Temperature(-273.15, unit: .celsius)
     
     func testIdentityConversions() {
-        XCTAssertEqual(zeroC.inUnit(.celsius).value, zeroC.value)
-        XCTAssertEqual(bodyTempF.inUnit(.fahrenheit).value, bodyTempF.value)
-        XCTAssertEqual(absoluteZeroK.inUnit(.kelvin).value, absoluteZeroK.value)
+        XCTAssertEqual(zeroC.value(inUnit: .celsius), 0.0)
+        XCTAssertEqual(bodyTempF.value(inUnit: .fahrenheit), 98.6)
+        XCTAssertEqual(absoluteZeroK.value(inUnit: .kelvin), 0.0)
     }
     
     func testConversions() {
-        XCTAssertEqual(bodyTempC.inUnit(.fahrenheit).value, bodyTempF.value)
-        XCTAssertEqual(absoluteZeroC.inUnit(.kelvin).value, absoluteZeroK.value)
-        XCTAssertEqual(Temperature.standardSeaLevel.inUnit(.kelvin).value, 288.15)
+        XCTAssertEqual(bodyTempC.value(inUnit: .fahrenheit), bodyTempF.value(inUnit: .fahrenheit))
+        XCTAssertEqual(absoluteZeroC.value(inUnit: .kelvin), absoluteZeroK.value(inUnit: .kelvin))
+        XCTAssertEqual(Temperature.standardSeaLevel.value(inUnit: .kelvin), 288.15)
     }
     
     func testCrossUnitEquality() {
@@ -61,7 +61,9 @@ final class ThermodynamicsTests: XCTestCase {
         
         // Identity
         for t in [-30.0, -15.0, 0.0, 15.0, 50.0] {
-            XCTAssertEqual(Temperature(t).temperatureOfDryParcelRaised(from: 0.0, to: 0.0).value, t)
+            XCTAssertEqual(Temperature(t).temperatureOfDryParcelRaised(from: 0.0, to: 0.0)
+                .value(inUnit: .celsius),
+                           t)
         }
         
         let standardTemperature = Temperature(15.0)
@@ -75,7 +77,8 @@ final class ThermodynamicsTests: XCTestCase {
         
         for (altitudeRange, expectedTemperature) in expectedTemperatureByAltitudeRange {
             XCTAssertEqual(standardTemperature.temperatureOfDryParcelRaised(from: altitudeRange.lowerBound,
-                                                                            to: altitudeRange.upperBound).value,
+                                                                            to: altitudeRange.upperBound)
+                .value(inUnit: .celsius),
                            expectedTemperature,
                            accuracy: tolerance)
         }
@@ -107,7 +110,8 @@ final class ThermodynamicsTests: XCTestCase {
             XCTAssertEqual(lapseRate, expectedLapseRate, accuracy: tolerance)
             XCTAssertEqual(temperature.temperatureOfSaturatedParcelRaised(from: 0.0,
                                                                           to: feetPerKilometer,
-                                                                          pressure: .standardSeaLevel).value,
+                                                                          pressure: .standardSeaLevel)
+                .value(inUnit: .celsius),
                            temperatureValue - lapseRate,
                            accuracy: tolerance)
         }
@@ -147,7 +151,7 @@ final class ThermodynamicsTests: XCTestCase {
         
         for (mixingRatio, expectedTemperature) in expectedTemperatureBySeaLevelMixingRatio {
             let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: .standardSeaLevel)
-            XCTAssertEqual(temperature.inUnit(.celsius).value,
+            XCTAssertEqual(temperature.value(inUnit: .celsius),
                            expectedTemperature,
                            accuracy: tolerance)
         }
