@@ -112,7 +112,7 @@ extension Temperature {
 extension Temperature {
     // Saturated vapor pressure in Pa
     var saturatedVaporPressure: Double {
-        let t = self.inUnit(.kelvin).value
+        let t = self.value(inUnit: .kelvin)
         
         // Vapor pressure implementation from...
         //  Hardy, B., 1998, ITS-90 Formulations for Vapor Pressure, Frostpoint Temperature,
@@ -134,7 +134,7 @@ extension Temperature {
 // Mixing ratio
 extension Temperature {
     public static func temperature(forMixingRatio mixingRatio: Double, pressure: Pressure) -> Temperature {
-        let t0 = Temperature(0.0, unit: .celsius).inUnit(.kelvin).value
+        let t0 = Temperature(0.0, unit: .celsius).value(inUnit: .kelvin)
         let mixingRatioInGPerG = mixingRatio / 1000.0
         let logTerm = log((mixingRatioInGPerG * pressure.inKilopascals)
                           / (.vaporPressureAt0C * (mixingRatioInGPerG + .gasConstantRatioDryAirToWaterVapor)))
