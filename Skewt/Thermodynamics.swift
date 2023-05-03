@@ -78,11 +78,11 @@ public struct Temperature: Comparable {
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.value == rhs.inUnit(lhs.unit).value
+        lhs.value == rhs.value(inUnit: lhs.unit)
     }
     
     public static func < (lhs: Temperature, rhs: Temperature) -> Bool {
-        return lhs.value < rhs.inUnit(lhs.unit).value
+        lhs.value < rhs.value(inUnit: lhs.unit)
     }
 }
 
