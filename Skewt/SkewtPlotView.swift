@@ -33,10 +33,18 @@ struct SkewtPlotView: View {
                                 .stroke(lineWidth: 3.0)
                                 .foregroundColor(.blue)
                             
-                            ForEach(plot.isobarPaths, id: \.self) { isobar in
-                                Path(isobar)
+                            let isobars = plot.isobarPaths
+                            ForEach(isobars.keys.sorted(), id: \.self) { p in
+                                Path(isobars[p]!)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.gray)
+                            }
+                            
+                            let altitudeIsobars = plot.altitudeIsobarPaths
+                            ForEach(altitudeIsobars.keys.sorted(), id: \.self) { a in
+                                Path(altitudeIsobars[a]!)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.blue)
                             }
                             
                             let isotherms = plot.isothermPaths

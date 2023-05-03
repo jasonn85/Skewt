@@ -16,6 +16,8 @@ fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
 fileprivate let defaultSkewSlope = 1.0
 fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0, 20.0]
+fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
+                                          30_000.0, 40_000.0]
 
 struct SkewtPlot {
     let sounding: Sounding?
@@ -30,6 +32,7 @@ struct SkewtPlot {
     let adiabatSpacing: Double  // in C
     let isobarSpacing: Double  // in mb
     let isohumes: [Double]  // in g/kg
+    let altitudeIsobars: [Double]  // in ft
     
     let skewSlope: CGFloat
     
@@ -72,6 +75,10 @@ extension SkewtPlot {
         log10(pressure / pressureRange.lowerBound)
         / log10(pressureRange.upperBound / pressureRange.lowerBound)
         * size.height
+    }
+    
+    public func y(forPressureAltitude altitude: Double) -> CGFloat {
+        y(forPressure: Pressure.standardPressure(atAltitude: altitude))
     }
     
     public func pressure(atY y: CGFloat) -> Double {
@@ -118,6 +125,7 @@ extension SkewtPlot {
         isothermSpacing = defaultIsothermSpacing
         isobarSpacing = defaultIsobarSpacing
         isohumes = defaultIsohumes
+        altitudeIsobars = defaultAltitudeIsobars
     }
 }
 
@@ -128,18 +136,32 @@ extension SkewtPlot {
     // Granularity for calculating non-linear isopleths (adiabats and isohumes)
     private static let isoplethDY = 1.0
 
-    var isobarPaths: [CGPath] {
+    var isobarPaths: [Double: CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
         let bottomLine = floor(pressureRange.upperBound / isobarSpacing) * isobarSpacing
         isobars.formUnion(stride(from: bottomLine, to: pressureRange.lowerBound, by: -isobarSpacing))
         
-        return isobars.map {
+        return isobars.reduce(into: [Double: CGPath]()) { (result, pressure) in
             let path = CGMutablePath()
-            let y = y(forPressure: $0)
+            let y = y(forPressure: pressure)
             path.move(to: CGPoint(x: 0.0, y: y))
             path.addLine(to: CGPoint(x: size.width, y: y))
             
-            return path
+            result[pressure] = path
+        }
+    }
+    
+    var altitudeIsobarPaths: [Double: CGPath] {
+        altitudeIsobars.reduce(into: [Double: CGPath]()) { (result, altitude) in
+            let y = y(forPressureAltitude: altitude)
+            
+            if y > 0.0 && y <= size.height {
+                let path = CGMutablePath()
+                path.move(to: CGPoint(x: 0.0, y: y))
+                path.addLine(to: CGPoint(x: size.width, y: y))
+                
+                result[altitude] = path
+            }
         }
     }
     
