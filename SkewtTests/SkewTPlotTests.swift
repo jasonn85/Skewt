@@ -118,7 +118,8 @@ RAOB sounding valid at:
     func testIsobarNonLinearScale() {
         let height = 100.0
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: height, height: height))
-        let sortedIsobars = plot.isobarPaths.sorted(by: { $0.boundingBox.origin.y > $1.boundingBox.origin.y })
+        let isobarPaths = plot.isobarPaths
+        let sortedIsobars = plot.isobarPaths.keys.sorted().reversed().map { isobarPaths[$0]! }
         
         var lastY = height
         var lastDy = 0.0
