@@ -33,12 +33,12 @@ struct SkewtPlotView: View {
                                 .stroke(lineWidth: 3.0)
                                 .foregroundColor(.blue)
                             
-                            let isobars = plot.isobarPaths
-                            ForEach(isobars.keys.sorted(), id: \.self) { p in
-                                Path(isobars[p]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.gray)
-                            }
+//                            let isobars = plot.isobarPaths
+//                            ForEach(isobars.keys.sorted(), id: \.self) { p in
+//                                Path(isobars[p]!)
+//                                    .stroke(lineWidth: 1.0)
+//                                    .foregroundColor(.gray)
+//                            }
                             
                             let altitudeIsobars = plot.altitudeIsobarPaths
                             ForEach(altitudeIsobars.keys.sorted(), id: \.self) { a in
@@ -54,11 +54,18 @@ struct SkewtPlotView: View {
                                     .foregroundColor(.red)
                             }
                             
+                            if let zeroIsotherm = isotherms[0.0] {
+                                Path(zeroIsotherm)
+                                    .stroke(lineWidth: 2.0)
+                                    .foregroundColor(.red)
+                            }
+                            
                             let dryAdiabats = plot.dryAdiabatPaths
                             ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
                                 Path(dryAdiabats[t]!)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.blue)
+                                    .opacity(0.5)
                             }
                             
                             let moistAdiabats = plot.moistAdiabatPaths
@@ -66,6 +73,7 @@ struct SkewtPlotView: View {
                                 Path(moistAdiabats[t]!)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.orange)
+                                    .opacity(0.5)
                             }
                             
                             let isohumes = plot.isohumePaths
@@ -73,6 +81,7 @@ struct SkewtPlotView: View {
                                 Path(isohumes[t]!)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.gray)
+                                    .opacity(0.5)
                             }
                             
                         }.frame(width: smallestDimension, height: smallestDimension)
