@@ -67,30 +67,6 @@ extension CGPath {
     }
 }
 
-extension Array where Element == CGPath {
-    /// Whether the starting points of each path in the array are ordered left to right (then bottom to top if points start at the same X)
-    var isInOrderLeftToRight: Bool {
-        var lastPoint = CGPoint(x: -.infinity, y: -.infinity)
-        
-        for bottomPoint in map({ $0.bottomPoint }) {
-            guard let bottomPoint = bottomPoint else {
-                continue
-            }
-            
-            let dx = bottomPoint.x - lastPoint.x
-            let dy = bottomPoint.y - lastPoint.y
-            
-            guard dx > 0.0 || (abs(dx) < 1.0 && dy < 0.0) else {
-                return false
-            }
-            
-            lastPoint = bottomPoint
-        }
-        
-        return true
-    }
-}
-
 final class SkewTPlotTests: XCTestCase {
     var sounding: Sounding!
     
@@ -194,18 +170,13 @@ RAOB sounding valid at:
         XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
     }
     
-    func testIsothermOrderLeftToRight() {
-        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
-        XCTAssertTrue(plot.isothermPaths.isInOrderLeftToRight, "Isotherm paths should be provided in order, left-to-right")
-    }
-    
     func testIsothermSkew() {
         let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
         
         XCTAssertTrue(plot.isothermPaths.count > 0)
         
         plot.isothermPaths.forEach {
-            XCTAssertTrue($0.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
+            XCTAssertTrue($0.1.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
         }
     }
     
@@ -219,12 +190,6 @@ RAOB sounding valid at:
         
         XCTAssertTrue(expectedCount.contains(plot.isothermPaths.count),
                       "Expecting \(String(describing: expectedCount)) isotherms, found \(plot.isobarPaths.count)")
-    }
-    
-    func testAdiabatOrder() {
-        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
-        XCTAssertTrue(plot.dryAdiabatPaths.isInOrderLeftToRight, "Dry adiabats should be provided in order, left-to-right")
-        XCTAssertTrue(plot.moistAdiabatPaths.isInOrderLeftToRight, "Moist adiabats should be provided in order, left-to-right")
     }
     
     func testAdiabatCount() {

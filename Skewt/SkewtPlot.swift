@@ -158,8 +158,8 @@ extension SkewtPlot {
         return (start, end)
     }
     
-    /// CGPaths for isotherms, sorted left to right
-    var isothermPaths: [CGPath] {
+    /// CGPaths for isotherms, keyed by temperature C
+    var isothermPaths: [Double: CGPath] {
         let margin = 5.0
         let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
         let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin,
@@ -167,17 +167,18 @@ extension SkewtPlot {
         let firstIsotherm = ceil(topLeftTemperature / isothermSpacing) * isothermSpacing
         let lastIsotherm = floor(bottomRightTemperature / isothermSpacing) * isothermSpacing
         
-        return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing).map {
-            let isotherm = isotherm(forTemperature: $0)
-            let path = CGMutablePath()
-            path.move(to: isotherm.0)
-            path.addLine(to: isotherm.1)
-            return path
-        }
+        return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                let isotherm = isotherm(forTemperature: t)
+                let path = CGMutablePath()
+                path.move(to: isotherm.0)
+                path.addLine(to: isotherm.1)
+                partialResult[t] = path
+            }
     }
     
-    /// CGPaths for dry adiabats, sorted left to right
-    var dryAdiabatPaths: [CGPath] {
+    /// CGPaths for dry adiabats, keyed by surface temperature C
+    var dryAdiabatPaths: [Double: CGPath] {
         let margin = adiabatSpacing * 0.25
         let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
         
@@ -190,13 +191,16 @@ extension SkewtPlot {
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
-        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing).compactMap {
-            dryAdiabat(fromTemperature: $0, dy: SkewtPlot.isoplethDY)
-        }
+        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                if let adiabat = dryAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY) {
+                    partialResult[t] = adiabat
+                }
+            }
     }
     
-    /// CGPaths for moist adiabats, sorted left to right
-    var moistAdiabatPaths: [CGPath] {
+    /// CGPaths for moist adiabats, keyed by surface temperature C
+    var moistAdiabatPaths: [Double: CGPath] {
         let margin = adiabatSpacing * 0.25
         let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
         let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
@@ -204,13 +208,17 @@ extension SkewtPlot {
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
 
-        return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing).map {
-            moistAdiabat(fromTemperature: $0, dy: SkewtPlot.isoplethDY)
-        }        
+        return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                partialResult[t] = moistAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY)
+            }
     }
     
-    var isohumePaths: [CGPath] {
-        isohumes.map { isohume(forMixingRatio: $0, dy: SkewtPlot.isoplethDY) }
+    // CGPaths for isohumes, keyed by mixing ratio g/kg
+    var isohumePaths: [Double: CGPath] {
+        isohumes.reduce(into: [Double: CGPath]()) { (partialResult, mr) in
+            partialResult[mr] = isohume(forMixingRatio: mr, dy: SkewtPlot.isoplethDY)
+        }
     }
     
     private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
