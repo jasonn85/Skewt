@@ -15,6 +15,7 @@ fileprivate let defaultAdiabatSpacing = 10.0
 fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
 fileprivate let defaultSkewSlope = 1.0
+fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0, 20.0]
 
 struct SkewtPlot {
     let sounding: Sounding?
@@ -25,9 +26,10 @@ struct SkewtPlot {
     let pressureRange: ClosedRange<Double>
     
     // Isopleth display parameters
-    let isothermSpacing: CGFloat
-    let adiabatSpacing: CGFloat
-    let isobarSpacing: CGFloat
+    let isothermSpacing: Double  // in C
+    let adiabatSpacing: Double  // in C
+    let isobarSpacing: Double  // in mb
+    let isohumes: [Double]  // in g/kg
     
     let skewSlope: CGFloat
     
@@ -115,12 +117,16 @@ extension SkewtPlot {
         adiabatSpacing = defaultAdiabatSpacing
         isothermSpacing = defaultIsothermSpacing
         isobarSpacing = defaultIsobarSpacing
+        isohumes = defaultIsohumes
     }
 }
 
 // MARK: - Isopleth paths
 extension SkewtPlot {
     typealias Line = (CGPoint, CGPoint)
+    
+    // Granularity for calculating non-linear isopleths (adiabats and isohumes)
+    private static let isoplethDY = 1.0
 
     var isobarPaths: [CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
@@ -152,7 +158,8 @@ extension SkewtPlot {
         return (start, end)
     }
     
-    var isothermPaths: [CGPath] {
+    /// CGPaths for isotherms, keyed by temperature C
+    var isothermPaths: [Double: CGPath] {
         let margin = 5.0
         let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
         let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin,
@@ -160,23 +167,138 @@ extension SkewtPlot {
         let firstIsotherm = ceil(topLeftTemperature / isothermSpacing) * isothermSpacing
         let lastIsotherm = floor(bottomRightTemperature / isothermSpacing) * isothermSpacing
         
-        return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing).map {
-            let isotherm = isotherm(forTemperature: $0)
-            let path = CGMutablePath()
-            path.move(to: isotherm.0)
-            path.addLine(to: isotherm.1)
-            return path
+        return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                let isotherm = isotherm(forTemperature: t)
+                let path = CGMutablePath()
+                path.move(to: isotherm.0)
+                path.addLine(to: isotherm.1)
+                partialResult[t] = path
+            }
+    }
+    
+    /// CGPaths for dry adiabats, keyed by surface temperature C
+    var dryAdiabatPaths: [Double: CGPath] {
+        let margin = adiabatSpacing * 0.25
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
+        
+        // Find a value near the top-right for a dry adiabat, then lower a parcel from there to find the adiabat starting point at 0 altitude
+        let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: margin))
+        let topRightAltitude = Altitude.standardAltitude(forPressure: topRightPressure)
+        let lastAdiabatStartingTemperature = Temperature(topRightTemperature)
+            .temperatureOfDryParcelRaised(from: topRightAltitude, to: 0.0).value(inUnit: .celsius)
+        
+        let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
+        let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
+        
+        return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                if let adiabat = dryAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY) {
+                    partialResult[t] = adiabat
+                }
+            }
+    }
+    
+    /// CGPaths for moist adiabats, keyed by surface temperature C
+    var moistAdiabatPaths: [Double: CGPath] {
+        let margin = adiabatSpacing * 0.25
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
+
+        let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
+        let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
+
+        return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing)
+            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+                partialResult[t] = moistAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY)
+            }
+    }
+    
+    // CGPaths for isohumes, keyed by mixing ratio g/kg
+    var isohumePaths: [Double: CGPath] {
+        isohumes.reduce(into: [Double: CGPath]()) { (partialResult, mr) in
+            partialResult[mr] = isohume(forMixingRatio: mr, dy: SkewtPlot.isoplethDY)
         }
     }
     
-    var dryAdiabatPaths: [CGPath] {
-        // TODO
-        return []
+    private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let path = CGMutablePath()
+        let initialY = size.height
+        var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
+        var temp = Temperature(startingTemperature)
+        
+        let firstPoint = CGPoint(x: x(forSurfaceTemperature: temp.value(inUnit: .celsius)), y: initialY)
+        if bounds.contains(firstPoint) {
+            path.move(to: firstPoint)
+        }
+        
+        for y in stride(from: initialY - dy, to: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let altitude = Altitude.standardAltitude(forPressure: pressure)
+            temp = temp.temperatureOfDryParcelRaised(from: lastAltitude, to: altitude)
+            let point = point(pressure: pressure, temperature: temp.value(inUnit: .celsius))
+            
+            if bounds.contains(point) {
+                if path.isEmpty {
+                    path.move(to: point)
+                } else {
+                    path.addLine(to: point)
+                }
+            }
+            
+            lastAltitude = altitude
+        }
+                         
+        return !path.isEmpty ? path : nil
     }
     
-    var moistAdiabatPaths: [CGPath] {
-        // TODO
-        return []
+    private func moistAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let path = CGMutablePath()
+        let initialY = size.height
+        var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
+        var temp = Temperature(startingTemperature)
+        
+        path.move(to: CGPoint(x: x(forSurfaceTemperature: temp.value(inUnit: .celsius)), y: initialY))
+        
+        for y in stride(from: initialY - dy, through: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let altitude = Altitude.standardAltitude(forPressure: pressure)
+            temp = temp.temperatureOfSaturatedParcelRaised(from: lastAltitude, to: altitude, pressure: pressure)
+            let point = point(pressure: pressure, temperature: temp.value(inUnit: .celsius))
+            
+            if bounds.contains(point) {
+                path.addLine(to: point)
+            }
+            
+            lastAltitude = altitude
+        }
+        
+        return path
+    }
+    
+    private func isohume(forMixingRatio mixingRatio: Double, dy: CGFloat) -> CGPath {
+        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let path = CGMutablePath()
+        
+        let initialPressure = pressure(atY: size.height)
+        let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: initialPressure)
+            .value(inUnit: .celsius)
+        path.move(to: point(pressure: initialPressure, temperature: temperature))
+        
+        for y in stride(from: size.height - dy, through: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: pressure)
+                .value(inUnit: .celsius)
+            let point = point(pressure: pressure, temperature: temperature)
+            
+            if bounds.contains(point) {
+                path.addLine(to: point)
+            }
+        }
+        
+        return path
     }
 }
 

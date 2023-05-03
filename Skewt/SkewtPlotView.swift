@@ -39,16 +39,32 @@ struct SkewtPlotView: View {
                                     .foregroundColor(.gray)
                             }
                             
-                            ForEach(plot.isothermPaths, id: \.self) { isotherm in
-                                Path(isotherm)
+                            let isotherms = plot.isothermPaths
+                            ForEach(isotherms.keys.sorted(), id: \.self) { t in
+                                Path(isotherms[t]!)
                                     .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.red)
                             }
                             
-                            ForEach(plot.dryAdiabatPaths, id: \.self) { adiabat in
-                                Path(adiabat)
+                            let dryAdiabats = plot.dryAdiabatPaths
+                            ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
+                                Path(dryAdiabats[t]!)
                                     .stroke(lineWidth: 1.0)
                                     .foregroundColor(.blue)
+                            }
+                            
+                            let moistAdiabats = plot.moistAdiabatPaths
+                            ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
+                                Path(moistAdiabats[t]!)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.orange)
+                            }
+                            
+                            let isohumes = plot.isohumePaths
+                            ForEach(isohumes.keys.sorted(), id: \.self) { t in
+                                Path(isohumes[t]!)
+                                    .stroke(lineWidth: 1.0)
+                                    .foregroundColor(.gray)
                             }
                             
                         }.frame(width: smallestDimension, height: smallestDimension)

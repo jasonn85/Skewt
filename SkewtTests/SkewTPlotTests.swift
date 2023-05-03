@@ -8,23 +8,28 @@
 import XCTest
 @testable import Skewt
 
+extension CGPathElement {
+    var numberOfPoints: Int {
+        switch self.type {
+        case .moveToPoint, .addLineToPoint:
+            return 1
+        case .addQuadCurveToPoint:
+            return 2
+        case .addCurveToPoint:
+            return 3
+        case .closeSubpath:
+            return 0
+        default:
+            return 0
+        }
+    }
+}
+
 extension CGPath {
     /// Tests that all linear pieces of the path draw a positive slope.
     /// Ignores curved elements.
     var isPositiveSlope: Bool {
-        var points: [CGPoint] = []
-                
-        applyWithBlock {
-            let element = $0.pointee
-            
-            guard element.type == .moveToPoint || element.type == .addLineToPoint else {
-                return
-            }
-            
-            let point = Array(UnsafeBufferPointer(start: element.points, count: 1))[0]
-            points.append(point)
-        }
-        
+        let points = componentEndPoints
         var lastX = -CGFloat.infinity
         
         for point in points.sorted(by: { $0.y > $1.y }) {
@@ -36,6 +41,29 @@ extension CGPath {
         }
         
         return true
+    }
+    
+    /// The last point in each path element
+    var componentEndPoints: [CGPoint] {
+        var points: [CGPoint] = []
+                
+        applyWithBlock {
+            let element = $0.pointee
+            let pointCount = element.numberOfPoints
+            
+            guard pointCount > 0 else {
+                return
+            }
+            
+            let lastPoint = Array(UnsafeBufferPointer(start: element.points, count: pointCount)).last!
+            points.append(lastPoint)
+        }
+        
+        return points
+    }
+    
+    var bottomPoint: CGPoint? {
+        return componentEndPoints.sorted(by: { $0.y < $1.y }).last
     }
 }
 
@@ -128,7 +156,7 @@ RAOB sounding valid at:
         XCTAssertEqual(halfOffLeftLine.0, middleLeft)
         XCTAssertEqual(halfOffLeftLine.1, middleTop)
         
-        let skewedUpSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, skewSlope: 2.0)
+        let skewedUpSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, skewSlope: 2.0)
         let steepFromBottomLeft = skewedUpSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         let steepFromBottomMiddle = skewedUpSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(steepFromBottomLeft.0, bottomLeft)
@@ -136,7 +164,7 @@ RAOB sounding valid at:
         XCTAssertEqual(steepFromBottomMiddle.0, middleBottom)
         XCTAssertEqual(steepFromBottomMiddle.1, squareTopRight)
         
-        let skewedDownSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, skewSlope: 0.5)
+        let skewedDownSquarePlot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0), surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, skewSlope: 0.5)
         let shallowFromBottomLeft = skewedDownSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         XCTAssertEqual(shallowFromBottomLeft.0, bottomLeft)
         XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
@@ -148,7 +176,7 @@ RAOB sounding valid at:
         XCTAssertTrue(plot.isothermPaths.count > 0)
         
         plot.isothermPaths.forEach {
-            XCTAssertTrue($0.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
+            XCTAssertTrue($0.1.isPositiveSlope, "Slope of isotherm should be positive: \(String(describing: $0))")
         }
     }
     
@@ -162,6 +190,18 @@ RAOB sounding valid at:
         
         XCTAssertTrue(expectedCount.contains(plot.isothermPaths.count),
                       "Expecting \(String(describing: expectedCount)) isotherms, found \(plot.isobarPaths.count)")
+    }
+    
+    func testAdiabatCount() {
+        // It's not yet defined if/how many dry adiabats should be drawn from off screen right, so just
+        // ensure that we have at least enough to cover the bottom.
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        let singleAxisCount = Int((plot.surfaceTemperatureRange.upperBound
+                                   - plot.surfaceTemperatureRange.lowerBound)
+                                  / plot.adiabatSpacing) - 2
+        
+        XCTAssertTrue(plot.dryAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) dry adiabats")
+        XCTAssertTrue(plot.moistAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) moist adiabats")
     }
     
     func testDataToCoordinateAndBack() {
