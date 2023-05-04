@@ -9,92 +9,68 @@ import SwiftUI
 
 struct SkewtPlotView: View {
     let state: SoundingScreenState
+    let plot: SkewtPlot
     
     var body: some View {
-        switch state.soundingState {
-        case .ready(let sounding):
-            GeometryReader { geometry in
-                let smallestDimension = min(geometry.size.width, geometry.size.height)
-                let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
-                let plot = SkewtPlot(sounding: sounding, size: squareSize)
-                
-                HStack() {
-                    Spacer()
-                    
-                    VStack() {
-                        Spacer()
-                        
-                        ZStack() {
-                            Path(plot.temperaturePath!)
-                                .stroke(lineWidth: 3.0)
-                                .foregroundColor(.red)
-                            
-                            Path(plot.dewPointPath!)
-                                .stroke(lineWidth: 3.0)
-                                .foregroundColor(.blue)
-                            
-//                            let isobars = plot.isobarPaths
-//                            ForEach(isobars.keys.sorted(), id: \.self) { p in
-//                                Path(isobars[p]!)
-//                                    .stroke(lineWidth: 1.0)
-//                                    .foregroundColor(.gray)
-//                            }
-                            
-                            let altitudeIsobars = plot.altitudeIsobarPaths
-                            ForEach(altitudeIsobars.keys.sorted(), id: \.self) { a in
-                                Path(altitudeIsobars[a]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            let isotherms = plot.isothermPaths
-                            ForEach(isotherms.keys.sorted(), id: \.self) { t in
-                                Path(isotherms[t]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.red)
-                            }
-                            
-                            if let zeroIsotherm = isotherms[0.0] {
-                                Path(zeroIsotherm)
-                                    .stroke(lineWidth: 2.0)
-                                    .foregroundColor(.red)
-                            }
-                            
-                            let dryAdiabats = plot.dryAdiabatPaths
-                            ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
-                                Path(dryAdiabats[t]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.blue)
-                                    .opacity(0.5)
-                            }
-                            
-                            let moistAdiabats = plot.moistAdiabatPaths
-                            ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
-                                Path(moistAdiabats[t]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.orange)
-                                    .opacity(0.5)
-                            }
-                            
-                            let isohumes = plot.isohumePaths
-                            ForEach(isohumes.keys.sorted(), id: \.self) { t in
-                                Path(isohumes[t]!)
-                                    .stroke(lineWidth: 1.0)
-                                    .foregroundColor(.gray)
-                                    .opacity(0.5)
-                            }
-                            
-                        }.frame(width: smallestDimension, height: smallestDimension)
-                        
-                        Spacer()
-                    }
-                    
-                    Spacer()
-                }
+        ZStack() {
+            if let temperaturePath = plot.temperaturePath {
+                Path(temperaturePath)
+                    .stroke(lineWidth: 3.0)
+                    .foregroundColor(.red)
             }
-        default:
-            Text("Nothing here dawg")
-        }
+            
+            if let dewPointPath = plot.dewPointPath {
+                Path(dewPointPath)
+                    .stroke(lineWidth: 3.0)
+                    .foregroundColor(.blue)
+            }
+            
+            
+            let altitudeIsobars = plot.altitudeIsobarPaths
+            ForEach(altitudeIsobars.keys.sorted(), id: \.self) { a in
+                Path(altitudeIsobars[a]!)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundColor(.blue)
+            }
+            
+            let isotherms = plot.isothermPaths
+            ForEach(isotherms.keys.sorted(), id: \.self) { t in
+                Path(isotherms[t]!)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundColor(.red)
+            }
+            
+            if let zeroIsotherm = isotherms[0.0] {
+                Path(zeroIsotherm)
+                    .stroke(lineWidth: 2.0)
+                    .foregroundColor(.red)
+            }
+            
+            let dryAdiabats = plot.dryAdiabatPaths
+            ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
+                Path(dryAdiabats[t]!)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundColor(.blue)
+                    .opacity(0.5)
+            }
+            
+            let moistAdiabats = plot.moistAdiabatPaths
+            ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
+                Path(moistAdiabats[t]!)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundColor(.orange)
+                    .opacity(0.5)
+            }
+            
+            let isohumes = plot.isohumePaths
+            ForEach(isohumes.keys.sorted(), id: \.self) { t in
+                Path(isohumes[t]!)
+                    .stroke(lineWidth: 1.0)
+                    .foregroundColor(.gray)
+                    .opacity(0.5)
+            }
+            
+        }.frame(width: plot.size.width, height: plot.size.height)
     }
 }
 
@@ -106,6 +82,13 @@ struct SkewtPlotView_Previews: PreviewProvider {
         let soundingScreenState = SoundingScreenState(soundingState:.ready(previewSounding),
                                                       annotationState: AnnotationState())
         
-        SkewtPlotView(state: soundingScreenState)
+        GeometryReader { geometry in
+            let smallestDimension = min(geometry.size.width, geometry.size.height)
+            let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
+            let plot = SkewtPlot(sounding: previewSounding, size: squareSize)
+            
+            SkewtPlotView(state: soundingScreenState, plot: plot)
+        }
+        
     }
 }
