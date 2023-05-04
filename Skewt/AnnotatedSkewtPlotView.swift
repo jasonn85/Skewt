@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnnotatedSkewtPlotView: View {
     let state: SoundingScreenState
-    let leftAxisLabelWidth = 16.0
+    let leftAxisLabelWidth = 12.0
     let bottomAxisLabelHeight = 16.0
     
     private var sounding: Sounding? {
@@ -32,7 +32,7 @@ struct AnnotatedSkewtPlotView: View {
             ZStack {
                 SkewtPlotView(state: state, plot: plot)
                     .frame(width: plot.size.width, height: plot.size.height)
-                    .position(x: geometry.size.width / 2.0 + leftAxisLabelWidth, y: plot.size.height / 2.0)
+                    .offset(x: leftAxisLabelWidth)
                 
                 let altitudeIsobars = plot.altitudeIsobarPaths
                 ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
@@ -40,7 +40,8 @@ struct AnnotatedSkewtPlotView: View {
                         .font(.system(size: 12.0))
                         .lineLimit(1)
                         .foregroundColor(.blue)
-                        .position(x: leftAxisLabelWidth / 2.0 + 4.0, y: plot.y(forPressureAltitude: altitude))
+                        .position(y: plot.y(forPressureAltitude: altitude))
+                        .offset(x: leftAxisLabelWidth - 2.0, y: 8.0)
                 }
                 
                 let isotherms = plot.isothermPaths
@@ -49,9 +50,11 @@ struct AnnotatedSkewtPlotView: View {
                     Text(String(Int(temperature)))
                         .font(.system(size: 12.0))
                         .foregroundColor(.red)
-                        .position(x: leftAxisLabelWidth + plot.x(forSurfaceTemperature: temperature) + 8.0, y: smallestDimension + (bottomAxisLabelHeight / 2.0))
+                        .position(x: plot.x(forSurfaceTemperature: temperature))
+                        .offset(x: leftAxisLabelWidth + 8.0, y: smallestDimension + bottomAxisLabelHeight)
                 }
-            }.frame(width: smallestDimension + leftAxisLabelWidth, height: smallestDimension + bottomAxisLabelHeight)
+            }
+            .frame(width: smallestDimension + leftAxisLabelWidth, height: smallestDimension + bottomAxisLabelHeight)
         }
     }
 }
