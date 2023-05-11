@@ -9,8 +9,12 @@ import SwiftUI
 
 struct AnnotatedSkewtPlotView: View {
     let state: SoundingScreenState
-    let leftAxisLabelWidth = 12.0
-    let bottomAxisLabelHeight = 16.0
+    
+    private var altitudeFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.multiplier = 0.001
+        return formatter
+    }
     
     private var sounding: Sounding? {
         switch state.soundingState {
@@ -20,41 +24,92 @@ struct AnnotatedSkewtPlotView: View {
             return nil
         }
     }
-
-    var body: some View {
-        GeometryReader { geometry in
-            let smallestDimension = min(geometry.size.width - leftAxisLabelWidth,
-                                        geometry.size.height - bottomAxisLabelHeight)
-            let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
+    
+    private var axisLabelFont: UIFont {
+        UIFont.systemFont(ofSize: 12.0)
+    }
+    
+    private var leftAxisLabelFont: UIFont {
+        axisLabelFont
+    }
+    
+    private var bottomAxisLabelFont: UIFont {
+        axisLabelFont
+    }
+    
+    private func widestAltitudeText() -> CGFloat? {
+        // TODO: Use altitudes from current state/settings
+        let expectedAltitudes = [0.0, 5_000.0, 10_000.0, 20_000.0,
+                                 30_000.0, 40_000.0]
+        
+        // TODO: guard there are some altitudes and the labels are on else return nil
+        
+        var widest: CGFloat = 0.0
+        
+        for altitude in expectedAltitudes {
+            let text = altitudeFormatter.string(from: altitude as NSNumber)!
+            let attributes = [NSAttributedString.Key.font: leftAxisLabelFont]
+            let width = text.size(withAttributes: attributes).width
             
-            let plot = SkewtPlot(sounding: sounding, size: squareSize)
-            
-            ZStack {
-                SkewtPlotView(state: state, plot: plot)
-                    .frame(width: plot.size.width, height: plot.size.height)
-                    .offset(x: leftAxisLabelWidth)
-                
-                let altitudeIsobars = plot.altitudeIsobarPaths
-                ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
-                    Text(String(Int(altitude / 1000.0)))
-                        .font(.system(size: 12.0))
-                        .lineLimit(1)
-                        .foregroundColor(.blue)
-                        .position(y: plot.y(forPressureAltitude: altitude))
-                        .offset(x: leftAxisLabelWidth - 2.0, y: 8.0)
-                }
-                
-                let isotherms = plot.isothermPaths
-                
-                ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                    Text(String(Int(temperature)))
-                        .font(.system(size: 12.0))
-                        .foregroundColor(.red)
-                        .position(x: plot.x(forSurfaceTemperature: temperature))
-                        .offset(x: leftAxisLabelWidth + 8.0, y: smallestDimension + bottomAxisLabelHeight)
-                }
+            if width > widest {
+                widest = width
             }
-            .frame(width: smallestDimension + leftAxisLabelWidth, height: smallestDimension + bottomAxisLabelHeight)
+        }
+        
+        return widest
+    }
+    
+    private func xAxisLabelHeight() -> CGFloat? {
+        // TODO: guard x axis labels are enabled else return nil
+        
+        let text = "12334567890"
+        let attributes = [NSAttributedString.Key.font: bottomAxisLabelFont]
+        return text.size(withAttributes: attributes).height
+    }
+    
+    var body: some View {
+        VStack(spacing: 2.0) {
+            if let title = sounding?.description {
+                Text(title)
+            }
+            
+            GeometryReader { geometry in
+                let yAxisLabelWidth = widestAltitudeText() ?? 0.0
+                let xAxisLabelHeight = xAxisLabelHeight() ?? 0.0
+                let smallestDimension = min(geometry.size.width - yAxisLabelWidth,
+                                            geometry.size.height - xAxisLabelHeight)
+                let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
+                
+                let plot = SkewtPlot(sounding: sounding, size: squareSize)
+                
+                ZStack {
+                    SkewtPlotView(state: state, plot: plot)
+                        .frame(width: plot.size.width, height: plot.size.height)
+                        .offset(x: yAxisLabelWidth)
+                        .background(.gray.opacity(0.05))
+                    
+                    let altitudeIsobars = plot.altitudeIsobarPaths
+                    ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
+                        Text(altitudeFormatter.string(from: altitude as NSNumber) ?? "")
+                            .font(Font(leftAxisLabelFont))
+                            .lineLimit(1)
+                            .foregroundColor(.blue)
+                            .position(y: plot.y(forPressureAltitude: altitude))
+                            .offset(x: yAxisLabelWidth, y: 8.0)
+                    }
+                    
+                    let isotherms = plot.isothermPaths
+                    
+                    ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
+                        Text(String(Int(temperature)))
+                            .font(Font(bottomAxisLabelFont))
+                            .foregroundColor(.red)
+                            .position(x: plot.x(forSurfaceTemperature: temperature))
+                            .offset(x: yAxisLabelWidth + 8.0, y: smallestDimension + xAxisLabelHeight)
+                    }
+                }
+                .frame(width: smallestDimension + yAxisLabelWidth, height: smallestDimension + xAxisLabelHeight)
+            }
         }
     }
 }
