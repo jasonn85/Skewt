@@ -20,21 +20,21 @@ fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                           30_000.0, 40_000.0]
 
 struct SkewtPlot {
-    let sounding: Sounding?
-    let size: CGSize
+    var sounding: Sounding?
+    var size: CGSize
     
     // Ranges
-    let surfaceTemperatureRange: ClosedRange<Double>
-    let pressureRange: ClosedRange<Double>
+    var surfaceTemperatureRange: ClosedRange<Double>
+    var pressureRange: ClosedRange<Double>
     
     // Isopleth display parameters
-    let isothermSpacing: Double  // in C
-    let adiabatSpacing: Double  // in C
-    let isobarSpacing: Double  // in mb
-    let isohumes: [Double]  // in g/kg
-    let altitudeIsobars: [Double]  // in ft
+    var isothermSpacing: Double  // in C
+    var adiabatSpacing: Double  // in C
+    var isobarSpacing: Double  // in mb
+    var isohumes: [Double]  // in g/kg
+    var altitudeIsobars: [Double]  // in ft
     
-    let skewSlope: CGFloat
+    var skewSlope: CGFloat
     
     var temperaturePath: CGPath? {
         guard let data = sounding?.data.filter({ $0.isPlottable }),
