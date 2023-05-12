@@ -15,18 +15,27 @@ extension Double {
     public static let gravitationalAcceleration = 9.80665  // m / s^2
     public static let airMolarMass = 0.0289644  // kg / mol
     public static let seaLevelLapseRate = -0.0065  // K / m
+    public static let heatOfWaterVaporization = 2_501_000.0  // J / kg
+    public static let vaporPressureAt0C = 0.611  // kPa
+    public static let latentHeatOfDeposition = 2.83e6  // J / kg
+    public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
+    public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
+    public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor  // ~0.622
+    public static let specificHeatDryAirConstantPressure = 1_003.5  // J / (kg * K)
+    
     public static let metersPerFoot = 0.3048
+    public static let feetPerKm = 3_280.84
 }
 
-enum TemperatureUnit {
+public enum TemperatureUnit {
     case celsius
     case fahrenheit
     case kelvin
 }
 
 /// Temperature (double precision), representable and comparable across C, F, and K
-struct Temperature: Comparable {
-    let value: Double
+public struct Temperature: Comparable {
+    private let value: Double
     let unit: TemperatureUnit
     
     public static let standardSeaLevel = Temperature(15.0, unit: .celsius)
@@ -38,7 +47,11 @@ struct Temperature: Comparable {
         self.unit = unit
     }
     
-    public func inUnit(_ unit: TemperatureUnit) -> Temperature {
+    public func value(inUnit unit: TemperatureUnit) -> Double {
+        return self.inUnit(unit).value
+    }
+    
+    private func inUnit(_ unit: TemperatureUnit) -> Temperature {
         if unit == self.unit {
             return self
         }
@@ -64,21 +77,112 @@ struct Temperature: Comparable {
         }
     }
     
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.value == rhs.inUnit(lhs.unit).value
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.value == rhs.value(inUnit: lhs.unit)
     }
     
-    static func < (lhs: Temperature, rhs: Temperature) -> Bool {
-        return lhs.value < rhs.inUnit(lhs.unit).value
+    public static func < (lhs: Temperature, rhs: Temperature) -> Bool {
+        lhs.value < rhs.value(inUnit: lhs.unit)
     }
 }
 
+// Lapsing
+extension Temperature {
+    private static let lapseRatePerFoot = 0.00298704
+    
+    func temperatureOfDryParcelRaised(from a1: Altitude, to a2: Altitude) -> Temperature {
+        let dA = a2 - a1
+        let dT = Temperature.lapseRatePerFoot * dA
+        return Temperature(self.inUnit(.celsius).value - dT)
+    }
+    
+    func temperatureOfSaturatedParcelRaised(from a1: Altitude,
+                                            to a2: Altitude,
+                                            pressure: Pressure) -> Temperature {
+        let dA = a2 - a1
+        let lapseRateCPerKm = moistLapseRate(withTemperature: self, pressure: pressure)
+        let lapseRate = lapseRateCPerKm / .feetPerKm
+        let dT = lapseRate * dA
+        
+        return Temperature(self.inUnit(.celsius).value - dT)
+    }
+}
+
+// Vapor pressure
+extension Temperature {
+    // Saturated vapor pressure in Pa
+    var saturatedVaporPressure: Double {
+        let t = self.value(inUnit: .kelvin)
+        
+        // Vapor pressure implementation from...
+        //  Hardy, B., 1998, ITS-90 Formulations for Vapor Pressure, Frostpoint Temperature,
+        //  Dewpoint Temperature, and Enhancement Factors in the Range –100 to +100 °C,
+        //  The Proceedings of the Third International Symposium on Humidity & Moisture, London, England
+        return exp(
+            (-2.8365744e3 / pow(t, 2))
+            - (6.028076559e3 / t)
+            + 1.954263612e1
+            - (2.737830188e-2 * t)
+            + (1.6261698e-5 * pow(t, 2))
+            + (7.0229056e-10 * pow(t, 3))
+            - (1.8680009e-13 * pow(t, 4))
+            + (2.7150305 * log(t))
+        )
+    }
+}
+
+// Mixing ratio
+extension Temperature {
+    public static func temperature(forMixingRatio mixingRatio: Double, pressure: Pressure) -> Temperature {
+        let t0 = Temperature(0.0, unit: .celsius).value(inUnit: .kelvin)
+        let mixingRatioInGPerG = mixingRatio / 1000.0
+        let logTerm = log((mixingRatioInGPerG * pressure.inKilopascals)
+                          / (.vaporPressureAt0C * (mixingRatioInGPerG + .gasConstantRatioDryAirToWaterVapor)))
+        
+        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .latentHeatOfDeposition) * logTerm)
+
+        return Temperature(resultInKelvin, unit: .kelvin)
+    }
+}
+
+public func vaporPressure(withPressure pressure: Pressure, mixingRatio: Double) -> Double {
+    return mixingRatio * pressure.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
+}
+
+public func saturatedMixingRatio(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
+    let vaporPressure = temperature.saturatedVaporPressure
+    return (.gasConstantRatioDryAirToWaterVapor * vaporPressure
+            / (pressure.inPascals - vaporPressure))
+}
+
+/// Lapse rate for a saturated parcel in C/km
+public func moistLapseRate(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
+    let t = temperature.value(inUnit: .kelvin)
+    let mixingRatio = saturatedMixingRatio(withTemperature: temperature, pressure: pressure)
+    let numerator = 1.0 + ((.heatOfWaterVaporization * mixingRatio)
+                           / (.specificGasConstantDryAir * t))
+    let denominator = (.specificHeatDryAirConstantPressure
+                       + ((pow(.heatOfWaterVaporization, 2) * mixingRatio)
+                          / (.specificGasConstantWaterVapor * pow(t, 2))))
+    
+    return 1000.0 * .gravitationalAcceleration * numerator / denominator
+}
+
+/// Pressure in millibars
 extension Pressure {
     static let standardSeaLevel: Pressure = 1013.25
     
+    var inPascals: Double {
+        self * 100.0
+    }
+    
+    var inKilopascals: Double {
+        self / 10.0
+    }
+    
     /// Pressure at a given altitude in the International Standard Atmosphere
     public static func standardPressure(atAltitude altitude: Altitude) -> Pressure {
-        let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
+        let referenceTemperature = Temperature.standardSeaLevel.value(inUnit: .kelvin)
         let exponent = -gravitationalAcceleration * airMolarMass / (universalGasConstant * seaLevelLapseRate)
         let numerator = referenceTemperature + (altitude * metersPerFoot * seaLevelLapseRate)
         
@@ -89,7 +193,7 @@ extension Pressure {
 extension Altitude {
     /// Pressure altitude for a given pressure in the International Standard Atmosphere
     public static func standardAltitude(forPressure pressure: Pressure) -> Altitude {
-        let referenceTemperature = Temperature.standardSeaLevel.inUnit(.kelvin).value
+        let referenceTemperature = Temperature.standardSeaLevel.value(inUnit: .kelvin)
         let exponent = universalGasConstant * seaLevelLapseRate / (-gravitationalAcceleration * airMolarMass)
         let base = pressure / Pressure.standardSeaLevel
 
