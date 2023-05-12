@@ -210,12 +210,12 @@ extension SkewtPlot {
         let lastIsotherm = floor(bottomRightTemperature / isothermSpacing) * isothermSpacing
         
         return stride(from: firstIsotherm, through: lastIsotherm, by: isothermSpacing)
-            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+            .reduce(into: [Double: CGPath]()) { (result, t) in
                 let isotherm = isotherm(forTemperature: t)
                 let path = CGMutablePath()
                 path.move(to: isotherm.0)
                 path.addLine(to: isotherm.1)
-                partialResult[t] = path
+                result[t] = path
             }
     }
     
@@ -234,9 +234,9 @@ extension SkewtPlot {
         let lastAdiabat = floor(lastAdiabatStartingTemperature / adiabatSpacing) * adiabatSpacing
         
         return stride(from: firstAdiabat, through: lastAdiabat + margin, by: adiabatSpacing)
-            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
+            .reduce(into: [Double: CGPath]()) { (result, t) in
                 if let adiabat = dryAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY) {
-                    partialResult[t] = adiabat
+                    result[t] = adiabat
                 }
             }
     }
@@ -251,15 +251,15 @@ extension SkewtPlot {
         let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
 
         return stride(from: firstAdiabat, to: lastAdiabat + margin, by: adiabatSpacing)
-            .reduce(into: [Double: CGPath]()) { (partialResult, t) in
-                partialResult[t] = moistAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY)
+            .reduce(into: [Double: CGPath]()) { (result, t) in
+                result[t] = moistAdiabat(fromTemperature: t, dy: SkewtPlot.isoplethDY)
             }
     }
     
     // CGPaths for isohumes, keyed by mixing ratio g/kg
     var isohumePaths: [Double: CGPath] {
-        isohumes.reduce(into: [Double: CGPath]()) { (partialResult, mr) in
-            partialResult[mr] = isohume(forMixingRatio: mr, dy: SkewtPlot.isoplethDY)
+        isohumes.reduce(into: [Double: CGPath]()) { (result, mr) in
+            result[mr] = isohume(forMixingRatio: mr, dy: SkewtPlot.isoplethDY)
         }
     }
     
@@ -287,6 +287,8 @@ extension SkewtPlot {
                 } else {
                     path.addLine(to: point)
                 }
+            } else {
+                break
             }
             
             lastAltitude = altitude
@@ -312,6 +314,8 @@ extension SkewtPlot {
             
             if bounds.contains(point) {
                 path.addLine(to: point)
+            } else {
+                break
             }
             
             lastAltitude = altitude
@@ -337,6 +341,8 @@ extension SkewtPlot {
             
             if bounds.contains(point) {
                 path.addLine(to: point)
+            } else {
+                break
             }
         }
         
