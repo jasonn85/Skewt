@@ -44,14 +44,19 @@ struct SkewtPlot {
         
         let bounds = CGRect(origin: .zero, size: size)
         let path = CGMutablePath()
-        path.move(to: point(pressure: data[0].pressure, temperature: data[0].temperature!))
+        var lastPoint = point(pressure: data[0].pressure, temperature: data[0].temperature!)
+        path.move(to: lastPoint)
         
         data[1...].forEach {
             let point = point(pressure: $0.pressure, temperature: $0.temperature!)
             
-            if bounds.contains(point) {
+            if bounds.contains(lastPoint) || bounds.contains(point) {
                 path.addLine(to: point)
+            } else {
+                path.move(to: point)
             }
+    
+            lastPoint = point
         }
         
         return path
@@ -65,14 +70,19 @@ struct SkewtPlot {
         
         let bounds = CGRect(origin: .zero, size: size)
         let path = CGMutablePath()
-        path.move(to: point(pressure: data[0].pressure, temperature: data[0].dewPoint!))
+        var lastPoint = point(pressure: data[0].pressure, temperature: data[0].dewPoint!)
+        path.move(to: lastPoint)
         
         data[1...].forEach {
             let point = point(pressure: $0.pressure, temperature: $0.dewPoint!)
             
-            if bounds.contains(point) {
+            if bounds.contains(lastPoint) || bounds.contains(point) {
                 path.addLine(to: point)
+            } else {
+                path.move(to: point)
             }
+            
+            lastPoint = point
         }
         
         return path
