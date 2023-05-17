@@ -61,15 +61,37 @@ final class Store<State>: ObservableObject {
 }
 
 struct State: Codable {
+    enum Action: Skewt.Action {
+        case saveSelectionAsDefault
+    }
+    
     let currentSoundingState: SoundingState
     let defaultSoundingSelection: SoundingSelection
     let plotOptions: PlotOptions
 }
 
+
+
+// Default initializer
 extension State {
     init() {
         currentSoundingState = SoundingState()
         defaultSoundingSelection = SoundingSelection()
         plotOptions = PlotOptions()
+    }
+}
+
+// Reducer
+extension State {
+    static let reducer: Reducer<Self> = { state, action in
+        if action as? Action == .saveSelectionAsDefault {
+            return State(currentSoundingState: state.currentSoundingState,
+                         defaultSoundingSelection: state.currentSoundingState.selection,
+                         plotOptions: state.plotOptions)
+        }
+        
+        return State(currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
+                     defaultSoundingSelection: state.defaultSoundingSelection,
+                     plotOptions: PlotOptions.reducer(state.plotOptions, action))
     }
 }

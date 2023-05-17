@@ -8,6 +8,12 @@
 import Foundation
 
 struct SoundingSelection: Codable {
+    enum Action: Skewt.Action {
+        case selectModelType(ModelType)
+        case selectLocation(Location)
+        case selectTime(Time)
+    }
+    
     enum ModelType: Codable {
         case op40
         case raob
@@ -30,6 +36,7 @@ struct SoundingSelection: Codable {
     let time: Time
 }
 
+// Default initializer
 extension SoundingSelection {
     init() {
         type = .op40
@@ -38,10 +45,35 @@ extension SoundingSelection {
     }
 }
 
+// Reducer
+extension SoundingSelection {
+    static let reducer: Reducer<Self> = { state, action in
+        guard let action = action as? Action else {
+            return state
+        }
+        
+        switch action {
+        case .selectModelType(let type):
+            return SoundingSelection(type: type, location: state.location, time: state.time)
+        case .selectLocation(let location):
+            return SoundingSelection(type: state.type, location: location, time: state.time)
+        case .selectTime(let time):
+            return SoundingSelection(type: state.type, location: state.location, time: time)
+        }
+    }
+}
+
 struct SoundingState: Codable {
     enum SoundingError: Error, Codable {
-        // TODO: Implement
-        case unknown
+        case unparseableResponse
+        case lackingLocationPermission  // We can't do closest weather if we lack CL permission
+    }
+    
+    enum Action: Skewt.Action {
+        case doRefresh
+        case changeSelection(SoundingSelection.Action)
+        case didReceiveFailure(SoundingError)
+        case didReceiveResponse(Sounding)
     }
     
     enum Status: Codable {
@@ -56,9 +88,38 @@ struct SoundingState: Codable {
     let status: Status
 }
 
+// Default initializer
 extension SoundingState {
     init() {
         selection = SoundingSelection()
         status = .idle
+    }
+}
+
+// Reducer
+extension SoundingState {
+    static let reducer: Reducer<Self> = { state, action in
+        guard let action = action as? Action else {
+            return state
+        }
+        
+        switch action {
+        case .doRefresh:
+            switch state.status {
+            case .done(let sounding):
+                return SoundingState(selection: state.selection, status: .refreshing(sounding))
+            default:
+                return SoundingState(selection: state.selection, status: .loading)
+            }
+            
+        case .changeSelection(let action):
+            return SoundingState(selection: SoundingSelection.reducer(state.selection, action),
+                                 status: .loading)
+            
+        case .didReceiveFailure(let error):
+            return SoundingState(selection: state.selection, status: .failed(error))
+        case .didReceiveResponse(let sounding):
+            return SoundingState(selection: state.selection, status: .done(sounding))
+        }
     }
 }

@@ -67,3 +67,10 @@ extension PlotOptions {
         showIsothermLabels = true
     }
 }
+
+extension PlotOptions {
+    static let reducer: Reducer<Self> = { state, action in
+        // TODO:
+        return state
+    }
+}
