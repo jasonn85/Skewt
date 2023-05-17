@@ -12,7 +12,7 @@ fileprivate let columnWidth = 7
 fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB format
 
 /// A rawindsonde sounding
-struct Sounding {
+struct Sounding: Codable {
     let stationInfo: StationInfo
     let type: SoundingType
     let timestamp: Date
@@ -30,7 +30,7 @@ struct Sounding {
     let data: [LevelDataPoint]
 }
 
-struct StationInfo {
+struct StationInfo: Codable {
     let wbanId: Int
     let wmoId: Int
     let latitude: Double
@@ -38,7 +38,7 @@ struct StationInfo {
     let altitude: Int
 }
 
-enum SoundingType: String {
+enum SoundingType: String, Codable {
     case op40 = "Op40"
     case bak40 = "Bak40"
     case nam = "NAM"
@@ -46,7 +46,7 @@ enum SoundingType: String {
     case raob = "RAOB"
 }
 
-struct LevelDataPoint {
+struct LevelDataPoint: Codable {
     let type: DataPointType
     let pressure: Double
     let height: Int?
@@ -61,7 +61,7 @@ struct LevelDataPoint {
     }
 }
 
-enum SoundingParseError: Error {
+enum SoundingParseError: Error, Codable {
     case empty
     case missingHeaders
     case unparseableLine(String)
@@ -69,12 +69,12 @@ enum SoundingParseError: Error {
     case duplicateStationInfo
 }
 
-enum WindSpeedUnit: String {
+enum WindSpeedUnit: String, Codable {
     case ms = "ms"
     case kt = "kt"
 }
 
-enum DataPointType: Int {
+enum DataPointType: Int, Codable {
     case stationId = 1
     case soundingChecks = 2
     case stationIdAndOther = 3
@@ -86,13 +86,13 @@ enum DataPointType: Int {
     case surfaceLevel = 9
 }
 
-struct StationInfoAndOther {
+struct StationInfoAndOther: Codable {
     let stationId: String
     let radiosondeType: RadiosondeCode?
     let windSpeedUnit: WindSpeedUnit
 }
 
-enum RadiosondeCode: Int {
+enum RadiosondeCode: Int, Codable {
     case vizA = 10
     case vizB = 11
     case sdc = 12
