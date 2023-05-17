@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnnotatedSkewtPlotView: View {
-    let state: SoundingScreenState
+    let state: SoundingState
     
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -17,8 +17,8 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var sounding: Sounding? {
-        switch state.soundingState {
-        case .ready(let s):
+        switch state.status {
+        case .done(let s):
             return s
         default:
             return nil
@@ -86,7 +86,7 @@ struct AnnotatedSkewtPlotView: View {
                     SkewtPlotView(state: state, plot: plot)
                         .frame(width: plot.size.width, height: plot.size.height)
                         .offset(x: yAxisLabelWidth)
-                        .background(.gray.opacity(0.05))
+                        .background(Color.gray.opacity(0.05))
                     
                     let altitudeIsobars = plot.altitudeIsobarPaths
                     ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
@@ -119,10 +119,8 @@ struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
         let previewData = NSDataAsset(name: "op40-sample")!.data
         let previewDataString = String(decoding: previewData, as: UTF8.self)
         let previewSounding = try! Sounding(fromText: previewDataString)
-        let soundingScreenState = SoundingScreenState(soundingState:.ready(previewSounding),
-                                                      annotationState: AnnotationState())
+        let soundingScreenState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
         
-
         AnnotatedSkewtPlotView(state: soundingScreenState)
     }
 }

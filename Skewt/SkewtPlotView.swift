@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SkewtPlotView: View {
-    let state: SoundingScreenState
+    let state: SoundingState
     let plot: SkewtPlot
     
     var body: some View {
@@ -79,8 +79,7 @@ struct SkewtPlotView_Previews: PreviewProvider {
         let previewData = NSDataAsset(name: "op40-sample")!.data
         let previewDataString = String(decoding: previewData, as: UTF8.self)
         let previewSounding = try! Sounding(fromText: previewDataString)
-        let soundingScreenState = SoundingScreenState(soundingState:.ready(previewSounding),
-                                                      annotationState: AnnotationState())
+        let soundingScreenState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
         
         GeometryReader { geometry in
             let smallestDimension = min(geometry.size.width, geometry.size.height)

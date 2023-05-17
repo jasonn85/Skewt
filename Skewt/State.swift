@@ -60,32 +60,133 @@ final class Store<State>: ObservableObject {
     }
 }
 
-struct State {
-    let soundingScreenState: SoundingScreenState
-    
+struct State: Codable {
+    let currentSoundingState: SoundingState
+    let defaultSoundingSelection: SoundingSelection
+    let plotOptions: PlotOptions
+}
+
+extension State {
     init() {
-        soundingScreenState = SoundingScreenState()
+        currentSoundingState = SoundingState()
+        defaultSoundingSelection = SoundingSelection()
+        plotOptions = PlotOptions()
     }
 }
 
-struct SoundingScreenState {
-    let soundingState: SoundingState
-    let annotationState: AnnotationState
+struct SoundingSelection: Codable {
+    enum ModelType: Codable {
+        case op40
+        case raob
+    }
+    
+    enum Location: Codable {
+        case closest
+        case point(latitude: Double, longitude: Double)
+        case named(String)
+    }
+    
+    enum Time: Codable {
+        case now
+        case relative(TimeInterval)
+        case specific(Date)
+    }
+    
+    let type: ModelType
+    let location: Location
+    let time: Time
 }
 
-extension SoundingScreenState {
+extension SoundingSelection {
     init() {
-        soundingState = .blank
-        annotationState = AnnotationState()
+        type = .op40
+        location = .closest
+        time = .now
     }
 }
 
-enum SoundingState {
-    case blank
-    case loading(SoundingRequest)
-    case ready(Sounding)
+struct SoundingState: Codable {
+    enum SoundingError: Error, Codable {
+        // TODO: Implement
+        case unknown
+    }
+    
+    enum Status: Codable {
+        case idle
+        case loading
+        case done(Sounding)
+        case refreshing(Sounding)
+        case failed(SoundingError)
+    }
+    
+    let selection: SoundingSelection
+    let status: Status
 }
 
-struct AnnotationState {
+extension SoundingState {
+    init() {
+        selection = SoundingSelection()
+        status = .idle
+    }
+}
+
+struct PlotOptions: Codable {
+    struct PlotStyling: Codable {
+        enum PlotType: Codable {
+            case temperature
+            case dewPoint
+            case isotherms
+            case zeroIsotherm
+            case altitudeIsobars
+            case pressureIsobars
+            case dryAdiabats
+            case moistAdiabats
+        }
+        
+        struct LineStyle: Codable {
+            let lineWidth: CGFloat
+            let color: String
+            let opacity: CGFloat
+            let dashed: Bool
+        }
+        
+        let lineStyles: [PlotType: LineStyle]
+    }
     
+    enum IsothermTypes: Codable {
+        case none
+        case tens
+        case zeroOnly
+    }
+    
+    enum IsobarTypes: Codable {
+        case none
+        case altitude
+        case pressure
+    }
+    
+    enum AdiabatTypes: Codable {
+        case none
+        case tens
+    }
+        
+    let altitudeRange: Range<Double>?
+    let isothermTypes: IsothermTypes
+    let isobarTypes: IsobarTypes
+    let adiabatTypes: AdiabatTypes
+    let showMixingLines: Bool
+    let showIsobarLabels: Bool
+    let showIsothermLabels: Bool
+}
+
+extension PlotOptions {
+    init() {
+        altitudeRange = nil
+        isothermTypes = .tens
+        isobarTypes = .altitude
+        adiabatTypes = .tens
+        showMixingLines = false
+        showIsobarLabels = true
+        showIsothermLabels = true
+    }
 }
