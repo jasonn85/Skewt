@@ -9,6 +9,14 @@ import XCTest
 @testable import Skewt
 
 final class SoundingRequestTests: XCTestCase {
+    func testBaseUrl() {
+        let request = SoundingRequest(location: .name("NKX"))
+        let components = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
+        XCTAssertEqual(components.scheme!, "https")
+        XCTAssertEqual(components.host!, "rucsoundings.noaa.gov")
+        XCTAssertEqual(components.path, "/get_soundings.cgi")
+    }
+    
     func testNamedLocation() {
         let locationName = "NKX"
         let request = SoundingRequest(location: .name(locationName))
