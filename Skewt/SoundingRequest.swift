@@ -42,7 +42,6 @@ class SoundingRequestLocationFormatter {
         formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.roundingMode = .halfUp
-        formatter.minimumFractionDigits = numberOfDecimals
         formatter.maximumFractionDigits = numberOfDecimals
     }
     
