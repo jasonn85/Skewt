@@ -7,8 +7,6 @@
 
 import Foundation
 
-fileprivate let locationFormatter = SoundingRequestLocationFormatter()
-
 struct SoundingRequest {
     enum Location {
         case name(String)
@@ -36,6 +34,8 @@ struct SoundingRequest {
 }
 
 class SoundingRequestLocationFormatter {
+    static let shared = SoundingRequestLocationFormatter()
+    
     private var formatter: NumberFormatter
     
     init(numberOfDecimals: Int = 2) {
@@ -61,6 +61,7 @@ class SoundingRequestLocationFormatter {
 extension SoundingRequest {
     var url: URL {
         var components = URLComponents(string: SoundingRequest.rucUrl)!
+        let locationFormatter = SoundingRequestLocationFormatter.shared
         components.queryItems = [URLQueryItem(name: "airport",
                                                value: locationFormatter.string(forLocation: location))]
                                   
