@@ -38,9 +38,10 @@ struct SoundingRequest {
 class SoundingRequestLocationFormatter {
     private var formatter: NumberFormatter
     
-    init(numberOfDecimals: Int = 3) {
+    init(numberOfDecimals: Int = 2) {
         formatter = NumberFormatter()
         formatter.numberStyle = .decimal
+        formatter.roundingMode = .halfUp
         formatter.minimumFractionDigits = numberOfDecimals
         formatter.maximumFractionDigits = numberOfDecimals
     }
