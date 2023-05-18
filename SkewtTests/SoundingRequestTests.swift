@@ -18,7 +18,7 @@ final class SoundingRequestTests: XCTestCase {
     }
     
     func testNamedLocation() {
-        let locationName = "NKX"
+        let locationName = "NKX&SAN"  // Nonsensical location name but tests URL escaping
         let request = SoundingRequest(location: .name(locationName))
         let url = request.url
         
