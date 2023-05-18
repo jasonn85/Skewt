@@ -13,7 +13,7 @@ struct SoundingRequest {
         case geolocation(latitude: Double, longitude: Double)
     }
     
-    private static let rucUrl = "http://rucsoundings.noaa.gov/get_soundings.cgi"
+    private static let rucUrl = "https://rucsoundings.noaa.gov/get_soundings.cgi"
     let location: Location
     let modelName: SoundingType?
     let startTime: Date?
