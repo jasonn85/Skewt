@@ -38,7 +38,7 @@ struct StationInfo: Codable {
     let altitude: Int
 }
 
-enum SoundingType: String, Codable {
+enum SoundingType: String, Codable, CaseIterable {
     case op40 = "Op40"
     case bak40 = "Bak40"
     case nam = "NAM"
