@@ -13,7 +13,10 @@ struct SkewtApp: App {
         let store = Store(
             initial: State(),
             reducer: State.reducer,
-            middlewares: [Middlewares.locationMiddleware]
+            middlewares: [
+                Middlewares.rucApi,
+                Middlewares.locationMiddleware
+            ]
         )
         
         WindowGroup {
