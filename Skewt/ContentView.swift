@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var store: Store<State>
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        AnnotatedSkewtPlotView().environmentObject(store)
     }
 }
 

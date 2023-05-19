@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SkewtPlotView: View {
-    let state: SoundingState
+    @EnvironmentObject var store: Store<State>
     let plot: SkewtPlot
     
     var body: some View {
@@ -81,12 +81,23 @@ struct SkewtPlotView_Previews: PreviewProvider {
         let previewSounding = try! Sounding(fromText: previewDataString)
         let soundingScreenState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
         
+        let store = Store(
+            initial: State(
+                currentSoundingState: soundingScreenState,
+                defaultSoundingSelection: soundingScreenState.selection,
+                plotOptions: PlotOptions(),
+                locationState: LocationState()
+            ),
+            reducer: State.reducer,
+            middlewares: []
+        )
+        
         GeometryReader { geometry in
             let smallestDimension = min(geometry.size.width, geometry.size.height)
             let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
             let plot = SkewtPlot(sounding: previewSounding, size: squareSize)
             
-            SkewtPlotView(state: soundingScreenState, plot: plot)
+            SkewtPlotView(plot: plot).environmentObject(store)
         }
         
     }
