@@ -11,7 +11,9 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<State>
     
     var body: some View {
-        AnnotatedSkewtPlotView().environmentObject(store)
+        AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
+            store.dispatch(LocationState.Action.requestLocation)
+        }
     }
 }
 
