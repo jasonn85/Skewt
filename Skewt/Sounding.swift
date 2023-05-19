@@ -32,10 +32,10 @@ struct Sounding: Codable {
 
 struct StationInfo: Codable {
     let wbanId: Int
-    let wmoId: Int
+    let wmoId: Int?
     let latitude: Double
     let longitude: Double
-    let altitude: Int
+    let altitude: Int?
 }
 
 enum SoundingType: String, Codable, CaseIterable {
@@ -285,16 +285,17 @@ extension StationInfo {
         
         guard let result = try? pattern.wholeMatch(in: text),
               let wbanId = Int(fromSoundingString: result.1),
-              let wmoId = Int(fromSoundingString: result.2),
               var latitude = Double(fromSoundingString: result.3),
-              var longitude = Double(fromSoundingString: result.5),
-              let altitude = Int(fromSoundingString: result.7) else {
+              var longitude = Double(fromSoundingString: result.5) else {
             if let lineType = text.soundingDataType(), lineType != .stationId {
                 throw SoundingParseError.lineTypeMismatch(text)
             }
             
             throw SoundingParseError.unparseableLine(text)
         }
+        
+        let wmoId = Int(fromSoundingString: result.2)
+        let altitude = Int(fromSoundingString: result.7)
         
         // Only assume southern hemisphere (negative latitude) if an S is present
         if result.4 == "S" {

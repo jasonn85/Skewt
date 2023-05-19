@@ -116,6 +116,14 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(mushedInfo.longitude, -117.15)
         XCTAssertEqual(mushedInfo.altitude, 134)
         
+        // Permit missing WMO ID and altitude
+        let stationInfoNoWmoIdOrAltitude = try StationInfo(fromText: "      1  23062  99999  32.87 117.15  99999  99999")
+        XCTAssertEqual(stationInfoNoWmoIdOrAltitude.wbanId, 23062)
+        XCTAssertNil(stationInfoNoWmoIdOrAltitude.wmoId)
+        XCTAssertEqual(stationInfoNoWmoIdOrAltitude.latitude, 32.87)
+        XCTAssertEqual(stationInfoNoWmoIdOrAltitude.longitude, -117.15)
+        XCTAssertNil(stationInfoNoWmoIdOrAltitude.altitude)
+        
         do {
             let _ = try StationInfo(fromText: "      4   2500  10313   -525   -574    256     36")
             XCTFail("Parsing a data point line as a station ID line should throw an error")
