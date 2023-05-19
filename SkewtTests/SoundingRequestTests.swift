@@ -67,6 +67,22 @@ final class SoundingRequestTests: XCTestCase {
         }
     }
     
+    func testLatestOrStartTime() {
+        let startTimeEpoch = TimeInterval(1683417600)
+        let startTime = Date(timeIntervalSince1970: startTimeEpoch)
+        
+        let timeRequest = SoundingRequest(location: .name("NKX"), startTime: startTime)
+        let timeComponents = URLComponents(url: timeRequest.url, resolvingAgainstBaseURL: false)!
+        let timeItem = timeComponents.queryItems!.first { $0.name == "startSecs" }!
+        XCTAssertEqual(String(timeItem.value!), String(Int(startTimeEpoch)))
+        XCTAssertNil(timeComponents.queryItems!.first { $0.name == "start" })
+        
+        let nowRequest = SoundingRequest(location: .name("NKX"))
+        let nowComponents = URLComponents(url: nowRequest.url, resolvingAgainstBaseURL: false)!
+        XCTAssertNil(nowComponents.queryItems!.first { $0.name == "startSecs" })
+        XCTAssertEqual(nowComponents.queryItems!.first { $0.name == "start" }!.value , "latest")
+    }
+    
     func testTimestamps() {
         let startTimeEpoch = TimeInterval(1683417600)
         let endTimeEpoch = TimeInterval(1683504000)

@@ -71,11 +71,13 @@ extension SoundingRequest {
         if let startTime = startTime {
             components.queryItems!.append(URLQueryItem(name: "startSecs",
                                                        value: String(Int(startTime.timeIntervalSince1970))))
-        }
-        
-        if let endTime = endTime {
-            components.queryItems!.append(URLQueryItem(name: "endSecs",
-                                                       value: String(Int(endTime.timeIntervalSince1970))))
+            
+            if let endTime = endTime {
+                components.queryItems!.append(URLQueryItem(name: "endSecs",
+                                                           value: String(Int(endTime.timeIntervalSince1970))))
+            }
+        } else {
+            components.queryItems!.append(URLQueryItem(name: "start", value: "latest"))
         }
         
         if let numberOfHours = numberOfHours {
