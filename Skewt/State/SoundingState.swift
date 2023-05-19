@@ -71,7 +71,7 @@ struct SoundingState: Codable {
     
     enum Action: Skewt.Action {
         case doRefresh
-        case changeSelection(SoundingSelection.Action)
+        case changeAndLoadSelection(SoundingSelection.Action)
         case didReceiveFailure(SoundingError)
         case didReceiveResponse(Sounding)
     }
@@ -112,7 +112,7 @@ extension SoundingState {
                 return SoundingState(selection: state.selection, status: .loading)
             }
             
-        case .changeSelection(let action):
+        case .changeAndLoadSelection(let action):
             return SoundingState(selection: SoundingSelection.reducer(state.selection, action),
                                  status: .loading)
             
