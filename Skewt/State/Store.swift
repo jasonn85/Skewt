@@ -11,6 +11,7 @@ import Combine
 protocol Action {}
 typealias Reducer<State> = (State, Action) -> State
 typealias Middleware<State> = (State, Action) -> AnyPublisher<Action, Never>
+enum Middlewares {}
 
 fileprivate let dispatchQueueLabel = "com.jasonneel.skewt.store"
 
@@ -68,9 +69,8 @@ struct State: Codable {
     let currentSoundingState: SoundingState
     let defaultSoundingSelection: SoundingSelection
     let plotOptions: PlotOptions
+    let locationState: LocationState
 }
-
-
 
 // Default initializer
 extension State {
@@ -78,6 +78,7 @@ extension State {
         currentSoundingState = SoundingState()
         defaultSoundingSelection = SoundingSelection()
         plotOptions = PlotOptions()
+        locationState = LocationState()
     }
 }
 
@@ -87,11 +88,13 @@ extension State {
         if action as? Action == .saveSelectionAsDefault {
             return State(currentSoundingState: state.currentSoundingState,
                          defaultSoundingSelection: state.currentSoundingState.selection,
-                         plotOptions: state.plotOptions)
+                         plotOptions: state.plotOptions,
+                         locationState: state.locationState)
         }
         
         return State(currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
                      defaultSoundingSelection: state.defaultSoundingSelection,
-                     plotOptions: PlotOptions.reducer(state.plotOptions, action))
+                     plotOptions: PlotOptions.reducer(state.plotOptions, action),
+                     locationState: LocationState.reducer(state.locationState, action))
     }
 }

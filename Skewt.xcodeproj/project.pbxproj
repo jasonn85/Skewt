@@ -14,6 +14,8 @@
 		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
+		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
+		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
@@ -58,6 +60,9 @@
 		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequestTests.swift; sourceTree = "<group>"; };
+		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
+		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
+		968998232A17F8E2005457D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtApp.swift; sourceTree = "<group>"; };
 		96A8F5E4299DAC3E0021A170 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -110,7 +115,9 @@
 			children = (
 				96F4B05D29A80396006D23BE /* Store.swift */,
 				961202622A156B03009423D5 /* SoundingState.swift */,
+				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
+				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -138,6 +145,7 @@
 		96A8F5E1299DAC3E0021A170 /* Skewt */ = {
 			isa = PBXGroup;
 			children = (
+				968998232A17F8E2005457D6 /* Info.plist */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
@@ -321,8 +329,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */,
 				96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */,
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
+				968998202A17323F005457D6 /* LocationState.swift in Sources */,
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
@@ -496,6 +506,8 @@
 				DEVELOPMENT_TEAM = HNS87AD5L9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Skewt/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Use location to find the nearest weather";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -526,6 +538,8 @@
 				DEVELOPMENT_TEAM = HNS87AD5L9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Skewt/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Use location to find the nearest weather";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
