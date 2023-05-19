@@ -11,13 +11,17 @@ import CoreLocation
 
 extension Middlewares {
     static let locationMiddleware: Middleware<State> = { state, action in
-        guard let action = action as? LocationState.Action else {
-            return Empty().eraseToAnyPublisher()
-        }
-        
-        switch action {
+        switch action as? LocationState.Action {
         case .requestLocation:
             return LocationManager.shared.requestLocation()
+        case .didDetermineLocation(_):
+            if case .idle = state.currentSoundingState.status,
+                state.currentSoundingState.selection.requiresLocation {
+                
+                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
+            }
+            
+            fallthrough
         default:
             return Empty().eraseToAnyPublisher()
         }

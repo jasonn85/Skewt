@@ -25,6 +25,17 @@ struct LocationState: Codable {
 }
 
 extension LocationState {
+    var isLocationKnown: Bool {
+        switch self.status {
+        case .locationKnown(_, _, _):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+extension LocationState {
     init() {
         status = nil
     }

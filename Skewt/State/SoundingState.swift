@@ -45,6 +45,17 @@ extension SoundingSelection {
     }
 }
 
+extension SoundingSelection {
+    var requiresLocation: Bool {
+        switch self.location {
+        case .closest:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 // Reducer
 extension SoundingSelection {
     static let reducer: Reducer<Self> = { state, action in
@@ -65,7 +76,9 @@ extension SoundingSelection {
 
 struct SoundingState: Codable {
     enum SoundingError: Error, Codable {
+        case unableToGenerateRequestFromSelection
         case unparseableResponse
+        case requestFailed
         case lackingLocationPermission  // We can't do closest weather if we lack CL permission
     }
     
