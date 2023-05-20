@@ -59,7 +59,7 @@ class LocationManager: NSObject {
     }
     
     private func getLocation() -> AnyPublisher<Action, Never> {
-        locationManager.startUpdatingLocation()
+        locationManager.requestLocation()
         return publisher.eraseToAnyPublisher()
     }
 }
@@ -78,6 +78,9 @@ extension LocationManager: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         publisher.send(LocationState.Action.didDetermineLocation(locations.first!))
-        manager.stopUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        publisher.send(LocationState.Action.locationRequestDidFail)
     }
 }
