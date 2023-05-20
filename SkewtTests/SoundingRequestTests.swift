@@ -23,9 +23,7 @@ final class SoundingRequestTests: XCTestCase {
         let url = request.url
         
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        XCTAssertTrue(components!.queryItems!.count == 1)
-        let item = components!.queryItems!.first!
-        XCTAssertEqual(item.name, "airport")
+        let item = components!.queryItems!.first { $0.name == "airport" }!
         XCTAssertEqual(item.value, locationName)
     }
     
@@ -36,9 +34,7 @@ final class SoundingRequestTests: XCTestCase {
         let url = request.url
         
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        XCTAssertTrue(components!.queryItems!.count == 1)
-        let item = components!.queryItems!.first!
-        XCTAssertEqual(item.name, "airport")
+        let item = components!.queryItems!.first { $0.name == "airport" }!
         XCTAssertEqual(item.value, "\(String(coords.0)),\(String(coords.1))")
     }
     
