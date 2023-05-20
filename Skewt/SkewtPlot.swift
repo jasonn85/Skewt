@@ -149,6 +149,17 @@ extension SkewtPlot {
     }
 }
 
+// MARK: - Applying options
+extension SkewtPlot {
+    mutating func applyOptions(_ options: PlotOptions) {
+        if let altitudeRange = options.altitudeRange {
+            let lowerPressure = Pressure.standardPressure(atAltitude: altitudeRange.lowerBound)
+            let upperPressure = Pressure.standardPressure(atAltitude: altitudeRange.upperBound)
+            pressureRange = lowerPressure...upperPressure
+        }
+    }
+}
+
 // MARK: - Isopleth paths
 extension SkewtPlot {
     typealias Line = (CGPoint, CGPoint)

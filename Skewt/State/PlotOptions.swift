@@ -45,19 +45,19 @@ struct PlotOptions: Codable {
         var lineStyles: [PlotType: LineStyle]
     }
     
-    enum IsothermTypes: Codable {
+    enum IsothermTypes: Codable, Equatable, CaseIterable {
         case none
         case tens
         case zeroOnly
     }
     
-    enum IsobarTypes: Codable {
+    enum IsobarTypes: Codable, Equatable, CaseIterable {
         case none
         case altitude
         case pressure
     }
     
-    enum AdiabatTypes: Codable {
+    enum AdiabatTypes: Codable, Equatable, CaseIterable {
         case none
         case tens
     }
