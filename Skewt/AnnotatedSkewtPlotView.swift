@@ -59,7 +59,11 @@ struct AnnotatedSkewtPlotView: View {
         return widest
     }
     
-    private func xAxisLabelHeight() -> CGFloat? {
+    private var yAxisLabelWidthOrNil: CGFloat? {
+        widestAltitudeText()
+    }
+    
+    private var xAxisLabelHeightOrNil: CGFloat? {
         guard store.state.plotOptions.showIsothermLabels else {
             return nil
         }
@@ -71,8 +75,8 @@ struct AnnotatedSkewtPlotView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let yAxisLabelWidth = widestAltitudeText() ?? 0.0
-            let xAxisLabelHeight = xAxisLabelHeight() ?? 0.0
+            let yAxisLabelWidth = yAxisLabelWidthOrNil ?? 0.0
+            let xAxisLabelHeight = xAxisLabelHeightOrNil ?? 0.0
             let smallestDimension = min(geometry.size.width - yAxisLabelWidth,
                                         geometry.size.height - xAxisLabelHeight)
             let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
@@ -84,12 +88,28 @@ struct AnnotatedSkewtPlotView: View {
                     ProgressView().controlSize(.large)
                 }
                 
-                SkewtPlotView(plot: plot)
-                    .frame(width: plot.size.width, height: plot.size.height)
-                    .offset(x: yAxisLabelWidth)
-                    .background(Color.gray.opacity(0.05))
-                    .environmentObject(store)
-                
+                VStack(alignment: .trailing, spacing: 8) {
+                    HStack(spacing: 8) {
+                        yAxisLabelView(withPlot: plot)
+                        
+                        SkewtPlotView(plot: plot)
+                            .frame(width: plot.size.width, height: plot.size.height)
+                            .background(Color.gray.opacity(0.05))
+                            .environmentObject(store)
+                    }
+                    
+                    xAxisLabelView(withPlot: plot, width: smallestDimension)
+                }
+            }
+            .aspectRatio(1.0, contentMode: .fit)
+        }
+    }
+    
+    @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
+        if yAxisLabelWidthOrNil == nil {
+            EmptyView()
+        } else {
+            Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
                 let altitudeIsobars = plot.altitudeIsobarPaths
                 ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
                     Text(altitudeFormatter.string(from: altitude as NSNumber) ?? "")
@@ -97,20 +117,27 @@ struct AnnotatedSkewtPlotView: View {
                         .lineLimit(1)
                         .foregroundColor(.blue)
                         .position(y: plot.y(forPressureAltitude: altitude))
-                        .offset(x: yAxisLabelWidth, y: 8.0)
-                }
-                
-                let isotherms = plot.isothermPaths
-                
-                ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                    Text(String(Int(temperature)))
-                        .font(Font(bottomAxisLabelFont))
-                        .foregroundColor(.red)
-                        .position(x: plot.x(forSurfaceTemperature: temperature))
-                        .offset(x: yAxisLabelWidth + 8.0, y: smallestDimension + xAxisLabelHeight)
+                        .offset(x: yAxisLabelWidthOrNil!)
                 }
             }
-            .frame(width: smallestDimension + yAxisLabelWidth, height: smallestDimension + xAxisLabelHeight)
+        }
+    }
+    
+    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot, width: CGFloat) -> some View {
+        if xAxisLabelHeightOrNil == nil {
+            EmptyView()
+        } else {
+            Rectangle().frame(width: width, height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
+                if store.state.plotOptions.showIsothermLabels {
+                    let isotherms = plot.isothermPaths
+                    ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
+                        Text(String(Int(temperature)))
+                            .font(Font(bottomAxisLabelFont))
+                            .foregroundColor(.red)
+                            .position(x: plot.x(forSurfaceTemperature: temperature))
+                    }
+                }
+            }
         }
     }
     
