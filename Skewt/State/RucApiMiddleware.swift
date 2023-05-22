@@ -15,26 +15,14 @@ enum RucRequestError: Error {
 
 extension Middlewares {
     static let rucApi: Middleware<State> = { state, action in
-        guard let action = action as? SoundingState.Action else {
-            return Empty().eraseToAnyPublisher()
-        }
-
-        switch action {
+        switch action as? SoundingState.Action {
         case .doRefresh, .changeAndLoadSelection(_):
             let selection = state.currentSoundingState.selection
-            var location: CLLocation? = nil
+            let location = state.locationState.locationIfKnown
             
-            guard !selection.requiresLocation || state.locationState.isLocationKnown else {
+            guard !selection.requiresLocation || location != nil else {
                 return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
                     .eraseToAnyPublisher()
-            }
-                        
-            if case .locationKnown(
-                latitude: let latitude,
-                longitude: let longitude,
-                time: _
-            ) = state.locationState.status {
-                location = CLLocation(latitude: latitude, longitude: longitude)
             }
             
             guard let soundingRequest = try? SoundingRequest(fromSoundingSelection: selection, currentLocation: location) else {
