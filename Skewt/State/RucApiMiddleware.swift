@@ -15,11 +15,7 @@ enum RucRequestError: Error {
 
 extension Middlewares {
     static let rucApi: Middleware<State> = { state, action in
-        guard let action = action as? SoundingState.Action else {
-            return Empty().eraseToAnyPublisher()
-        }
-
-        switch action {
+        switch action as? SoundingState.Action {
         case .doRefresh, .changeAndLoadSelection(_):
             let selection = state.currentSoundingState.selection
             var location: CLLocation? = nil
