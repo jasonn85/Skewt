@@ -27,12 +27,12 @@ struct LocationState: Codable {
 }
 
 extension LocationState {
-    var isLocationKnown: Bool {
-        switch self.status {
-        case .locationKnown(_, _, _):
-            return true
+    var locationIfKnown: CLLocation? {
+        switch status {
+        case .locationKnown(let latitude, let longitude, _):
+            return CLLocation(latitude: latitude, longitude: longitude)
         default:
-            return false
+            return nil
         }
     }
 }
