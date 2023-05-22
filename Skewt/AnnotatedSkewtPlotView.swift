@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnnotatedSkewtPlotView: View {
-    let state: SoundingScreenState
+    @EnvironmentObject var store: Store<State>
     
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -17,9 +17,9 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var sounding: Sounding? {
-        switch state.soundingState {
-        case .ready(let s):
-            return s
+        switch store.state.currentSoundingState.status {
+        case .done(let sounding):
+            return sounding
         default:
             return nil
         }
@@ -83,10 +83,11 @@ struct AnnotatedSkewtPlotView: View {
                 let plot = SkewtPlot(sounding: sounding, size: squareSize)
                 
                 ZStack {
-                    SkewtPlotView(state: state, plot: plot)
+                    SkewtPlotView(plot: plot)
                         .frame(width: plot.size.width, height: plot.size.height)
                         .offset(x: yAxisLabelWidth)
-                        .background(.gray.opacity(0.05))
+                        .background(Color.gray.opacity(0.05))
+                        .environmentObject(store)
                     
                     let altitudeIsobars = plot.altitudeIsobarPaths
                     ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
@@ -119,10 +120,19 @@ struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
         let previewData = NSDataAsset(name: "op40-sample")!.data
         let previewDataString = String(decoding: previewData, as: UTF8.self)
         let previewSounding = try! Sounding(fromText: previewDataString)
-        let soundingScreenState = SoundingScreenState(soundingState:.ready(previewSounding),
-                                                      annotationState: AnnotationState())
+        let soundingScreenState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
         
-
-        AnnotatedSkewtPlotView(state: soundingScreenState)
+        let store = Store(
+            initial: State(
+                currentSoundingState: soundingScreenState,
+                defaultSoundingSelection: soundingScreenState.selection,
+                plotOptions: PlotOptions(),
+                locationState: LocationState()
+            ),
+            reducer: State.reducer,
+            middlewares: []
+        )
+        
+        AnnotatedSkewtPlotView().environmentObject(store)
     }
 }

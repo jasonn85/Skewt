@@ -12,7 +12,7 @@ fileprivate let columnWidth = 7
 fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB format
 
 /// A rawindsonde sounding
-struct Sounding {
+struct Sounding: Codable {
     let stationInfo: StationInfo
     let type: SoundingType
     let timestamp: Date
@@ -30,15 +30,15 @@ struct Sounding {
     let data: [LevelDataPoint]
 }
 
-struct StationInfo {
+struct StationInfo: Codable {
     let wbanId: Int
-    let wmoId: Int
+    let wmoId: Int?
     let latitude: Double
     let longitude: Double
-    let altitude: Int
+    let altitude: Int?
 }
 
-enum SoundingType: String, CaseIterable {
+enum SoundingType: String, Codable, CaseIterable {
     case op40 = "Op40"
     case bak40 = "Bak40"
     case nam = "NAM"
@@ -46,7 +46,7 @@ enum SoundingType: String, CaseIterable {
     case raob = "RAOB"
 }
 
-struct LevelDataPoint {
+struct LevelDataPoint: Codable {
     let type: DataPointType
     let pressure: Double
     let height: Int?
@@ -61,7 +61,7 @@ struct LevelDataPoint {
     }
 }
 
-enum SoundingParseError: Error {
+enum SoundingParseError: Error, Codable {
     case empty
     case missingHeaders
     case unparseableLine(String)
@@ -69,12 +69,12 @@ enum SoundingParseError: Error {
     case duplicateStationInfo
 }
 
-enum WindSpeedUnit: String {
+enum WindSpeedUnit: String, Codable {
     case ms = "ms"
     case kt = "kt"
 }
 
-enum DataPointType: Int {
+enum DataPointType: Int, Codable {
     case stationId = 1
     case soundingChecks = 2
     case stationIdAndOther = 3
@@ -86,13 +86,13 @@ enum DataPointType: Int {
     case surfaceLevel = 9
 }
 
-struct StationInfoAndOther {
+struct StationInfoAndOther: Codable {
     let stationId: String
     let radiosondeType: RadiosondeCode?
     let windSpeedUnit: WindSpeedUnit
 }
 
-enum RadiosondeCode: Int {
+enum RadiosondeCode: Int, Codable {
     case vizA = 10
     case vizB = 11
     case sdc = 12
@@ -285,16 +285,17 @@ extension StationInfo {
         
         guard let result = try? pattern.wholeMatch(in: text),
               let wbanId = Int(fromSoundingString: result.1),
-              let wmoId = Int(fromSoundingString: result.2),
               var latitude = Double(fromSoundingString: result.3),
-              var longitude = Double(fromSoundingString: result.5),
-              let altitude = Int(fromSoundingString: result.7) else {
+              var longitude = Double(fromSoundingString: result.5) else {
             if let lineType = text.soundingDataType(), lineType != .stationId {
                 throw SoundingParseError.lineTypeMismatch(text)
             }
             
             throw SoundingParseError.unparseableLine(text)
         }
+        
+        let wmoId = Int(fromSoundingString: result.2)
+        let altitude = Int(fromSoundingString: result.7)
         
         // Only assume southern hemisphere (negative latitude) if an S is present
         if result.4 == "S" {

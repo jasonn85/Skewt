@@ -10,8 +10,17 @@ import SwiftUI
 @main
 struct SkewtApp: App {
     var body: some Scene {
+        let store = Store(
+            initial: State(),
+            reducer: State.reducer,
+            middlewares: [
+                Middlewares.rucApi,
+                Middlewares.locationMiddleware
+            ]
+        )
+        
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(store)
         }
     }
 }
