@@ -13,7 +13,8 @@ struct SoundingRequest {
         case geolocation(latitude: Double, longitude: Double)
     }
     
-    private static let rucUrl = "https://rucsoundings.noaa.gov/get_soundings.cgi"
+    private static let modelsUrl = "https://rucsoundings.noaa.gov/get_soundings.cgi"
+    private static let soundingsUrl = "https://rucsoundings.noaa.gov/get_pbraobs.cgi"
     let location: Location
     let modelName: SoundingType?
     let startTime: Date?
@@ -58,8 +59,17 @@ class SoundingRequestLocationFormatter {
 }
 
 extension SoundingRequest {
+    private var basePath: String {
+        switch modelName {
+        case .raob:
+            return SoundingRequest.soundingsUrl
+        default:
+            return SoundingRequest.modelsUrl
+        }
+    }
+    
     var url: URL {
-        var components = URLComponents(string: SoundingRequest.rucUrl)!
+        var components = URLComponents(string: basePath)!
         let locationFormatter = SoundingRequestLocationFormatter.shared
         components.queryItems = [URLQueryItem(name: "airport",
                                                value: locationFormatter.string(forLocation: location))]
