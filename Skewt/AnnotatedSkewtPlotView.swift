@@ -104,13 +104,14 @@ struct AnnotatedSkewtPlotView: View {
                                     endPoint: .top
                                 )
                             }
+                            .border(.black)
                     }
                     
                     xAxisLabelView(withPlot: plot, width: smallestDimension)
                 }
             }
-            .aspectRatio(1.0, contentMode: .fit)
         }
+        .aspectRatio(1.0, contentMode: .fit)
     }
     
     @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {

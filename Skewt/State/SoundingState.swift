@@ -109,6 +109,17 @@ extension SoundingState {
     }
 }
 
+extension SoundingState.Status {
+    var isLoading: Bool {
+        switch self {
+        case .loading, .refreshing(_):
+            return true
+        case .idle, .done(_), .failed(_):
+            return false
+        }
+    }
+}
+
 // Reducer
 extension SoundingState {
     static let reducer: Reducer<Self> = { state, action in

@@ -17,14 +17,14 @@ struct SkewtPlotView: View {
                 Path(temperaturePath)
                     .stroke(lineWidth: 3.0)
                     .foregroundColor(Color("TemperaturePlot"))
-                    .zIndex(1)
+                    .zIndex(100)
             }
             
             if let dewPointPath = plot.dewPointPath {
                 Path(dewPointPath)
                     .stroke(lineWidth: 3.0)
                     .foregroundColor(Color("DewPointPlot"))
-                    .zIndex(1)
+                    .zIndex(99)
             }
             
             
@@ -33,6 +33,7 @@ struct SkewtPlotView: View {
                 Path(altitudeIsobars[a]!)
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.blue)
+                    .zIndex(75)
             }
             
             let isotherms = plot.isothermPaths
@@ -40,12 +41,14 @@ struct SkewtPlotView: View {
                 Path(isotherms[t]!)
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.red)
+                    .zIndex(25)
             }
             
             if let zeroIsotherm = isotherms[0.0] {
                 Path(zeroIsotherm)
                     .stroke(lineWidth: 2.0)
                     .foregroundColor(.red)
+                    .zIndex(50)
             }
             
             let dryAdiabats = plot.dryAdiabatPaths
@@ -54,6 +57,7 @@ struct SkewtPlotView: View {
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.blue)
                     .opacity(0.5)
+                    .zIndex(10)
             }
             
             let moistAdiabats = plot.moistAdiabatPaths
@@ -62,6 +66,7 @@ struct SkewtPlotView: View {
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.orange)
                     .opacity(0.5)
+                    .zIndex(9)
             }
             
             let isohumes = plot.isohumePaths
@@ -70,6 +75,7 @@ struct SkewtPlotView: View {
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.gray)
                     .opacity(0.5)
+                    .zIndex(5)
             }
             
         }.frame(width: plot.size.width, height: plot.size.height)
