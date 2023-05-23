@@ -10,7 +10,7 @@ import Combine
 import CoreLocation
 
 extension Middlewares {
-    static let locationMiddleware: Middleware<State> = { state, action in
+    static let locationMiddleware: Middleware<SkewtState> = { state, action in
         switch action as? LocationState.Action {
         case .requestLocation:
             return LocationManager.shared.requestLocation()

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnnotatedSkewtPlotView: View {
-    @EnvironmentObject var store: Store<State>
+    @EnvironmentObject var store: Store<SkewtState>
     
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -150,22 +150,6 @@ struct AnnotatedSkewtPlotView: View {
 
 struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
     static var previews: some View {
-        let previewData = NSDataAsset(name: "op40-sample")!.data
-        let previewDataString = String(decoding: previewData, as: UTF8.self)
-        let previewSounding = try! Sounding(fromText: previewDataString)
-        let soundingScreenState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
-        
-        let store = Store(
-            initial: State(
-                currentSoundingState: soundingScreenState,
-                defaultSoundingSelection: soundingScreenState.selection,
-                plotOptions: PlotOptions(),
-                locationState: LocationState()
-            ),
-            reducer: State.reducer,
-            middlewares: []
-        )
-        
-        AnnotatedSkewtPlotView().environmentObject(store)
+        AnnotatedSkewtPlotView().environmentObject(Store<SkewtState>.previewStore)
     }
 }
