@@ -94,8 +94,16 @@ struct AnnotatedSkewtPlotView: View {
                         
                         SkewtPlotView(plot: plot)
                             .frame(width: plot.size.width, height: plot.size.height)
-                            .background(Color.gray.opacity(0.05))
                             .environmentObject(store)
+                            .background {
+                                LinearGradient(
+                                    colors: [
+                                        Color("LowSkyBlue"), Color("HighSkyBlue")
+                                    ],
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
+                            }
                     }
                     
                     xAxisLabelView(withPlot: plot, width: smallestDimension)

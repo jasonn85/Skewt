@@ -16,13 +16,15 @@ struct SkewtPlotView: View {
             if let temperaturePath = plot.temperaturePath {
                 Path(temperaturePath)
                     .stroke(lineWidth: 3.0)
-                    .foregroundColor(.red)
+                    .foregroundColor(Color("TemperaturePlot"))
+                    .zIndex(1)
             }
             
             if let dewPointPath = plot.dewPointPath {
                 Path(dewPointPath)
                     .stroke(lineWidth: 3.0)
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color("DewPointPlot"))
+                    .zIndex(1)
             }
             
             
