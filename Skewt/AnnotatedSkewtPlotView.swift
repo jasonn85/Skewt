@@ -131,10 +131,13 @@ struct AnnotatedSkewtPlotView: View {
                 if store.state.plotOptions.showIsothermLabels {
                     let isotherms = plot.isothermPaths
                     ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                        Text(String(Int(temperature)))
-                            .font(Font(bottomAxisLabelFont))
-                            .foregroundColor(.red)
-                            .position(x: plot.x(forSurfaceTemperature: temperature))
+                        let x = plot.x(forSurfaceTemperature: temperature)
+                        if x >= 0 {
+                            Text(String(Int(temperature)))
+                                .font(Font(bottomAxisLabelFont))
+                                .foregroundColor(.red)
+                                .position(x: x)
+                        }
                     }
                 }
             }
