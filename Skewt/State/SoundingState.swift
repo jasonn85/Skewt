@@ -25,7 +25,7 @@ struct SoundingSelection: Codable {
         case named(String)
     }
     
-    enum Time: Codable {
+    enum Time: Codable, Equatable {
         case now
         case relative(TimeInterval)
         case specific(Date)

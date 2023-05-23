@@ -38,6 +38,7 @@ struct ContentView: View {
             
             if selectingTime {
                 timeSelection
+//                    .transition(.move(edge: .top))
             }
             
             Spacer()
@@ -77,17 +78,49 @@ struct ContentView: View {
                 ProgressView()
             } else {
                 Image(systemName: "chevron.right")
+                    .rotationEffect(timeSelectionChevronRotation)
             }
         }
         .font(.footnote)
         .onTapGesture {
-            selectingTime = !selectingTime
+            withAnimation {
+                selectingTime.toggle()
+            }
         }
     }
     
+    private var timeSelectionChevronRotation: Angle {
+        selectingTime ? .degrees(90) : .zero
+    }
+    
     private var timeSelection: some View {
-        // TODO:
-        Text("doing stuff")
+        TimeSelectView(
+            value: Binding<TimeInterval>(
+                get: { selectedTimeInterval },
+                set: { setTimeInterval($0) }
+            ),
+            range: .hours(-12)...TimeInterval.hours(12),
+            maximumRange: .hours(-24)...TimeInterval.hours(24)
+        )
+    }
+    
+    private var selectedTimeInterval: TimeInterval {
+        switch store.state.currentSoundingState.selection.time {
+        case .now:
+            return 0
+        case .relative(let interval):
+            return interval
+        case .specific(let date):
+            return date.timeIntervalSinceNow
+        }
+    }
+    
+    private func setTimeInterval(_ interval: TimeInterval) {
+        let time: SoundingSelection.Time = interval == 0 ? .now : .relative(interval)
+        
+        if time != store.state.currentSoundingState.selection.time {
+            store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(time)))
+        }
     }
     
     private var statusText: String? {

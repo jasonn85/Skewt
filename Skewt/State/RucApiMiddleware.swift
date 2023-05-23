@@ -54,6 +54,7 @@ extension SoundingRequest {
         var location: SoundingRequest.Location
         var modelType: SoundingType
         var startTime: Date?
+        var endTime: Date?
         
         switch selection.location {
         case .closest:
@@ -81,10 +82,11 @@ extension SoundingRequest {
             startTime = nil
         case .relative(let timeInterval):
             startTime = Date(timeIntervalSinceNow: timeInterval)
+            endTime = Date(timeIntervalSinceNow: timeInterval + .hours(1))
         case .specific(let date):
             startTime = date
         }
         
-        self.init(location: location, modelName: modelType, startTime: startTime)
+        self.init(location: location, modelName: modelType, startTime: startTime, endTime: endTime)
     }
 }
