@@ -11,6 +11,11 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @State var selectingTime = false
     
+    @State private var updateTimeTask: Task<(), Error>? = nil
+    private let updateTimeDebounce: Duration = .milliseconds(100)
+    
+    @State private var selectedTimeInterval: TimeInterval = 0
+    
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
         formatter.formattingContext = .standalone
@@ -104,22 +109,19 @@ struct ContentView: View {
         )
     }
     
-    private var selectedTimeInterval: TimeInterval {
-        switch store.state.currentSoundingState.selection.time {
-        case .now:
-            return 0
-        case .relative(let interval):
-            return interval
-        case .specific(let date):
-            return date.timeIntervalSinceNow
-        }
-    }
-    
     private func setTimeInterval(_ interval: TimeInterval) {
+        selectedTimeInterval = interval
+        
+        updateTimeTask?.cancel()
+        updateTimeTask = nil
+        
         let time: SoundingSelection.Time = interval == 0 ? .now : .relative(interval)
         
         if time != store.state.currentSoundingState.selection.time {
-            store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(time)))
+            updateTimeTask = Task {
+                try await Task.sleep(for: updateTimeDebounce)
+                store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(time)))
+            }
         }
     }
     
@@ -151,6 +153,19 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environmentObject(Store<SkewtState>.previewStore)
+    }
+}
+
+extension SoundingSelection.Time {
+    var asTimeInterval: TimeInterval {
+        switch self {
+        case .now:
+            return 0
+        case .relative(let interval):
+            return interval
+        case .specific(let date):
+            return date.timeIntervalSinceNow
+        }
     }
 }
 
