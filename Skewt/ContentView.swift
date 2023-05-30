@@ -53,8 +53,7 @@ struct ContentView: View {
     private var header: some View {
         HStack {
             if store.state.currentSoundingState.selection.requiresLocation {
-                Image("locationIcon")
-                    .offset(y: 1)
+                Image(systemName: "location")
             }
             
             Text(store.state.currentSoundingState.selection.type.description)
