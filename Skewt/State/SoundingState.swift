@@ -117,6 +117,21 @@ extension SoundingState.Status {
         case .idle, .done(_), .failed(_):
             return false
         }
+	}
+}
+
+extension SoundingState.Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .doRefresh:
+            return "Refreshing"
+        case .changeAndLoadSelection(let selection):
+            return "Changing selection and reloading: \(selection)"
+        case .didReceiveFailure(let error):
+            return "Failed to load sounding: \(error)"
+        case .didReceiveResponse(let sounding):
+            return "Received sounding with \(sounding.data.count) data points"
+        }
     }
 }
 

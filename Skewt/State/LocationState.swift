@@ -43,6 +43,21 @@ extension LocationState {
     }
 }
 
+extension LocationState.Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .requestLocation:
+            return "Requesting location"
+        case .permissionWasDenied:
+            return "Location permission was denied"
+        case .locationRequestDidFail:
+            return "Location request failed"
+        case .didDetermineLocation(_):
+            return "Location acquired"
+        }
+    }
+}
+
 extension LocationState {
     static let reducer: Reducer<Self> = { state, action in
         guard let action = action as? LocationState.Action else {
