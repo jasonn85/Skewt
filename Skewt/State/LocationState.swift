@@ -59,6 +59,8 @@ extension LocationState.Action: CustomStringConvertible {
 }
 
 extension LocationState {
+    private static let immediateErrorIgnoreTime: TimeInterval = 10.0  // 10 seconds
+    
     static let reducer: Reducer<Self> = { state, action in
         guard let action = action as? LocationState.Action else {
             return state
@@ -68,11 +70,19 @@ extension LocationState {
         case .permissionWasDenied:
             return LocationState(status: .permissionDenied)
         case .locationRequestDidFail:
+            // A simulator bug causes a failure immediately after a success when simulating location.
+            // We can keep a recent, previous location in this case
+            if case .locationKnown(_, _, let time) = state.status {
+                if -time.timeIntervalSinceNow < immediateErrorIgnoreTime {
+                    return state
+                }
+            }
+            
             return LocationState(status: .locationRequestFailed)
         case .didDetermineLocation(let location):
             return LocationState(status: .locationKnown(latitude: location.coordinate.latitude,
                                                         longitude: location.coordinate.longitude,
-                                                        time: Date()))
+                                                        time: location.timestamp))
         default:
             return state
         }
