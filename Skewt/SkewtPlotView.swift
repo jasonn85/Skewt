@@ -27,58 +27,88 @@ struct SkewtPlotView: View {
                     .zIndex(99)
             }
             
-            
-            let altitudeIsobars = plot.altitudeIsobarPaths
-            ForEach(altitudeIsobars.keys.sorted(), id: \.self) { a in
-                Path(altitudeIsobars[a]!)
+            ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
+                Path(isobarPaths[a]!)
                     .stroke(lineWidth: 1.0)
                     .foregroundColor(.blue)
                     .zIndex(75)
             }
             
             let isotherms = plot.isothermPaths
-            ForEach(isotherms.keys.sorted(), id: \.self) { t in
-                Path(isotherms[t]!)
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(.red)
-                    .zIndex(25)
+            
+            if case .tens = store.state.plotOptions.isothermTypes {
+                ForEach(isotherms.keys.sorted(), id: \.self) { t in
+                    Path(isotherms[t]!)
+                        .stroke(lineWidth: 1.0)
+                        .foregroundColor(.red)
+                        .zIndex(25)
+                }
             }
             
-            if let zeroIsotherm = isotherms[0.0] {
-                Path(zeroIsotherm)
-                    .stroke(lineWidth: 2.0)
-                    .foregroundColor(.red)
-                    .zIndex(50)
+            if showZeroIsotherm {
+                if let zeroIsotherm = isotherms[0.0] {
+                    Path(zeroIsotherm)
+                        .stroke(lineWidth: 2.0)
+                        .foregroundColor(.red)
+                        .zIndex(50)
+                }
             }
             
-            let dryAdiabats = plot.dryAdiabatPaths
-            ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
-                Path(dryAdiabats[t]!)
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(.blue)
-                    .opacity(0.5)
-                    .zIndex(10)
+            switch store.state.plotOptions.adiabatTypes {
+            case .none:
+                EmptyView()
+            case .tens:
+                let dryAdiabats = plot.dryAdiabatPaths
+                ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
+                    Path(dryAdiabats[t]!)
+                        .stroke(lineWidth: 1.0)
+                        .foregroundColor(.blue)
+                        .opacity(0.5)
+                        .zIndex(10)
+                }
+                
+                let moistAdiabats = plot.moistAdiabatPaths
+                ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
+                    Path(moistAdiabats[t]!)
+                        .stroke(lineWidth: 1.0)
+                        .foregroundColor(.orange)
+                        .opacity(0.5)
+                        .zIndex(9)
+                }
             }
             
-            let moistAdiabats = plot.moistAdiabatPaths
-            ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
-                Path(moistAdiabats[t]!)
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(.orange)
-                    .opacity(0.5)
-                    .zIndex(9)
-            }
-            
-            let isohumes = plot.isohumePaths
-            ForEach(isohumes.keys.sorted(), id: \.self) { t in
-                Path(isohumes[t]!)
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(.gray)
-                    .opacity(0.5)
-                    .zIndex(5)
+            if store.state.plotOptions.showMixingLines {
+                let isohumes = plot.isohumePaths
+                ForEach(isohumes.keys.sorted(), id: \.self) { t in
+                    Path(isohumes[t]!)
+                        .stroke(lineWidth: 1.0)
+                        .foregroundColor(.gray)
+                        .opacity(0.5)
+                        .zIndex(5)
+                }
             }
             
         }.frame(width: plot.size.width, height: plot.size.height)
+    }
+    
+    private var isobarPaths: [Double: CGPath] {
+        switch store.state.plotOptions.isobarTypes {
+        case .none:
+            return [:]
+        case .altitude:
+            return plot.altitudeIsobarPaths
+        case .pressure:
+            return plot.isobarPaths
+        }
+    }
+    
+    private var showZeroIsotherm: Bool {
+        switch store.state.plotOptions.isothermTypes {
+        case .tens, .zeroOnly:
+            return true
+        case .none:
+            return false
+        }
     }
 }
 

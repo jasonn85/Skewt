@@ -45,21 +45,27 @@ struct PlotOptions: Codable {
         var lineStyles: [PlotType: LineStyle]
     }
     
-    enum IsothermTypes: Codable, Equatable, CaseIterable {
+    enum IsothermTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
-        case tens
         case zeroOnly
+        case tens
+        
+        var id: Self { self }
     }
     
-    enum IsobarTypes: Codable, Equatable, CaseIterable {
+    enum IsobarTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
         case altitude
         case pressure
+        
+        var id: Self { self }
     }
     
-    enum AdiabatTypes: Codable, Equatable, CaseIterable {
+    enum AdiabatTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
         case tens
+        
+        var id: Self { self }
     }
         
     var altitudeRange: Range<Double>?

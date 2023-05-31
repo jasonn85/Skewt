@@ -11,6 +11,9 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @State var selectingTime = false
     
+    
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+    
     @State private var updateTimeTask: Task<(), Error>? = nil
     private let updateTimeDebounce: Duration = .milliseconds(100)
     
@@ -32,21 +35,29 @@ struct ContentView: View {
     }
     
     var body: some View {
-        VStack (alignment: .center) {
-            header
-            
-            AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
-                store.dispatch(LocationState.Action.requestLocation)
+        let isPhone = UIDevice.current.userInterfaceIdiom == .phone
+        let horizontal = isPhone && verticalSizeClass == .compact
+        let layout = horizontal ? AnyLayout(HStackLayout()) : AnyLayout(VStackLayout())
+        
+        layout {
+            VStack (alignment: .center) {
+                header
+                
+                AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
+                    store.dispatch(LocationState.Action.requestLocation)
+                }
+                
+                footer
+                
+                if selectingTime {
+                    timeSelection
+                    //                    .transition(.move(edge: .top))
+                }
+                
+                Spacer()
             }
             
-            footer
-            
-            if selectingTime {
-                timeSelection
-//                    .transition(.move(edge: .top))
-            }
-            
-            Spacer()
+            DisplayOptionsView().environmentObject(store)
         }
     }
     
