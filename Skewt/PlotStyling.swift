@@ -38,6 +38,8 @@ extension PlotOptions.PlotStyling {
             color = UIColor(named: "DryAdiabatPlot")!
         case .moistAdiabats:
             color = UIColor(named: "MoistAdiabatPlot")!
+        case .isohumes:
+            color = UIColor(named: "IsohumePlot")!
         }
         
         let textColor = color.cgColor.rgbHexString!

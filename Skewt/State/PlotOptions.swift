@@ -33,6 +33,7 @@ struct PlotOptions: Codable {
             case pressureIsobars
             case dryAdiabats
             case moistAdiabats
+            case isohumes
             
             var id: Self { self }
         }
