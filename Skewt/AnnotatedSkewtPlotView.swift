@@ -16,6 +16,19 @@ struct AnnotatedSkewtPlotView: View {
         return formatter
     }
     
+    private var pressureFormatter: NumberFormatter {
+        return NumberFormatter()
+    }
+    
+    private var isobarFormatter: NumberFormatter {
+        switch store.state.plotOptions.isobarTypes {
+        case .none, .altitude:
+            return altitudeFormatter
+        case .pressure:
+            return pressureFormatter
+        }
+    }
+    
     private var sounding: Sounding? {
         switch store.state.currentSoundingState.status {
         case .done(let sounding), .refreshing(let sounding):
@@ -42,12 +55,22 @@ struct AnnotatedSkewtPlotView: View {
             return nil
         }
         
+        let formatter = isobarFormatter
         let sampleAltitudes = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                30_000.0, 40_000.0]
+        let samplePressures = [0.0, 1050.0, 9999.0, 8888.0]
         var widest: CGFloat = 0.0
+        var samples: [Double]
         
-        for altitude in sampleAltitudes {
-            let text = altitudeFormatter.string(from: altitude as NSNumber)!
+        switch store.state.plotOptions.isobarTypes {
+        case .none, .altitude:
+            samples = sampleAltitudes
+        case .pressure:
+            samples = samplePressures
+        }
+        
+        for sample in samples {
+            let text = formatter.string(from: sample as NSNumber)!
             let attributes = [NSAttributedString.Key.font: leftAxisLabelFont]
             let width = text.size(withAttributes: attributes).width
             
@@ -119,13 +142,13 @@ struct AnnotatedSkewtPlotView: View {
             EmptyView()
         } else {
             Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
-                let altitudeIsobars = plot.altitudeIsobarPaths
-                ForEach(altitudeIsobars.keys.sorted().reversed(), id: \.self) { altitude in
-                    Text(altitudeFormatter.string(from: altitude as NSNumber) ?? "")
+                let isobars = isobars(withPlot: plot)
+                ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
+                    Text(isobarFormatter.string(from: key as NSNumber) ?? "")
                         .font(Font(leftAxisLabelFont))
                         .lineLimit(1)
-                        .foregroundColor(.blue)
-                        .position(y: plot.y(forPressureAltitude: altitude))
+                        .foregroundColor(isobarColor)
+                        .position(y: yForIsobar(key, inPlot: plot))
                         .offset(x: yAxisLabelWidthOrNil!)
                 }
             }
@@ -144,12 +167,58 @@ struct AnnotatedSkewtPlotView: View {
                         if x >= 0 {
                             Text(String(Int(temperature)))
                                 .font(Font(bottomAxisLabelFont))
-                                .foregroundColor(.red)
+                                .foregroundColor(isothermColor)
                                 .position(x: x)
                         }
                     }
                 }
             }
+        }
+    }
+    
+    private func isobars(withPlot plot: SkewtPlot) -> [Double: CGPath] {
+        switch store.state.plotOptions.isobarTypes {
+        case .none:
+            return [:]
+        case .altitude:
+            return plot.altitudeIsobarPaths
+        case .pressure:
+            return plot.isobarPaths
+        }
+    }
+    
+    private var isobarColor: Color {
+        let type = (
+            store.state.plotOptions.isobarTypes == .pressure
+            ? PlotOptions.PlotStyling.PlotType.pressureIsobars
+            : .altitudeIsobars
+            )
+        
+        guard let cgColor = CGColor.fromHex(
+            hexString: store.state.plotOptions.plotStyling.lineStyle(forType: type).color
+        ) else {
+            return .black
+        }
+        
+        return Color(cgColor: cgColor)
+    }
+    
+    private var isothermColor: Color {
+        guard let cgColor = CGColor.fromHex(
+            hexString: store.state.plotOptions.plotStyling.lineStyle(forType: .temperature).color
+        ) else {
+            return .black
+        }
+        
+        return Color(cgColor: cgColor)
+    }
+    
+    private func yForIsobar(_ value: Double, inPlot plot: SkewtPlot) -> CGFloat {
+        switch store.state.plotOptions.isobarTypes {
+        case .none, .altitude:
+            return plot.y(forPressureAltitude: value)
+        case .pressure:
+            return plot.y(forPressure: value)
         }
     }
     
