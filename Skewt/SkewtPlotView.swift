@@ -12,25 +12,24 @@ struct SkewtPlotView: View {
     let plot: SkewtPlot
     
     var body: some View {
+        let plotStyling = store.state.plotOptions.plotStyling
+        
         ZStack() {
             if let temperaturePath = plot.temperaturePath {
                 Path(temperaturePath)
-                    .stroke(lineWidth: 3.0)
-                    .foregroundColor(Color("TemperaturePlot"))
+                    .applyLineStyle(plotStyling.lineStyle(forType: .temperature))
                     .zIndex(100)
             }
             
             if let dewPointPath = plot.dewPointPath {
                 Path(dewPointPath)
-                    .stroke(lineWidth: 3.0)
-                    .foregroundColor(Color("DewPointPlot"))
+                    .applyLineStyle(plotStyling.lineStyle(forType: .dewPoint))
                     .zIndex(99)
             }
             
             ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
                 Path(isobarPaths[a]!)
-                    .stroke(lineWidth: 1.0)
-                    .foregroundColor(.blue)
+                    .applyLineStyle(isobarStyle)
                     .zIndex(75)
             }
             
@@ -39,8 +38,7 @@ struct SkewtPlotView: View {
             if case .tens = store.state.plotOptions.isothermTypes {
                 ForEach(isotherms.keys.sorted(), id: \.self) { t in
                     Path(isotherms[t]!)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.red)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .isotherms))
                         .zIndex(25)
                 }
             }
@@ -48,8 +46,7 @@ struct SkewtPlotView: View {
             if showZeroIsotherm {
                 if let zeroIsotherm = isotherms[0.0] {
                     Path(zeroIsotherm)
-                        .stroke(lineWidth: 2.0)
-                        .foregroundColor(.red)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .zeroIsotherm))
                         .zIndex(50)
                 }
             }
@@ -61,18 +58,14 @@ struct SkewtPlotView: View {
                 let dryAdiabats = plot.dryAdiabatPaths
                 ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
                     Path(dryAdiabats[t]!)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.blue)
-                        .opacity(0.5)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .dryAdiabats))
                         .zIndex(10)
                 }
                 
                 let moistAdiabats = plot.moistAdiabatPaths
                 ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
                     Path(moistAdiabats[t]!)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.orange)
-                        .opacity(0.5)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .moistAdiabats))
                         .zIndex(9)
                 }
             }
@@ -81,9 +74,7 @@ struct SkewtPlotView: View {
                 let isohumes = plot.isohumePaths
                 ForEach(isohumes.keys.sorted(), id: \.self) { t in
                     Path(isohumes[t]!)
-                        .stroke(lineWidth: 1.0)
-                        .foregroundColor(.gray)
-                        .opacity(0.5)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .isohumes))
                         .zIndex(5)
                 }
             }
@@ -100,6 +91,14 @@ struct SkewtPlotView: View {
         case .pressure:
             return plot.isobarPaths
         }
+    }
+    
+    private var isobarStyle: PlotOptions.PlotStyling.LineStyle {
+        let type: PlotOptions.PlotStyling.PlotType = (
+            store.state.plotOptions.isobarTypes == .altitude ? .altitudeIsobars : .pressureIsobars
+            )
+        
+        return store.state.plotOptions.plotStyling.lineStyle(forType: type)
     }
     
     private var showZeroIsotherm: Bool {
