@@ -24,7 +24,7 @@ struct PlotOptions: Codable {
             case setLineStyle(PlotType, LineStyle)
         }
         
-        enum PlotType: Codable {
+        enum PlotType: Codable, Equatable, CaseIterable, Identifiable {
             case temperature
             case dewPoint
             case isotherms
@@ -33,9 +33,11 @@ struct PlotOptions: Codable {
             case pressureIsobars
             case dryAdiabats
             case moistAdiabats
+            
+            var id: Self { self }
         }
         
-        struct LineStyle: Codable {
+        struct LineStyle: Codable, Equatable {
             let lineWidth: CGFloat
             let color: String
             let opacity: CGFloat

@@ -19,6 +19,8 @@
 		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
+		969117902A29165000A5C72D /* PlotStyling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9691178F2A29165000A5C72D /* PlotStyling.swift */; };
+		969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969117912A29178900A5C72D /* PlotStylingTests.swift */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
@@ -72,6 +74,8 @@
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
 		968998232A17F8E2005457D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9691178F2A29165000A5C72D /* PlotStyling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStyling.swift; sourceTree = "<group>"; };
+		969117912A29178900A5C72D /* PlotStylingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStylingTests.swift; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtApp.swift; sourceTree = "<group>"; };
 		96A8F5E4299DAC3E0021A170 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -163,13 +167,14 @@
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
-				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
+				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96A8F60C299DAC680021A170 /* Sounding.swift */,
 				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
+				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
 				96A8F5E6299DAC3F0021A170 /* Assets.xcassets */,
 				96A8F5E8299DAC3F0021A170 /* Preview Content */,
 				961202612A156AC2009423D5 /* State */,
@@ -190,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
+				969117912A29178900A5C72D /* PlotStylingTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
 				9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */,
@@ -351,6 +357,7 @@
 				96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */,
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
 				968998202A17323F005457D6 /* LocationState.swift in Sources */,
+				969117902A29165000A5C72D /* PlotStyling.swift in Sources */,
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
@@ -373,6 +380,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */,
+				969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */,
 				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
