@@ -36,7 +36,9 @@ final class PlotStylingTests: XCTestCase {
         let redHex = "#FF0000"
         let blackHex = "#000000"
         let greenHexNoHash = "00FF00"
+        let cyanHex = "#00FFFF"
         let blueHex = "#0000FF"
+        let lightBlueHex = "#0080FF"
         
         let red = CGColor.fromHex(hexString: redHex)!
         XCTAssertEqual(red.components![0], 1.0)
@@ -53,10 +55,20 @@ final class PlotStylingTests: XCTestCase {
         XCTAssertEqual(green.components![1], 1.0)
         XCTAssertEqual(green.components![2], 0.0)
         
+        let cyan = CGColor.fromHex(hexString: cyanHex)!
+        XCTAssertEqual(cyan.components![0], 0.0)
+        XCTAssertEqual(cyan.components![1], 1.0)
+        XCTAssertEqual(cyan.components![2], 1.0)
+        
         let blue = CGColor.fromHex(hexString: blueHex)!
         XCTAssertEqual(blue.components![0], 0.0)
         XCTAssertEqual(blue.components![1], 0.0)
         XCTAssertEqual(blue.components![2], 1.0)
+        
+        let lightBlue = CGColor.fromHex(hexString: lightBlueHex)!
+        XCTAssertEqual(lightBlue.components![0], 0.0)
+        XCTAssertEqual(lightBlue.components![1], 0.5, accuracy: 0.01)
+        XCTAssertEqual(lightBlue.components![2], 1.0)
     }
     
     func testToHex() {

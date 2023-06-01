@@ -99,14 +99,19 @@ extension CGColor {
         let green = "0x" + String(justHex.suffix(4).prefix(2))
         let blue = "0x" + String(justHex.suffix(2))
         
-        var redValue: Double = 0
-        var greenValue: Double = 0
-        var blueValue: Double = 0
+        var redInt: UInt64 = 0
+        var greenInt: UInt64 = 0
+        var blueInt: UInt64 = 0
         
-        Scanner(string: red).scanHexDouble(&redValue)
-        Scanner(string: green).scanHexDouble(&greenValue)
-        Scanner(string: blue).scanHexDouble(&blueValue)
+        Scanner(string: red).scanHexInt64(&redInt)
+        Scanner(string: green).scanHexInt64(&greenInt)
+        Scanner(string: blue).scanHexInt64(&blueInt)
 
-        return CGColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1.0)
+        return CGColor(
+            red: CGFloat(redInt) / 255.0,
+            green: CGFloat(greenInt) / 255.0,
+            blue: CGFloat(blueInt) / 255.0,
+            alpha: 1.0
+        )
     }
 }
