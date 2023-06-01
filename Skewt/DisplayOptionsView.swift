@@ -37,6 +37,8 @@ struct DisplayOptionsView: View {
     
     private var isotherms: some View {
         HStack {
+            Image("logoIsotherms")
+            
             Text("Isotherms")
                             
             Picker("Isotherms",
@@ -60,6 +62,8 @@ struct DisplayOptionsView: View {
     
     private var isobars: some View {
         HStack {
+            Image("logoIsobars")
+            
             Text("Isobars")
             
             Picker("Isobars",
@@ -83,6 +87,8 @@ struct DisplayOptionsView: View {
     
     private var adiabats: some View {
         HStack {
+            Image("logoAdiabats")
+            
             Text("Adiabats")
             
             Picker("Adiabats",
@@ -103,30 +109,47 @@ struct DisplayOptionsView: View {
     }
     
     private var mixingLines: some View {
-        Toggle(isOn: Binding<Bool>(
-            get: { store.state.plotOptions.showMixingLines },
-            set: { store.dispatch(PlotOptions.Action.setMixingLines($0)) }
-        )) {
-            Text("Mixing lines")
+        HStack {
+            Image("logoIsohumes")
+            
+            Toggle(isOn: Binding<Bool>(
+                get: { store.state.plotOptions.showMixingLines },
+                set: { store.dispatch(PlotOptions.Action.setMixingLines($0)) }
+            )) {
+                Text("Mixing lines")
+            }
         }
     }
     
     private var isobarLabels: some View {
-        Toggle(isOn: Binding<Bool>(
-            get: { store.state.plotOptions.showIsobarLabels },
-            set: { store.dispatch(PlotOptions.Action.setIsobarLabels($0)) }
-        )) {
-            Text("Isobar labels")
+        HStack {
+            Image("logoYLabels")
+            
+            Toggle(isOn: Binding<Bool>(
+                get: { store.state.plotOptions.showIsobarLabels },
+                set: { store.dispatch(PlotOptions.Action.setIsobarLabels($0)) }
+            )) {
+                Text("Isobar labels")
+            }
         }
     }
     
     private var isothermLabels: some View {
-        Toggle(isOn: Binding<Bool>(
-            get: { store.state.plotOptions.showIsothermLabels },
-            set: { store.dispatch(PlotOptions.Action.setIsothermLabels($0)) }
-        )) {
-            Text("Isotherm labels")
+        HStack {
+            Image("logoXLabels")
+            
+            Toggle(isOn: Binding<Bool>(
+                get: { store.state.plotOptions.showIsothermLabels },
+                set: { store.dispatch(PlotOptions.Action.setIsothermLabels($0)) }
+            )) {
+                Text("Isotherm labels")
+            }
         }
+    }
+    
+    func lineStyle(forType type: PlotOptions.PlotStyling.PlotType) -> some View {
+        // TODO
+        EmptyView()
     }
 }
 
