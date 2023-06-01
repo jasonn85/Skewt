@@ -33,10 +33,39 @@ final class PlotStylingTests: XCTestCase {
     }
     
     func testFromHex() {
+        let redHex = "#FF0000"
+        let blackHex = "#000000"
+        let greenHexNoHash = "00FF00"
+        let blueHex = "#0000FF"
         
+        let red = CGColor.fromHex(hexString: redHex)!
+        XCTAssertEqual(red.components![0], 1.0)
+        XCTAssertEqual(red.components![1], 0.0)
+        XCTAssertEqual(red.components![2], 0.0)
+
+        let black = CGColor.fromHex(hexString: blackHex)!
+        XCTAssertEqual(black.components![0], 0.0)
+        XCTAssertEqual(black.components![1], 0.0)
+        XCTAssertEqual(black.components![2], 0.0)
+        
+        let green = CGColor.fromHex(hexString: greenHexNoHash)!
+        XCTAssertEqual(green.components![0], 0.0)
+        XCTAssertEqual(green.components![1], 1.0)
+        XCTAssertEqual(green.components![2], 0.0)
+        
+        let blue = CGColor.fromHex(hexString: blueHex)!
+        XCTAssertEqual(blue.components![0], 0.0)
+        XCTAssertEqual(blue.components![1], 0.0)
+        XCTAssertEqual(blue.components![2], 1.0)
     }
     
     func testToHex() {
+        let red = CGColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
+        let green = CGColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 1.0)
+        let blue = CGColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 1.0)
         
+        XCTAssertEqual(red.rgbHexString!.uppercased(), "#FF0000")
+        XCTAssertEqual(green.rgbHexString!.uppercased(), "#00FF00")
+        XCTAssertEqual(blue.rgbHexString!.uppercased(), "#0000FF")
     }
 }

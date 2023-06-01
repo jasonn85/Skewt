@@ -61,9 +61,9 @@ extension CGColor {
             return nil
         }
         
-        let red = components[0]
-        let green = components[1]
-        let blue = components[2]
+        let red = Int(components[0] * 255.0)
+        let green = Int(components[1] * 255.0)
+        let blue = Int(components[2] * 255.0)
         
         return String(format: "#%02X%02X%02X", red, green, blue)
     }
@@ -77,9 +77,9 @@ extension CGColor {
             return nil
         }
         
-        let red = String(justHex.prefix(2))
-        let green = String(justHex.suffix(4).prefix(2))
-        let blue = String(justHex.suffix(2))
+        let red = "0x" + String(justHex.prefix(2))
+        let green = "0x" + String(justHex.suffix(4).prefix(2))
+        let blue = "0x" + String(justHex.suffix(2))
         
         var redValue: Double = 0
         var greenValue: Double = 0
