@@ -9,7 +9,7 @@ import Foundation
 import CoreGraphics
 import SwiftUI
 
-let dashLength: CGFloat = 10.0
+let dashLength: CGFloat = 6.0
 
 extension Shape {
     func applyLineStyle(_ lineStyle: PlotOptions.PlotStyling.LineStyle) -> some View {
@@ -33,7 +33,7 @@ extension PlotOptions.PlotStyling {
         // Standard defaults
         var width: CGFloat = 1.0
         var color = UIColor.red
-        let dashed = false
+        var dashed = false
         
         switch type {
         case .temperature:
@@ -55,6 +55,7 @@ extension PlotOptions.PlotStyling {
             color = UIColor(named: "MoistAdiabatPlot")!
         case .isohumes:
             color = UIColor(named: "IsohumePlot")!
+            dashed = true
         }
         
         let textColor = color.cgColor.rgbHexString!
