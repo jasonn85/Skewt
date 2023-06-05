@@ -129,13 +129,11 @@
 		961202612A156AC2009423D5 /* State */ = {
 			isa = PBXGroup;
 			children = (
+				96AA78DA2A2E759D003338D8 /* Middleware */,
 				96F4B05D29A80396006D23BE /* Store.swift */,
 				961202622A156B03009423D5 /* SoundingState.swift */,
 				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
-				96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */,
-				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
-				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -163,21 +161,14 @@
 		96A8F5E1299DAC3E0021A170 /* Skewt */ = {
 			isa = PBXGroup;
 			children = (
-				968998232A17F8E2005457D6 /* Info.plist */,
-				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
-				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
-				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
-				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */,
-				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
-				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
-				96A8F60C299DAC680021A170 /* Sounding.swift */,
-				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
-				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
-				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
+				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
+				968998232A17F8E2005457D6 /* Info.plist */,
 				96A8F5E6299DAC3F0021A170 /* Assets.xcassets */,
 				96A8F5E8299DAC3F0021A170 /* Preview Content */,
+				96AA78DC2A2E763A003338D8 /* Model */,
 				961202612A156AC2009423D5 /* State */,
+				96AA78DB2A2E75E2003338D8 /* Views */,
 			);
 			path = Skewt;
 			sourceTree = "<group>";
@@ -216,6 +207,39 @@
 				96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */,
 			);
 			path = SkewtUITests;
+			sourceTree = "<group>";
+		};
+		96AA78DA2A2E759D003338D8 /* Middleware */ = {
+			isa = PBXGroup;
+			children = (
+				96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */,
+				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
+				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
+			);
+			path = Middleware;
+			sourceTree = "<group>";
+		};
+		96AA78DB2A2E75E2003338D8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
+				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
+				9691178F2A29165000A5C72D /* PlotStyling.swift */,
+				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
+				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		96AA78DC2A2E763A003338D8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
+				96A8F60C299DAC680021A170 /* Sounding.swift */,
+				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
+				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

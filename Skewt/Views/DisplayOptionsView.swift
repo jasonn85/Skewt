@@ -29,7 +29,9 @@ struct DisplayOptionsView: View {
             }
             
             Section("Line styles") {
-                Text("TODO")
+                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) {
+                    lineStyle(forType: $0)
+                }
             }
         }
         .pickerStyle(.segmented)
