@@ -25,8 +25,12 @@ extension Shape {
 }
 
 extension PlotOptions.PlotStyling {
-    func lineStyle(forType type: PlotType) -> LineStyle {
-        return lineStyles[type] ?? Self.defaultStyle(forType: type)
+    func lineStyle(forType type: PlotType, includeInactive: Bool = false) -> LineStyle {
+        guard let style = lineStyles[type], includeInactive || style.active else {
+            return Self.defaultStyle(forType: type)
+        }
+        
+        return style
     }
     
     static func defaultStyle(forType type: PlotType) -> LineStyle {
@@ -62,6 +66,7 @@ extension PlotOptions.PlotStyling {
         let opacity = color.cgColor.alpha
         
         return LineStyle(
+            active: true,
             lineWidth: width,
             color: textColor,
             opacity: opacity,

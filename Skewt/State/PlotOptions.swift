@@ -20,8 +20,9 @@ struct PlotOptions: Codable {
     
     struct PlotStyling: Codable {
         enum Action: Skewt.Action, Codable {
-            case resetToDefaults
-            case setLineStyle(PlotType, LineStyle)
+            case resetAllToDefaults
+            case setStyleToDefault(PlotType)
+            case setStyle(PlotType, LineStyle)
         }
         
         enum PlotType: Codable, Equatable, CaseIterable, Identifiable {
@@ -39,10 +40,11 @@ struct PlotOptions: Codable {
         }
         
         struct LineStyle: Codable, Equatable {
-            let lineWidth: CGFloat
-            let color: String
-            let opacity: CGFloat
-            let dashed: Bool
+            var active: Bool
+            var lineWidth: CGFloat
+            var color: String
+            var opacity: CGFloat
+            var dashed: Bool
         }
         
         var lineStyles: [PlotType: LineStyle]
@@ -135,9 +137,20 @@ extension PlotOptions.PlotStyling {
         }
         
         switch action {
-        case .resetToDefaults:
+        case .resetAllToDefaults:
             return PlotOptions.PlotStyling()
-        case .setLineStyle(let type, let style):
+        case .setStyleToDefault(let type):
+            guard var style = state.lineStyles[type] else {
+                return state
+            }
+            
+            var s = state
+            style.active = false
+            s.lineStyles[type] = style
+            
+            return s
+            
+        case .setStyle(let type, let style):
             var s = state
             s.lineStyles[type] = style
             return s

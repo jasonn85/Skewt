@@ -20,6 +20,7 @@ final class PlotStylingTests: XCTestCase {
     
     func testNonDefaultStylesApplied() {
         let crazyStyle = PlotOptions.PlotStyling.LineStyle(
+            active: true,
             lineWidth: 69.0,
             color: "#69AB42",
             opacity: 0.69,
@@ -30,6 +31,20 @@ final class PlotStylingTests: XCTestCase {
             let style = PlotOptions.PlotStyling(lineStyles: [$0: crazyStyle])
             XCTAssertEqual(style.lineStyle(forType: $0), crazyStyle)
         }
+    }
+    
+    func testInactiveStyles() {
+        let type = PlotOptions.PlotStyling.PlotType.temperature
+        let style = PlotOptions.PlotStyling.LineStyle(active: true, lineWidth: 2.0, color: "#123456", opacity: 0.75, dashed: true)
+        var inactiveStyle = style
+        inactiveStyle.active = false
+        
+        let styles = PlotOptions.PlotStyling(lineStyles: [type: style])
+        XCTAssertEqual(styles.lineStyle(forType: type), style)
+        
+        let stylesWithDeactivated = PlotOptions.PlotStyling.reducer(styles, PlotOptions.PlotStyling.Action.setStyleToDefault(type))
+        XCTAssertNotEqual(stylesWithDeactivated.lineStyle(forType: type), style)
+        XCTAssertEqual(stylesWithDeactivated.lineStyle(forType: type, includeInactive: true), inactiveStyle)
     }
     
     func testFromHex() {
