@@ -29,6 +29,7 @@
 		96A8F5FE299DAC3F0021A170 /* SkewtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */; };
 		96A8F600299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */; };
 		96A8F60D299DAC680021A170 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* Sounding.swift */; };
+		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
 		96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */; };
 		96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */; };
 		96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F02A26757200B90043 /* LocationStateTests.swift */; };
@@ -87,6 +88,7 @@
 		96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITests.swift; sourceTree = "<group>"; };
 		96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		96A8F60C299DAC680021A170 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
+		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
 		96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotatedSkewtPlotView.swift; sourceTree = "<group>"; };
 		96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLogMiddleware.swift; sourceTree = "<group>"; };
 		96E334F02A26757200B90043 /* LocationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStateTests.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
+				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
+				96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */,
 				9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
