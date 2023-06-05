@@ -56,50 +56,39 @@ struct LineStyleView: View {
                         }
                     }
             }
-            
-            Spacer()
-            
+                        
             VStack {
-                Text("Default")
+                Text("Default").font(.footnote)
                 Toggle("Default", isOn: Binding<Bool>(
                     get: { !lineStyle.active },
                     set: { lineStyle.active = !$0 }
                 ))
-                    .labelsHidden()
+                .labelsHidden()
             }
             
-            VStack {
-                VStack {
-//                    Text("Width")
-                    
-                    HStack {
-                        Stepper(
-                            "Width",
-                            value: $lineStyle.lineWidth,
-                            in: 1.0...10.0,
-                            step: 1.0
-                        )
-                        .lineLimit(1)
-//                        .labelsHidden()
-                    }
-                }
-                
-                VStack {
-//                    Text("Color")
-                    
-                    ColorPicker("Color", selection: Binding<CGColor>(
-                        get: { CGColor.fromHex(hexString: lineStyle.color)! },
-                        set: { lineStyle.color = $0.rgbHexString! }
-                    ))
-//                    .labelsHidden()
-                }
-                
-                VStack {
-//                    Text("Dashed").lineLimit(1)
-                    
-                    Toggle("Dashed", isOn: $lineStyle.dashed)
-//                        .labelsHidden()
-                }
+            let twoColumns = [GridItem(.flexible()), GridItem(.flexible(minimum: 70))]
+            
+            LazyVGrid(columns: twoColumns) {
+                Image(systemName: "arrow.left.and.line.vertical.and.arrow.right")
+                Stepper(
+                    "Width",
+                    value: $lineStyle.lineWidth,
+                    in: 1.0...10.0,
+                    step: 1.0
+                )
+                .lineLimit(1)
+                .labelsHidden()
+            
+                Image(systemName: "paintpalette")
+                ColorPicker("Color", selection: Binding<CGColor>(
+                    get: { CGColor.fromHex(hexString: lineStyle.color)! },
+                    set: { lineStyle.color = $0.rgbHexString! }
+                ))
+                .labelsHidden()
+
+                Image(systemName: "square.dashed")
+                Toggle("Dashed", isOn: $lineStyle.dashed)
+                    .labelsHidden()
             }
             .opacity(lineStyle.active ? 1.0 : 0.66)
         }
