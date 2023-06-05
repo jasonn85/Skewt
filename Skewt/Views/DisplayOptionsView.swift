@@ -29,8 +29,20 @@ struct DisplayOptionsView: View {
             }
             
             Section("Line styles") {
-                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) {
-                    lineStyle(forType: $0)
+                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
+                    LineStyleView(
+                        lineType: lineType,
+                        lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
+                            get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
+                            set: { lineStyle in
+                                if lineStyle.active {
+                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                                } else {
+                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
+                                }
+                            }
+                        )
+                    )
                 }
             }
         }
@@ -147,11 +159,6 @@ struct DisplayOptionsView: View {
                 Text("Isotherm labels")
             }
         }
-    }
-    
-    func lineStyle(forType type: PlotOptions.PlotStyling.PlotType) -> some View {
-        // TODO
-        EmptyView()
     }
 }
 
