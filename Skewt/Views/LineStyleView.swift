@@ -56,6 +56,10 @@ struct LineStyleView: View {
                         }
                     }
             }
+            
+            Spacer()
+            Divider()
+            Spacer()
                         
             VStack {
                 Text("Default").font(.footnote)
@@ -65,6 +69,10 @@ struct LineStyleView: View {
                 ))
                 .labelsHidden()
             }
+            
+            Spacer()
+            Divider()
+            Spacer()
             
             let twoColumns = [GridItem(.flexible()), GridItem(.flexible(minimum: 70))]
             
@@ -95,6 +103,8 @@ struct LineStyleView: View {
                     .labelsHidden()
             }
             .opacity(lineStyle.active ? 1.0 : 0.66)
+            
+            Spacer(minLength: 20.0)
         }
     }
 }
