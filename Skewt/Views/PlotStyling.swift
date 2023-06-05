@@ -91,7 +91,7 @@ extension CGColor {
         return String(format: "#%02X%02X%02X", red, green, blue)
     }
     
-    static func fromHex(hexString: String) -> CGColor? {
+    static func fromHex(hexString: String, alpha: CGFloat = 1.0) -> CGColor? {
         let justHex = hexString.suffix(6).trimmingCharacters(
             in: CharacterSet(charactersIn: "1234567890ABCDEFabcdef").inverted
         )
@@ -116,7 +116,7 @@ extension CGColor {
             red: CGFloat(redInt) / 255.0,
             green: CGFloat(greenInt) / 255.0,
             blue: CGFloat(blueInt) / 255.0,
-            alpha: 1.0
+            alpha: alpha
         )
     }
 }

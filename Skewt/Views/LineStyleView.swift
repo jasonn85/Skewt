@@ -81,8 +81,12 @@ struct LineStyleView: View {
             
                 Image(systemName: "paintpalette")
                 ColorPicker("Color", selection: Binding<CGColor>(
-                    get: { CGColor.fromHex(hexString: lineStyle.color)! },
-                    set: { lineStyle.color = $0.rgbHexString! }
+                    get: { CGColor.fromHex(hexString: lineStyle.color,
+                                           alpha: lineStyle.opacity)! },
+                    set: {
+                        lineStyle.color = $0.rgbHexString!
+                        lineStyle.opacity = $0.alpha
+                    }
                 ))
                 .labelsHidden()
 
