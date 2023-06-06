@@ -21,7 +21,6 @@ fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
 
 struct SkewtPlot {
     var sounding: Sounding?
-    var size: CGSize
     
     // Ranges
     var surfaceTemperatureRange: ClosedRange<Double>
@@ -56,7 +55,7 @@ struct SkewtPlot {
             return nil
         }
         
-        let bounds = CGRect(origin: .zero, size: size)
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         let path = CGMutablePath()
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].temperature!)
         path.move(to: lastPoint)
@@ -82,7 +81,7 @@ struct SkewtPlot {
             return nil
         }
         
-        let bounds = CGRect(origin: .zero, size: size)
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         let path = CGMutablePath()
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].dewPoint!)
         path.move(to: lastPoint)
@@ -108,7 +107,6 @@ extension SkewtPlot {
     public func y(forPressure pressure: Double) -> CGFloat {
         log10(pressure / pressureRange.lowerBound)
         / log10(pressureRange.upperBound / pressureRange.lowerBound)
-        * size.height
     }
     
     public func y(forPressureAltitude altitude: Double) -> CGFloat {
@@ -118,26 +116,25 @@ extension SkewtPlot {
     public func pressure(atY y: CGFloat) -> Double {
         pressureRange.lowerBound
         * pow(10.0,
-              y * log10(pressureRange.upperBound / pressureRange.lowerBound) / size.height)
+              y * log10(pressureRange.upperBound / pressureRange.lowerBound))
     }
     
     public func x(forSurfaceTemperature temperature: Double) -> CGFloat {
         ((temperature - surfaceTemperatureRange.lowerBound)
-         / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
-         * size.width)
+         / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound))
     }
     
     public func point(pressure: Double, temperature: Double) -> CGPoint {
         let y = y(forPressure: pressure)
         let surfaceX = x(forSurfaceTemperature: temperature)
-        let skewedX = surfaceX + ((size.height - y) * skewSlope)
+        let skewedX = surfaceX + ((1.0 - y) * skewSlope)
         
         return CGPoint(x: skewedX, y: y)
     }
     
     public func pressureAndTemperature(atPoint point: CGPoint) -> (pressure: Double, temperature: Double) {
-        let skewedX = point.x - ((size.height - point.y) * skewSlope)
-        let temperature = ((skewedX / size.width)
+        let skewedX = point.x - ((1.0 - point.y) * skewSlope)
+        let temperature = (skewedX
                             * (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
                             + surfaceTemperatureRange.lowerBound)
         
@@ -147,9 +144,8 @@ extension SkewtPlot {
 
 // MARK: - Initialization
 extension SkewtPlot {
-    init(sounding: Sounding?, size: CGSize) {
+    init(sounding: Sounding?) {
         self.sounding = sounding
-        self.size = size
         skewSlope = defaultSkewSlope
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
@@ -168,7 +164,7 @@ extension SkewtPlot {
     typealias Line = (CGPoint, CGPoint)
     
     // Granularity for calculating non-linear isopleths (adiabats and isohumes)
-    private static let isoplethDY = 1.0
+    private static let isoplethDY = 1.0 / 500.0
 
     var isobarPaths: [Double: CGPath] {
         var isobars: Set<Double> = Set([pressureRange.lowerBound, pressureRange.upperBound])
@@ -179,7 +175,7 @@ extension SkewtPlot {
             let path = CGMutablePath()
             let y = y(forPressure: pressure)
             path.move(to: CGPoint(x: 0.0, y: y))
-            path.addLine(to: CGPoint(x: size.width, y: y))
+            path.addLine(to: CGPoint(x: 1.0, y: y))
             
             result[pressure] = path
         }
@@ -189,10 +185,10 @@ extension SkewtPlot {
         altitudeIsobars.reduce(into: [Double: CGPath]()) { (result, altitude) in
             let y = y(forPressureAltitude: altitude)
             
-            if y > 0.0 && y <= size.height {
+            if y > 0.0 && y <= 1.0 {
                 let path = CGMutablePath()
                 path.move(to: CGPoint(x: 0.0, y: y))
-                path.addLine(to: CGPoint(x: size.width, y: y))
+                path.addLine(to: CGPoint(x: 1.0, y: y))
                 
                 result[altitude] = path
             }
@@ -203,12 +199,12 @@ extension SkewtPlot {
     func isotherm(forTemperature temperature: Double) -> Line {
         let surfaceX = x(forSurfaceTemperature: temperature)
         
-        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: size.height + (surfaceX * skewSlope)) : nil
-        let intersectingRightY = size.height - ((size.width - surfaceX) * skewSlope)
-        let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: size.width, y:intersectingRightY) : nil
-        let intersectingTop = intersectingRight == nil ? CGPoint(x: size.height / skewSlope + surfaceX, y: 0.0) : nil
+        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skewSlope)) : nil
+        let intersectingRightY = 1.0 - ((1.0 - surfaceX) * skewSlope)
+        let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY) : nil
+        let intersectingTop = intersectingRight == nil ? CGPoint(x: 1.0 / skewSlope + surfaceX, y: 0.0) : nil
         
-        let start = intersectingLeft ?? CGPoint(x: surfaceX, y: size.height)
+        let start = intersectingLeft ?? CGPoint(x: surfaceX, y: 1.0)
         let end = intersectingRight ?? intersectingTop!
         
         return (start, end)
@@ -218,8 +214,8 @@ extension SkewtPlot {
     var isothermPaths: [Double: CGPath] {
         let margin = 5.0
         let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
-        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin,
-                                                                                  y: size.height - margin))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: 1.0 - margin,
+                                                                                  y: 1.0 - margin))
         let firstIsotherm = ceil(topLeftTemperature / isothermSpacing) * isothermSpacing
         let lastIsotherm = floor(bottomRightTemperature / isothermSpacing) * isothermSpacing
         
@@ -236,10 +232,10 @@ extension SkewtPlot {
     /// CGPaths for dry adiabats, keyed by surface temperature C
     var dryAdiabatPaths: [Double: CGPath] {
         let margin = adiabatSpacing * 0.25
-        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: 1.0))
         
         // Find a value near the top-right for a dry adiabat, then lower a parcel from there to find the adiabat starting point at 0 altitude
-        let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: margin))
+        let (topRightPressure, topRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: 1.0 - margin, y: margin))
         let topRightAltitude = Altitude.standardAltitude(forPressure: topRightPressure)
         let lastAdiabatStartingTemperature = Temperature(topRightTemperature)
             .temperatureOfDryParcelRaised(from: topRightAltitude, to: 0.0).value(inUnit: .celsius)
@@ -258,8 +254,8 @@ extension SkewtPlot {
     /// CGPaths for moist adiabats, keyed by surface temperature C
     var moistAdiabatPaths: [Double: CGPath] {
         let margin = adiabatSpacing * 0.25
-        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: size.height))
-        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: size.width - margin, y: size.height))
+        let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: 1.0))
+        let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: 1.0 - margin, y: 1.0))
 
         let firstAdiabat = ceil(bottomLeftTemperature / adiabatSpacing) * adiabatSpacing
         let lastAdiabat = floor(bottomRightTemperature / adiabatSpacing) * adiabatSpacing
@@ -278,9 +274,9 @@ extension SkewtPlot {
     }
     
     private func dryAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath? {
-        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         let path = CGMutablePath()
-        let initialY = size.height
+        let initialY: CGFloat = 1.0
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
         var temp = Temperature(startingTemperature)
         
@@ -312,9 +308,9 @@ extension SkewtPlot {
     }
     
     private func moistAdiabat(fromTemperature startingTemperature: Double, dy: CGFloat) -> CGPath {
-        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         let path = CGMutablePath()
-        let initialY = size.height
+        let initialY: CGFloat = 1.0
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: initialY))
         var temp = Temperature(startingTemperature)
         
@@ -339,15 +335,15 @@ extension SkewtPlot {
     }
     
     private func isohume(forMixingRatio mixingRatio: Double, dy: CGFloat) -> CGPath {
-        let bounds = CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: self.size)
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         let path = CGMutablePath()
         
-        let initialPressure = pressure(atY: size.height)
+        let initialPressure = pressure(atY: 1.0)
         let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: initialPressure)
             .value(inUnit: .celsius)
         path.move(to: point(pressure: initialPressure, temperature: temperature))
         
-        for y in stride(from: size.height - dy, through: 0.0, by: -dy) {
+        for y in stride(from: 1.0 - dy, through: 0.0, by: -dy) {
             let pressure = pressure(atY: y)
             let temperature = Temperature.temperature(forMixingRatio: mixingRatio, pressure: pressure)
                 .value(inUnit: .celsius)

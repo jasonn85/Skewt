@@ -104,7 +104,7 @@ struct AnnotatedSkewtPlotView: View {
                                         geometry.size.height - xAxisLabelHeight)
             let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
             
-            let plot = plot(withSize: squareSize)
+            let plot = plot
             
             ZStack {
                 if case .loading = store.state.currentSoundingState.status {
@@ -116,7 +116,7 @@ struct AnnotatedSkewtPlotView: View {
                         yAxisLabelView(withPlot: plot)
                         
                         SkewtPlotView(plot: plot)
-                            .frame(width: plot.size.width, height: plot.size.height)
+                            .frame(width: squareSize.width, height: squareSize.height)
                             .environmentObject(store)
                             .background {
                                 LinearGradient(
@@ -222,8 +222,8 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    func plot(withSize size: CGSize) -> SkewtPlot {
-        var plot = SkewtPlot(sounding: sounding, size: size)
+    private var plot: SkewtPlot {
+        var plot = SkewtPlot(sounding: sounding)
         
         if let altitudeRange = store.state.plotOptions.altitudeRange {
             plot.altitudeRange = altitudeRange
