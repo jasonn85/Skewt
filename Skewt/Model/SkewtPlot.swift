@@ -212,7 +212,7 @@ extension SkewtPlot {
     
     /// CGPaths for isotherms, keyed by temperature C
     var isothermPaths: [Double: CGPath] {
-        let margin = 5.0
+        let margin: CGFloat = 0.05
         let (_, topLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: margin))
         let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: 1.0 - margin,
                                                                                   y: 1.0 - margin))
@@ -231,7 +231,7 @@ extension SkewtPlot {
     
     /// CGPaths for dry adiabats, keyed by surface temperature C
     var dryAdiabatPaths: [Double: CGPath] {
-        let margin = adiabatSpacing * 0.25
+        let margin = 0.05
         let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: 1.0))
         
         // Find a value near the top-right for a dry adiabat, then lower a parcel from there to find the adiabat starting point at 0 altitude
@@ -253,7 +253,7 @@ extension SkewtPlot {
     
     /// CGPaths for moist adiabats, keyed by surface temperature C
     var moistAdiabatPaths: [Double: CGPath] {
-        let margin = adiabatSpacing * 0.25
+        let margin = 0.05
         let (_, bottomLeftTemperature) = pressureAndTemperature(atPoint: CGPoint(x: margin, y: 1.0))
         let (_, bottomRightTemperature) = pressureAndTemperature(atPoint: CGPoint(x: 1.0 - margin, y: 1.0))
 
