@@ -224,7 +224,11 @@ struct AnnotatedSkewtPlotView: View {
     
     func plot(withSize size: CGSize) -> SkewtPlot {
         var plot = SkewtPlot(sounding: sounding, size: size)
-        plot.applyOptions(store.state.plotOptions)
+        
+        if let altitudeRange = store.state.plotOptions.altitudeRange {
+            plot.altitudeRange = altitudeRange
+        }
+        
         return plot
     }
 }

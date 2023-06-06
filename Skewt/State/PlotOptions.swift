@@ -9,7 +9,7 @@ import Foundation
 
 struct PlotOptions: Codable {
     enum Action: Skewt.Action, Codable {
-        case changeAltitudeRange(Range<Double>)
+        case changeAltitudeRange(ClosedRange<Double>)
         case changeIsothermTypes(IsothermTypes)
         case changeIsobarTypes(IsobarTypes)
         case changeAdiabatTypes(AdiabatTypes)
@@ -72,7 +72,7 @@ struct PlotOptions: Codable {
         var id: Self { self }
     }
         
-    var altitudeRange: Range<Double>?
+    var altitudeRange: ClosedRange<Double>?
     var isothermTypes: IsothermTypes
     var isobarTypes: IsobarTypes
     var adiabatTypes: AdiabatTypes
