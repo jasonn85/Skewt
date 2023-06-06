@@ -35,7 +35,6 @@ extension PlotOptions.PlotStyling.PlotType: CustomStringConvertible {
 struct LineStyleView: View {
     let lineType: PlotOptions.PlotStyling.PlotType
     @Binding var lineStyle: PlotOptions.PlotStyling.LineStyle
-    @State var lastStyle: PlotOptions.PlotStyling.LineStyle?
     
     private var isDefault: Bool {
         lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType)
@@ -96,24 +95,13 @@ struct LineStyleView: View {
                         .labelsHidden()
                 }
                 
-                                
-                if let lastStyle = lastStyle {
+                if isDefault {
+                    EmptyView()
+                } else {
                     Divider()
 
-                    Button("Undo") {
-                        lineStyle = lastStyle
-                        self.lastStyle = nil
-                    }
-                } else {
-                    if isDefault {
-                        EmptyView()
-                    } else {
-                        Divider()
-
-                        Button("Set to default") {
-                            lastStyle = lineStyle
-                            lineStyle = PlotOptions.PlotStyling.defaultStyle(forType: lineType)
-                        }
+                    Button("Set to default") {
+                        lineStyle = PlotOptions.PlotStyling.defaultStyle(forType: lineType)
                     }
                 }
             }
