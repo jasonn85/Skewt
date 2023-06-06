@@ -261,9 +261,17 @@ RAOB sounding valid at:
         let altitudeRange = 0.0...10_000.0
         plot.altitudeRange = altitudeRange
         
-        XCTAssertEqual(plot.altitudeRange.lowerBound, altitudeRange.lowerBound, accuracy: altitudeTolerance)
-        XCTAssertEqual(plot.altitudeRange.upperBound, altitudeRange.upperBound, accuracy: altitudeTolerance)
-        XCTAssertEqual(plot.pressureRange.upperBound, Pressure.standardPressure(atAltitude: altitudeRange.lowerBound), accuracy: pressureTolerance)
-        XCTAssertEqual(plot.pressureRange.lowerBound, Pressure.standardPressure(atAltitude: altitudeRange.upperBound), accuracy: pressureTolerance)
+        XCTAssertEqual(plot.altitudeRange.lowerBound,
+                       altitudeRange.lowerBound,
+                       accuracy: altitudeTolerance)
+        XCTAssertEqual(plot.altitudeRange.upperBound,
+                       altitudeRange.upperBound,
+                       accuracy: altitudeTolerance)
+        XCTAssertEqual(plot.pressureRange.upperBound,
+                       Pressure.standardPressure(atAltitude: altitudeRange.lowerBound),
+                       accuracy: pressureTolerance)
+        XCTAssertEqual(plot.pressureRange.lowerBound,
+                       Pressure.standardPressure(atAltitude: altitudeRange.upperBound),
+                       accuracy: pressureTolerance)
     }
 }
