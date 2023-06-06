@@ -62,7 +62,6 @@ struct TimeSelectView_Previews: PreviewProvider {
         var time = TimeInterval(0)
 
         TimeSelectView(
-//            value: $time,
             value: Binding<TimeInterval>(get: { time }, set: { time = $0 }),
             range: .hours(-2)...TimeInterval.hours(12),
             maximumRange: .hours(-12)...TimeInterval.hours(24)

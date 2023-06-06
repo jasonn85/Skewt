@@ -9,13 +9,37 @@ import SwiftUI
 
 struct DisplayOptionsView: View {
     @EnvironmentObject var store: Store<SkewtState>
+    static private let maximumAltitude = 40_000.0
+    static private let minimumMaximumAltitude = 2_000.0
+    
+    private var altitudeFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }
+    
+    private var topAltitude: Double {
+        store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude
+    }
 
     var body: some View {
         List {
-            Section("Range") {
+            Section() {
                 VStack {
                     Text("Altitude range")
-                    Text("--slider here--").font(Font.system(size: 14.0))
+                    Slider(
+                        value: Binding<Double>(
+                            get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
+                            set: {
+                                store.dispatch(PlotOptions.Action.changeAltitudeRange(0.0...$0))
+                            }
+                        ),
+                        in: Self.minimumMaximumAltitude...Self.maximumAltitude,
+                        step: 1_000.0
+                        )
+                    
+                    Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
+                        .font(.caption)
                 }
             }
             
