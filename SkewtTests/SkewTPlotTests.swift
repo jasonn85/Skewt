@@ -233,4 +233,37 @@ RAOB sounding valid at:
         XCTAssertEqual(point.x, recalculatedPoint.x, accuracy: 0.5)
         XCTAssertEqual(point.y, recalculatedPoint.y, accuracy: 0.5)
     }
+    
+    func testDefaultAltitudeRangeVsPressureRange() {
+        let plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        let pressureTolerance = 1.0
+        let altitudeTolerance = 50.0
+        
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: plot.altitudeRange.lowerBound),
+                       plot.pressureRange.upperBound,
+                       accuracy: pressureTolerance)
+        XCTAssertEqual(Pressure.standardPressure(atAltitude: plot.altitudeRange.upperBound),
+                       plot.pressureRange.lowerBound,
+                       accuracy: pressureTolerance)
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: plot.pressureRange.lowerBound),
+                       plot.altitudeRange.upperBound,
+                       accuracy: altitudeTolerance)
+        XCTAssertEqual(Altitude.standardAltitude(forPressure: plot.pressureRange.upperBound),
+                       plot.altitudeRange.lowerBound,
+                       accuracy: altitudeTolerance)
+    }
+    
+    func testChangingAltitudeRange() {
+        let pressureTolerance = 1.0
+        let altitudeTolerance = 50.0
+        
+        var plot = SkewtPlot(sounding: sounding, size: CGSize(width: 100.0, height: 100.0))
+        let altitudeRange = 0.0...10_000.0
+        plot.altitudeRange = altitudeRange
+        
+        XCTAssertEqual(plot.altitudeRange.lowerBound, altitudeRange.lowerBound, accuracy: altitudeTolerance)
+        XCTAssertEqual(plot.altitudeRange.upperBound, altitudeRange.upperBound, accuracy: altitudeTolerance)
+        XCTAssertEqual(plot.pressureRange.upperBound, Pressure.standardPressure(atAltitude: altitudeRange.lowerBound), accuracy: pressureTolerance)
+        XCTAssertEqual(plot.pressureRange.lowerBound, Pressure.standardPressure(atAltitude: altitudeRange.upperBound), accuracy: pressureTolerance)
+    }
 }

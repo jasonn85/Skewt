@@ -26,6 +26,20 @@ struct SkewtPlot {
     // Ranges
     var surfaceTemperatureRange: ClosedRange<Double>
     var pressureRange: ClosedRange<Double>
+    var altitudeRange: ClosedRange<Double> {
+        get {
+            let low = Altitude.standardAltitude(forPressure: pressureRange.upperBound)
+            let high = Altitude.standardAltitude(forPressure: pressureRange.lowerBound)
+            
+            return low...high
+        }
+        set {
+            let low = Pressure.standardPressure(atAltitude: newValue.upperBound)
+            let high = Pressure.standardPressure(atAltitude: newValue.lowerBound)
+            
+            pressureRange = low...high
+        }
+    }
     
     // Isopleth display parameters
     var isothermSpacing: Double  // in C
