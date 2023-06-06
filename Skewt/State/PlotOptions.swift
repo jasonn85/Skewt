@@ -8,8 +8,24 @@
 import Foundation
 
 struct PlotOptions: Codable {
+    enum Action: Skewt.Action, Codable {
+        case changeAltitudeRange(ClosedRange<Double>)
+        case changeIsothermTypes(IsothermTypes)
+        case changeIsobarTypes(IsobarTypes)
+        case changeAdiabatTypes(AdiabatTypes)
+        case setMixingLines(Bool)
+        case setIsobarLabels(Bool)
+        case setIsothermLabels(Bool)
+    }
+    
     struct PlotStyling: Codable {
-        enum PlotType: Codable {
+        enum Action: Skewt.Action, Codable {
+            case resetAllToDefaults
+            case setStyleToDefault(PlotType)
+            case setStyle(PlotType, LineStyle)
+        }
+        
+        enum PlotType: Codable, Equatable, CaseIterable, Identifiable {
             case temperature
             case dewPoint
             case isotherms
@@ -18,42 +34,52 @@ struct PlotOptions: Codable {
             case pressureIsobars
             case dryAdiabats
             case moistAdiabats
+            case isohumes
+            
+            var id: Self { self }
         }
         
-        struct LineStyle: Codable {
-            let lineWidth: CGFloat
-            let color: String
-            let opacity: CGFloat
-            let dashed: Bool
+        struct LineStyle: Codable, Equatable {
+            var lineWidth: CGFloat
+            var color: String
+            var opacity: CGFloat
+            var dashed: Bool
         }
         
-        let lineStyles: [PlotType: LineStyle]
+        var lineStyles: [PlotType: LineStyle]
     }
     
-    enum IsothermTypes: Codable {
+    enum IsothermTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
-        case tens
         case zeroOnly
+        case tens
+        
+        var id: Self { self }
     }
     
-    enum IsobarTypes: Codable {
+    enum IsobarTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
         case altitude
         case pressure
+        
+        var id: Self { self }
     }
     
-    enum AdiabatTypes: Codable {
+    enum AdiabatTypes: Codable, Equatable, CaseIterable, Identifiable {
         case none
         case tens
+        
+        var id: Self { self }
     }
         
-    let altitudeRange: Range<Double>?
-    let isothermTypes: IsothermTypes
-    let isobarTypes: IsobarTypes
-    let adiabatTypes: AdiabatTypes
-    let showMixingLines: Bool
-    let showIsobarLabels: Bool
-    let showIsothermLabels: Bool
+    var altitudeRange: ClosedRange<Double>?
+    var isothermTypes: IsothermTypes
+    var isobarTypes: IsobarTypes
+    var adiabatTypes: AdiabatTypes
+    var showMixingLines: Bool
+    var showIsobarLabels: Bool
+    var showIsothermLabels: Bool
+    var plotStyling: PlotStyling
 }
 
 extension PlotOptions {
@@ -65,12 +91,64 @@ extension PlotOptions {
         showMixingLines = false
         showIsobarLabels = true
         showIsothermLabels = true
+        plotStyling = PlotStyling()
+    }
+}
+
+extension PlotOptions.PlotStyling {
+    init() {
+        lineStyles = [:]
     }
 }
 
 extension PlotOptions {
     static let reducer: Reducer<Self> = { state, action in
-        // TODO:
-        return state
+        var options = state
+        options.plotStyling = PlotStyling.reducer(options.plotStyling, action)
+        
+        if let action = action as? PlotOptions.Action {
+            switch action  {
+            case .changeAltitudeRange(let range):
+                options.altitudeRange = range
+            case .changeIsothermTypes(let types):
+                options.isothermTypes = types
+            case .changeIsobarTypes(let types):
+                options.isobarTypes = types
+            case .changeAdiabatTypes(let types):
+                options.adiabatTypes = types
+            case .setMixingLines(let mixingLines):
+                options.showMixingLines = mixingLines
+            case .setIsobarLabels(let isobarLabels):
+                options.showIsobarLabels = isobarLabels
+            case .setIsothermLabels(let isothermLabels):
+                options.showIsothermLabels = isothermLabels
+            }
+        }
+        
+        return options
+    }
+}
+
+extension PlotOptions.PlotStyling {
+    static let reducer: Reducer<Self> = { state, action in
+        guard let action = action as? PlotOptions.PlotStyling.Action else {
+            return state
+        }
+        
+        switch action {
+        case .resetAllToDefaults:
+            return PlotOptions.PlotStyling()
+        case .setStyleToDefault(let type):
+            var s = state
+            var styles = s.lineStyles
+            styles.removeValue(forKey: type)
+            s.lineStyles = styles
+            
+            return s
+        case .setStyle(let type, let style):
+            var s = state
+            s.lineStyles[type] = style
+            return s
+        }
     }
 }

@@ -25,7 +25,7 @@ struct SoundingSelection: Codable {
         case named(String)
     }
     
-    enum Time: Codable {
+    enum Time: Codable, Equatable {
         case now
         case relative(TimeInterval)
         case specific(Date)
@@ -107,6 +107,17 @@ extension SoundingState {
         selection = SoundingSelection()
         status = .idle
     }
+}
+
+extension SoundingState.Status {
+    var isLoading: Bool {
+        switch self {
+        case .loading, .refreshing(_):
+            return true
+        case .idle, .done(_), .failed(_):
+            return false
+        }
+	}
 }
 
 extension SoundingState.Action: CustomStringConvertible {

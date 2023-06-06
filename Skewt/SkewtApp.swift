@@ -11,8 +11,8 @@ import SwiftUI
 struct SkewtApp: App {
     var body: some Scene {
         let store = Store(
-            initial: State(),
-            reducer: State.reducer,
+            initial: SkewtState(),
+            reducer: SkewtState.reducer,
             middlewares: [
                 Middlewares.rucApi,
                 Middlewares.locationMiddleware,
