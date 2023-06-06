@@ -40,7 +40,6 @@ struct PlotOptions: Codable {
         }
         
         struct LineStyle: Codable, Equatable {
-            var active: Bool
             var lineWidth: CGFloat
             var color: String
             var opacity: CGFloat
@@ -140,16 +139,12 @@ extension PlotOptions.PlotStyling {
         case .resetAllToDefaults:
             return PlotOptions.PlotStyling()
         case .setStyleToDefault(let type):
-            guard var style = state.lineStyles[type] else {
-                return state
-            }
-            
             var s = state
-            style.active = false
-            s.lineStyles[type] = style
+            var styles = s.lineStyles
+            styles.removeValue(forKey: type)
+            s.lineStyles = styles
             
             return s
-            
         case .setStyle(let type, let style):
             var s = state
             s.lineStyles[type] = style
