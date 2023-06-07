@@ -72,6 +72,10 @@ struct DisplayOptionsView: View {
                                 }
                             )
                         )
+                        
+                        if lineType != PlotOptions.PlotStyling.PlotType.allCases.last {
+                            Divider()
+                        }
                     }
                 }
             }
