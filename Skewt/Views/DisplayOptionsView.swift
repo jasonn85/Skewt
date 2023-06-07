@@ -165,7 +165,11 @@ struct DisplayOptionsView: View {
             
             Toggle(isOn: Binding<Bool>(
                 get: { store.state.plotOptions.showIsobarLabels },
-                set: { store.dispatch(PlotOptions.Action.setIsobarLabels($0)) }
+                set: { isOn in
+                    withAnimation {
+                        store.dispatch(PlotOptions.Action.setIsobarLabels(isOn))
+                    }
+                }
             )) {
                 Text("Isobar labels")
             }
@@ -178,7 +182,11 @@ struct DisplayOptionsView: View {
             
             Toggle(isOn: Binding<Bool>(
                 get: { store.state.plotOptions.showIsothermLabels },
-                set: { store.dispatch(PlotOptions.Action.setIsothermLabels($0)) }
+                set: { isOn in
+                    withAnimation {
+                        store.dispatch(PlotOptions.Action.setIsothermLabels(isOn))
+                    }
+                }
             )) {
                 Text("Isotherm labels")
             }
