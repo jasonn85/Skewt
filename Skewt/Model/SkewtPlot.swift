@@ -297,8 +297,6 @@ extension SkewtPlot {
                 } else {
                     path.addLine(to: point)
                 }
-            } else {
-                break
             }
             
             lastAltitude = altitude
