@@ -107,7 +107,11 @@ struct DisplayOptionsView: View {
             Picker("Isobars",
                    selection: Binding<PlotOptions.IsobarTypes>(
                     get: { store.state.plotOptions.isobarTypes },
-                    set: { store.dispatch(PlotOptions.Action.changeIsobarTypes($0)) }
+                    set: { type in
+                        withAnimation {
+                            store.dispatch(PlotOptions.Action.changeIsobarTypes(type))
+                        }
+                    }
                    )) {
                        ForEach(PlotOptions.IsobarTypes.allCases, id: \.id) {
                            switch $0 {
@@ -165,7 +169,11 @@ struct DisplayOptionsView: View {
             
             Toggle(isOn: Binding<Bool>(
                 get: { store.state.plotOptions.showIsobarLabels },
-                set: { store.dispatch(PlotOptions.Action.setIsobarLabels($0)) }
+                set: { isOn in
+                    withAnimation {
+                        store.dispatch(PlotOptions.Action.setIsobarLabels(isOn))
+                    }
+                }
             )) {
                 Text("Isobar labels")
             }
@@ -178,7 +186,11 @@ struct DisplayOptionsView: View {
             
             Toggle(isOn: Binding<Bool>(
                 get: { store.state.plotOptions.showIsothermLabels },
-                set: { store.dispatch(PlotOptions.Action.setIsothermLabels($0)) }
+                set: { isOn in
+                    withAnimation {
+                        store.dispatch(PlotOptions.Action.setIsothermLabels(isOn))
+                    }
+                }
             )) {
                 Text("Isotherm labels")
             }

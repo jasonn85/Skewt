@@ -16,19 +16,19 @@ struct SkewtPlotView: View {
         
         ZStack() {
             if let temperaturePath = plot.temperaturePath {
-                Path(temperaturePath)
+                PlottedPath(path: temperaturePath)
                     .applyLineStyle(plotStyling.lineStyle(forType: .temperature))
                     .zIndex(100)
             }
             
             if let dewPointPath = plot.dewPointPath {
-                Path(dewPointPath)
+                PlottedPath(path: dewPointPath)
                     .applyLineStyle(plotStyling.lineStyle(forType: .dewPoint))
                     .zIndex(99)
             }
             
             ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
-                Path(isobarPaths[a]!)
+                PlottedPath(path: isobarPaths[a]!)
                     .applyLineStyle(isobarStyle)
                     .zIndex(75)
             }
@@ -37,7 +37,7 @@ struct SkewtPlotView: View {
             
             if case .tens = store.state.plotOptions.isothermTypes {
                 ForEach(isotherms.keys.sorted(), id: \.self) { t in
-                    Path(isotherms[t]!)
+                    PlottedPath(path: isotherms[t]!)
                         .applyLineStyle(plotStyling.lineStyle(forType: .isotherms))
                         .zIndex(25)
                 }
@@ -45,7 +45,7 @@ struct SkewtPlotView: View {
             
             if showZeroIsotherm {
                 if let zeroIsotherm = isotherms[0.0] {
-                    Path(zeroIsotherm)
+                    PlottedPath(path: zeroIsotherm)
                         .applyLineStyle(plotStyling.lineStyle(forType: .zeroIsotherm))
                         .zIndex(50)
                 }
@@ -57,14 +57,14 @@ struct SkewtPlotView: View {
             case .tens:
                 let dryAdiabats = plot.dryAdiabatPaths
                 ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
-                    Path(dryAdiabats[t]!)
+                    PlottedPath(path: dryAdiabats[t]!)
                         .applyLineStyle(plotStyling.lineStyle(forType: .dryAdiabats))
                         .zIndex(10)
                 }
                 
                 let moistAdiabats = plot.moistAdiabatPaths
                 ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
-                    Path(moistAdiabats[t]!)
+                    PlottedPath(path: moistAdiabats[t]!)
                         .applyLineStyle(plotStyling.lineStyle(forType: .moistAdiabats))
                         .zIndex(9)
                 }
@@ -73,13 +73,12 @@ struct SkewtPlotView: View {
             if store.state.plotOptions.showMixingLines {
                 let isohumes = plot.isohumePaths
                 ForEach(isohumes.keys.sorted(), id: \.self) { t in
-                    Path(isohumes[t]!)
+                    PlottedPath(path: isohumes[t]!)
                         .applyLineStyle(plotStyling.lineStyle(forType: .isohumes))
                         .zIndex(5)
                 }
             }
-            
-        }.frame(width: plot.size.width, height: plot.size.height)
+        }
     }
     
     private var isobarPaths: [Double: CGPath] {
@@ -111,13 +110,20 @@ struct SkewtPlotView: View {
     }
 }
 
+struct PlottedPath: Shape {
+    let path: CGPath
+    
+    func path(in rect: CGRect) -> Path {
+        let scale = min(rect.size.width, rect.size.height)
+        return Path(path).applying(CGAffineTransformMakeScale(scale, scale))
+    }
+}
+
 struct SkewtPlotView_Previews: PreviewProvider {
     static var previews: some View {
         GeometryReader { geometry in
             let store = Store<SkewtState>.previewStore
-            let smallestDimension = min(geometry.size.width, geometry.size.height)
-            let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
-            let plot = SkewtPlot(sounding: Store<SkewtState>.previewSounding, size: squareSize)
+            let plot = SkewtPlot(sounding: Store<SkewtState>.previewSounding)
             
             SkewtPlotView(plot: plot).environmentObject(store)
         }

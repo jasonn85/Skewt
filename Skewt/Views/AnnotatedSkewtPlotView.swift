@@ -51,7 +51,8 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func widestAltitudeText() -> CGFloat? {
-        guard store.state.plotOptions.showIsobarLabels else {
+        guard store.state.plotOptions.showIsobarLabels,
+                store.state.plotOptions.isobarTypes != .none else {
             return nil
         }
         
@@ -98,39 +99,32 @@ struct AnnotatedSkewtPlotView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let yAxisLabelWidth = yAxisLabelWidthOrNil ?? 0.0
-            let xAxisLabelHeight = xAxisLabelHeightOrNil ?? 0.0
-            let smallestDimension = min(geometry.size.width - yAxisLabelWidth,
-                                        geometry.size.height - xAxisLabelHeight)
-            let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
-            
-            let plot = plot(withSize: squareSize)
+            let plot = plot
             
             ZStack {
                 if case .loading = store.state.currentSoundingState.status {
                     ProgressView().controlSize(.large)
                 }
                 
-                VStack(alignment: .trailing, spacing: 8) {
-                    HStack(spacing: 8) {
+                Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
+                    GridRow {
                         yAxisLabelView(withPlot: plot)
+                            .gridCellUnsizedAxes(.vertical)
                         
                         SkewtPlotView(plot: plot)
-                            .frame(width: plot.size.width, height: plot.size.height)
                             .environmentObject(store)
-                            .background {
-                                LinearGradient(
-                                    colors: [
-                                        Color("LowSkyBlue"), Color("HighSkyBlue")
-                                    ],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            }
+                            .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
                     }
                     
-                    xAxisLabelView(withPlot: plot, width: smallestDimension)
+                    GridRow {
+                        Rectangle()
+                            .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
+                            .foregroundColor(.clear)
+                        
+                        xAxisLabelView(withPlot: plot)
+                            .gridCellUnsizedAxes(.horizontal)
+                    }
                 }
             }
         }
@@ -139,36 +133,48 @@ struct AnnotatedSkewtPlotView: View {
     
     @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if yAxisLabelWidthOrNil == nil {
-            EmptyView()
+            Rectangle()
+                .foregroundColor(.clear)
+                .frame(width: 0.0, height: 0.0)
         } else {
             Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
-                let isobars = isobars(withPlot: plot)
-                ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                    Text(isobarFormatter.string(from: key as NSNumber) ?? "")
-                        .font(Font(leftAxisLabelFont))
-                        .lineLimit(1)
-                        .foregroundColor(isobarColor)
-                        .position(y: yForIsobar(key, inPlot: plot))
-                        .offset(x: yAxisLabelWidthOrNil!)
+                GeometryReader { geometry in
+                    let isobars = isobars(withPlot: plot)
+                    
+                    ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
+                        Text(isobarFormatter.string(from: key as NSNumber) ?? "")
+                            .font(Font(leftAxisLabelFont))
+                            .lineLimit(1)
+                            .foregroundColor(isobarColor)
+                            .position(
+                                x: geometry.size.width / 2.0,
+                                y: yForIsobar(key, inPlot: plot) * geometry.size.height
+                            )
+                    }
                 }
             }
         }
     }
     
-    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot, width: CGFloat) -> some View {
+    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
-            Rectangle().frame(width: width, height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
-                if store.state.plotOptions.showIsothermLabels {
-                    let isotherms = plot.isothermPaths
-                    ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                        let x = plot.x(forSurfaceTemperature: temperature)
-                        if x >= 0 {
-                            Text(String(Int(temperature)))
-                                .font(Font(bottomAxisLabelFont))
-                                .foregroundColor(isothermColor)
-                                .position(x: x)
+            Rectangle().frame(height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
+                GeometryReader { geometry in
+                    if store.state.plotOptions.showIsothermLabels {
+                        let isotherms = plot.isothermPaths
+                        ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
+                            let x = plot.x(forSurfaceTemperature: temperature) * geometry.size.width
+                            if x >= 0 {
+                                Text(String(Int(temperature)))
+                                    .font(Font(bottomAxisLabelFont))
+                                    .foregroundColor(isothermColor)
+                                    .position(
+                                        x: x,
+                                        y: geometry.size.height / 2.0
+                                    )
+                            }
                         }
                     }
                 }
@@ -222,8 +228,8 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    func plot(withSize size: CGSize) -> SkewtPlot {
-        var plot = SkewtPlot(sounding: sounding, size: size)
+    private var plot: SkewtPlot {
+        var plot = SkewtPlot(sounding: sounding)
         
         if let altitudeRange = store.state.plotOptions.altitudeRange {
             plot.altitudeRange = altitudeRange
