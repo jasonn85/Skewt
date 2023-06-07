@@ -65,6 +65,10 @@ extension CGPath {
     var bottomPoint: CGPoint? {
         return componentEndPoints.sorted(by: { $0.y < $1.y }).last
     }
+    
+    func intersectsRect(_ rect: CGRect) -> Bool {
+        return componentEndPoints.first(where: { rect.contains($0) }) != nil
+    }
 }
 
 final class SkewTPlotTests: XCTestCase {
@@ -199,8 +203,16 @@ RAOB sounding valid at:
                                    - plot.surfaceTemperatureRange.lowerBound)
                                   / plot.adiabatSpacing) - 2
         
-        XCTAssertTrue(plot.dryAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) dry adiabats")
-        XCTAssertTrue(plot.moistAdiabatPaths.count >= singleAxisCount, "There should be at least \(singleAxisCount) moist adiabats")
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
+        let inBoundsDryAdiabatPaths = plot.dryAdiabatPaths.filter { $0.value.intersectsRect(bounds) }
+        let inBoundsMoistAdiabatPaths = plot.moistAdiabatPaths.filter { $0.value.intersectsRect(bounds) }
+        
+        let minimumDryAdiabats = Int(Double(singleAxisCount) * 1.5)
+                        
+        XCTAssertTrue(inBoundsDryAdiabatPaths.count >= minimumDryAdiabats,
+                      "There should be at least ~\(minimumDryAdiabats) dry adiabats")
+        XCTAssertTrue(inBoundsMoistAdiabatPaths.count >= singleAxisCount,
+                      "There should be at least \(singleAxisCount) moist adiabats")
     }
     
     func testDataToCoordinateAndBack() {
