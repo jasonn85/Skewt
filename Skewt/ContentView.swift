@@ -11,7 +11,6 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @State var selectingTime = false
     
-    
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
     @State private var updateTimeTask: Task<(), Error>? = nil
@@ -52,8 +51,6 @@ struct ContentView: View {
                 if selectingTime {
                     timeSelection
                 }
-                
-                Spacer()
             }
             
             DisplayOptionsView().environmentObject(store)
