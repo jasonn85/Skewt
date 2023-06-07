@@ -26,7 +26,14 @@ struct DisplayOptionsView: View {
         List {
             Section() {
                 VStack {
-                    Text("Altitude range")
+                    HStack {
+                        Text("Maximum altitude")
+                        
+                        Spacer()
+                        
+                        Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
+                    }
+                    
                     Slider(
                         value: Binding<Double>(
                             get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
@@ -36,10 +43,7 @@ struct DisplayOptionsView: View {
                         ),
                         in: Self.minimumMaximumAltitude...Self.maximumAltitude,
                         step: 1_000.0
-                        )
-                    
-                    Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
-                        .font(.caption)
+                    )
                 }
             }
             
