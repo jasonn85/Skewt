@@ -51,7 +51,8 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func widestAltitudeText() -> CGFloat? {
-        guard store.state.plotOptions.showIsobarLabels else {
+        guard store.state.plotOptions.showIsobarLabels,
+                store.state.plotOptions.isobarTypes != .none else {
             return nil
         }
         

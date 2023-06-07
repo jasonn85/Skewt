@@ -107,7 +107,11 @@ struct DisplayOptionsView: View {
             Picker("Isobars",
                    selection: Binding<PlotOptions.IsobarTypes>(
                     get: { store.state.plotOptions.isobarTypes },
-                    set: { store.dispatch(PlotOptions.Action.changeIsobarTypes($0)) }
+                    set: { type in
+                        withAnimation {
+                            store.dispatch(PlotOptions.Action.changeIsobarTypes(type))
+                        }
+                    }
                    )) {
                        ForEach(PlotOptions.IsobarTypes.allCases, id: \.id) {
                            switch $0 {
