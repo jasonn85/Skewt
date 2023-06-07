@@ -68,7 +68,7 @@ struct LineStyleView: View {
                 .gridCellUnsizedAxes(.vertical)
             
             VStack {
-                let twoColumns = [GridItem(.flexible()), GridItem(.flexible(minimum: 70))]
+                let twoColumns = [GridItem(.flexible(maximum: 24)), GridItem(.flexible(minimum: 70))]
                 
                 LazyVGrid(columns: twoColumns) {
                     GridRow {
