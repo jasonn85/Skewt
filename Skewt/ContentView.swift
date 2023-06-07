@@ -51,7 +51,6 @@ struct ContentView: View {
                 
                 if selectingTime {
                     timeSelection
-                    //                    .transition(.move(edge: .top))
                 }
                 
                 Spacer()
@@ -114,8 +113,7 @@ struct ContentView: View {
                 get: { selectedTimeInterval },
                 set: { setTimeInterval($0) }
             ),
-            range: .hours(-12)...TimeInterval.hours(12),
-            maximumRange: .hours(-24)...TimeInterval.hours(24)
+            range: .hours(-24)...TimeInterval.hours(24)
         )
     }
     
