@@ -98,12 +98,6 @@ struct AnnotatedSkewtPlotView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let yAxisLabelWidth = yAxisLabelWidthOrNil ?? 0.0
-            let xAxisLabelHeight = xAxisLabelHeightOrNil ?? 0.0
-            let smallestDimension = min(geometry.size.width - yAxisLabelWidth,
-                                        geometry.size.height - xAxisLabelHeight)
-            let squareSize = CGSize(width: smallestDimension, height: smallestDimension)
-            
             let plot = plot
             
             ZStack {
@@ -111,26 +105,25 @@ struct AnnotatedSkewtPlotView: View {
                     ProgressView().controlSize(.large)
                 }
                 
-                VStack(alignment: .trailing, spacing: 8) {
-                    HStack(spacing: 8) {
+                Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
+                    GridRow {
                         yAxisLabelView(withPlot: plot)
+                            .gridCellUnsizedAxes(.vertical)
                         
                         SkewtPlotView(plot: plot)
-                            .frame(width: squareSize.width, height: squareSize.height)
                             .environmentObject(store)
-                            .background {
-                                LinearGradient(
-                                    colors: [
-                                        Color("LowSkyBlue"), Color("HighSkyBlue")
-                                    ],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            }
+                            .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
                     }
                     
-                    xAxisLabelView(withPlot: plot, width: smallestDimension)
+                    GridRow {
+                        Rectangle()
+                            .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
+                            .foregroundColor(.clear)
+                        
+                        xAxisLabelView(withPlot: plot)
+                            .gridCellUnsizedAxes(.horizontal)
+                    }
                 }
             }
         }
@@ -139,7 +132,9 @@ struct AnnotatedSkewtPlotView: View {
     
     @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if yAxisLabelWidthOrNil == nil {
-            EmptyView()
+            Rectangle()
+                .foregroundColor(.clear)
+                .frame(width: 0.0, height: 0.0)
         } else {
             Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
                 let isobars = isobars(withPlot: plot)
@@ -149,17 +144,16 @@ struct AnnotatedSkewtPlotView: View {
                         .lineLimit(1)
                         .foregroundColor(isobarColor)
                         .position(y: yForIsobar(key, inPlot: plot))
-                        .offset(x: yAxisLabelWidthOrNil!)
                 }
             }
         }
     }
     
-    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot, width: CGFloat) -> some View {
+    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
-            Rectangle().frame(width: width, height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
+            Rectangle().frame(height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
                 if store.state.plotOptions.showIsothermLabels {
                     let isotherms = plot.isothermPaths
                     ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
