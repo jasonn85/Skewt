@@ -14,82 +14,69 @@ struct SkewtPlotView: View {
     var body: some View {
         let plotStyling = store.state.plotOptions.plotStyling
         
-        GeometryReader { geometry in
-            let smallestDimension = min(geometry.size.width, geometry.size.height)
+        ZStack() {
+            if let temperaturePath = plot.temperaturePath {
+                PlottedPath(path: temperaturePath)
+                    .applyLineStyle(plotStyling.lineStyle(forType: .temperature))
+                    .zIndex(100)
+            }
             
-            ZStack() {
-                if let temperaturePath = plot.temperaturePath {
-                    Path(temperaturePath)
-                        .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                        .applyLineStyle(plotStyling.lineStyle(forType: .temperature))
-                        .zIndex(100)
+            if let dewPointPath = plot.dewPointPath {
+                PlottedPath(path: dewPointPath)
+                    .applyLineStyle(plotStyling.lineStyle(forType: .dewPoint))
+                    .zIndex(99)
+            }
+            
+            ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
+                PlottedPath(path: isobarPaths[a]!)
+                    .applyLineStyle(isobarStyle)
+                    .zIndex(75)
+            }
+            
+            let isotherms = plot.isothermPaths
+            
+            if case .tens = store.state.plotOptions.isothermTypes {
+                ForEach(isotherms.keys.sorted(), id: \.self) { t in
+                    PlottedPath(path: isotherms[t]!)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .isotherms))
+                        .zIndex(25)
+                }
+            }
+            
+            if showZeroIsotherm {
+                if let zeroIsotherm = isotherms[0.0] {
+                    PlottedPath(path: zeroIsotherm)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .zeroIsotherm))
+                        .zIndex(50)
+                }
+            }
+            
+            switch store.state.plotOptions.adiabatTypes {
+            case .none:
+                EmptyView()
+            case .tens:
+                let dryAdiabats = plot.dryAdiabatPaths
+                ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
+                    PlottedPath(path: dryAdiabats[t]!)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .dryAdiabats))
+                        .zIndex(10)
                 }
                 
-                if let dewPointPath = plot.dewPointPath {
-                    Path(dewPointPath)
-                        .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                        .applyLineStyle(plotStyling.lineStyle(forType: .dewPoint))
-                        .zIndex(99)
+                let moistAdiabats = plot.moistAdiabatPaths
+                ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
+                    PlottedPath(path: moistAdiabats[t]!)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .moistAdiabats))
+                        .zIndex(9)
                 }
-                
-                ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
-                    Path(isobarPaths[a]!)
-                        .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                        .applyLineStyle(isobarStyle)
-                        .zIndex(75)
+            }
+            
+            if store.state.plotOptions.showMixingLines {
+                let isohumes = plot.isohumePaths
+                ForEach(isohumes.keys.sorted(), id: \.self) { t in
+                    PlottedPath(path: isohumes[t]!)
+                        .applyLineStyle(plotStyling.lineStyle(forType: .isohumes))
+                        .zIndex(5)
                 }
-                
-                let isotherms = plot.isothermPaths
-                
-                if case .tens = store.state.plotOptions.isothermTypes {
-                    ForEach(isotherms.keys.sorted(), id: \.self) { t in
-                        Path(isotherms[t]!)
-                            .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                            .applyLineStyle(plotStyling.lineStyle(forType: .isotherms))
-                            .zIndex(25)
-                    }
-                }
-                
-                if showZeroIsotherm {
-                    if let zeroIsotherm = isotherms[0.0] {
-                        Path(zeroIsotherm)
-                            .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                            .applyLineStyle(plotStyling.lineStyle(forType: .zeroIsotherm))
-                            .zIndex(50)
-                    }
-                }
-                
-                switch store.state.plotOptions.adiabatTypes {
-                case .none:
-                    EmptyView()
-                case .tens:
-                    let dryAdiabats = plot.dryAdiabatPaths
-                    ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
-                        Path(dryAdiabats[t]!)
-                            .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                            .applyLineStyle(plotStyling.lineStyle(forType: .dryAdiabats))
-                            .zIndex(10)
-                    }
-                    
-                    let moistAdiabats = plot.moistAdiabatPaths
-                    ForEach(moistAdiabats.keys.sorted(), id: \.self) { t in
-                        Path(moistAdiabats[t]!)
-                            .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                            .applyLineStyle(plotStyling.lineStyle(forType: .moistAdiabats))
-                            .zIndex(9)
-                    }
-                }
-                
-                if store.state.plotOptions.showMixingLines {
-                    let isohumes = plot.isohumePaths
-                    ForEach(isohumes.keys.sorted(), id: \.self) { t in
-                        Path(isohumes[t]!)
-                            .applying(CGAffineTransform(scaleX: smallestDimension, y: smallestDimension))
-                            .applyLineStyle(plotStyling.lineStyle(forType: .isohumes))
-                            .zIndex(5)
-                    }
-                }
-                
             }
         }
     }
@@ -120,6 +107,15 @@ struct SkewtPlotView: View {
         case .none:
             return false
         }
+    }
+}
+
+struct PlottedPath: Shape {
+    let path: CGPath
+    
+    func path(in rect: CGRect) -> Path {
+        let scale = min(rect.size.width, rect.size.height)
+        return Path(path).applying(CGAffineTransformMakeScale(scale, scale))
     }
 }
 
