@@ -115,6 +115,13 @@ struct AnnotatedSkewtPlotView: View {
                             .environmentObject(store)
                             .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
+                            .background {
+                                LinearGradient(
+                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
+                            }
                     }
                     
                     GridRow {

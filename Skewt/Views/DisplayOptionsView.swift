@@ -26,7 +26,14 @@ struct DisplayOptionsView: View {
         List {
             Section() {
                 VStack {
-                    Text("Altitude range")
+                    HStack {
+                        Text("Maximum altitude")
+                        
+                        Spacer()
+                        
+                        Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
+                    }
+                    
                     Slider(
                         value: Binding<Double>(
                             get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
@@ -36,10 +43,7 @@ struct DisplayOptionsView: View {
                         ),
                         in: Self.minimumMaximumAltitude...Self.maximumAltitude,
                         step: 1_000.0
-                        )
-                    
-                    Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
-                        .font(.caption)
+                    )
                 }
             }
             
@@ -53,20 +57,26 @@ struct DisplayOptionsView: View {
             }
             
             Section("Line styles") {
-                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
-                    LineStyleView(
-                        lineType: lineType,
-                        lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
-                            get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
-                            set: { lineStyle in
-                                if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
-                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
-                                } else {
-                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                Grid {
+                    ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
+                        LineStyleView(
+                            lineType: lineType,
+                            lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
+                                get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
+                                set: { lineStyle in
+                                    if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
+                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
+                                    } else {
+                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                                    }
                                 }
-                            }
+                            )
                         )
-                    )
+                        
+                        if lineType != PlotOptions.PlotStyling.PlotType.allCases.last {
+                            Divider()
+                        }
+                    }
                 }
             }
         }

@@ -11,7 +11,6 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @State var selectingTime = false
     
-    
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
     @State private var updateTimeTask: Task<(), Error>? = nil
@@ -51,10 +50,7 @@ struct ContentView: View {
                 
                 if selectingTime {
                     timeSelection
-                    //                    .transition(.move(edge: .top))
                 }
-                
-                Spacer()
             }
             
             DisplayOptionsView().environmentObject(store)
@@ -114,8 +110,7 @@ struct ContentView: View {
                 get: { selectedTimeInterval },
                 set: { setTimeInterval($0) }
             ),
-            range: .hours(-12)...TimeInterval.hours(12),
-            maximumRange: .hours(-24)...TimeInterval.hours(24)
+            range: .hours(-24)...TimeInterval.hours(24)
         )
     }
     

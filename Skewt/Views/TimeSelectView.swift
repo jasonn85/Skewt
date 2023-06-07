@@ -10,44 +10,38 @@ import SwiftUI
 struct TimeSelectView: View {
     @Binding var value: TimeInterval
     @State var range: ClosedRange<TimeInterval>
-    var maximumRange: ClosedRange<TimeInterval>
     @State var stepSize: TimeInterval = .hours(1)
     
-    private var formatter: RelativeDateTimeFormatter {
+    private var formatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h a"
+        return formatter
+    }
+    
+    private var relativeFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
-        formatter.formattingContext = .standalone
+        formatter.formattingContext = .middleOfSentence
         formatter.dateTimeStyle = .named
         return formatter
     }
     
     var body: some View {
         VStack {
-            HStack(spacing: 20) {
-                Button("<") {
-                    if (range.lowerBound - stepSize) >= maximumRange.lowerBound {
-                        range = (range.lowerBound - stepSize)...range.upperBound
-                    }
-                }
-                
-                Slider(
-                    value: $value,
-                    in: range,
-                    step: stepSize
-                ) {
-                    Text("Time")
-                }
-                
-                Button(">") {
-                    if (range.upperBound + stepSize) <= maximumRange.upperBound {
-                        range = range.lowerBound...(range.upperBound + stepSize)
-                    }
-                }
+            Slider(
+                value: $value,
+                in: range,
+                step: stepSize
+            ) {
+                Text("Time")
             }
-            .padding(.horizontal, 16)
             
-            Text(formatter.localizedString(fromTimeInterval: value))
+            let absoluteString = formatter.string(from: Date(timeIntervalSinceNow: value))
+            let relativeString = relativeFormatter.localizedString(fromTimeInterval: value)
+            
+            Text("\(absoluteString) (\(relativeString))")
                 .font(.footnote)
         }
+        .scenePadding(.horizontal)
     }
 }
 
@@ -63,8 +57,7 @@ struct TimeSelectView_Previews: PreviewProvider {
 
         TimeSelectView(
             value: Binding<TimeInterval>(get: { time }, set: { time = $0 }),
-            range: .hours(-2)...TimeInterval.hours(12),
-            maximumRange: .hours(-12)...TimeInterval.hours(24)
+            range: .hours(-24)...TimeInterval.hours(24)
         )
     }
 }
