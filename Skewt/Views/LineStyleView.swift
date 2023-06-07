@@ -41,7 +41,7 @@ struct LineStyleView: View {
     }
     
     var body: some View {
-        HStack {
+        GridRow {
             VStack {
                 Text(lineType.description)
                 
@@ -61,38 +61,45 @@ struct LineStyleView: View {
                     }
             }
             
-            Spacer()
-            Divider()
-            Spacer()
+            Rectangle()
+                .frame(width: 1.0)
+                .foregroundColor(.gray)
+                .opacity(0.33)
+                .gridCellUnsizedAxes(.vertical)
             
             VStack {
                 let twoColumns = [GridItem(.flexible()), GridItem(.flexible(minimum: 70))]
                 
                 LazyVGrid(columns: twoColumns) {
-                    Image(systemName: "arrow.left.and.line.vertical.and.arrow.right")
-                    Stepper(
-                        "Width",
-                        value: $lineStyle.lineWidth,
-                        in: 1.0...10.0,
-                        step: 1.0
-                    )
-                    .lineLimit(1)
-                    .labelsHidden()
-                    
-                    Image(systemName: "paintpalette")
-                    ColorPicker("Color", selection: Binding<CGColor>(
-                        get: { CGColor.fromHex(hexString: lineStyle.color,
-                                               alpha: lineStyle.opacity)! },
-                        set: {
-                            lineStyle.color = $0.rgbHexString!
-                            lineStyle.opacity = $0.alpha
-                        }
-                    ))
-                    .labelsHidden()
-                    
-                    Image(systemName: "square.dashed")
-                    Toggle("Dashed", isOn: $lineStyle.dashed)
+                    GridRow {
+                        Image(systemName: "arrow.left.and.line.vertical.and.arrow.right")
+                        Stepper(
+                            "Width",
+                            value: $lineStyle.lineWidth,
+                            in: 1.0...10.0,
+                            step: 1.0
+                        )
                         .labelsHidden()
+                    }
+                    
+                    GridRow {
+                        Image(systemName: "paintpalette")
+                        ColorPicker("Color", selection: Binding<CGColor>(
+                            get: { CGColor.fromHex(hexString: lineStyle.color,
+                                                   alpha: lineStyle.opacity)! },
+                            set: {
+                                lineStyle.color = $0.rgbHexString!
+                                lineStyle.opacity = $0.alpha
+                            }
+                        ))
+                        .labelsHidden()
+                    }
+                    
+                    GridRow {
+                        Image(systemName: "square.dashed")
+                        Toggle("Dashed", isOn: $lineStyle.dashed)
+                            .labelsHidden()
+                    }
                 }
                 
                 if isDefault {
@@ -105,8 +112,6 @@ struct LineStyleView: View {
                     }
                 }
             }
-            
-            Spacer(minLength: 20.0)
         }
     }
 }
@@ -124,7 +129,7 @@ struct LineStyleView_Previews: PreviewProvider {
         let store = previewStore
         let typesToShow: [PlotOptions.PlotStyling.PlotType] = [.temperature, .dewPoint]
         
-        List {
+        Grid {
             ForEach(typesToShow, id: \.id) { lineType in
                 LineStyleView(
                     lineType: lineType,

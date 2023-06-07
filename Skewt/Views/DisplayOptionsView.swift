@@ -57,20 +57,22 @@ struct DisplayOptionsView: View {
             }
             
             Section("Line styles") {
-                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
-                    LineStyleView(
-                        lineType: lineType,
-                        lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
-                            get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
-                            set: { lineStyle in
-                                if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
-                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
-                                } else {
-                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                Grid {
+                    ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
+                        LineStyleView(
+                            lineType: lineType,
+                            lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
+                                get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
+                                set: { lineStyle in
+                                    if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
+                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
+                                    } else {
+                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                                    }
                                 }
-                            }
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
