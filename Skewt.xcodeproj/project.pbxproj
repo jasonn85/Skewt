@@ -19,6 +19,7 @@
 		967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24242A366064009262D9 /* SoundingLocationList.swift */; };
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
+		967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */ = {isa = PBXBuildFile; fileRef = 967E242A2A3670F6009262D9 /* latest_pbraob.txt */; };
 		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
@@ -77,6 +78,7 @@
 		967E24242A366064009262D9 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
+		967E242A2A3670F6009262D9 /* latest_pbraob.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = latest_pbraob.txt; sourceTree = "<group>"; };
 		9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequestTests.swift; sourceTree = "<group>"; };
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */,
 				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
+				967E242A2A3670F6009262D9 /* latest_pbraob.txt */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				967E24262A3660F2009262D9 /* raob.short */,
@@ -368,6 +371,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
+				967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				967E24272A3660F2009262D9 /* raob.short in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,

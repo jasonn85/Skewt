@@ -173,7 +173,7 @@ internal extension String {
         let dateString = components[1...].joined(separator: " ")
         
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)!
         dateFormatter.dateFormat = "HH dd MMM yyyy"
 
         guard let date = dateFormatter.date(from: dateString) else {

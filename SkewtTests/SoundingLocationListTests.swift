@@ -9,19 +9,28 @@ import XCTest
 @testable import Skewt
 
 final class SoundingLocationListTests: XCTestCase {
-    var soundingListString: String!
-    let expectedStationCount = 1157
+    var locationListString: String!
+    var expectedStationCount: Int!
+
+    var soundingsListString: String!
+    var expectedSoundingsCount: Int!
     
     override func setUpWithError() throws {
         let bundle = Bundle(for: type(of: self))
-        let fileUrl = bundle.url(forResource: "raob", withExtension: "short")!
-        let d = try Data(contentsOf: fileUrl)
-        soundingListString = String(data: d, encoding: .utf8)!
+        let locationsFile = bundle.url(forResource: "raob", withExtension: "short")!
+        let locationsData = try Data(contentsOf: locationsFile)
+        locationListString = String(data: locationsData, encoding: .utf8)!
+        expectedStationCount = 1157
+        
+        let soundingsFile = bundle.url(forResource: "latest_pbraob", withExtension: "txt")!
+        let soundingsData = try Data(contentsOf: soundingsFile)
+        soundingsListString = String(data: soundingsData, encoding: .utf8)!
+        expectedSoundingsCount = 804
     }
     
     func testLoadsWithVaryingHeaders() throws {
         for headerCullCount in 0...2 {
-            let allLines = soundingListString.components(separatedBy: .newlines)
+            let allLines = locationListString.components(separatedBy: .newlines)
             let lines = allLines[headerCullCount...].map { String($0) }
             let locationInfo = try LocationList(String(lines.joined(separator: "\n")))
             
@@ -30,7 +39,7 @@ final class SoundingLocationListTests: XCTestCase {
     }
     
     func testMissingHeader() {
-        let allLines = soundingListString.components(separatedBy: .newlines)
+        let allLines = locationListString.components(separatedBy: .newlines)
         let headerIndex = allLines.firstIndex(where: { $0.hasPrefix("Name") })!
         let linesMinusHeader = allLines[(headerIndex + 1)...]
         
@@ -45,7 +54,7 @@ final class SoundingLocationListTests: XCTestCase {
     }
     
     func testUnparseableLines() {
-        let allLines = soundingListString.components(separatedBy: .newlines)
+        let allLines = locationListString.components(separatedBy: .newlines)
         let insertionIndex = 420
         
         let stupidLines = [
@@ -87,5 +96,46 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertEqual(yining.longitude, 81.33)
         XCTAssertEqual(yining.elevation, 663)
         XCTAssertEqual(yining.description, "Yining, CI")
+    }
+    
+    func testStationId() {
+        let wmo = LatestSoundingList.Entry("-51431, 2022-10-27 12:00:00")!
+        XCTAssertEqual(wmo.stationId, .wmoId(-51431))
+        
+        let slashes = LatestSoundingList.Entry("///, 2023-01-24 12:00:00")!
+        XCTAssertEqual(slashes.stationId, .bufr("///"))
+        
+        let longBufrName = LatestSoundingList.Entry("XKQLWQB, 2023-06-11 12:00:00")!
+        XCTAssertEqual(longBufrName.stationId, .bufr("XKQLWQB"))
+    }
+    
+    func testSoundingsListParsing() throws {
+        let soundings = try LatestSoundingList(soundingsListString)
+        XCTAssertEqual(soundings.soundings.count, expectedSoundingsCount)
+    }
+    
+    func testIgnoreUnparseableStationInfoLines() {
+        XCTAssertNil(LatestSoundingList.Entry("WMOID Name ---------latest date-------------"))
+        XCTAssertNil(LatestSoundingList.Entry(""))
+        XCTAssertNil(LatestSoundingList.Entry("NKX, Time is a flat circle"))
+    }
+    
+    func testSoundingTimestampParsing() {
+        let midnight = LatestSoundingList.Entry("03918, 2023-06-11 00:00:00")!
+        let noon = LatestSoundingList.Entry("03953, 2023-06-11 12:00:00")!
+        let calendar = Calendar(identifier: .gregorian)
+        let utc = TimeZone(secondsFromGMT: 0)!
+
+        let midnightComponents = calendar.dateComponents(in: utc, from: midnight.timestamp)
+        let noonComponents = calendar.dateComponents(in: utc, from: noon.timestamp)
+        
+        [midnightComponents, noonComponents].forEach {
+            XCTAssertEqual($0.year, 2023)
+            XCTAssertEqual($0.month, 6)
+            XCTAssertEqual($0.day, 11)
+        }
+        
+        XCTAssertEqual(midnightComponents.hour, 0)
+        XCTAssertEqual(noonComponents.hour, 12)
     }
 }
