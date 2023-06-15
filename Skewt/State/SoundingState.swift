@@ -14,9 +14,11 @@ struct SoundingSelection: Codable {
         case selectTime(Time)
     }
     
-    enum ModelType: Codable {
+    enum ModelType: Codable, CaseIterable, Identifiable {
         case op40
         case raob
+        
+        var id: Self { self }
     }
     
     enum Location: Codable {
