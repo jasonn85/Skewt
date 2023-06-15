@@ -10,6 +10,7 @@ import Foundation
 struct RecentSoundingsState: Codable {
     enum Action: Skewt.Action, Codable {
         case load
+        case refresh
         case loadingListFailed(RecentSoundingsError)
         case didReceiveList(LatestSoundingList)
     }
@@ -17,6 +18,7 @@ struct RecentSoundingsState: Codable {
     enum Status: Codable {
         case idle
         case loading
+        case refreshing(LatestSoundingList, Date)
         case failed(RecentSoundingsError)
         case done(LatestSoundingList, Date)
     }
@@ -42,6 +44,13 @@ extension RecentSoundingsState {
         }
         
         switch action {
+        case .refresh:
+            if case RecentSoundingsState.Status.done(let oldList, let oldDate) = state.status {
+                return RecentSoundingsState(status: .refreshing(oldList, oldDate))
+            }
+            
+            // If refresh is called with no other data, fall through as a normal .load action
+            fallthrough
         case .load:
             return RecentSoundingsState(status: .loading)
         case .loadingListFailed(let error):
