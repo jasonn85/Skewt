@@ -65,6 +65,7 @@ struct ContentView: View {
                         Label("Location", systemImage: "location")
                     }
             }
+            .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
     }
     
