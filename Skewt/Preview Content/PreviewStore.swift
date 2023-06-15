@@ -22,7 +22,8 @@ extension Store {
                 currentSoundingState: soundingState,
                 defaultSoundingSelection: soundingState.selection,
                 plotOptions: PlotOptions(),
-                locationState: LocationState()
+                locationState: LocationState(),
+                recentSoundingsState: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

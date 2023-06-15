@@ -71,6 +71,7 @@ struct SkewtState: Codable {
     var defaultSoundingSelection: SoundingSelection
     var plotOptions: PlotOptions
     var locationState: LocationState
+    var recentSoundingsState: RecentSoundingsState
 }
 
 // Default initializer
@@ -80,6 +81,7 @@ extension SkewtState {
         defaultSoundingSelection = SoundingSelection()
         plotOptions = PlotOptions()
         locationState = LocationState()
+        recentSoundingsState = RecentSoundingsState()
     }
 }
 
@@ -87,15 +89,21 @@ extension SkewtState {
 extension SkewtState {
     static let reducer: Reducer<Self> = { state, action in
         if action as? Action == .saveSelectionAsDefault {
-            return SkewtState(currentSoundingState: state.currentSoundingState,
-                              defaultSoundingSelection: state.currentSoundingState.selection,
-                              plotOptions: state.plotOptions,
-                              locationState: state.locationState)
+            return SkewtState(
+                currentSoundingState: state.currentSoundingState,
+                defaultSoundingSelection: state.currentSoundingState.selection,
+                plotOptions: state.plotOptions,
+                locationState: state.locationState,
+                recentSoundingsState: state.recentSoundingsState
+            )
         }
         
-        return SkewtState(currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
-                          defaultSoundingSelection: state.defaultSoundingSelection,
-                          plotOptions: PlotOptions.reducer(state.plotOptions, action),
-                          locationState: LocationState.reducer(state.locationState, action))
+        return SkewtState(
+            currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
+            defaultSoundingSelection: state.defaultSoundingSelection,
+            plotOptions: PlotOptions.reducer(state.plotOptions, action),
+            locationState: LocationState.reducer(state.locationState, action),
+            recentSoundingsState: RecentSoundingsState.reducer(state.recentSoundingsState, action)
+        )
     }
 }

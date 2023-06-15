@@ -46,6 +46,8 @@
 		96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */; };
 		96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06529B165D0006D23BE /* SkewtPlot.swift */; };
 		96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */; };
+		96FE7E522A3A89ED0069AD3A /* RecentSoundingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96FE7E512A3A89ED0069AD3A /* RecentSoundingsState.swift */; };
+		96FE7E542A3A8C030069AD3A /* SoundingsListApiMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96FE7E532A3A8C030069AD3A /* SoundingsListApiMiddleware.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,8 @@
 		96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlotView.swift; sourceTree = "<group>"; };
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
 		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
+		96FE7E512A3A89ED0069AD3A /* RecentSoundingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSoundingsState.swift; sourceTree = "<group>"; };
+		96FE7E532A3A8C030069AD3A /* SoundingsListApiMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingsListApiMiddleware.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +148,7 @@
 				961202622A156B03009423D5 /* SoundingState.swift */,
 				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
+				96FE7E512A3A89ED0069AD3A /* RecentSoundingsState.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -226,8 +231,9 @@
 			isa = PBXGroup;
 			children = (
 				96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */,
-				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
 				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
+				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
+				96FE7E532A3A8C030069AD3A /* SoundingsListApiMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -394,11 +400,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96FE7E542A3A8C030069AD3A /* SoundingsListApiMiddleware.swift in Sources */,
 				968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */,
 				96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */,
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
 				968998202A17323F005457D6 /* LocationState.swift in Sources */,
 				969117902A29165000A5C72D /* PlotStyling.swift in Sources */,
+				96FE7E522A3A89ED0069AD3A /* RecentSoundingsState.swift in Sources */,
 				967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */,
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,

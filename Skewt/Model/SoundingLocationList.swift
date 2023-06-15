@@ -13,6 +13,8 @@ enum LocationListParsingError: Error {
 }
 
 struct LatestSoundingList: Codable {
+    static let url = URL(string: "https://rucsoundings.noaa.gov/latest_pbraob.txt")!
+    
     enum StationId: Codable, Equatable {
         case wmoId(Int)
         case bufr(String)
