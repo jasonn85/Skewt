@@ -9,13 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @State var selectingTime = false
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
+    @State private var selectingTime = false
     @State private var updateTimeTask: Task<(), Error>? = nil
     private let updateTimeDebounce: Duration = .milliseconds(100)
-    
     @State private var selectedTimeInterval: TimeInterval = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
@@ -53,7 +52,19 @@ struct ContentView: View {
                 }
             }
             
-            DisplayOptionsView().environmentObject(store)
+            TabView {
+                DisplayOptionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Options", systemImage: "slider.horizontal.3")
+                    }
+                
+                SoundingSelectionView(modelType: store.state.currentSoundingState.selection.type)
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Location", systemImage: "location")
+                    }
+            }
         }
     }
     
@@ -174,7 +185,7 @@ extension SoundingSelection.Time {
     }
 }
 
-extension SoundingSelection.ModelType {
+extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
         case .op40:
