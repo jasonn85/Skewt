@@ -16,7 +16,8 @@ struct SkewtApp: App {
             middlewares: [
                 Middlewares.rucApi,
                 Middlewares.locationMiddleware,
-                Middlewares.consoleLogger
+                Middlewares.consoleLogger,
+                Middlewares.userDefaultsSaving
             ]
         )
         
