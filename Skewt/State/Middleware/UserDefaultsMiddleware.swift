@@ -43,7 +43,7 @@ extension Middlewares {
             break
         }
         
-        if action as? PlotOptions.Action != nil {
+        if action is PlotOptions.Action || action is PlotOptions.PlotStyling.Action {
             UserDefaults.standard.save(state.plotOptions, forKey: .plotOptions)
         }
         
