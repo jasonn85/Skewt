@@ -112,14 +112,14 @@ extension SoundingState {
     init() {
         selection = SoundingSelection()
         pinnedSelections = []
-        recentSelections = []
+        recentSelections = [selection]
         status = .idle
     }
     
     init(selection: SoundingSelection?) {
         self.selection = selection ?? SoundingSelection()
         pinnedSelections = []
-        recentSelections = []
+        recentSelections = [self.selection]
         status = .idle
     }
 }
