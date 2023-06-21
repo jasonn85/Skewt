@@ -13,6 +13,24 @@ struct SoundingSelectionView: View {
     
     var body: some View {
         List {
+            Section("Pinned") {
+                
+            }
+            
+            Section("Recents") {
+                VStack {
+                    Text("Current location").font(.title3)
+                    Text("op40 forecast")
+                        .font(.footnote)
+                }
+                
+                VStack {
+                    Text("Current location").font(.title3)
+                    Text("sounding")
+                        .font(.footnote)
+                }
+            }
+            
             Section("Data type") {
                 Picker("Data type", selection: $modelType) {
                     ForEach(SoundingSelection.ModelType.allCases, id: \.id) {
@@ -23,14 +41,10 @@ struct SoundingSelectionView: View {
             }
             
             Section("Location") {
-                Text("Closest")
-                Text("Somewhere else")
+                
             }
-
-            Section("Recents") {
-                Text("Recent 1")
-                Text("Recent 2")
-            }
+            
+            // map here and stuff
         }
     }
 }
