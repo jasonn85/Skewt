@@ -12,6 +12,7 @@ extension UserDefaults {
     enum SkewtKey: String {
         case currentSelection = "skewt.currentSelection"
         case plotOptions = "skewt.plotOptions"
+        case displayState = "skewt.displayState"
     }
     
     func save<T: Encodable>(_ value: T, forKey key: SkewtKey) {
@@ -47,6 +48,10 @@ extension Middlewares {
             UserDefaults.standard.save(state.plotOptions, forKey: .plotOptions)
         }
         
+        if action is DisplayState.Action {
+            UserDefaults.standard.save(state.displayState, forKey: .displayState)
+        }
+        
         return Empty().eraseToAnyPublisher()
     }
 }
@@ -60,5 +65,11 @@ extension SoundingSelection {
 extension PlotOptions {
     static var saved: PlotOptions? {
         UserDefaults.standard.loadValue(forKey: .plotOptions) as Self?
+    }
+}
+
+extension DisplayState {
+    static var saved: DisplayState? {
+        UserDefaults.standard.loadValue(forKey: .displayState) as Self?
     }
 }
