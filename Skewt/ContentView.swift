@@ -94,6 +94,11 @@ struct ContentView: View {
         }
         .font(.headline.weight(.semibold))
         .foregroundColor(.blue)
+        .onTapGesture {
+            if store.state.displayState.tabSelection != .soundingSelection {
+                store.dispatch(DisplayState.Action.selectTab(.soundingSelection))
+            }
+        }
     }
     
     private var footer: some View {
