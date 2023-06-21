@@ -108,7 +108,7 @@ extension CGColor {
         Scanner(string: blue).scanHexInt64(&blueInt)
 
         return CGColor(
-            red: CGFloat(redInt) / 255.0,
+            srgbRed: CGFloat(redInt) / 255.0,
             green: CGFloat(greenInt) / 255.0,
             blue: CGFloat(blueInt) / 255.0,
             alpha: alpha

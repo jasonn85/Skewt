@@ -107,6 +107,11 @@ extension SoundingState {
         selection = SoundingSelection()
         status = .idle
     }
+    
+    init(selection: SoundingSelection?) {
+        self.selection = selection ?? SoundingSelection()
+        status = .idle
+    }
 }
 
 extension SoundingState.Status {

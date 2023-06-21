@@ -110,6 +110,7 @@ struct LineStyleView: View {
                     Button("Set to default") {
                         lineStyle = PlotOptions.PlotStyling.defaultStyle(forType: lineType)
                     }
+                    .buttonStyle(.borderless)
                 }
             }
         }
