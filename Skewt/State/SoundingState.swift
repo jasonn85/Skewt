@@ -7,19 +7,21 @@
 
 import Foundation
 
-struct SoundingSelection: Codable {
+struct SoundingSelection: Codable, Equatable {
     enum Action: Skewt.Action {
         case selectModelType(ModelType)
         case selectLocation(Location)
         case selectTime(Time)
     }
     
-    enum ModelType: Codable {
+    enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
         case op40
         case raob
+        
+        var id: Self { self }
     }
     
-    enum Location: Codable {
+    enum Location: Codable, Equatable {
         case closest
         case point(latitude: Double, longitude: Double)
         case named(String)
@@ -85,6 +87,8 @@ struct SoundingState: Codable {
     enum Action: Skewt.Action {
         case doRefresh
         case changeAndLoadSelection(SoundingSelection.Action)
+        case pinSelection(SoundingSelection)
+        case unpinSelection(SoundingSelection)
         case didReceiveFailure(SoundingError)
         case didReceiveResponse(Sounding)
     }
@@ -97,19 +101,25 @@ struct SoundingState: Codable {
         case failed(SoundingError)
     }
     
-    let selection: SoundingSelection
-    let status: Status
+    var selection: SoundingSelection
+    var pinnedSelections: [SoundingSelection]
+    var recentSelections: [SoundingSelection]
+    var status: Status
 }
 
 // Default initializer
 extension SoundingState {
     init() {
         selection = SoundingSelection()
+        pinnedSelections = []
+        recentSelections = []
         status = .idle
     }
     
     init(selection: SoundingSelection?) {
         self.selection = selection ?? SoundingSelection()
+        pinnedSelections = []
+        recentSelections = []
         status = .idle
     }
 }
@@ -130,6 +140,10 @@ extension SoundingState.Action: CustomStringConvertible {
         switch self {
         case .doRefresh:
             return "Refreshing"
+        case .pinSelection(let selection):
+            return "Pinning selection: \(selection)"
+        case .unpinSelection(let selection):
+            return "Unpinning selection: \(selection)"
         case .changeAndLoadSelection(let selection):
             return "Changing selection and reloading: \(selection)"
         case .didReceiveFailure(let error):
@@ -149,21 +163,77 @@ extension SoundingState {
         
         switch action {
         case .doRefresh:
+            var state = state
+            
             switch state.status {
             case .done(let sounding):
-                return SoundingState(selection: state.selection, status: .refreshing(sounding))
+                state.status = .refreshing(sounding)
             default:
-                return SoundingState(selection: state.selection, status: .loading)
+                state.status = .loading
             }
             
-        case .changeAndLoadSelection(let action):
-            return SoundingState(selection: SoundingSelection.reducer(state.selection, action),
-                                 status: .loading)
+            return state
+        case .pinSelection(let selection):
+            var state = state
+            state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
             
+            return state
+        case .unpinSelection(let selection):
+            var state = state
+            state.pinnedSelections = state.pinnedSelections.filter { $0 != selection }
+            
+            return state
+        case .changeAndLoadSelection(let action):
+            let selection = SoundingSelection.reducer(state.selection, action)
+            var recentSelections = state.recentSelections
+            
+            if action.isCreatingNewSelection {
+                let maximumRecents = 5
+                recentSelections = recentSelections.addingToHead(selection, maximumCount: maximumRecents)
+            }
+            
+            return SoundingState(
+                selection: selection,
+                pinnedSelections: state.pinnedSelections,
+                recentSelections: recentSelections,
+                status: .loading
+            )
         case .didReceiveFailure(let error):
-            return SoundingState(selection: state.selection, status: .failed(error))
+            var state = state
+            state.status = .failed(error)
+            
+            return state
         case .didReceiveResponse(let sounding):
-            return SoundingState(selection: state.selection, status: .done(sounding))
+            var state = state
+            state.status = .done(sounding)
+            
+            return state
+        }
+    }
+}
+
+extension Array where Element: Equatable {
+    public func addingToHead(_ element: Element, maximumCount: Int? = nil) -> Self {
+        let max = maximumCount ?? self.count + 1
+        
+        return [element] + self.filter({ $0 != element })[0..<(max - 1)]
+    }
+}
+
+extension Action {
+    // Is this action changing the sounding type or location?
+    var isCreatingNewSelection: Bool {
+        switch self as? SoundingState.Action {
+        case .changeAndLoadSelection(let action):
+            switch action {
+            case .selectLocation(_), .selectModelType(_):
+                return true
+            case .selectTime(_):
+                // Just changing time is not creating a new selection type
+                return false
+            }
+        default:
+            return false
         }
     }
 }

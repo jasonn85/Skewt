@@ -15,7 +15,12 @@ extension Store {
     }
     
     static var previewStore: Store<SkewtState> {
-        let soundingState = SoundingState(selection: SoundingSelection(), status: .done(previewSounding))
+        let soundingState = SoundingState(
+            selection: SoundingSelection(),
+            pinnedSelections: [],
+            recentSelections: [],
+            status: .done(previewSounding)
+        )
         
         return Store<SkewtState>(
             initial: SkewtState(
