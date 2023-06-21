@@ -52,18 +52,23 @@ struct ContentView: View {
                 }
             }
             
-            TabView {
+            TabView(selection: Binding<DisplayState.TabSelection>(
+                get: { store.state.displayState.tabSelection },
+                set: { store.dispatch(DisplayState.Action.selectTab($0)) }
+            )) {
                 DisplayOptionsView()
                     .environmentObject(store)
                     .tabItem {
                         Label("Options", systemImage: "slider.horizontal.3")
                     }
+                    .tag(DisplayState.TabSelection.displayOptions)
                 
                 SoundingSelectionView(modelType: store.state.currentSoundingState.selection.type)
                     .environmentObject(store)
                     .tabItem {
                         Label("Location", systemImage: "location")
                     }
+                    .tag(DisplayState.TabSelection.soundingSelection)
             }
             .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }

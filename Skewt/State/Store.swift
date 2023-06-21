@@ -67,6 +67,7 @@ struct SkewtState: Codable {
         case saveSelectionAsDefault
     }
     
+    var displayState: DisplayState
     var currentSoundingState: SoundingState
     var defaultSoundingSelection: SoundingSelection
     var plotOptions: PlotOptions
@@ -76,6 +77,7 @@ struct SkewtState: Codable {
 // Default initializer
 extension SkewtState {
     init() {
+        displayState = DisplayState()
         defaultSoundingSelection = SoundingSelection.savedCurrentSelection ?? SoundingSelection()
         currentSoundingState = SoundingState(selection: defaultSoundingSelection)
         plotOptions = PlotOptions.saved ?? PlotOptions()
@@ -87,15 +89,20 @@ extension SkewtState {
 extension SkewtState {
     static let reducer: Reducer<Self> = { state, action in
         if action as? Action == .saveSelectionAsDefault {
-            return SkewtState(currentSoundingState: state.currentSoundingState,
-                              defaultSoundingSelection: state.currentSoundingState.selection,
-                              plotOptions: state.plotOptions,
-                              locationState: state.locationState)
+            return SkewtState(
+                displayState: state.displayState,
+                currentSoundingState: state.currentSoundingState,
+                defaultSoundingSelection: state.currentSoundingState.selection,
+                plotOptions: state.plotOptions,
+                locationState: state.locationState
+            )
         }
         
-        return SkewtState(currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
-                          defaultSoundingSelection: state.defaultSoundingSelection,
-                          plotOptions: PlotOptions.reducer(state.plotOptions, action),
-                          locationState: LocationState.reducer(state.locationState, action))
+        return SkewtState(
+            displayState: DisplayState.reducer(state.displayState, action),
+            currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
+            defaultSoundingSelection: state.defaultSoundingSelection,
+            plotOptions: PlotOptions.reducer(state.plotOptions, action),
+            locationState: LocationState.reducer(state.locationState, action))
     }
 }

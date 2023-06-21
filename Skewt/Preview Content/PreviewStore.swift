@@ -19,6 +19,7 @@ extension Store {
         
         return Store<SkewtState>(
             initial: SkewtState(
+                displayState: DisplayState(),
                 currentSoundingState: soundingState,
                 defaultSoundingSelection: soundingState.selection,
                 plotOptions: PlotOptions(),
