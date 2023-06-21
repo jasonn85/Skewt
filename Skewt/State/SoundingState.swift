@@ -214,25 +214,20 @@ extension SoundingState {
 
 extension Array where Element: Equatable {
     public func addingToHead(_ element: Element, maximumCount: Int? = nil) -> Self {
-        let max = maximumCount ?? self.count + 1
+        let maximumCount = maximumCount ?? self.count + 1
         
-        return [element] + self.filter({ $0 != element })[0..<(max - 1)]
+        return [element] + self.filter({ $0 != element }).prefix(maximumCount - 1)
     }
 }
 
-extension Action {
+extension SoundingSelection.Action {
     // Is this action changing the sounding type or location?
     var isCreatingNewSelection: Bool {
-        switch self as? SoundingState.Action {
-        case .changeAndLoadSelection(let action):
-            switch action {
-            case .selectLocation(_), .selectModelType(_):
-                return true
-            case .selectTime(_):
-                // Just changing time is not creating a new selection type
-                return false
-            }
-        default:
+        switch self {
+        case .selectLocation(_), .selectModelType(_):
+            return true
+        case .selectTime(_):
+            // Just changing time is not creating a new selection type
             return false
         }
     }
