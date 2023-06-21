@@ -16,6 +16,7 @@
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */; };
 		96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* TimeSelectView.swift */; };
+		967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */; };
 		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
@@ -72,6 +73,7 @@
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewStore.swift; sourceTree = "<group>"; };
 		96590BA12A1D6562001143DB /* TimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSelectView.swift; sourceTree = "<group>"; };
+		967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMiddleware.swift; sourceTree = "<group>"; };
 		9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequestTests.swift; sourceTree = "<group>"; };
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */,
 				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
 				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
+				967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -393,6 +396,7 @@
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
 				96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
+				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
 				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
 				96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */,

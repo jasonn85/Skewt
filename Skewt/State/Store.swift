@@ -76,9 +76,9 @@ struct SkewtState: Codable {
 // Default initializer
 extension SkewtState {
     init() {
-        currentSoundingState = SoundingState()
-        defaultSoundingSelection = SoundingSelection()
-        plotOptions = PlotOptions()
+        defaultSoundingSelection = SoundingSelection.savedCurrentSelection ?? SoundingSelection()
+        currentSoundingState = SoundingState(selection: defaultSoundingSelection)
+        plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
     }
 }
