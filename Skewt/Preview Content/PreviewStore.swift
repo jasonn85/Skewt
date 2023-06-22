@@ -19,8 +19,6 @@ extension Store {
         
         let soundingState = SoundingState(
             selection: selection,
-            pinnedSelections: [],
-            recentSelections: [selection],
             status: .done(previewSounding)
         )
         
@@ -29,6 +27,8 @@ extension Store {
                 displayState: DisplayState(),
                 currentSoundingState: soundingState,
                 defaultSoundingSelection: soundingState.selection,
+                pinnedSelections: [],
+                recentSelections: [selection],
                 plotOptions: PlotOptions(),
                 locationState: LocationState()
             ),
