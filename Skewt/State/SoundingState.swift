@@ -87,8 +87,6 @@ struct SoundingState: Codable {
     enum Action: Skewt.Action {
         case doRefresh
         case changeAndLoadSelection(SoundingSelection.Action)
-        case pinSelection(SoundingSelection)
-        case unpinSelection(SoundingSelection)
         case didReceiveFailure(SoundingError)
         case didReceiveResponse(Sounding)
     }
@@ -102,8 +100,6 @@ struct SoundingState: Codable {
     }
     
     var selection: SoundingSelection
-    var pinnedSelections: [SoundingSelection]
-    var recentSelections: [SoundingSelection]
     var status: Status
 }
 
@@ -111,15 +107,11 @@ struct SoundingState: Codable {
 extension SoundingState {
     init() {
         selection = SoundingSelection()
-        pinnedSelections = []
-        recentSelections = [selection]
         status = .idle
     }
     
     init(selection: SoundingSelection?) {
         self.selection = selection ?? SoundingSelection()
-        pinnedSelections = []
-        recentSelections = [self.selection]
         status = .idle
     }
 }
@@ -140,10 +132,6 @@ extension SoundingState.Action: CustomStringConvertible {
         switch self {
         case .doRefresh:
             return "Refreshing"
-        case .pinSelection(let selection):
-            return "Pinning selection: \(selection)"
-        case .unpinSelection(let selection):
-            return "Unpinning selection: \(selection)"
         case .changeAndLoadSelection(let selection):
             return "Changing selection and reloading: \(selection)"
         case .didReceiveFailure(let error):
@@ -173,29 +161,9 @@ extension SoundingState {
             }
             
             return state
-        case .pinSelection(let selection):
-            var state = state
-            state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
-            
-            return state
-        case .unpinSelection(let selection):
-            var state = state
-            state.pinnedSelections = state.pinnedSelections.filter { $0 != selection }
-            
-            return state
         case .changeAndLoadSelection(let action):
-            let selection = SoundingSelection.reducer(state.selection, action)
-            var recentSelections = state.recentSelections
-            
-            if action.isCreatingNewSelection {
-                let maximumRecents = 5
-                recentSelections = recentSelections.addingToHead(selection, maximumCount: maximumRecents)
-            }
-            
             return SoundingState(
-                selection: selection,
-                pinnedSelections: state.pinnedSelections,
-                recentSelections: recentSelections,
+                selection: SoundingSelection.reducer(state.selection, action),
                 status: .loading
             )
         case .didReceiveFailure(let error):
@@ -209,14 +177,6 @@ extension SoundingState {
             
             return state
         }
-    }
-}
-
-extension Array where Element: Equatable {
-    public func addingToHead(_ element: Element, maximumCount: Int? = nil) -> Self {
-        let maximumCount = maximumCount ?? self.count + 1
-        
-        return [element] + self.filter({ $0 != element }).prefix(maximumCount - 1)
     }
 }
 
