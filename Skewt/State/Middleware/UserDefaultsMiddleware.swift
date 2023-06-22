@@ -13,6 +13,8 @@ extension UserDefaults {
         case currentSelection = "skewt.currentSelection"
         case plotOptions = "skewt.plotOptions"
         case displayState = "skewt.displayState"
+        case recentSelections = "skewt.recentSelections"
+        case pinnedSelections = "skewt.pinnedSelections"
     }
     
     func save<T: Encodable>(_ value: T, forKey key: SkewtKey) {
@@ -36,9 +38,17 @@ extension UserDefaults {
 
 extension Middlewares {
     static let userDefaultsSaving: Middleware<SkewtState> = { state, action in
+        switch action as? SkewtState.Action {
+        case .pinSelection(_), .unpinSelection(_):
+            UserDefaults.standard.save(state.pinnedSelections, forKey: .pinnedSelections)
+        default:
+            break
+        }
+        
         switch action as? SoundingState.Action {
         case .changeAndLoadSelection(_):
             UserDefaults.standard.save(state.currentSoundingState.selection, forKey: .currentSelection)
+            UserDefaults.standard.save(state.recentSelections, forKey: .recentSelections)
             
         default:
             break
@@ -71,5 +81,15 @@ extension PlotOptions {
 extension DisplayState {
     static var saved: DisplayState? {
         UserDefaults.standard.loadValue(forKey: .displayState) as Self?
+    }
+}
+
+extension SkewtState {
+    static var savedRecents: [SoundingSelection] {
+        UserDefaults.standard.loadValue(forKey: .recentSelections) as [SoundingSelection]? ?? []
+    }
+    
+    static var savedPinnedSelections: [SoundingSelection] {
+        UserDefaults.standard.loadValue(forKey: .pinnedSelections) as [SoundingSelection]? ?? []
     }
 }
