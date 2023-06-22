@@ -81,9 +81,11 @@ struct SkewtState: Codable {
 extension SkewtState {
     init() {
         displayState = DisplayState.saved ?? DisplayState()
-        currentSoundingState = SoundingState(selection: defaultSoundingSelection)
-        recentSelections = [defaultSoundingSelection]
-        pinnedSelections = []
+        currentSoundingState = SoundingState(
+            selection: SoundingSelection.savedCurrentSelection ?? SoundingSelection()
+        )
+        recentSelections = SkewtState.savedRecentSelections ?? [currentSoundingState.selection]
+        pinnedSelections = SkewtState.savedPinnedSelections
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
     }
