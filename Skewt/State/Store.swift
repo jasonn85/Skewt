@@ -130,8 +130,7 @@ extension SkewtState {
 extension Array where Element: Equatable {
     public func addingToHead(_ element: Element, maximumCount: Int? = nil) -> Self {
         let maximumCount = maximumCount ?? self.count + 1
-        let r = [element] + self.filter({ $0 != element }).prefix(maximumCount - 1)
         
-        return r
+        return [element] + self.filter({ $0 != element }).prefix(maximumCount - 1)
     }
 }
