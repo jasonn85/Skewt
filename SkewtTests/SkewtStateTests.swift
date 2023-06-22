@@ -17,7 +17,6 @@ final class SkewtStateTests: XCTestCase {
         let originalState = SkewtState(
             displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestOp40),
-            defaultSoundingSelection: closestLatestOp40,
             pinnedSelections: [],
             recentSelections: [closestLatestOp40],
             plotOptions: PlotOptions(),
@@ -36,7 +35,6 @@ final class SkewtStateTests: XCTestCase {
         let originalState = SkewtState(
             displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestOp40),
-            defaultSoundingSelection: closestLatestOp40,
             pinnedSelections: [],
             recentSelections: [closestLatestOp40],
             plotOptions: PlotOptions(),
@@ -56,7 +54,6 @@ final class SkewtStateTests: XCTestCase {
         var state = SkewtState(
             displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestOp40),
-            defaultSoundingSelection: closestLatestOp40,
             pinnedSelections: [],
             recentSelections: [closestLatestOp40],
             plotOptions: PlotOptions(),
@@ -86,7 +83,6 @@ final class SkewtStateTests: XCTestCase {
         let originalState = SkewtState(
             displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestOp40),
-            defaultSoundingSelection: closestLatestOp40,
             pinnedSelections: [],
             recentSelections: [closestLatestOp40],
             plotOptions: PlotOptions(),
@@ -108,7 +104,6 @@ final class SkewtStateTests: XCTestCase {
         let pinnedState = SkewtState(
             displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: selection),
-            defaultSoundingSelection: selection,
             pinnedSelections: [selection],
             recentSelections: [selection],
             plotOptions: PlotOptions(),

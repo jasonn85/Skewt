@@ -26,7 +26,6 @@ extension Store {
             initial: SkewtState(
                 displayState: DisplayState(),
                 currentSoundingState: soundingState,
-                defaultSoundingSelection: soundingState.selection,
                 pinnedSelections: [],
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),

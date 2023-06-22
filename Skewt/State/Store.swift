@@ -64,14 +64,12 @@ final class Store<State>: ObservableObject {
 
 struct SkewtState: Codable {
     enum Action: Skewt.Action {
-        case saveSelectionAsDefault
         case pinSelection(SoundingSelection)
         case unpinSelection(SoundingSelection)
     }
     
     var displayState: DisplayState
     var currentSoundingState: SoundingState
-    var defaultSoundingSelection: SoundingSelection
     var pinnedSelections: [SoundingSelection]
     var recentSelections: [SoundingSelection]
     
@@ -83,7 +81,6 @@ struct SkewtState: Codable {
 extension SkewtState {
     init() {
         displayState = DisplayState.saved ?? DisplayState()
-        defaultSoundingSelection = SoundingSelection.savedCurrentSelection ?? SoundingSelection()
         currentSoundingState = SoundingState(selection: defaultSoundingSelection)
         recentSelections = [defaultSoundingSelection]
         pinnedSelections = []
@@ -99,13 +96,10 @@ extension SkewtState {
         
         state.displayState = DisplayState.reducer(state.displayState, action)
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
-        state.defaultSoundingSelection = state.defaultSoundingSelection
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
         
         switch action as? SkewtState.Action {
-        case .saveSelectionAsDefault:
-            state.defaultSoundingSelection = state.currentSoundingState.selection
         case .pinSelection(let selection):
             print("state before pinning: \(state)")
             state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
