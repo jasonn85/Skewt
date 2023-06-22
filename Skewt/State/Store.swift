@@ -103,9 +103,7 @@ extension SkewtState {
         
         switch action as? SkewtState.Action {
         case .pinSelection(let selection):
-            print("state before pinning: \(state)")
             state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
-            print("state after pinning: \(state)")
         case .unpinSelection(let selection):
             state.pinnedSelections = state.pinnedSelections.filter { $0 != selection }
         case .none:
