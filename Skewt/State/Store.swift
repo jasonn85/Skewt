@@ -85,7 +85,7 @@ extension SkewtState {
             selection: SoundingSelection.savedCurrentSelection ?? SoundingSelection()
         )
         recentSelections = SkewtState.savedRecentSelections ?? [currentSoundingState.selection]
-        pinnedSelections = SkewtState.savedPinnedSelections
+        pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
     }

@@ -89,7 +89,7 @@ extension SkewtState {
         UserDefaults.standard.loadValue(forKey: .recentSelections) as [SoundingSelection]?
     }
     
-    static var savedPinnedSelections: [SoundingSelection] {
-        UserDefaults.standard.loadValue(forKey: .pinnedSelections) as [SoundingSelection]? ?? []
+    static var savedPinnedSelections: [SoundingSelection]? {
+        UserDefaults.standard.loadValue(forKey: .pinnedSelections) as [SoundingSelection]?
     }
 }
