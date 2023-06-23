@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SoundingSelection: Codable, Equatable {
+struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Action: Skewt.Action {
         case selectModelType(ModelType)
         case selectLocation(Location)
@@ -21,21 +21,27 @@ struct SoundingSelection: Codable, Equatable {
         var id: Self { self }
     }
     
-    enum Location: Codable, Equatable {
+    enum Location: Codable, Hashable, Identifiable {
         case closest
         case point(latitude: Double, longitude: Double)
         case named(String)
+        
+        var id: Self { self }
     }
     
-    enum Time: Codable, Equatable {
+    enum Time: Codable, Hashable, Identifiable {
         case now
         case relative(TimeInterval)
         case specific(Date)
+        
+        var id: Self { self }
     }
     
     let type: ModelType
     let location: Location
     let time: Time
+    
+    var id: Self { self }
 }
 
 // Default initializer
