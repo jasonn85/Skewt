@@ -12,7 +12,7 @@ enum LocationListParsingError: Error {
     case unparseableLine(String)
 }
 
-struct LatestSoundingList: Codable {
+struct LatestSoundingList: Codable, Equatable {
     static let url = URL(string: "https://rucsoundings.noaa.gov/latest_pbraob.txt")!
     
     enum StationId: Codable, Equatable {
@@ -20,7 +20,7 @@ struct LatestSoundingList: Codable {
         case bufr(String)
     }
     
-    struct Entry: Codable {
+    struct Entry: Codable, Equatable {
         var stationId: StationId
         var timestamp: Date
     }
@@ -96,5 +96,23 @@ extension LatestSoundingList.Entry {
         }
         
         self.timestamp = timestamp
+    }
+}
+
+extension TimeInterval {
+    static var twentyFourHours: Self {
+        60.0 * 60.0 * 24.0
+    }
+}
+
+extension LatestSoundingList {
+    func recentSoundings(_ timeInterval: TimeInterval = .twentyFourHours) -> [Entry] {
+        let now = Date()
+        
+        return soundings.filter {
+            let thisInterval = now.timeIntervalSince($0.timestamp)
+        
+            return thisInterval > 0.0 && thisInterval < timeInterval
+        }
     }
 }

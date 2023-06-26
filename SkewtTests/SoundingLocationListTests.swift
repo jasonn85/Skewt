@@ -138,4 +138,51 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertEqual(midnightComponents.hour, 0)
         XCTAssertEqual(noonComponents.hour, 12)
     }
+    
+    func testRecentSoundingFilter() {
+        let yearOldSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(1),
+            timestamp: Date(timeIntervalSinceNow: -365.0 * 24.0 * 60.0 * 60.0)
+        )
+        
+        let weekOldSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(2),
+            timestamp: Date(timeIntervalSinceNow: -7.0 * 24.0 * 60.0 * 60.0)
+        )
+        
+        let twentyHourOldSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(3),
+            timestamp: Date(timeIntervalSinceNow: -20.0 * 60.0 * 60.0)
+        )
+        
+        let twelveHourOldSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(4),
+            timestamp: Date(timeIntervalSinceNow: -12.0 * 60.0 * 60.0)
+        )
+        
+        let hourOldSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(5),
+            timestamp: Date(timeIntervalSinceNow: -60.0 * 60.0)
+        )
+        
+        let hourInFutureSounding = LatestSoundingList.Entry(
+            stationId: .wmoId(6),
+            timestamp: Date(timeIntervalSinceNow: 60.0 * 60.0)
+        )
+        
+        let oneSounding = LatestSoundingList(soundings: [hourOldSounding])
+        XCTAssertEqual(oneSounding.recentSoundings(), oneSounding.soundings)
+        
+        let allRecentSoundings = LatestSoundingList(soundings: [twentyHourOldSounding, twelveHourOldSounding, hourOldSounding])
+        XCTAssertEqual(allRecentSoundings.recentSoundings(), allRecentSoundings.soundings)
+        
+        let ancientSoundings = LatestSoundingList(soundings: [yearOldSounding, weekOldSounding])
+        XCTAssertEqual(ancientSoundings.recentSoundings(), [])
+        
+        let oneOldOneCurrentSounding = LatestSoundingList(soundings: [yearOldSounding, hourOldSounding])
+        XCTAssertEqual(oneOldOneCurrentSounding.recentSoundings(), [hourOldSounding])
+        
+        let futureSounding = LatestSoundingList(soundings: [hourInFutureSounding])
+        XCTAssertEqual(futureSounding.recentSoundings(), [])
+    }
 }
