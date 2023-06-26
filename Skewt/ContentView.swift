@@ -9,13 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @State var selectingTime = false
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
+    @State private var selectingTime = false
     @State private var updateTimeTask: Task<(), Error>? = nil
     private let updateTimeDebounce: Duration = .milliseconds(100)
-    
     @State private var selectedTimeInterval: TimeInterval = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
@@ -53,7 +52,25 @@ struct ContentView: View {
                 }
             }
             
-            DisplayOptionsView().environmentObject(store)
+            TabView(selection: Binding<DisplayState.TabSelection>(
+                get: { store.state.displayState.tabSelection },
+                set: { store.dispatch(DisplayState.Action.selectTab($0)) }
+            )) {
+                DisplayOptionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Options", systemImage: "slider.horizontal.3")
+                    }
+                    .tag(DisplayState.TabSelection.displayOptions)
+                
+                SoundingSelectionView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Location", systemImage: "location")
+                    }
+                    .tag(DisplayState.TabSelection.soundingSelection)
+            }
+            .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
     }
     
@@ -77,6 +94,11 @@ struct ContentView: View {
         }
         .font(.headline.weight(.semibold))
         .foregroundColor(.blue)
+        .onTapGesture {
+            if store.state.displayState.tabSelection != .soundingSelection {
+                store.dispatch(DisplayState.Action.selectTab(.soundingSelection))
+            }
+        }
     }
     
     private var footer: some View {
@@ -174,7 +196,7 @@ extension SoundingSelection.Time {
     }
 }
 
-extension SoundingSelection.ModelType {
+extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
         case .op40:

@@ -20,6 +20,9 @@
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
 		967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */ = {isa = PBXBuildFile; fileRef = 967E242A2A3670F6009262D9 /* latest_pbraob.txt */; };
+		967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */; };
+		967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2B2A4299A600034A78 /* DisplayState.swift */; };
+		967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */; };
 		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
@@ -34,6 +37,7 @@
 		96A8F600299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */; };
 		96A8F60D299DAC680021A170 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* Sounding.swift */; };
 		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
+		96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */; };
 		96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */; };
 		96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */; };
 		96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F02A26757200B90043 /* LocationStateTests.swift */; };
@@ -81,6 +85,9 @@
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
 		967E242A2A3670F6009262D9 /* latest_pbraob.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = latest_pbraob.txt; sourceTree = "<group>"; };
+		967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMiddleware.swift; sourceTree = "<group>"; };
+		967FAF2B2A4299A600034A78 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayState.swift; sourceTree = "<group>"; };
+		967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtStateTests.swift; sourceTree = "<group>"; };
 		9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequestTests.swift; sourceTree = "<group>"; };
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
@@ -99,6 +106,7 @@
 		96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		96A8F60C299DAC680021A170 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
+		96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionView.swift; sourceTree = "<group>"; };
 		96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotatedSkewtPlotView.swift; sourceTree = "<group>"; };
 		96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLogMiddleware.swift; sourceTree = "<group>"; };
 		96E334F02A26757200B90043 /* LocationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStateTests.swift; sourceTree = "<group>"; };
@@ -145,6 +153,7 @@
 			children = (
 				96AA78DA2A2E759D003338D8 /* Middleware */,
 				96F4B05D29A80396006D23BE /* Store.swift */,
+				967FAF2B2A4299A600034A78 /* DisplayState.swift */,
 				961202622A156B03009423D5 /* SoundingState.swift */,
 				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
@@ -201,6 +210,7 @@
 			isa = PBXGroup;
 			children = (
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
+				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
 				969117912A29178900A5C72D /* PlotStylingTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
@@ -234,6 +244,7 @@
 				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
 				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
 				96FE7E532A3A8C030069AD3A /* SoundingsListApiMiddleware.swift */,
+				967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -243,10 +254,11 @@
 			children = (
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
+				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
-				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
+				96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -411,7 +423,10 @@
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
+				96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */,
+				967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
+				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
 				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
 				96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */,
@@ -436,6 +451,7 @@
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
 				967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */,
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
+				967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */,
 				96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

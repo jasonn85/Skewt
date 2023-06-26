@@ -64,11 +64,15 @@ final class Store<State>: ObservableObject {
 
 struct SkewtState: Codable {
     enum Action: Skewt.Action {
-        case saveSelectionAsDefault
+        case pinSelection(SoundingSelection)
+        case unpinSelection(SoundingSelection)
     }
     
+    var displayState: DisplayState
     var currentSoundingState: SoundingState
-    var defaultSoundingSelection: SoundingSelection
+    var pinnedSelections: [SoundingSelection]
+    var recentSelections: [SoundingSelection]
+    
     var plotOptions: PlotOptions
     var locationState: LocationState
     var recentSoundingsState: RecentSoundingsState
@@ -77,9 +81,13 @@ struct SkewtState: Codable {
 // Default initializer
 extension SkewtState {
     init() {
-        currentSoundingState = SoundingState()
-        defaultSoundingSelection = SoundingSelection()
-        plotOptions = PlotOptions()
+        displayState = DisplayState.saved ?? DisplayState()
+        currentSoundingState = SoundingState(
+            selection: SoundingSelection.savedCurrentSelection ?? SoundingSelection()
+        )
+        recentSelections = SkewtState.savedRecentSelections ?? [currentSoundingState.selection]
+        pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
+        plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
         recentSoundingsState = RecentSoundingsState()
     }
@@ -88,22 +96,41 @@ extension SkewtState {
 // Reducer
 extension SkewtState {
     static let reducer: Reducer<Self> = { state, action in
-        if action as? Action == .saveSelectionAsDefault {
-            return SkewtState(
-                currentSoundingState: state.currentSoundingState,
-                defaultSoundingSelection: state.currentSoundingState.selection,
-                plotOptions: state.plotOptions,
-                locationState: state.locationState,
-                recentSoundingsState: state.recentSoundingsState
+        var state = state
+        
+        state.displayState = DisplayState.reducer(state.displayState, action)
+        state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
+        state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
+        state.locationState = LocationState.reducer(state.locationState, action)
+        state.recentSoundingsState = RecentSoundingsState.reducer(state.recentSoundingsState, action)
+        
+        switch action as? SkewtState.Action {
+        case .pinSelection(let selection):
+            state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
+        case .unpinSelection(let selection):
+            state.pinnedSelections = state.pinnedSelections.filter { $0 != selection }
+        case .none:
+            break
+        }
+        
+        if case .changeAndLoadSelection(let selectionAction) = action as? SoundingState.Action,
+           selectionAction.isCreatingNewSelection {
+            
+            let maximumRecentSelections = 5
+            state.recentSelections = state.recentSelections.addingToHead(
+                state.currentSoundingState.selection,
+                maximumCount: maximumRecentSelections
             )
         }
         
-        return SkewtState(
-            currentSoundingState: SoundingState.reducer(state.currentSoundingState, action),
-            defaultSoundingSelection: state.defaultSoundingSelection,
-            plotOptions: PlotOptions.reducer(state.plotOptions, action),
-            locationState: LocationState.reducer(state.locationState, action),
-            recentSoundingsState: RecentSoundingsState.reducer(state.recentSoundingsState, action)
-        )
+        return state
+    }
+}
+
+extension Array where Element: Equatable {
+    public func addingToHead(_ element: Element, maximumCount: Int? = nil) -> Self {
+        let maximumCount = maximumCount ?? self.count + 1
+        
+        return [element] + self.filter({ $0 != element }).prefix(maximumCount - 1)
     }
 }

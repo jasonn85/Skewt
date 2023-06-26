@@ -7,37 +7,42 @@
 
 import Foundation
 
-struct SoundingSelection: Codable {
+struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Action: Skewt.Action {
         case selectModelType(ModelType)
         case selectLocation(Location)
         case selectTime(Time)
+        case selectModelTypeAndLocation(ModelType?, Location?)
     }
     
-    enum ModelType: Codable, CaseIterable, Identifiable {
-        var id: Self {
-            return self
-        }
-        
+    enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
         case op40
         case raob
+        
+        var id: Self { self }
     }
     
-    enum Location: Codable {
+    enum Location: Codable, Hashable, Identifiable {
         case closest
         case point(latitude: Double, longitude: Double)
         case named(String)
+        
+        var id: Self { self }
     }
     
-    enum Time: Codable, Equatable {
+    enum Time: Codable, Hashable, Identifiable {
         case now
         case relative(TimeInterval)
         case specific(Date)
+        
+        var id: Self { self }
     }
     
     let type: ModelType
     let location: Location
     let time: Time
+    
+    var id: Self { self }
 }
 
 // Default initializer
@@ -74,6 +79,12 @@ extension SoundingSelection {
             return SoundingSelection(type: state.type, location: location, time: state.time)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time)
+        case .selectModelTypeAndLocation(let type, let location):
+            return SoundingSelection(
+                type: type ?? state.type,
+                location: location ?? state.location,
+                time: .now
+            )
         }
     }
 }
@@ -101,14 +112,19 @@ struct SoundingState: Codable {
         case failed(SoundingError)
     }
     
-    let selection: SoundingSelection
-    let status: Status
+    var selection: SoundingSelection
+    var status: Status
 }
 
 // Default initializer
 extension SoundingState {
     init() {
         selection = SoundingSelection()
+        status = .idle
+    }
+    
+    init(selection: SoundingSelection?) {
+        self.selection = selection ?? SoundingSelection()
         status = .idle
     }
 }
@@ -148,21 +164,46 @@ extension SoundingState {
         
         switch action {
         case .doRefresh:
+            var state = state
+            
             switch state.status {
             case .done(let sounding):
-                return SoundingState(selection: state.selection, status: .refreshing(sounding))
+                state.status = .refreshing(sounding)
             default:
-                return SoundingState(selection: state.selection, status: .loading)
+                state.status = .loading
             }
             
+            return state
         case .changeAndLoadSelection(let action):
-            return SoundingState(selection: SoundingSelection.reducer(state.selection, action),
-                                 status: .loading)
-            
+            return SoundingState(
+                selection: SoundingSelection.reducer(state.selection, action),
+                status: .loading
+            )
         case .didReceiveFailure(let error):
-            return SoundingState(selection: state.selection, status: .failed(error))
+            var state = state
+            state.status = .failed(error)
+            
+            return state
         case .didReceiveResponse(let sounding):
-            return SoundingState(selection: state.selection, status: .done(sounding))
+            var state = state
+            state.status = .done(sounding)
+            
+            return state
+        }
+    }
+}
+
+extension SoundingSelection.Action {
+    // Is this action changing the sounding type or location?
+    var isCreatingNewSelection: Bool {
+        switch self {
+        case .selectModelTypeAndLocation(let type, let location):
+            return type != nil || location != nil
+        case .selectLocation(_), .selectModelType(_):
+            return true
+        case .selectTime(_):
+            // Just changing time is not creating a new selection type
+            return false
         }
     }
 }
