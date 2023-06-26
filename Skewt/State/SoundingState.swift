@@ -12,6 +12,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
         case selectModelType(ModelType)
         case selectLocation(Location)
         case selectTime(Time)
+        case selectModelTypeAndLocation(ModelType?, Location?)
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
@@ -78,6 +79,12 @@ extension SoundingSelection {
             return SoundingSelection(type: state.type, location: location, time: state.time)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time)
+        case .selectModelTypeAndLocation(let type, let location):
+            return SoundingSelection(
+                type: type ?? state.type,
+                location: location ?? state.location,
+                time: .now
+            )
         }
     }
 }
@@ -190,6 +197,8 @@ extension SoundingSelection.Action {
     // Is this action changing the sounding type or location?
     var isCreatingNewSelection: Bool {
         switch self {
+        case .selectModelTypeAndLocation(let type, let location):
+            return type != nil || location != nil
         case .selectLocation(_), .selectModelType(_):
             return true
         case .selectTime(_):

@@ -80,7 +80,16 @@ struct SoundingSelectionView: View {
                     Image(systemName: selectionIsPinned(selection) ? "pin.fill" : "pin")
                 }
                 .toggleStyle(.button)
-
+        }
+        .onTapGesture {
+            withAnimation {
+                store.dispatch(SoundingState.Action.changeAndLoadSelection(
+                    .selectModelTypeAndLocation(
+                        selection.type,
+                        selection.location
+                    )
+                ))
+            }
         }
     }
     
