@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SoundingSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @State var modelType: SoundingSelection.ModelType = .op40
     @State private var searchText = ""
     
     var body: some View {
@@ -29,7 +28,12 @@ struct SoundingSelectionView: View {
             }
             
             Section("Data type") {
-                Picker("Data type", selection: $modelType) {
+                Picker("Data type", selection: Binding<SoundingSelection.ModelType>(get: {
+                    store.state.currentSoundingState.selection.type
+                }, set: {
+                    store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectModelType($0)))
+                })
+                ) {
                     ForEach(SoundingSelection.ModelType.allCases, id: \.id) {
                        Text($0.briefDescription)
                     }

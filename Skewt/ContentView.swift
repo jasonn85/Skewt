@@ -63,7 +63,7 @@ struct ContentView: View {
                     }
                     .tag(DisplayState.TabSelection.displayOptions)
                 
-                SoundingSelectionView(modelType: store.state.currentSoundingState.selection.type)
+                SoundingSelectionView()
                     .environmentObject(store)
                     .tabItem {
                         Label("Location", systemImage: "location")
