@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import Skewt
+import CoreLocation
 
 final class SoundingLocationListTests: XCTestCase {
     var soundingLocationListString: String!
@@ -178,5 +179,15 @@ final class SoundingLocationListTests: XCTestCase {
         
         let futureSounding = LatestSoundingList(soundings: [hourInFutureSounding])
         XCTAssertEqual(futureSounding.recentSoundings(), [])
+    }
+    
+    func testProximitySorting() throws {
+        let metarList = try LocationList(metarLocationListString)
+        let nearSanLocation = CLLocation(latitude: 32.74, longitude: -117.22)
+        
+        let sorted = metarList.locationsSortedByProximity(to: nearSanLocation)
+        XCTAssertEqual(sorted.count, metarList.locations.count)
+        XCTAssertEqual(sorted.first?.name, "SAN")
+        XCTAssertEqual(sorted[1].name, "NZY")
     }
 }

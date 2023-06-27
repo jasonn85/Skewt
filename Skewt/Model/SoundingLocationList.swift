@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 enum LocationListParsingError: Error {
     case unparseableLine(String)
@@ -108,6 +109,17 @@ extension LatestSoundingList {
             let thisInterval = now.timeIntervalSince($0.timestamp)
         
             return thisInterval > 0.0 && thisInterval < timeInterval
+        }
+    }
+}
+
+extension LocationList {
+    func locationsSortedByProximity(to location: CLLocation) -> [Location] {
+        locations.sorted {
+            let first = CLLocation(latitude: $0.latitude, longitude: $0.longitude)
+            let second = CLLocation(latitude: $1.latitude, longitude: $1.longitude)
+            
+            return location.distance(from: first) < location.distance(from: second)
         }
     }
 }
