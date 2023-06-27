@@ -11,6 +11,9 @@ import XCTest
 final class SoundingLocationListTests: XCTestCase {
     var soundingLocationListString: String!
     var expectedStationCount: Int!
+    
+    var metarLocationListString: String!
+    var expectedMetarLocationCount: Int!
 
     var soundingsListString: String!
     var expectedSoundingsCount: Int!
@@ -22,6 +25,11 @@ final class SoundingLocationListTests: XCTestCase {
         let soundingLocationsData = try Data(contentsOf: soundingLocationsFile)
         soundingLocationListString = String(data: soundingLocationsData, encoding: .utf8)!
         expectedStationCount = 1157
+        
+        let metarLocationsFile = bundle.url(forResource: "metar", withExtension: "short")!
+        let metarLocationsData = try Data(contentsOf: metarLocationsFile)
+        metarLocationListString = String(data: metarLocationsData, encoding: .utf8)!
+        expectedMetarLocationCount = 7413
         
         let soundingsFile = bundle.url(forResource: "latest_pbraob", withExtension: "txt")!
         let soundingsData = try Data(contentsOf: soundingsFile)
@@ -93,6 +101,11 @@ final class SoundingLocationListTests: XCTestCase {
     func testSoundingsListParsing() throws {
         let soundings = try LatestSoundingList(soundingsListString)
         XCTAssertEqual(soundings.soundings.count, expectedSoundingsCount)
+    }
+    
+    func testMetarListParsing() throws {
+        let metarList = try LocationList(metarLocationListString)
+        XCTAssertEqual(metarList.locations.count, expectedMetarLocationCount)
     }
     
     func testIgnoreUnparseableStationInfoLines() {

@@ -42,6 +42,7 @@
 		96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */; };
 		96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F02A26757200B90043 /* LocationStateTests.swift */; };
 		96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F22A2707E700B90043 /* DisplayOptionsView.swift */; };
+		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
 		96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05929A72D61006D23BE /* ord-gfs-1.txt */; };
@@ -111,6 +112,7 @@
 		96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLogMiddleware.swift; sourceTree = "<group>"; };
 		96E334F02A26757200B90043 /* LocationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStateTests.swift; sourceTree = "<group>"; };
 		96E334F22A2707E700B90043 /* DisplayOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayOptionsView.swift; sourceTree = "<group>"; };
+		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
 		96F4B05929A72D61006D23BE /* ord-gfs-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ord-gfs-1.txt"; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
 				967E242A2A3670F6009262D9 /* latest_pbraob.txt */,
+				96F081892A4B67C100D8289A /* metar.short */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				967E24262A3660F2009262D9 /* raob.short */,
@@ -390,6 +393,7 @@
 			files = (
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
 				967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */,
+				96F0818A2A4B67C100D8289A /* metar.short in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				967E24272A3660F2009262D9 /* raob.short in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,
