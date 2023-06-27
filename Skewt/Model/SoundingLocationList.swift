@@ -30,7 +30,7 @@ struct LatestSoundingList: Codable, Equatable {
 struct LocationList: Codable {
     struct Location: Codable {
         var name: String
-        var id: Int
+        var wmoId: Int?
         var latitude: Double
         var longitude: Double
         var elevation: Int
@@ -55,9 +55,9 @@ extension LocationList.Location {
         guard let result = try? pattern.wholeMatch(in: locationLine) else {
             throw LocationListParsingError.unparseableLine(locationLine)
         }
-        
+                
         name = String(result.1)
-        id = Int(result.2)!
+        wmoId = Int(result.2)! != 0 ? Int(result.2)! : nil
         latitude = Double(result.3)!
         longitude = Double(result.5)!
         elevation = Int(result.7)!

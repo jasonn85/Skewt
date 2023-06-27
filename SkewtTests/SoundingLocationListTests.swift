@@ -43,6 +43,7 @@ final class SoundingLocationListTests: XCTestCase {
         let insertionIndex = 420
         
         let stupidLines = [
+            "(Ordered by state or province, or country name, then south to north)",
             "This 12345 is a 12345.63 -5555.5 22 broken line with no station info",
             "NJK  7228.1   32.82 -115.68  -13 El Centro Naf, CA/US",  // . in station ID
             "NJK  72281   32.82 --115.68  -13 El Centro Naf, CA/US",  // double negative in longitude
@@ -68,7 +69,7 @@ final class SoundingLocationListTests: XCTestCase {
     func testLocationParsing() throws {
         let elCentro = try LocationList.Location("NJK  72281   32.82 -115.68  -13 El Centro Naf, CA/US")
         XCTAssertEqual(elCentro.name, "NJK")
-        XCTAssertEqual(elCentro.id, 72281)
+        XCTAssertEqual(elCentro.wmoId, 72281)
         XCTAssertEqual(elCentro.latitude, 32.82)
         XCTAssertEqual(elCentro.longitude, -115.68)
         XCTAssertEqual(elCentro.elevation, -13)
@@ -76,7 +77,7 @@ final class SoundingLocationListTests: XCTestCase {
         
         let yining = try LocationList.Location("ZWYN -51431   43.95   81.33  663 Yining, CI")
         XCTAssertEqual(yining.name, "ZWYN")
-        XCTAssertEqual(yining.id, -51431)
+        XCTAssertEqual(yining.wmoId, -51431)
         XCTAssertEqual(yining.latitude, 43.95)
         XCTAssertEqual(yining.longitude, 81.33)
         XCTAssertEqual(yining.elevation, 663)
