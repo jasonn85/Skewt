@@ -8,7 +8,6 @@
 import Foundation
 
 enum LocationListParsingError: Error {
-    case missingHeader
     case unparseableLine(String)
 }
 
@@ -45,11 +44,7 @@ extension LocationList {
     init(_ s: String) throws {
         let lines = s.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }
         
-        guard let headerIndex = lines.firstIndex(where: { $0.hasPrefix("Name") }) else {
-            throw LocationListParsingError.missingHeader
-        }
-        
-        locations = try lines[(headerIndex + 1)...].map { try Location(String($0)) }
+        locations = lines.compactMap { try? Location(String($0)) }
     }
 }
 

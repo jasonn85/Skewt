@@ -38,21 +38,6 @@ final class SoundingLocationListTests: XCTestCase {
         }
     }
     
-    func testMissingHeader() {
-        let allLines = locationListString.components(separatedBy: .newlines)
-        let headerIndex = allLines.firstIndex(where: { $0.hasPrefix("Name") })!
-        let linesMinusHeader = allLines[(headerIndex + 1)...]
-        
-        do {
-            let _ = try LocationList(String(linesMinusHeader.joined(separator: "\n")))
-            XCTFail("Loading a location list without a header should throw an error")
-        } catch LocationListParsingError.missingHeader {
-            return
-        } catch {
-            XCTFail("Loading a location list without a header should throw a .missingHeader error")
-        }
-    }
-    
     func testUnparseableLines() {
         let allLines = locationListString.components(separatedBy: .newlines)
         let insertionIndex = 420
