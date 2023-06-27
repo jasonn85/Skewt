@@ -9,7 +9,7 @@ import XCTest
 @testable import Skewt
 
 final class SoundingLocationListTests: XCTestCase {
-    var locationListString: String!
+    var soundingLocationListString: String!
     var expectedStationCount: Int!
 
     var soundingsListString: String!
@@ -17,9 +17,10 @@ final class SoundingLocationListTests: XCTestCase {
     
     override func setUpWithError() throws {
         let bundle = Bundle(for: type(of: self))
-        let locationsFile = bundle.url(forResource: "raob", withExtension: "short")!
-        let locationsData = try Data(contentsOf: locationsFile)
-        locationListString = String(data: locationsData, encoding: .utf8)!
+        
+        let soundingLocationsFile = bundle.url(forResource: "raob", withExtension: "short")!
+        let soundingLocationsData = try Data(contentsOf: soundingLocationsFile)
+        soundingLocationListString = String(data: soundingLocationsData, encoding: .utf8)!
         expectedStationCount = 1157
         
         let soundingsFile = bundle.url(forResource: "latest_pbraob", withExtension: "txt")!
@@ -30,7 +31,7 @@ final class SoundingLocationListTests: XCTestCase {
     
     func testLoadsWithVaryingHeaders() throws {
         for headerCullCount in 0...2 {
-            let allLines = locationListString.components(separatedBy: .newlines)
+            let allLines = soundingLocationListString.components(separatedBy: .newlines)
             let lines = allLines[headerCullCount...].map { String($0) }
             let locationInfo = try LocationList(String(lines.joined(separator: "\n")))
             
@@ -38,8 +39,9 @@ final class SoundingLocationListTests: XCTestCase {
         }
     }
     
-    func testUnparseableLines() {
-        let allLines = locationListString.components(separatedBy: .newlines)
+    /// Test that unparseable lines are silently discarded
+    func testUnparseableLines() throws {
+        let allLines = soundingLocationListString.components(separatedBy: .newlines)
         let insertionIndex = 420
         
         let stupidLines = [
@@ -54,15 +56,8 @@ final class SoundingLocationListTests: XCTestCase {
         
         for stupidLine in stupidLines {
             let lines = allLines[..<insertionIndex] + [stupidLine] + allLines[insertionIndex...]
-
-            do {
-                let _ = try LocationList(String(lines.joined(separator: "\n")))
-                XCTFail("Loading a location list with an unparseable line should throw an error")
-            } catch LocationListParsingError.unparseableLine(let failedLine) {
-                XCTAssertEqual(failedLine, stupidLine)
-            } catch {
-                XCTFail("Loading a location list with an unparseable line should throw an .unparseableLine error")
-            }
+            let locationList = try LocationList(String(lines.joined(separator: "\n")))
+            XCTAssertEqual(locationList.locations.count, expectedStationCount)
         }
     }
     
