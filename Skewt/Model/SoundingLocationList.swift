@@ -74,19 +74,26 @@ extension LocationList {
 }
 
 extension LocationList.Location {
+    // Note that this implementation with ugly column splitting is literally ten times faster than
+    //  Swift's awful regex engine with `/(\w+)\s+(-?\d+)\s+(-?\d+(\.\d+))\s+(-?\d+(\.\d+))\s+(-?\d+)\s+(.+)/`
     init(_ locationLine: String) throws {
-        let pattern = /(\w+)\s+(-?\d+)\s+(-?\d+(\.\d+))\s+(-?\d+(\.\d+))\s+(-?\d+)\s+(.+)/
-        
-        guard let result = try? pattern.wholeMatch(in: locationLine) else {
+        let columns = locationLine.split(maxSplits: 5, omittingEmptySubsequences: true, whereSeparator: \.isWhitespace)
+
+        guard columns.count >= 6,
+              Int(columns[1]) != nil || columns[1] == "0",
+              let latitude = Double(columns[2]),
+              let longitude = Double(columns[3]),
+              let elevation = Int(columns[4]) else {
             throw LocationListParsingError.unparseableLine(locationLine)
         }
-                
-        name = String(result.1)
-        wmoId = Int(result.2)! != 0 ? Int(result.2)! : nil
-        latitude = Double(result.3)!
-        longitude = Double(result.5)!
-        elevation = Int(result.7)!
-        description = String(result.8)
+
+        name = String(columns[0])
+        let wmoIdOrZero = Int(columns[1])
+        wmoId = wmoIdOrZero != 0 ? wmoIdOrZero : nil
+        self.latitude = latitude
+        self.longitude = longitude
+        self.elevation = elevation
+        description = String(columns[5])
     }
 }
 
