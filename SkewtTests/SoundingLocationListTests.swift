@@ -25,12 +25,12 @@ final class SoundingLocationListTests: XCTestCase {
         let soundingLocationsFile = bundle.url(forResource: "raob", withExtension: "short")!
         let soundingLocationsData = try Data(contentsOf: soundingLocationsFile)
         soundingLocationListString = String(data: soundingLocationsData, encoding: .utf8)!
-        expectedStationCount = 1157
+        expectedStationCount = 1158
         
         let metarLocationsFile = bundle.url(forResource: "metar", withExtension: "short")!
         let metarLocationsData = try Data(contentsOf: metarLocationsFile)
         metarLocationListString = String(data: metarLocationsData, encoding: .utf8)!
-        expectedMetarLocationCount = 7413
+        expectedMetarLocationCount = 7414
         
         let soundingsFile = bundle.url(forResource: "latest_pbraob", withExtension: "txt")!
         let soundingsData = try Data(contentsOf: soundingsFile)
@@ -189,5 +189,13 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertEqual(sorted.count, metarList.locations.count)
         XCTAssertEqual(sorted.first?.name, "SAN")
         XCTAssertEqual(sorted[1].name, "NZY")
+    }
+    
+    func testInitialDataInAssets() throws {
+        let metarData = try LocationList.forType(.metar)
+        let soundingData = try LocationList.forType(.sounding)
+        
+        XCTAssertTrue(metarData.locations.contains { $0.name == "MYF" })
+        XCTAssertTrue(soundingData.locations.contains { $0.name == "NKX" })
     }
 }

@@ -7,8 +7,10 @@
 
 import Foundation
 import CoreLocation
+import UIKit
 
 enum LocationListParsingError: Error {
+    case missingData
     case unparseableLine(String)
 }
 
@@ -29,6 +31,11 @@ struct LatestSoundingList: Codable, Equatable {
 }
 
 struct LocationList: Codable {
+    enum LocationType: Codable {
+        case metar
+        case sounding
+    }
+    
     struct Location: Codable {
         var name: String
         var wmoId: Int?
@@ -46,6 +53,28 @@ extension LocationList {
         let lines = s.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }
         
         locations = lines.compactMap { try? Location(String($0)) }
+    }
+}
+
+extension LocationList.LocationType {
+    var assetName: String {
+        switch self {
+        case .metar:
+            return "Metar Locations"
+        case .sounding:
+            return "Sounding Locations"
+        }
+    }
+}
+
+extension LocationList {
+    static func forType(_ type: LocationType) throws -> Self {
+        guard let asset = NSDataAsset(name: type.assetName),
+              let string = String(data: asset.data, encoding: .utf8) else {
+            throw LocationListParsingError.missingData
+        }
+        
+        return try LocationList(string)
     }
 }
 
