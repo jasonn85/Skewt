@@ -66,7 +66,8 @@ final class SoundingLocationListTests: XCTestCase {
         for stupidLine in stupidLines {
             let lines = allLines[..<insertionIndex] + [stupidLine] + allLines[insertionIndex...]
             let locationList = try LocationList(String(lines.joined(separator: "\n")))
-            XCTAssertEqual(locationList.locations.count, expectedStationCount)
+            XCTAssertEqual(locationList.locations.count, expectedStationCount,
+                           "\"\(stupidLine)\" should not be parsed as a valid location entry")
         }
     }
     
