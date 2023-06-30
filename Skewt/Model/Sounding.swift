@@ -31,7 +31,7 @@ struct Sounding: Codable {
 }
 
 struct StationInfo: Codable {
-    let wbanId: Int
+    let wbanId: Int?
     let wmoId: Int?
     let latitude: Double
     let longitude: Double
@@ -284,7 +284,6 @@ extension StationInfo {
         let pattern = /\s*1\s+(\d+)\s+(\d+)\s+([\d.]+)([NS]?)\s*([\d.]+)([EW]?)\s+(\d+)\s+(\d+).*/
         
         guard let result = try? pattern.wholeMatch(in: text),
-              let wbanId = Int(fromSoundingString: result.1),
               var latitude = Double(fromSoundingString: result.3),
               var longitude = Double(fromSoundingString: result.5) else {
             if let lineType = text.soundingDataType(), lineType != .stationId {
@@ -294,6 +293,7 @@ extension StationInfo {
             throw SoundingParseError.unparseableLine(text)
         }
         
+        let wbanId = Int(fromSoundingString: result.1)
         let wmoId = Int(fromSoundingString: result.2)
         let altitude = Int(fromSoundingString: result.7)
         
