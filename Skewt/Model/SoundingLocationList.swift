@@ -51,6 +51,17 @@ extension LocationList {
     }
 }
 
+extension LatestSoundingList.Entry {
+    var wmoIdOrNil: Int? {
+        switch stationId {
+        case .wmoId(let id):
+            return id
+        case .bufr(_):
+            return nil
+        }
+    }
+}
+
 extension SoundingSelection.ModelType {
     var assetName: String {
         switch self {

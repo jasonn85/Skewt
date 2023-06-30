@@ -11,6 +11,7 @@ import CoreLocation
 
 enum RucRequestError: Error {
     case missingCurrentLocation
+    case unableToFindClosestSounding
 }
 
 extension Middlewares {
@@ -25,7 +26,9 @@ extension Middlewares {
                     .eraseToAnyPublisher()
             }
             
-            guard let soundingRequest = try? SoundingRequest(fromSoundingSelection: selection, currentLocation: location) else {
+            guard let soundingRequest = try? SoundingRequest(fromSoundingSelection: selection,
+                                                             currentLocation: location,
+                                                             recentSoundings: state.recentSoundingsState.recentSoundings) else {
                 return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
                     .eraseToAnyPublisher()
             }
@@ -98,31 +101,41 @@ extension LatestSoundingList {
 }
 
 extension SoundingRequest {
-    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocation? = nil) throws {
+    init(fromSoundingSelection selection: SoundingSelection,
+         currentLocation: CLLocation? = nil,
+         recentSoundings: LatestSoundingList? = nil) throws {
         var location: SoundingRequest.Location
         var modelType: SoundingType
         var startTime: Date?
         var endTime: Date?
         
-        switch selection.location {
-        case .closest:
-            guard let currentLocation = currentLocation else {
-                throw RucRequestError.missingCurrentLocation
+        switch selection.type {
+        case .raob:
+            guard let recentSoundings = recentSoundings else {
+                throw RucRequestError.unableToFindClosestSounding
             }
             
-            location = .geolocation(latitude: currentLocation.coordinate.latitude,
-                                    longitude: currentLocation.coordinate.longitude)
-        case .point(latitude: let latitude, longitude: let longitude):
-            location = .geolocation(latitude: latitude, longitude: longitude)
-        case .named(let locationName):
-            location = .name(locationName)
-        }
-        
-        switch selection.type {
+            modelType = .raob
+            location = try recentSoundings.soundingRequestLocation(
+                forSelectionLocation: selection.location,
+                currentLocation: currentLocation
+            )
         case .op40:
             modelType = .op40
-        case .raob:
-            modelType = .raob
+            
+            switch selection.location {
+            case .closest:
+                guard let currentLocation = currentLocation else {
+                    throw RucRequestError.missingCurrentLocation
+                }
+                
+                location = .geolocation(latitude: currentLocation.coordinate.latitude,
+                                        longitude: currentLocation.coordinate.longitude)
+            case .point(latitude: let latitude, longitude: let longitude):
+                location = .geolocation(latitude: latitude, longitude: longitude)
+            case .named(let locationName):
+                location = .name(locationName)
+            }
         }
         
         switch selection.time {
