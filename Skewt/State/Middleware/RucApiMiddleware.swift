@@ -93,7 +93,7 @@ extension LatestSoundingList {
             throw RucRequestError.unableToFindClosestSounding
         }
         
-        return .geolocation(latitude: location.latitude, longitude: location.longitude)
+        return .name(location.name)
     }
 }
 
