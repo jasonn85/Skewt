@@ -9,7 +9,6 @@ import Foundation
 
 struct RecentSoundingsState: Codable {
     enum Action: Skewt.Action, Codable {
-        case load
         case refresh
         case loadingListFailed(RecentSoundingsError)
         case didReceiveList(LatestSoundingList)
@@ -38,6 +37,26 @@ extension RecentSoundingsState {
 }
 
 extension RecentSoundingsState {
+    var recentSoundings: LatestSoundingList? {
+        switch status {
+        case.done(let list, _), .refreshing(let list, _):
+            return list
+        case .failed(_), .idle, .loading:
+            return nil
+        }
+    }
+    
+    var dataAge: TimeInterval? {
+        switch status {
+        case .done(_, let date), .refreshing(_, let date):
+            return Date().timeIntervalSince(date)
+        case .failed(_), .idle, .loading:
+            return nil
+        }
+    }
+}
+
+extension RecentSoundingsState {
     static let reducer: Reducer<Self> = { state, action in
         guard let action = action as? RecentSoundingsState.Action else {
             return state
@@ -49,9 +68,6 @@ extension RecentSoundingsState {
                 return RecentSoundingsState(status: .refreshing(oldList, oldDate))
             }
             
-            // If refresh is called with no other data, fall through as a normal .load action
-            fallthrough
-        case .load:
             return RecentSoundingsState(status: .loading)
         case .loadingListFailed(let error):
             return RecentSoundingsState(status: .failed(error))

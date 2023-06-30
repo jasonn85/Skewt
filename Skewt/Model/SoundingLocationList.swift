@@ -138,8 +138,14 @@ extension LatestSoundingList {
 }
 
 extension LocationList {
-    func locationsSortedByProximity(to location: CLLocation) -> [Location] {
-        locations.sorted {
+    func locationsSortedByProximity(to location: CLLocation, onlyWmoIds wmoIds: [Int]? = nil) -> [Location] {
+        var locations = self.locations
+        
+        if let wmoIds = wmoIds {
+            locations = locations.filter { $0.wmoId != nil && wmoIds.contains($0.wmoId!) }
+        }
+        
+        return locations.sorted {
             let first = CLLocation(latitude: $0.latitude, longitude: $0.longitude)
             let second = CLLocation(latitude: $1.latitude, longitude: $1.longitude)
             

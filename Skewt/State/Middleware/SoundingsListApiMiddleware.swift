@@ -10,7 +10,7 @@ import Combine
 
 extension Middlewares {
     static let soundingsListApi: Middleware<SkewtState> = { state, action in
-        guard case RecentSoundingsState.Action.load = action else {
+        guard case RecentSoundingsState.Action.refresh = action else {
             return Empty().eraseToAnyPublisher()
         }
         

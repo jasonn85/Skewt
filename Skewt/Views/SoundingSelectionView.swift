@@ -6,10 +6,16 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct SoundingSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
+    
     @State private var searchText = ""
+    
+    var locationListLength = 5
+    var mapSpan = 1.0
+    var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
     var body: some View {
         List {
@@ -21,13 +27,15 @@ struct SoundingSelectionView: View {
                 }
             }
             
-            Section("Recents") {
+            Section("Recent") {
                 ForEach(store.state.recentSelections, id: \.id) {
                     selectionRow($0)
                 }
             }
             
-            Section("Data type") {
+            Section("Location") {
+                TextField("Search", text: $searchText)
+
                 Picker("Data type", selection: Binding<SoundingSelection.ModelType>(get: {
                     store.state.currentSoundingState.selection.type
                 }, set: {
@@ -39,15 +47,69 @@ struct SoundingSelectionView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                
+                locationList
             }
+        }
+        .listStyle(.plain)
+        .onAppear {
+            let soundingsDataAge = store.state.recentSoundingsState.dataAge
             
-            Section("Location") {
-                Text("TODO")
+            if soundingsDataAge == nil || soundingsDataAge! > soundingDataMaxAge {
+                store.dispatch(RecentSoundingsState.Action.refresh)
             }
         }
     }
     
-    private func selectionRow(_ selection: SoundingSelection) -> some View {
+    private var centerLocation: CLLocation {
+        store.state.locationState.locationIfKnown ?? CLLocation(latitude: 39.83, longitude: -104.66)
+    }
+    
+    private var closestLocationsForCurrentModelType: [LocationList.Location] {
+        var wmoIds: [Int]? = nil
+        
+        switch store.state.currentSoundingState.selection.type {
+        case .op40:
+            break
+        case .raob:
+            guard let recentSoundings = store.state.recentSoundingsState.recentSoundings else {
+                return []
+            }
+            
+            wmoIds = recentSoundings.soundings.compactMap {
+                switch $0.stationId {
+                case .wmoId(let wmoId) :
+                    return wmoId
+                case .bufr(_):
+                    return nil
+                }
+            }
+        }
+        
+        let modelType = store.state.currentSoundingState.selection.type
+
+        guard let locations = try? LocationList.forType(modelType) else {
+            return []
+        }
+
+        return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
+    }
+    
+    @ViewBuilder
+    private var locationList: some View {
+        ForEach(closestLocationsForCurrentModelType, id: \.name) {
+            selectionRow(
+                SoundingSelection(
+                    type: store.state.currentSoundingState.selection.type,
+                    location: .named($0.name),
+                    time: .now
+                ),
+                friendlyName: "\($0.name) - \($0.description)"
+            )
+        }
+    }
+        
+    private func selectionRow(_ selection: SoundingSelection, friendlyName: String? = nil) -> some View {
         HStack {
             Image(systemName: "checkmark")
                 .foregroundColor(.blue)
@@ -55,8 +117,7 @@ struct SoundingSelectionView: View {
                 .padding(.trailing)
             
             VStack(alignment: .leading) {
-                Text(selection.location.briefDescription)
-                    .font(.title3)
+                Text(friendlyName ?? selection.location.briefDescription)
                 
                 Text(selection.type.briefDescription)
                     .font(.footnote)
