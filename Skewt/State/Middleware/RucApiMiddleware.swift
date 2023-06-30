@@ -49,6 +49,54 @@ extension Middlewares {
     }
 }
 
+extension LatestSoundingList {
+    func soundingRequestLocation(forSelectionLocation selectionLocation: SoundingSelection.Location,
+                                 currentLocation: CLLocation?) throws -> SoundingRequest.Location {
+        var searchLocation: CLLocation
+        let recentSoundingIds = recentSoundings().compactMap { $0.wmoIdOrNil }
+        
+        switch selectionLocation {
+        case .closest:
+            guard let currentLocation = currentLocation else {
+                throw RucRequestError.missingCurrentLocation
+            }
+            
+            searchLocation = currentLocation
+        case .point(latitude: let latitude, longitude: let longitude):
+            searchLocation = CLLocation(latitude: latitude, longitude: longitude)
+        case .named(let name):
+            if let soundingLocation = try? LocationList.forType(.raob).locations.first(where:{ $0.name == name }) {
+                if let wmoId = soundingLocation.wmoId,
+                   recentSoundingIds.contains(wmoId) {
+                    // This site name corresponds to an active sounding site. Use it.
+                    return .name(name)
+                } else {
+                    // This is a sounding site that has _not_ had a recent sounding
+                    searchLocation = CLLocation(latitude: soundingLocation.latitude,
+                                                longitude: soundingLocation.longitude)
+                }
+            } else {
+                guard let location = try? LocationList.forType(.op40).locations.first(where: { $0.name == name }) else {
+                    throw RucRequestError.unableToFindClosestSounding
+                }
+                
+                searchLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+            }
+        }
+        
+        // We now have a location that does not directly correspond to a sounding location.
+        // Find the closest active sounding location.
+        guard let location = try? LocationList.forType(.raob)
+            .locationsSortedByProximity(to: searchLocation, onlyWmoIds: recentSoundingIds)
+            .first else {
+            
+            throw RucRequestError.unableToFindClosestSounding
+        }
+        
+        return .geolocation(latitude: location.latitude, longitude: location.longitude)
+    }
+}
+
 extension SoundingRequest {
     init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocation? = nil) throws {
         var location: SoundingRequest.Location
