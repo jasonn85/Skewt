@@ -31,11 +31,6 @@ struct LatestSoundingList: Codable, Equatable {
 }
 
 struct LocationList: Codable {
-    enum LocationType: Codable {
-        case metar
-        case sounding
-    }
-    
     struct Location: Codable {
         var name: String
         var wmoId: Int?
@@ -56,19 +51,19 @@ extension LocationList {
     }
 }
 
-extension LocationList.LocationType {
+extension SoundingSelection.ModelType {
     var assetName: String {
         switch self {
-        case .metar:
+        case .op40:
             return "Metar Locations"
-        case .sounding:
+        case .raob:
             return "Sounding Locations"
         }
     }
 }
 
 extension LocationList {
-    static func forType(_ type: LocationType) throws -> Self {
+    static func forType(_ type: SoundingSelection.ModelType) throws -> Self {
         guard let asset = NSDataAsset(name: type.assetName),
               let string = String(data: asset.data, encoding: .utf8) else {
             throw LocationListParsingError.missingData
