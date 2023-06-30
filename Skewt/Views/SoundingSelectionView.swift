@@ -10,9 +10,7 @@ import MapKit
 
 struct SoundingSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    
-    @State private var searchText = ""
-    
+        
     var locationListLength = 5
     var mapSpan = 1.0
     var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
@@ -33,9 +31,7 @@ struct SoundingSelectionView: View {
                 }
             }
             
-            Section("Location") {
-                TextField("Search", text: $searchText)
-
+            Section("Nearby Locations") {
                 Picker("Data type", selection: Binding<SoundingSelection.ModelType>(get: {
                     store.state.currentSoundingState.selection.type
                 }, set: {
