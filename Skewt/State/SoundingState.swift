@@ -102,10 +102,12 @@ struct SoundingState: Codable {
         case changeAndLoadSelection(SoundingSelection.Action)
         case didReceiveFailure(SoundingError)
         case didReceiveResponse(Sounding)
+        case awaitSoundingLocation
     }
     
     enum Status: Codable {
         case idle
+        case awaitingSoundingLocationData
         case loading
         case done(Sounding)
         case refreshing(Sounding)
@@ -132,7 +134,7 @@ extension SoundingState {
 extension SoundingState.Status {
     var isLoading: Bool {
         switch self {
-        case .loading, .refreshing(_):
+        case .loading, .refreshing(_), .awaitingSoundingLocationData:
             return true
         case .idle, .done(_), .failed(_):
             return false
@@ -151,6 +153,8 @@ extension SoundingState.Action: CustomStringConvertible {
             return "Failed to load sounding: \(error)"
         case .didReceiveResponse(let sounding):
             return "Received sounding with \(sounding.data.count) data points"
+        case .awaitSoundingLocation:
+            return "Waiting for sounding location data"
         }
     }
 }
@@ -187,6 +191,11 @@ extension SoundingState {
         case .didReceiveResponse(let sounding):
             var state = state
             state.status = .done(sounding)
+            
+            return state
+        case .awaitSoundingLocation:
+            var state = state
+            state.status = .awaitingSoundingLocationData
             
             return state
         }

@@ -16,6 +16,19 @@ enum RucRequestError: Error {
 
 extension Middlewares {
     static let rucApi: Middleware<SkewtState> = { state, action in
+        
+        switch action as? RecentSoundingsState.Action {
+        case .didReceiveList(_):
+            switch state.currentSoundingState.status {
+            case .awaitingSoundingLocationData:
+                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
+            default:
+                break
+            }
+        default:
+            break
+        }
+        
         switch action as? SoundingState.Action {
         case .doRefresh, .changeAndLoadSelection(_):
             let selection = state.currentSoundingState.selection
@@ -26,25 +39,29 @@ extension Middlewares {
                     .eraseToAnyPublisher()
             }
             
-            guard let soundingRequest = try? SoundingRequest(fromSoundingSelection: selection,
-                                                             currentLocation: location,
-                                                             recentSoundings: state.recentSoundingsState.recentSoundings) else {
+            do {
+                let soundingRequest = try SoundingRequest(fromSoundingSelection: selection,
+                                                          currentLocation: location,
+                                                          recentSoundings: state.recentSoundingsState.recentSoundings)
+                
+                return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
+                    .map { data, response in
+                        guard !data.isEmpty,
+                              let text = String(data: data, encoding: .utf8),
+                              let sounding = try? Sounding(fromText: text) else {
+                            return SoundingState.Action.didReceiveFailure(.unparseableResponse)
+                        }
+                        
+                        return SoundingState.Action.didReceiveResponse(sounding)
+                    }
+                    .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
+                    .eraseToAnyPublisher()
+            } catch RucRequestError.unableToFindClosestSounding {
+                return Just(SoundingState.Action.awaitSoundingLocation).eraseToAnyPublisher()
+            } catch {
                 return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
                     .eraseToAnyPublisher()
             }
-        
-            return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
-                .map { data, response in
-                    guard !data.isEmpty,
-                          let text = String(data: data, encoding: .utf8),
-                          let sounding = try? Sounding(fromText: text) else {
-                        return SoundingState.Action.didReceiveFailure(.unparseableResponse)
-                    }
-                    
-                    return SoundingState.Action.didReceiveResponse(sounding)
-                }
-                .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
-                .eraseToAnyPublisher()
             
         default:
             return Empty().eraseToAnyPublisher()

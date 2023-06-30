@@ -43,6 +43,7 @@ struct ContentView: View {
                 
                 AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
+                    store.dispatch(SoundingState.Action.doRefresh)
                 }
                 
                 footer
@@ -160,7 +161,7 @@ struct ContentView: View {
             return "\(timeAgo) (\(dateString))"
         case .idle:
             return nil
-        case .loading:
+        case .loading, .awaitingSoundingLocationData:
             return "Loading..."
         case .failed(let error):
             switch error {
