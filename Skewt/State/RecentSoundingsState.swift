@@ -36,6 +36,19 @@ extension RecentSoundingsState {
     }
 }
 
+extension RecentSoundingsState.Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .refresh:
+            return "Refreshing recent soundings list"
+        case .loadingListFailed(let error):
+            return "Loading recent soundings failed: \(error)"
+        case .didReceiveList(let list):
+            return "Received list of \(list.soundings.count) recent soundings"
+        }
+    }
+}
+
 extension RecentSoundingsState {
     var recentSoundings: LatestSoundingList? {
         switch status {
