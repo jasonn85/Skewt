@@ -198,4 +198,16 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertTrue(metarData.locations.contains { $0.name == "MYF" })
         XCTAssertTrue(soundingData.locations.contains { $0.name == "NKX" })
     }
+    
+    func testSoundingLocationLoadPerformance() {
+       measure {
+            _ = try! LocationList.forType(.raob)
+        }
+    }
+    
+    func testMetarLocationLoadPerformance() throws {
+        measure {
+            _ = try! LocationList.forType(.op40)
+        }
+    }
 }
