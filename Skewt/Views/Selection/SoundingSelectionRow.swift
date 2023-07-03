@@ -10,7 +10,8 @@ import SwiftUI
 struct SoundingSelectionRow: View {
     @EnvironmentObject var store: Store<SkewtState>
     var selection: SoundingSelection
-    var friendlyName: String?
+    var title: String?
+    var subtitle: String?
     var showModelType = true
     
     var body: some View {
@@ -21,10 +22,10 @@ struct SoundingSelectionRow: View {
                 .padding(.trailing)
             
             VStack(alignment: .leading) {
-                Text(friendlyName ?? selection.location.briefDescription)
+                Text(title ?? selection.location.briefDescription)
                 
-                if showModelType {
-                    Text(selection.type.briefDescription)
+                if let subtitle = subtitle {
+                    Text(subtitle)
                         .font(.footnote)
                 }
             }
