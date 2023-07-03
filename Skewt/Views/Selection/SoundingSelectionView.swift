@@ -14,10 +14,28 @@ struct SoundingSelectionView: View {
     var locationListLength = 5
     var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
+    var distanceFormatter: MKDistanceFormatter {
+        let formatter = MKDistanceFormatter()
+        formatter.unitStyle = .abbreviated
+        
+        return formatter
+    }
+    
     var body: some View {
         List {
             Section("Nearby Soundings") {
-                locationList
+                ForEach(closestLocations, id: \.name) {
+                    SoundingSelectionRow(
+                        selection: SoundingSelection(
+                            type: store.state.currentSoundingState.selection.type,
+                            location: .named($0.name),
+                            time: .now
+                        ),
+                        title: "\($0.name) - \($0.description)",
+                        subtitle: relativeLocationDescription(forStationName: $0.name),
+                        showModelType: false
+                    )
+                }
             }
         }
         .listStyle(.plain)
@@ -57,18 +75,40 @@ struct SoundingSelectionView: View {
         return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
     }
     
-    @ViewBuilder
-    private var locationList: some View {
-        ForEach(closestLocations, id: \.name) {
-            SoundingSelectionRow(
-                selection: SoundingSelection(
-                    type: store.state.currentSoundingState.selection.type,
-                    location: .named($0.name),
-                    time: .now
-                ),
-                friendlyName: "\($0.name) - \($0.description)",
-                showModelType: false
-            )
+    private func relativeLocationDescription(forStationName name: String) -> String? {
+        guard let locations = try? LocationList.forType(.raob).locations,
+              let currentLocation = store.state.locationState.locationIfKnown,
+              let station = locations.first(where: { $0.name == name }) else {
+            return nil
+        }
+
+        let stationLocation = station.clLocation
+        let distance = currentLocation.distance(from: stationLocation)
+        let direction = currentLocation.ordinalDirection(toLocation: stationLocation)
+
+        return "\(distanceFormatter.string(fromDistance: distance)) \(direction.shortDescription)"
+    }
+}
+
+extension OrdinalDirection {
+    var shortDescription: String {
+        switch self {
+        case .north:
+            return "N"
+        case .northeast:
+            return "NE"
+        case .east:
+            return "E"
+        case .southeast:
+            return "SE"
+        case .south:
+            return "S"
+        case .southwest:
+            return "SW"
+        case .west:
+            return "W"
+        case .northwest:
+            return "NW"
         }
     }
 }
