@@ -92,15 +92,14 @@ extension LatestSoundingList {
                     return .name(name)
                 } else {
                     // This is a sounding site that has _not_ had a recent sounding
-                    searchLocation = CLLocation(latitude: soundingLocation.latitude,
-                                                longitude: soundingLocation.longitude)
+                    searchLocation = soundingLocation.clLocation
                 }
             } else {
                 guard let location = try? LocationList.forType(.op40).locations.first(where: { $0.name == name }) else {
                     throw RucRequestError.unableToFindClosestSounding
                 }
                 
-                searchLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+                searchLocation = location.clLocation
             }
         }
         

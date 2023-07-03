@@ -108,6 +108,12 @@ extension LocationList.Location {
     }
 }
 
+extension LocationList.Location {
+    var clLocation: CLLocation {
+        CLLocation(latitude: latitude, longitude: longitude)
+    }
+}
+
 extension LatestSoundingList {
     init(_ s: String) throws {
         let lines = s.split(whereSeparator: \.isNewline)
