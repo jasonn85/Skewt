@@ -11,6 +11,7 @@ struct SoundingSelectionRow: View {
     @EnvironmentObject var store: Store<SkewtState>
     var selection: SoundingSelection
     var friendlyName: String?
+    var showModelType = true
     
     var body: some View {
         HStack {
@@ -22,8 +23,10 @@ struct SoundingSelectionRow: View {
             VStack(alignment: .leading) {
                 Text(friendlyName ?? selection.location.briefDescription)
                 
-                Text(selection.type.briefDescription)
-                    .font(.footnote)
+                if showModelType {
+                    Text(selection.type.briefDescription)
+                        .font(.footnote)
+                }
             }
             
             Spacer()

@@ -17,6 +17,8 @@
 		963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */; };
 		96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* TimeSelectView.swift */; };
 		965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */; };
+		965D66542A5292D30015FB4B /* RecentSelectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66532A5292D30015FB4B /* RecentSelectionsView.swift */; };
+		965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66552A5293A50015FB4B /* ForecastSelectionView.swift */; };
 		967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24242A366064009262D9 /* SoundingLocationList.swift */; };
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
@@ -85,6 +87,8 @@
 		963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewStore.swift; sourceTree = "<group>"; };
 		96590BA12A1D6562001143DB /* TimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSelectView.swift; sourceTree = "<group>"; };
 		965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionRow.swift; sourceTree = "<group>"; };
+		965D66532A5292D30015FB4B /* RecentSelectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSelectionsView.swift; sourceTree = "<group>"; };
+		965D66552A5293A50015FB4B /* ForecastSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastSelectionView.swift; sourceTree = "<group>"; };
 		967E24242A366064009262D9 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
@@ -166,6 +170,17 @@
 				96FE7E512A3A89ED0069AD3A /* RecentSoundingsState.swift */,
 			);
 			path = State;
+			sourceTree = "<group>";
+		};
+		965D66572A5293A90015FB4B /* Selection */ = {
+			isa = PBXGroup;
+			children = (
+				965D66552A5293A50015FB4B /* ForecastSelectionView.swift */,
+				965D66532A5292D30015FB4B /* RecentSelectionsView.swift */,
+				965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */,
+				96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */,
+			);
+			path = Selection;
 			sourceTree = "<group>";
 		};
 		96A8F5D6299DAC3E0021A170 = {
@@ -260,14 +275,13 @@
 		96AA78DB2A2E75E2003338D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				965D66572A5293A90015FB4B /* Selection */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
-				965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */,
-				96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -444,9 +458,11 @@
 				961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */,
 				963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */,
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
+				965D66542A5292D30015FB4B /* RecentSelectionsView.swift in Sources */,
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
+				965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */,
 				96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */,
 				9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */,
 			);

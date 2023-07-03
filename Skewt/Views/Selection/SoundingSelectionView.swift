@@ -11,41 +11,12 @@ import MapKit
 struct SoundingSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
-    var modelType = SoundingSelection.ModelType.op40
     var locationListLength = 5
     var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
     var body: some View {
         List {
-            if store.state.pinnedSelections.count > 0 {
-                Section("Pinned") {
-                    ForEach(store.state.pinnedSelections, id: \.id) {
-                        SoundingSelectionRow(selection: $0)
-                            .environmentObject(store)
-                    }
-                }
-            }
-            
-            Section("Recent") {
-                ForEach(store.state.recentSelections, id: \.id) {
-                    SoundingSelectionRow(selection: $0)
-                        .environmentObject(store)
-                }
-            }
-            
-            Section("Nearby Locations") {
-                Picker("Data type", selection: Binding<SoundingSelection.ModelType>(get: {
-                    store.state.currentSoundingState.selection.type
-                }, set: {
-                    store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectModelType($0)))
-                })
-                ) {
-                    ForEach(SoundingSelection.ModelType.allCases, id: \.id) {
-                       Text($0.briefDescription)
-                    }
-                }
-                .pickerStyle(.segmented)
-                
+            Section("Nearby Soundings") {
                 locationList
             }
         }
@@ -63,30 +34,23 @@ struct SoundingSelectionView: View {
         store.state.locationState.locationIfKnown ?? CLLocation(latitude: 39.83, longitude: -104.66)
     }
     
-    private var closestLocationsForCurrentModelType: [LocationList.Location] {
+    private var closestLocations: [LocationList.Location] {
         var wmoIds: [Int]? = nil
         
-        switch store.state.currentSoundingState.selection.type {
-        case .op40:
-            break
-        case .raob:
-            guard let recentSoundings = store.state.recentSoundingsState.recentSoundings else {
-                return []
-            }
-            
-            wmoIds = recentSoundings.soundings.compactMap {
-                switch $0.stationId {
-                case .wmoId(let wmoId) :
-                    return wmoId
-                case .bufr(_):
-                    return nil
-                }
+        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings else {
+            return []
+        }
+        
+        wmoIds = recentSoundings.soundings.compactMap {
+            switch $0.stationId {
+            case .wmoId(let wmoId) :
+                return wmoId
+            case .bufr(_):
+                return nil
             }
         }
         
-        let modelType = store.state.currentSoundingState.selection.type
-
-        guard let locations = try? LocationList.forType(modelType) else {
+        guard let locations = try? LocationList.forType(.op40) else {
             return []
         }
 
@@ -95,14 +59,15 @@ struct SoundingSelectionView: View {
     
     @ViewBuilder
     private var locationList: some View {
-        ForEach(closestLocationsForCurrentModelType, id: \.name) {
+        ForEach(closestLocations, id: \.name) {
             SoundingSelectionRow(
                 selection: SoundingSelection(
                     type: store.state.currentSoundingState.selection.type,
                     location: .named($0.name),
                     time: .now
                 ),
-                friendlyName: "\($0.name) - \($0.description)"
+                friendlyName: "\($0.name) - \($0.description)",
+                showModelType: false
             )
         }
     }

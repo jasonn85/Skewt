@@ -10,6 +10,8 @@ import Foundation
 struct DisplayState: Codable {
     enum TabSelection: Hashable, Codable {
         case displayOptions
+        case recentSelections
+        case forecastSelection
         case soundingSelection
     }
     

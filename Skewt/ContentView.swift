@@ -57,19 +57,33 @@ struct ContentView: View {
                 get: { store.state.displayState.tabSelection },
                 set: { store.dispatch(DisplayState.Action.selectTab($0)) }
             )) {
+                ForecastSelectionView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
+                    }
+                    .tag(DisplayState.TabSelection.forecastSelection)
+                
+                SoundingSelectionView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Soundings", systemImage: "balloon")
+                    }
+                    .tag(DisplayState.TabSelection.soundingSelection)
+                
+                RecentSelectionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Recents", systemImage: "list.bullet")
+                    }
+                    .tag(DisplayState.TabSelection.recentSelections)
+                
                 DisplayOptionsView()
                     .environmentObject(store)
                     .tabItem {
                         Label("Options", systemImage: "slider.horizontal.3")
                     }
                     .tag(DisplayState.TabSelection.displayOptions)
-                
-                SoundingSelectionView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Location", systemImage: "location")
-                    }
-                    .tag(DisplayState.TabSelection.soundingSelection)
             }
             .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
