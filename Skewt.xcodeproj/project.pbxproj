@@ -19,6 +19,8 @@
 		965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */; };
 		965D66542A5292D30015FB4B /* RecentSelectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66532A5292D30015FB4B /* RecentSelectionsView.swift */; };
 		965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66552A5293A50015FB4B /* ForecastSelectionView.swift */; };
+		965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66582A52A09A0015FB4B /* RelativeLocations.swift */; };
+		965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */; };
 		967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24242A366064009262D9 /* SoundingLocationList.swift */; };
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
@@ -89,6 +91,8 @@
 		965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionRow.swift; sourceTree = "<group>"; };
 		965D66532A5292D30015FB4B /* RecentSelectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSelectionsView.swift; sourceTree = "<group>"; };
 		965D66552A5293A50015FB4B /* ForecastSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastSelectionView.swift; sourceTree = "<group>"; };
+		965D66582A52A09A0015FB4B /* RelativeLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocations.swift; sourceTree = "<group>"; };
+		965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocationTests.swift; sourceTree = "<group>"; };
 		967E24242A366064009262D9 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
@@ -233,6 +237,7 @@
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
 				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
 				969117912A29178900A5C72D /* PlotStylingTests.swift */,
+				965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */,
 				96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
@@ -293,6 +298,7 @@
 				96A8F60C299DAC680021A170 /* Sounding.swift */,
 				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
+				965D66582A52A09A0015FB4B /* RelativeLocations.swift */,
 				967E24242A366064009262D9 /* SoundingLocationList.swift */,
 			);
 			path = Model;
@@ -438,6 +444,7 @@
 			files = (
 				96FE7E542A3A8C030069AD3A /* SoundingsListApiMiddleware.swift in Sources */,
 				968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */,
+				965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */,
 				96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */,
 				965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */,
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
@@ -474,6 +481,7 @@
 			files = (
 				9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */,
 				969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */,
+				965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */,
 				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
 				967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */,
