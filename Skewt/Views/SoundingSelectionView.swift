@@ -10,9 +10,9 @@ import MapKit
 
 struct SoundingSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
-        
+    
+    var modelType = SoundingSelection.ModelType.op40
     var locationListLength = 5
-    var mapSpan = 1.0
     var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
     var body: some View {
@@ -20,14 +20,16 @@ struct SoundingSelectionView: View {
             if store.state.pinnedSelections.count > 0 {
                 Section("Pinned") {
                     ForEach(store.state.pinnedSelections, id: \.id) {
-                        selectionRow($0)
+                        SoundingSelectionRow(selection: $0)
+                            .environmentObject(store)
                     }
                 }
             }
             
             Section("Recent") {
                 ForEach(store.state.recentSelections, id: \.id) {
-                    selectionRow($0)
+                    SoundingSelectionRow(selection: $0)
+                        .environmentObject(store)
                 }
             }
             
@@ -94,8 +96,8 @@ struct SoundingSelectionView: View {
     @ViewBuilder
     private var locationList: some View {
         ForEach(closestLocationsForCurrentModelType, id: \.name) {
-            selectionRow(
-                SoundingSelection(
+            SoundingSelectionRow(
+                selection: SoundingSelection(
                     type: store.state.currentSoundingState.selection.type,
                     location: .named($0.name),
                     time: .now
@@ -103,55 +105,6 @@ struct SoundingSelectionView: View {
                 friendlyName: "\($0.name) - \($0.description)"
             )
         }
-    }
-        
-    private func selectionRow(_ selection: SoundingSelection, friendlyName: String? = nil) -> some View {
-        HStack {
-            Image(systemName: "checkmark")
-                .foregroundColor(.blue)
-                .opacity(store.state.currentSoundingState.selection == selection ? 1.0 : 0.0)
-                .padding(.trailing)
-            
-            VStack(alignment: .leading) {
-                Text(friendlyName ?? selection.location.briefDescription)
-                
-                Text(selection.type.briefDescription)
-                    .font(.footnote)
-            }
-            
-            Spacer()
-            
-            Toggle(
-                isOn: Binding<Bool>(
-                    get: { selectionIsPinned(selection) },
-                    set: { isPinned in
-                        withAnimation {
-                            if isPinned {
-                                store.dispatch(SkewtState.Action.pinSelection(selection))
-                            } else {
-                                store.dispatch(SkewtState.Action.unpinSelection(selection))
-                            }
-                        }
-                    }
-                )) {
-                    Image(systemName: selectionIsPinned(selection) ? "pin.fill" : "pin")
-                }
-                .toggleStyle(.button)
-        }
-        .onTapGesture {
-            withAnimation {
-                store.dispatch(SoundingState.Action.changeAndLoadSelection(
-                    .selectModelTypeAndLocation(
-                        selection.type,
-                        selection.location
-                    )
-                ))
-            }
-        }
-    }
-    
-    private func selectionIsPinned(_ selection: SoundingSelection) -> Bool {
-        store.state.pinnedSelections.contains(selection)
     }
 }
 
