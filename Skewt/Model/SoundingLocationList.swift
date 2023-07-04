@@ -189,7 +189,32 @@ extension LocationList {
 
 extension LocationList {
     func locationsForSearch(_ text: String) -> [Location] {
-        // TODO: Implement
-        return locations
+        let upperText = text.uppercased()
+        var matches: [Location] = []
+        
+        // Put any matches of airport ID at the top
+        if upperText.count == 3 || upperText.count == 4 {
+            let code = upperText.suffix(3)  // "IAD" if "IAD" or "KIAD"
+            
+            if let codeMatch = locations.first(where: { $0.name.uppercased() == code }) {
+                matches.append(codeMatch)
+            }
+        }
+
+        // Create an dictionary of text match locations
+        let matchPositions = locations.enumerated().reduce(into: Dictionary<Int, String.Index>()) { partialResult, item in
+            if let position = item.element.description.uppercased().firstRange(of: upperText) {
+                partialResult[item.offset] = position.lowerBound
+            }
+        }
+        
+        // Add text matches to the results, with matches occuring earliest in the text being first
+        matches.append(contentsOf: matchPositions
+            .sorted(by: { $0.value < $1.value })
+            .map { locations[$0.key] }
+            .filter { !matches.contains($0) }
+        )
+        
+        return matches
     }
 }

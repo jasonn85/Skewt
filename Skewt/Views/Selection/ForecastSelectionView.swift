@@ -11,7 +11,7 @@ import MapKit
 struct ForecastSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @State var searchText = ""
-    var searchCount = 5
+    var searchCount = 10
     
     var body: some View {
         NavigationView {

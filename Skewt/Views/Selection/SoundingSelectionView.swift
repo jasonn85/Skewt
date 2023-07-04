@@ -24,16 +24,27 @@ struct SoundingSelectionView: View {
     var body: some View {
         List {
             Section("Nearby Soundings") {
-                ForEach(closestLocations, id: \.name) {
-                    SoundingSelectionRow(
-                        selection: SoundingSelection(
-                            type: store.state.currentSoundingState.selection.type,
-                            location: .named($0.name),
-                            time: .now
-                        ),
-                        title: "\($0.name) - \($0.description)",
-                        subtitle: relativeLocationDescription(forStationName: $0.name)
-                    )
+                switch store.state.recentSoundingsState.status {
+                case .failed(_), .idle:
+                    Text("Failed to load soundings")
+                case .loading:
+                    HStack {
+                        ProgressView()
+                        Spacer().frame(width: 10)
+                        Text("Loading")
+                    }
+                default:
+                    ForEach(closestLocations, id: \.name) {
+                        SoundingSelectionRow(
+                            selection: SoundingSelection(
+                                type: store.state.currentSoundingState.selection.type,
+                                location: .named($0.name),
+                                time: .now
+                            ),
+                            title: "\($0.name) - \($0.description)",
+                            subtitle: relativeLocationDescription(forStationName: $0.name)
+                        )
+                    }
                 }
             }
         }

@@ -233,4 +233,16 @@ final class SoundingLocationListTests: XCTestCase {
             _ = try! LocationList.forType(.op40)
         }
     }
+    
+    func testLocationSearching() throws {
+        let list = LocationList.allLocationTypes
+        
+        XCTAssertEqual(list.locationsForSearch("IAD").first?.name, "IAD")
+        XCTAssertEqual(list.locationsForSearch("KIAD").first?.name, "IAD")
+        XCTAssertEqual(list.locationsForSearch("Dulle").first?.name, "IAD")
+        XCTAssertEqual(list.locationsForSearch("SAN").first?.name, "SAN")
+        XCTAssertEqual(list.locationsForSearch("San Diego").first?.name, "SAN")
+        XCTAssertEqual(list.locationsForSearch("SFO").first?.name, "SFO")
+        XCTAssertEqual(list.locationsForSearch("San F").first?.name, "SFO")
+    }
 }
