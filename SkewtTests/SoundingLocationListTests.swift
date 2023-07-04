@@ -200,6 +200,28 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertTrue(soundingData.locations.contains { $0.name == "NKX" })
     }
     
+    func testAllTypes() throws {
+        let allLocationLists = try SoundingSelection.ModelType.allCases.map { try LocationList.forType($0) }
+        
+        let list = LocationList.allLocationTypes
+        
+        allLocationLists.forEach {
+            $0.locations.forEach {
+                if !list.locations.contains($0) {
+                    XCTFail("allLocationTypes should include all locations. \($0) is missing.")
+                }
+            }
+        }
+        
+        var seenLocations = Set<LocationList.Location>()
+
+        list.locations.forEach {
+            if !seenLocations.insert($0).inserted {
+                XCTFail("allLocationTypes should not contain any duplicates. \($0) was found twice")
+            }
+        }
+    }
+    
     func testSoundingLocationLoadPerformance() {
        measure {
             _ = try! LocationList.forType(.raob)

@@ -31,7 +31,7 @@ struct LatestSoundingList: Codable, Equatable {
 }
 
 struct LocationList: Codable {
-    struct Location: Codable {
+    struct Location: Codable, Hashable {
         var name: String
         var wmoId: Int?
         var latitude: Double
@@ -48,6 +48,13 @@ extension LocationList {
         let lines = s.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }
         
         locations = lines.compactMap { try? Location(String($0)) }
+    }
+    
+    static var allLocationTypes: Self {
+        let lists = SoundingSelection.ModelType.allCases.map { try! Self.forType($0) }
+        let locationSet = lists.reduce(Set(), { $0.union($1.locations) })
+        
+        return LocationList(locations: Array(locationSet))
     }
 }
 
