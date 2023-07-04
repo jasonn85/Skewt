@@ -31,13 +31,15 @@ struct LatestSoundingList: Codable, Equatable {
 }
 
 struct LocationList: Codable {
-    struct Location: Codable, Hashable {
+    struct Location: Codable, Hashable, Identifiable {
         var name: String
         var wmoId: Int?
         var latitude: Double
         var longitude: Double
         var elevation: Int
         var description: String
+        
+        var id: String { name }
     }
     
     var locations: [Location]
@@ -182,5 +184,12 @@ extension LocationList {
             
             return location.distance(from: first) < location.distance(from: second)
         }
+    }
+}
+
+extension LocationList {
+    func locationsForSearch(_ text: String) -> [Location] {
+        // TODO: Implement
+        return locations
     }
 }

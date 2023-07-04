@@ -12,7 +12,6 @@ struct SoundingSelectionRow: View {
     var selection: SoundingSelection
     var title: String?
     var subtitle: String?
-    var showModelType = true
     
     var body: some View {
         HStack {

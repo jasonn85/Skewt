@@ -32,8 +32,7 @@ struct SoundingSelectionView: View {
                             time: .now
                         ),
                         title: "\($0.name) - \($0.description)",
-                        subtitle: relativeLocationDescription(forStationName: $0.name),
-                        showModelType: false
+                        subtitle: relativeLocationDescription(forStationName: $0.name)
                     )
                 }
             }
