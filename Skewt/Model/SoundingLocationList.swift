@@ -83,13 +83,25 @@ extension SoundingSelection.ModelType {
 }
 
 extension LocationList {
-    static func forType(_ type: SoundingSelection.ModelType) throws -> Self {
+    static private var op40Locations = try! LocationList.loadLocationForType(.op40)
+    static private var raobLocations = try! LocationList.loadLocationForType(.raob)
+    
+    static private func loadLocationForType(_ type: SoundingSelection.ModelType) throws -> Self {
         guard let asset = NSDataAsset(name: type.assetName),
               let string = String(data: asset.data, encoding: .utf8) else {
             throw LocationListParsingError.missingData
         }
         
         return try LocationList(string)
+    }
+    
+    static func forType(_ type: SoundingSelection.ModelType) throws -> Self {
+        switch type {
+        case .op40:
+            return op40Locations
+        case .raob:
+            return raobLocations
+        }
     }
 }
 
