@@ -37,7 +37,7 @@ struct SoundingSelectionView: View {
                     ForEach(closestLocations, id: \.name) {
                         SoundingSelectionRow(
                             selection: SoundingSelection(
-                                type: store.state.currentSoundingState.selection.type,
+                                type: .raob,
                                 location: .named($0.name),
                                 time: .now
                             ),
