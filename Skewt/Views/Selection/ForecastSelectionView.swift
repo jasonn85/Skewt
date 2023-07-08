@@ -19,10 +19,11 @@ struct ForecastSelectionView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 12) {
-                locationsList
-                    .listStyle(.plain)
-                
-                loadingView
+                List {
+                    locationsList
+                    loadingView
+                }
+                .listStyle(.plain)
             }
         }
         .searchable(
@@ -51,20 +52,18 @@ struct ForecastSelectionView: View {
                 EmptyView()
             }
         case .done(let locations):
-            List {
-                nearestRow
-                
-                ForEach(locations, id: \.id) {
-                    SoundingSelectionRow(
-                        selection: SoundingSelection(
-                            type: .op40,
-                            location: .named($0.name),
-                            time: .now
-                        ),
-                        title: $0.description,
-                        subtitle: $0.name
-                    )
-                }
+            nearestRow
+            
+            ForEach(locations, id: \.id) {
+                SoundingSelectionRow(
+                    selection: SoundingSelection(
+                        type: .op40,
+                        location: .named($0.name),
+                        time: .now
+                    ),
+                    title: $0.description,
+                    subtitle: $0.name
+                )
             }
         case .idle:
             EmptyView()
@@ -76,6 +75,7 @@ struct ForecastSelectionView: View {
         switch state.searchStatus {
         case.loading:
             HStack {
+                Spacer().frame(width: 10)
                 ProgressView().padding(2)
                 Text("Loading")
             }
