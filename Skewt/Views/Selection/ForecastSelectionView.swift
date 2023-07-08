@@ -10,20 +10,49 @@ import MapKit
 
 struct ForecastSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @State var searchText = ""
     var searchCount = 10
+    
+    private var state: ForecastSelectionState {
+        store.state.displayState.forecastSelectionState
+    }
     
     var body: some View {
         NavigationView {
+            VStack(spacing: 12) {
+                locationsList
+                    .listStyle(.plain)
+                
+                loadingView
+            }
+        }
+        .searchable(
+            text: Binding<String>(get: {
+                guard case .text(let text) = state.searchType else {
+                    return ""
+                }
+                
+                return text
+            }, set: {
+                store.dispatch(ForecastSelectionState.Action.setSearchText($0))
+            }),
+            prompt: "Search airports")
+        .onAppear {
+            store.dispatch(ForecastSelectionState.Action.load)
+        }
+    }
+    
+    @ViewBuilder
+    private var locationsList: some View {
+        switch state.searchStatus {
+        case .loading:
+            if showNearestRow {
+                nearestRow
+            } else {
+                EmptyView()
+            }
+        case .done(let locations):
             List {
-                SoundingSelectionRow(
-                    selection: SoundingSelection(
-                        type: .op40,
-                        location: .closest,
-                        time: .now
-                    ),
-                    subtitle: closestLocationDescription
-                )
+                nearestRow
                 
                 ForEach(locations, id: \.id) {
                     SoundingSelectionRow(
@@ -37,13 +66,47 @@ struct ForecastSelectionView: View {
                     )
                 }
             }
-            .listStyle(.plain)
+        case .idle:
+            EmptyView()
         }
-        .searchable(text: $searchText, prompt: "Search airports")
     }
     
-    private var isSearching: Bool {
-        searchText.count > 0
+    @ViewBuilder
+    private var loadingView: some View {
+        switch state.searchStatus {
+        case.loading:
+            HStack {
+                ProgressView().padding(2)
+                Text("Loading")
+            }
+        case .done(_), .idle:
+            EmptyView()
+        }
+    }
+    
+    private var showNearestRow: Bool {
+        switch state.searchType {
+        case .nearest:
+            return true
+        case .text(_):
+            return false
+        }
+    }
+    
+    @ViewBuilder
+    private var nearestRow: some View {
+        if showNearestRow {
+            SoundingSelectionRow(
+                selection: SoundingSelection(
+                    type: .op40,
+                    location: .closest,
+                    time: .now
+                ),
+                subtitle: closestLocationDescription
+            )
+        } else {
+            EmptyView()
+        }
     }
     
     private var closestLocationDescription: String? {
@@ -57,22 +120,6 @@ struct ForecastSelectionView: View {
         }
         
         return "Near \(closest.description)"
-    }
-    
-    private var locations: [LocationList.Location] {
-        var locations: [LocationList.Location] = []
-        
-        if isSearching {
-            locations = LocationList
-                .allLocationTypes
-                .locationsForSearch(searchText)
-        } else if let location = store.state.locationState.locationIfKnown {
-            locations = LocationList
-                .allLocationTypes
-                .locationsSortedByProximity(to: location)
-        }
-        
-        return Array(locations.prefix(searchCount))
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 struct DisplayState: Codable {
     enum TabSelection: Hashable, Codable {
@@ -20,23 +21,107 @@ struct DisplayState: Codable {
     }
     
     var tabSelection: TabSelection
+    var forecastSelectionState: ForecastSelectionState
+}
+
+struct ForecastSelectionState: Hashable {
+    enum SearchType: Hashable, Codable {
+        case nearest
+        case text(String)
+    }
+    
+    enum SearchStatus: Hashable, Codable {
+        case idle
+        case loading
+        case done([LocationList.Location])
+    }
+    
+    enum Action: Skewt.Action {
+        case load
+        case setSearchText(String?)
+        case didFinishSearch(SearchType, [LocationList.Location])
+    }
+    
+    var searchType: SearchType
+    var searchStatus: SearchStatus
+    var resultCount = 5
+    
+    private var searchTask: AnyCancellable? = nil
 }
 
 extension DisplayState {
     init() {
         tabSelection = .soundingSelection
+        forecastSelectionState = ForecastSelectionState()
+    }
+}
+
+extension ForecastSelectionState {
+    init() {
+        searchType = .nearest
+        searchStatus = .idle
+    }
+}
+
+extension ForecastSelectionState: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case searchType
+        case searchStatus
     }
 }
 
 extension DisplayState {
     static let reducer: Reducer<Self> = { state, action in
-        guard let action = action as? DisplayState.Action else {
+        if let action = action as? DisplayState.Action {
+            switch action {
+            case .selectTab(let tabSelection):
+                return DisplayState(
+                    tabSelection: tabSelection,
+                    forecastSelectionState: state.forecastSelectionState
+                )
+            }
+        }
+        
+        if let action = action as? ForecastSelectionState.Action {
+            return DisplayState(
+                tabSelection: state.tabSelection,
+                forecastSelectionState: ForecastSelectionState.reducer(state.forecastSelectionState, action)
+            )
+        }
+        
+        return state
+    }
+}
+
+extension ForecastSelectionState {
+    static let reducer: Reducer<Self> = { state, action in
+        guard let action = action as? Action else {
             return state
         }
         
+        var state = state
+        
         switch action {
-        case .selectTab(let tabSelection):
-            return DisplayState(tabSelection: tabSelection)
+        case .load:
+            state.searchTask?.cancel()
+            state.searchStatus = .loading
+        case .setSearchText(let text):
+            if let text = text, text.count > 0 {
+                state.searchType = .text(text)
+            } else {
+                state.searchType = .nearest
+            }
+            
+            state.searchTask?.cancel()
+            state.searchStatus = .loading
+        case .didFinishSearch(let searchType, let result):
+            guard searchType == state.searchType else {
+                return state
+            }
+            
+            state.searchStatus = .done(Array(result.prefix(state.resultCount)))
         }
+        
+        return state
     }
 }
