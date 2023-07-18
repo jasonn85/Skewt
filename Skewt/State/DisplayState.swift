@@ -45,8 +45,6 @@ struct ForecastSelectionState: Hashable {
     var searchType: SearchType
     var searchStatus: SearchStatus
     var resultCount = 5
-    
-    private var searchTask: AnyCancellable? = nil
 }
 
 extension DisplayState {
@@ -103,7 +101,6 @@ extension ForecastSelectionState {
         
         switch action {
         case .load:
-            state.searchTask?.cancel()
             state.searchStatus = .loading
         case .setSearchText(let text):
             if let text = text, text.count > 0 {
@@ -112,7 +109,6 @@ extension ForecastSelectionState {
                 state.searchType = .nearest
             }
             
-            state.searchTask?.cancel()
             state.searchStatus = .loading
         case .didFinishSearch(let searchType, let result):
             guard searchType == state.searchType else {

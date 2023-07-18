@@ -51,13 +51,6 @@ extension LocationList {
         
         locations = lines.compactMap { try? Location(String($0)) }
     }
-    
-    static var allLocationTypes: Self {
-        let lists = SoundingSelection.ModelType.allCases.map { try! Self.forType($0) }
-        let locationSet = lists.reduce(Set(), { $0.union($1.locations) })
-        
-        return LocationList(locations: Array(locationSet))
-    }
 }
 
 extension LatestSoundingList.Entry {
@@ -85,6 +78,14 @@ extension SoundingSelection.ModelType {
 extension LocationList {
     static private var op40Locations = try! LocationList.loadLocationForType(.op40)
     static private var raobLocations = try! LocationList.loadLocationForType(.raob)
+    static var allLocations = try! LocationList.loadAllLocations()
+    
+    static private func loadAllLocations() throws -> Self {
+        let lists = SoundingSelection.ModelType.allCases.map { try! Self.forType($0) }
+        let locationSet = lists.reduce(Set(), { $0.union($1.locations) })
+        
+        return LocationList(locations: Array(locationSet))
+    }
     
     static private func loadLocationForType(_ type: SoundingSelection.ModelType) throws -> Self {
         guard let asset = NSDataAsset(name: type.assetName),

@@ -18,7 +18,8 @@ struct SkewtApp: App {
                 Middlewares.soundingsListApi,
                 Middlewares.locationMiddleware,
                 Middlewares.consoleLogger,
-                Middlewares.userDefaultsSaving
+                Middlewares.userDefaultsSaving,
+                Middlewares.locationSearchMiddleware
             ]
         )
         

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */; };
 		961202632A156B03009423D5 /* SoundingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202622A156B03009423D5 /* SoundingState.swift */; };
 		961202652A156B39009423D5 /* PlotOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202642A156B39009423D5 /* PlotOptions.swift */; };
 		961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202662A157A52009423D5 /* RucApiMiddleware.swift */; };
@@ -79,6 +80,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchMiddleware.swift; sourceTree = "<group>"; };
 		961202622A156B03009423D5 /* SoundingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingState.swift; sourceTree = "<group>"; };
 		961202642A156B39009423D5 /* PlotOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotOptions.swift; sourceTree = "<group>"; };
 		961202662A157A52009423D5 /* RucApiMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucApiMiddleware.swift; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				961202662A157A52009423D5 /* RucApiMiddleware.swift */,
 				96FE7E532A3A8C030069AD3A /* SoundingsListApiMiddleware.swift */,
 				967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */,
+				960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -467,6 +470,7 @@
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
 				965D66542A5292D30015FB4B /* RecentSelectionsView.swift in Sources */,
 				96A8F60D299DAC680021A170 /* Sounding.swift in Sources */,
+				960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
 				965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */,

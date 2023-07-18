@@ -112,7 +112,7 @@ struct ForecastSelectionView: View {
     private var closestLocationDescription: String? {
         guard let location = store.state.locationState.locationIfKnown,
               let closest = LocationList
-            .allLocationTypes
+            .allLocations
             .locationsSortedByProximity(to: location)
             .first
         else {
