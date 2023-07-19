@@ -19,8 +19,13 @@ extension Middlewares {
     static let locationSearchMiddleware: Middleware<SkewtState> = { state, action in
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
-            return LocationSearchManager.shared.searchDebouncePublisher(forText: text)
-                .map { _ in ForecastSelectionState.Action.load }
+            return LocationSearchManager.shared.search(text)
+                .handleEvents(receiveOutput: {
+                    print("debounce happened: \($0)")
+                })
+                .map { _ in
+                    ForecastSelectionState.Action.load
+                }
                 .eraseToAnyPublisher()
         case .load:
             var searchType: LocationSearchManager.SearchType
@@ -46,26 +51,28 @@ extension Middlewares {
 class LocationSearchManager {
     static let shared = LocationSearchManager()
     
-    private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch")
-    private let searchTextSubject = PassthroughSubject<String?, Never>()
-    private var searchTextDebounce: AnyPublisher<String?, Never>
+    private let searchText = CurrentValueSubject<String?, Never>("")
+    private var searchDebouncePublisher: AnyPublisher<String?, Never>
     
     init() {
-        searchTextDebounce = searchTextSubject
-            .debounce(for: .seconds(5), scheduler: RunLoop.main)
-            .removeDuplicates()
+        searchDebouncePublisher = searchText
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .dropFirst()
             .eraseToAnyPublisher()
     }
+    
+    private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch")
     
     enum SearchType {
         case location(CLLocation)
         case text(String)
     }
     
-    func searchDebouncePublisher(forText text: String?) -> AnyPublisher<String?, Never> {
-        searchTextSubject.send(text)
+    @discardableResult
+    func search(_ text: String?) -> AnyPublisher<String?, Never> {
+        searchText.send(text)
         
-        return searchTextDebounce
+        return searchDebouncePublisher
     }
     
     func locationSearchPublisher(forType type: SearchType) -> AnyPublisher<[LocationList.Location], Never> {
