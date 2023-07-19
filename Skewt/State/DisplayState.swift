@@ -68,6 +68,24 @@ extension ForecastSelectionState: Codable {
     }
 }
 
+extension ForecastSelectionState.Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .didFinishSearch(let searchType, let locations):
+            switch searchType {
+            case .nearest:
+                return "Loaded \(locations.count) nearby locations"
+            case .text(let text):
+                return "Loaded \(locations.count) locations near \(text)"
+            }
+        case .load:
+            return "Loading"
+        case .setSearchText(let text):
+            return "Search text changed: \(text ?? "")"
+        }
+    }
+}
+
 extension DisplayState {
     static let reducer: Reducer<Self> = { state, action in
         if let action = action as? DisplayState.Action {
