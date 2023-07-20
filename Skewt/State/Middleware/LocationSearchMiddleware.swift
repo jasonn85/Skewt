@@ -20,9 +20,6 @@ extension Middlewares {
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
             return LocationSearchManager.shared.search(text)
-                .handleEvents(receiveOutput: {
-                    print("debounce happened: \($0)")
-                })
                 .map { _ in
                     ForecastSelectionState.Action.load
                 }
@@ -52,14 +49,8 @@ class LocationSearchManager {
     static let shared = LocationSearchManager()
     
     private let searchText = CurrentValueSubject<String?, Never>("")
-    private var searchDebouncePublisher: AnyPublisher<String?, Never>
-    
-    init() {
-        searchDebouncePublisher = searchText
-            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
-            .dropFirst()
-            .eraseToAnyPublisher()
-    }
+    private var searchDebouncePublisher: AnyCancellable!
+    private var searchDidDebouncePublisher: PassthroughSubject<String?, Never>? = nil
     
     private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch")
     
@@ -68,11 +59,26 @@ class LocationSearchManager {
         case text(String)
     }
     
+    init() {
+        searchDebouncePublisher = nil
+        
+        searchDebouncePublisher = searchText
+            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .dropFirst()
+            .sink {
+                self.searchDidDebouncePublisher?.send($0)
+                self.searchDidDebouncePublisher = nil
+            }
+    }
+    
     @discardableResult
     func search(_ text: String?) -> AnyPublisher<String?, Never> {
+        searchDidDebouncePublisher?.send(completion: .finished)
+        searchDidDebouncePublisher = PassthroughSubject()
+        
         searchText.send(text)
         
-        return searchDebouncePublisher
+        return searchDidDebouncePublisher!.eraseToAnyPublisher()
     }
     
     func locationSearchPublisher(forType type: SearchType) -> AnyPublisher<[LocationList.Location], Never> {
