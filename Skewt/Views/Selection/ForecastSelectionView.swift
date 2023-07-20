@@ -54,16 +54,20 @@ struct ForecastSelectionView: View {
         case .done(let locations):
             nearestRow
             
-            ForEach(locations, id: \.id) {
-                SoundingSelectionRow(
-                    selection: SoundingSelection(
-                        type: .op40,
-                        location: .named($0.name),
-                        time: .now
-                    ),
-                    title: $0.description,
-                    subtitle: $0.name
-                )
+            if locations.count == 0 {
+                noResultsRow
+            } else {
+                ForEach(locations, id: \.id) {
+                    SoundingSelectionRow(
+                        selection: SoundingSelection(
+                            type: .op40,
+                            location: .named($0.name),
+                            time: .now
+                        ),
+                        title: $0.description,
+                        subtitle: $0.name
+                    )
+                }
             }
         case .idle:
             EmptyView()
@@ -106,6 +110,14 @@ struct ForecastSelectionView: View {
             )
         } else {
             EmptyView()
+        }
+    }
+    
+    @ViewBuilder
+    private var noResultsRow: some View {
+        HStack {
+            Spacer().frame(width: 42)
+            Text("No results")
         }
     }
     
