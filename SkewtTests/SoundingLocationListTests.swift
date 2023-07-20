@@ -203,7 +203,7 @@ final class SoundingLocationListTests: XCTestCase {
     func testAllTypes() throws {
         let allLocationLists = try SoundingSelection.ModelType.allCases.map { try LocationList.forType($0) }
         
-        let list = LocationList.allLocationTypes
+        let list = LocationList.allLocations
         
         allLocationLists.forEach {
             $0.locations.forEach {
@@ -235,7 +235,7 @@ final class SoundingLocationListTests: XCTestCase {
     }
     
     func testLocationSearching() throws {
-        let list = LocationList.allLocationTypes
+        let list = LocationList.allLocations
         
         XCTAssertEqual(list.locationsForSearch("IAD").first?.name, "IAD")
         XCTAssertEqual(list.locationsForSearch("KIAD").first?.name, "IAD")
