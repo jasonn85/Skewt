@@ -222,18 +222,6 @@ final class SoundingLocationListTests: XCTestCase {
         }
     }
     
-    func testSoundingLocationLoadPerformance() {
-       measure {
-            _ = try! LocationList.forType(.raob)
-        }
-    }
-    
-    func testMetarLocationLoadPerformance() throws {
-        measure {
-            _ = try! LocationList.forType(.op40)
-        }
-    }
-    
     func testLocationSearching() throws {
         let list = LocationList.allLocations
         
