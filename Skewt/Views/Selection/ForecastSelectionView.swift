@@ -79,10 +79,12 @@ struct ForecastSelectionView: View {
         switch state.searchStatus {
         case.loading:
             HStack {
-                Spacer().frame(width: 10)
-                ProgressView().padding(2)
-                Text("Loading")
+                Spacer()
+                ProgressView()
+                    .progressViewStyle(.circular)
+                Spacer()
             }
+            .id(UUID())
         case .done(_), .idle:
             EmptyView()
         }
