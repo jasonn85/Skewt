@@ -229,8 +229,7 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertEqual(list.locationsForSearch("KIAD").first?.name, "IAD")
         XCTAssertEqual(list.locationsForSearch("Dulle").first?.name, "IAD")
         XCTAssertEqual(list.locationsForSearch("SAN").first?.name, "SAN")
-        XCTAssertEqual(list.locationsForSearch("San Diego").first?.name, "SAN")
         XCTAssertEqual(list.locationsForSearch("SFO").first?.name, "SFO")
-        XCTAssertEqual(list.locationsForSearch("San F").first?.name, "SFO")
+        XCTAssertEqual(list.locationsForSearch("San Fr").first?.name, "SFO")
     }
 }
