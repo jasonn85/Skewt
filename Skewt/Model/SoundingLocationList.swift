@@ -201,6 +201,10 @@ extension LocationList {
 }
 
 extension LocationList {
+    func locationNamed(_ name: String) -> Location? {
+        locations.first { $0.name == name }
+    }
+    
     func locationsForSearch(_ text: String) -> [Location] {
         let upperText = text.uppercased()
         var matches: [Location] = []

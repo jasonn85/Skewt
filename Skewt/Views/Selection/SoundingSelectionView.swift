@@ -79,9 +79,9 @@ struct SoundingSelectionView: View {
     }
     
     private func subtitleComponents(forStationNamed stationName: String) -> [SoundingSelectionRow.DescriptionComponent]? {
-        guard let locations = try? LocationList.forType(.raob).locations,
+        guard let locationList = try? LocationList.forType(.raob),
               let currentLocation = store.state.locationState.locationIfKnown,
-              let station = locations.first(where: { $0.name == stationName }) else {
+              let station = locationList.locationNamed(stationName) else {
             return nil
         }
         
