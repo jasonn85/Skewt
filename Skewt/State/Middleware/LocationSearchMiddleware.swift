@@ -52,7 +52,8 @@ class LocationSearchManager {
     private var searchDebouncePublisher: AnyCancellable!
     private var searchDidDebouncePublisher: PassthroughSubject<String?, Never>? = nil
     
-    private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch")
+    private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch",
+                                            target: .global(qos: .userInitiated))
     
     enum SearchType {
         case location(CLLocation)
