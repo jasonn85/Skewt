@@ -48,25 +48,32 @@ struct SoundingSelectionRow: View {
     private func view(forComponents components: [DescriptionComponent]) -> some View {
         HStack {
             ForEach(components, id: \.id) {
-                text(forComponent: $0)
+                view(forComponent: $0)
             }
         }
     }
     
-    private func text(forComponent component: DescriptionComponent) -> Text {
+    @ViewBuilder
+    private func view(forComponent component: DescriptionComponent) -> some View {
         switch component {
         case .selectionDescription:
-            return Text(selection.description)
+            Text(selection.description)
         case .text(let name):
-            return Text(name)
+            Text(name)
         case .bearingAndDistance(bearing: let bearing, distance: let distance):
             let distanceString = distanceFormatter.string(fromDistance: distance)
             let bearingString = OrdinalDirection.closest(toBearing: bearing)
             
-            return Text("\(distanceString) \(bearingString.abbreviation)")
+            HStack {
+                Text("\(distanceString) \(bearingString.abbreviation)")
+                
+                Image(systemName: "arrow.up")
+                    .foregroundColor(.red)
+                    .rotationEffect(Angle(degrees: bearing))
+            }
         case .age(let timestamp):
             // TODO: Relative time, including colors for age
-            return Text(String(describing: timestamp))
+            Text(String(describing: timestamp))
         }
     }
     
@@ -124,6 +131,8 @@ struct SoundingSelectionRow_Previews: PreviewProvider {
         let store = Store<SkewtState>.previewStore
         let currentForecast = SoundingSelection(type: .op40, location: .closest, time: .now)
         let mostRecentSounding = SoundingSelection(type: .raob, location: .closest, time: .now)
+        let anHourAgo = Date(timeIntervalSinceNow: -1.0 * 60.0 * 60.0)
+        let sixteenHoursAgo = Date(timeIntervalSinceNow: -16.0 * 60.0 * 60.0)
         
         List {
             SoundingSelectionRow(selection: currentForecast)
@@ -133,6 +142,20 @@ struct SoundingSelectionRow_Previews: PreviewProvider {
                 selection: mostRecentSounding,
                 titleComponents: [.text("SAN"), .text("Lindbergh Field")],
                 subtitleComponents: [.bearingAndDistance(bearing: 220, distance: 50_000)]
+            )
+                .environmentObject(store)
+            
+            SoundingSelectionRow(
+                selection: mostRecentSounding,
+                titleComponents: [.text("NKX"), .text("MCAS Miramar")],
+                subtitleComponents: [.age(anHourAgo), .bearingAndDistance(bearing: 220, distance: 50_000)]
+            )
+                .environmentObject(store)
+            
+            SoundingSelectionRow(
+                selection: mostRecentSounding,
+                titleComponents: [.text("NKX"), .text("MCAS Miramar")],
+                subtitleComponents: [.age(sixteenHoursAgo), .bearingAndDistance(bearing: 220, distance: 50_000)]
             )
                 .environmentObject(store)
         }
