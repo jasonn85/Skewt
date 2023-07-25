@@ -14,13 +14,6 @@ struct SoundingSelectionView: View {
     var locationListLength = 5
     var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
-    var distanceFormatter: MKDistanceFormatter {
-        let formatter = MKDistanceFormatter()
-        formatter.unitStyle = .abbreviated
-        
-        return formatter
-    }
-    
     var body: some View {
         List {
             Section("Nearby Soundings") {
@@ -41,8 +34,8 @@ struct SoundingSelectionView: View {
                                 location: .named($0.name),
                                 time: .now
                             ),
-                            title: "\($0.name) - \($0.description)",
-                            subtitle: relativeLocationDescription(forStationName: $0.name)
+                            titleComponents: [.text($0.name), .text($0.description)],
+                            subtitleComponents: subtitleComponentsForBearingAndDistance(toStationNamed: $0.name)
                         )
                     }
                 }
@@ -85,41 +78,18 @@ struct SoundingSelectionView: View {
         return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
     }
     
-    private func relativeLocationDescription(forStationName name: String) -> String? {
+    private func subtitleComponentsForBearingAndDistance(toStationNamed stationName: String) -> [SoundingSelectionRow.DescriptionComponent]? {
         guard let locations = try? LocationList.forType(.raob).locations,
               let currentLocation = store.state.locationState.locationIfKnown,
-              let station = locations.first(where: { $0.name == name }) else {
+              let station = locations.first(where: { $0.name == stationName }) else {
             return nil
         }
-
+        
         let stationLocation = station.clLocation
         let distance = currentLocation.distance(from: stationLocation)
-        let direction = currentLocation.ordinalDirection(toLocation: stationLocation)
-
-        return "\(distanceFormatter.string(fromDistance: distance)) \(direction.shortDescription)"
-    }
-}
-
-extension OrdinalDirection {
-    var shortDescription: String {
-        switch self {
-        case .north:
-            return "N"
-        case .northeast:
-            return "NE"
-        case .east:
-            return "E"
-        case .southeast:
-            return "SE"
-        case .south:
-            return "S"
-        case .southwest:
-            return "SW"
-        case .west:
-            return "W"
-        case .northwest:
-            return "NW"
-        }
+        let direction = currentLocation.bearing(toLocation: stationLocation)
+        
+        return [.bearingAndDistance(bearing: direction, distance: distance)]
     }
 }
 

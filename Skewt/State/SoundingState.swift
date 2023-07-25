@@ -65,6 +65,12 @@ extension SoundingSelection {
     }
 }
 
+extension SoundingSelection: CustomStringConvertible {
+    var description: String {
+        location.briefDescription
+    }
+}
+
 // Reducer
 extension SoundingSelection {
     static let reducer: Reducer<Self> = { state, action in

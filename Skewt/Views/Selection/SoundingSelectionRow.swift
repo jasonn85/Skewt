@@ -6,12 +6,69 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct SoundingSelectionRow: View {
     @EnvironmentObject var store: Store<SkewtState>
     var selection: SoundingSelection
-    var title: String?
-    var subtitle: String?
+    var titleComponents: [DescriptionComponent] = [.selectionDescription]
+    var subtitleComponents: [DescriptionComponent]? = nil
+    
+    enum DescriptionComponent: Hashable, Identifiable {
+        case selectionDescription
+        case text(String)
+        case bearingAndDistance(bearing: Double, distance: Double)
+        case age(Date)
+        
+        var id: Self { self }
+    }
+    
+    private var distanceFormatter: MKDistanceFormatter {
+        let formatter = MKDistanceFormatter()
+        formatter.unitStyle = .abbreviated
+        
+        return formatter
+    }
+    
+    @ViewBuilder
+    private var title: some View {
+        view(forComponents: titleComponents)
+    }
+    
+    @ViewBuilder
+    private var subtitle: some View {
+        if let subtitleComponents = subtitleComponents, !subtitleComponents.isEmpty {
+            view(forComponents: subtitleComponents)
+        } else {
+            EmptyView()
+        }
+    }
+    
+    @ViewBuilder
+    private func view(forComponents components: [DescriptionComponent]) -> some View {
+        HStack {
+            ForEach(components, id: \.id) {
+                text(forComponent: $0)
+            }
+        }
+    }
+    
+    private func text(forComponent component: DescriptionComponent) -> Text {
+        switch component {
+        case .selectionDescription:
+            return Text(selection.description)
+        case .text(let name):
+            return Text(name)
+        case .bearingAndDistance(bearing: let bearing, distance: let distance):
+            let distanceString = distanceFormatter.string(fromDistance: distance)
+            let bearingString = OrdinalDirection.closest(toBearing: bearing)
+            
+            return Text("\(distanceString) \(bearingString.abbreviation)")
+        case .age(let timestamp):
+            // TODO: Relative time, including colors for age
+            return Text(String(describing: timestamp))
+        }
+    }
     
     var body: some View {
         HStack {
@@ -21,12 +78,9 @@ struct SoundingSelectionRow: View {
                 .padding(.trailing)
             
             VStack(alignment: .leading) {
-                Text(title ?? selection.location.briefDescription)
-                
-                if let subtitle = subtitle {
-                    Text(subtitle)
-                        .font(.footnote)
-                }
+                title
+                subtitle
+                    .font(.footnote)
             }
             
             Spacer()
@@ -68,14 +122,18 @@ struct SoundingSelectionRow: View {
 struct SoundingSelectionRow_Previews: PreviewProvider {
     static var previews: some View {
         let store = Store<SkewtState>.previewStore
+        let currentForecast = SoundingSelection(type: .op40, location: .closest, time: .now)
+        let mostRecentSounding = SoundingSelection(type: .raob, location: .closest, time: .now)
         
-        ForEach(store.state.pinnedSelections, id: \.id) {
-            SoundingSelectionRow(selection: $0)
+        List {
+            SoundingSelectionRow(selection: currentForecast)
                 .environmentObject(store)
-        }
-        
-        ForEach(store.state.recentSelections, id: \.id) {
-            SoundingSelectionRow(selection: $0)
+            
+            SoundingSelectionRow(
+                selection: mostRecentSounding,
+                titleComponents: [.text("SAN"), .text("Lindbergh Field")],
+                subtitleComponents: [.bearingAndDistance(bearing: 220, distance: 50_000)]
+            )
                 .environmentObject(store)
         }
     }

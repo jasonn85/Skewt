@@ -64,8 +64,8 @@ struct ForecastSelectionView: View {
                             location: .named($0.name),
                             time: .now
                         ),
-                        title: $0.description,
-                        subtitle: $0.name
+                        titleComponents: [.text($0.description)],
+                        subtitleComponents: [.text($0.name)]
                     )
                 }
             }
@@ -108,7 +108,7 @@ struct ForecastSelectionView: View {
                     location: .closest,
                     time: .now
                 ),
-                subtitle: closestLocationDescription
+                subtitleComponents: nearestSubtitleComponents
             )
         } else {
             EmptyView()
@@ -121,6 +121,14 @@ struct ForecastSelectionView: View {
             Spacer().frame(width: 42)
             Text("No results")
         }
+    }
+    
+    private var nearestSubtitleComponents: [SoundingSelectionRow.DescriptionComponent]? {
+        guard let closestLocationDescription = closestLocationDescription else {
+            return nil
+        }
+        
+        return [.text(closestLocationDescription)]
     }
     
     private var closestLocationDescription: String? {

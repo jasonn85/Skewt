@@ -46,6 +46,29 @@ extension OrdinalDirection {
     }
 }
 
+extension OrdinalDirection {
+    var abbreviation: String {
+        switch self {
+        case .north:
+            return "N"
+        case .northeast:
+            return "NE"
+        case .east:
+            return "E"
+        case .southeast:
+            return "SE"
+        case .south:
+            return "S"
+        case .southwest:
+            return "SW"
+        case .west:
+            return "W"
+        case .northwest:
+            return "NW"
+        }
+    }
+}
+
 extension CLLocation {
     func bearing(toLocation otherLocation: CLLocation) -> Degrees {
         let c1 = (latitude: Degrees(self.coordinate.latitude).inRadians,
@@ -67,9 +90,5 @@ extension CLLocation {
         }
         
         return bearing.inDegrees
-    }
-    
-    func ordinalDirection(toLocation otherLocation: CLLocation) -> OrdinalDirection {
-        OrdinalDirection.closest(toBearing: self.bearing(toLocation: otherLocation))
     }
 }
