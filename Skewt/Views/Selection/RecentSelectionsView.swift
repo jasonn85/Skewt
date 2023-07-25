@@ -14,14 +14,14 @@ struct RecentSelectionsView: View {
         List {
             Section("Pinned") {
                 ForEach(store.state.pinnedSelections, id: \.id) {
-                    SoundingSelectionRow(selection: $0)
+                    SoundingSelectionRow(selection: $0, subtitleComponents: [.type])
                         .environmentObject(store)
                 }
             }
             
             Section("Recent") {
                 ForEach(store.state.recentSelections, id: \.id) {
-                    SoundingSelectionRow(selection: $0)
+                    SoundingSelectionRow(selection: $0, subtitleComponents: [.type])
                         .environmentObject(store)
                 }
             }

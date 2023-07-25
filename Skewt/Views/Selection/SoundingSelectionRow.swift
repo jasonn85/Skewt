@@ -16,6 +16,7 @@ struct SoundingSelectionRow: View {
     
     enum DescriptionComponent: Hashable, Identifiable {
         case selectionDescription
+        case type
         case text(String)
         case bearingAndDistance(bearing: Double, distance: Double)
         case age(Date)
@@ -66,6 +67,8 @@ struct SoundingSelectionRow: View {
         switch component {
         case .selectionDescription:
             Text(selection.description)
+        case .type:
+            typeView
         case .text(let name):
             Text(name)
         case .bearingAndDistance(bearing: let bearing, distance: let distance):
@@ -82,6 +85,25 @@ struct SoundingSelectionRow: View {
         case .age(let timestamp):
             Text(timeFormatter.localizedString(fromTimeInterval: timestamp.timeIntervalSinceNow))
                 .foregroundColor(color(forTimestamp: timestamp))
+        }
+    }
+    
+    private var typeView: some View {
+        var iconName: String
+        var description: String
+        
+        switch selection.type {
+        case .op40:
+            iconName = "chart.line.uptrend.xyaxis"
+            description = "Forecast"
+        case .raob:
+            iconName = "balloon"
+            description = "Sounding"
+        }
+        
+        return HStack {
+            Image(systemName: iconName)
+            Text(description)
         }
     }
     
@@ -185,6 +207,20 @@ struct SoundingSelectionRow_Previews: PreviewProvider {
                 selection: mostRecentSounding,
                 titleComponents: [.text("NKX"), .text("MCAS Miramar")],
                 subtitleComponents: [.age(sixteenHoursAgo), .bearingAndDistance(bearing: 220, distance: 50_000)]
+            )
+                .environmentObject(store)
+            
+            SoundingSelectionRow(
+                selection: mostRecentSounding,
+                titleComponents: [.text("A recent sounding")],
+                subtitleComponents: [.type]
+            )
+                .environmentObject(store)
+            
+            SoundingSelectionRow(
+                selection: currentForecast,
+                titleComponents: [.text("A forecast")],
+                subtitleComponents: [.type]
             )
                 .environmentObject(store)
         }
