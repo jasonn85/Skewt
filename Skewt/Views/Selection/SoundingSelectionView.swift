@@ -58,11 +58,11 @@ struct SoundingSelectionView: View {
     private var closestLocations: [LocationList.Location] {
         var wmoIds: [Int]? = nil
         
-        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings else {
+        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings() else {
             return []
         }
         
-        wmoIds = recentSoundings.soundings.compactMap {
+        wmoIds = recentSoundings.compactMap {
             switch $0.stationId {
             case .wmoId(let wmoId) :
                 return wmoId
