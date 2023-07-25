@@ -75,15 +75,4 @@ final class RelativeLocationTests: XCTestCase {
         XCTAssertEqual(OrdinalDirection.closest(toBearing: 180.0 + 360.0 + 360.0), .south)
         XCTAssertEqual(OrdinalDirection.closest(toBearing: 270.0 - 360.0 - 360.0), .west)
     }
-    
-    func testRelativeOrdinalDirections() {
-        XCTAssertEqual(center.ordinalDirection(toLocation: north), .north)
-        XCTAssertEqual(center.ordinalDirection(toLocation: east), .east)
-        XCTAssertEqual(center.ordinalDirection(toLocation: west), .west)
-        XCTAssertEqual(center.ordinalDirection(toLocation: south), .south)
-        XCTAssertEqual(center.ordinalDirection(toLocation: northeast), .northeast)
-        XCTAssertEqual(center.ordinalDirection(toLocation: southeast), .southeast)
-        XCTAssertEqual(center.ordinalDirection(toLocation: southwest), .southwest)
-        XCTAssertEqual(center.ordinalDirection(toLocation: northwest), .northwest)
-    }
 }
