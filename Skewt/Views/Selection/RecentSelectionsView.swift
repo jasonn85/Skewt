@@ -14,19 +14,38 @@ struct RecentSelectionsView: View {
         List {
             Section("Pinned") {
                 ForEach(store.state.pinnedSelections, id: \.id) {
-                    SoundingSelectionRow(selection: $0, subtitleComponents: [.type])
+                    SoundingSelectionRow(
+                        selection: $0,
+                        titleComponents: titleComponents(forSelection: $0),
+                        subtitleComponents: [.type]
+                    )
                         .environmentObject(store)
                 }
             }
             
             Section("Recent") {
                 ForEach(store.state.recentSelections, id: \.id) {
-                    SoundingSelectionRow(selection: $0, subtitleComponents: [.type])
+                    SoundingSelectionRow(
+                        selection: $0,
+                        titleComponents: titleComponents(forSelection: $0),
+                        subtitleComponents: [.type]
+                    )
                         .environmentObject(store)
                 }
             }
         }
         .listStyle(.plain)
+    }
+    
+    private func titleComponents(
+        forSelection selection: SoundingSelection
+    ) -> [SoundingSelectionRow.DescriptionComponent] {
+        guard case .named(let stationName) = selection.location,
+              let location = LocationList.allLocations.locationNamed(stationName) else {
+            return [.selectionDescription]
+        }
+        
+        return [.text(location.name), .text(location.description)]
     }
 }
 
