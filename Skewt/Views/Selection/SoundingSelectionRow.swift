@@ -74,6 +74,7 @@ struct SoundingSelectionRow: View {
         case .age(let timestamp):
             // TODO: Relative time, including colors for age
             Text(String(describing: timestamp))
+                .foregroundColor(color(forTimestamp: timestamp))
         }
     }
     
@@ -123,6 +124,27 @@ struct SoundingSelectionRow: View {
     
     private func selectionIsPinned(_ selection: SoundingSelection) -> Bool {
         store.state.pinnedSelections.contains(selection)
+    }
+    
+    private func color(forTimestamp time: Date) -> Color {
+        let age = -time.timeIntervalSinceNow
+        
+        if age >= redAge {
+            return Color("Old Sounding")
+        }
+        
+        return Color("Recent Sounding")
+    }
+    
+    private var redAge: TimeInterval {
+        switch selection.type {
+        case .op40:
+            let twoHours = 2.0 * 60.0 * 60.0
+            return twoHours
+        case .raob:
+            let tenHours = 10.0 * 60.0 * 60.0
+            return tenHours
+        }
     }
 }
 
