@@ -35,7 +35,7 @@ struct SoundingSelectionView: View {
                                 time: .now
                             ),
                             titleComponents: [.text($0.name), .text($0.description)],
-                            subtitleComponents: subtitleComponentsForBearingAndDistance(toStationNamed: $0.name)
+                            subtitleComponents: subtitleComponents(forStationNamed: $0.name)
                         )
                     }
                 }
@@ -78,7 +78,7 @@ struct SoundingSelectionView: View {
         return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
     }
     
-    private func subtitleComponentsForBearingAndDistance(toStationNamed stationName: String) -> [SoundingSelectionRow.DescriptionComponent]? {
+    private func subtitleComponents(forStationNamed stationName: String) -> [SoundingSelectionRow.DescriptionComponent]? {
         guard let locations = try? LocationList.forType(.raob).locations,
               let currentLocation = store.state.locationState.locationIfKnown,
               let station = locations.first(where: { $0.name == stationName }) else {
@@ -89,7 +89,23 @@ struct SoundingSelectionView: View {
         let distance = currentLocation.distance(from: stationLocation)
         let direction = currentLocation.bearing(toLocation: stationLocation)
         
-        return [.bearingAndDistance(bearing: direction, distance: distance)]
+        var timeComponents = [SoundingSelectionRow.DescriptionComponent]()
+        
+        if let wmoId = station.wmoId,
+           let ageComponent = lastSoundingComponent(forWmoId: wmoId) {
+            timeComponents = [ageComponent]
+        }
+        
+        return timeComponents + [.bearingAndDistance(bearing: direction, distance: distance)]
+    }
+    
+    private func lastSoundingComponent(forWmoId wmoId: Int) -> SoundingSelectionRow.DescriptionComponent? {
+        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.soundings,
+              let entry = recentSoundings.first(where:{ $0.wmoIdOrNil == wmoId }) else {
+            return nil
+        }
+        
+        return .age(entry.timestamp)
     }
 }
 

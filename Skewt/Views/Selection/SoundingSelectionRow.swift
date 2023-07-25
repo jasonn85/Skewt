@@ -30,6 +30,14 @@ struct SoundingSelectionRow: View {
         return formatter
     }
     
+    private var timeFormatter: RelativeDateTimeFormatter {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.dateTimeStyle = .numeric
+        formatter.unitsStyle = .short
+        
+        return formatter
+    }
+    
     @ViewBuilder
     private var title: some View {
         view(forComponents: titleComponents)
@@ -72,8 +80,7 @@ struct SoundingSelectionRow: View {
                     .rotationEffect(Angle(degrees: bearing))
             }
         case .age(let timestamp):
-            // TODO: Relative time, including colors for age
-            Text(String(describing: timestamp))
+            Text(timeFormatter.localizedString(fromTimeInterval: timestamp.timeIntervalSinceNow))
                 .foregroundColor(color(forTimestamp: timestamp))
         }
     }
