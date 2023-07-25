@@ -67,8 +67,8 @@ struct SoundingSelectionRow: View {
             HStack {
                 Text("\(distanceString) \(bearingString.abbreviation)")
                 
-                Image(systemName: "arrow.up")
-                    .foregroundColor(.red)
+                Image(systemName: "location.north.fill")
+                    .foregroundColor(Color("DirectionalArrow"))
                     .rotationEffect(Angle(degrees: bearing))
             }
         case .age(let timestamp):
