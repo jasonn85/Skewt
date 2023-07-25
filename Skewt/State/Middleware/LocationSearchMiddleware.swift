@@ -14,9 +14,9 @@ extension CLLocation {
 }
 
 extension Middlewares {
-    private static let defaultLocation = CLLocation.denver
-    
     static let locationSearchMiddleware: Middleware<SkewtState> = { state, action in
+        let defaultLocation = CLLocation.denver
+        
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
             return LocationSearchManager.shared.search(text)
