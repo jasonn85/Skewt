@@ -111,7 +111,9 @@ struct SoundingSelectionRow: View {
         HStack {
             Image(systemName: "checkmark")
                 .foregroundColor(.blue)
-                .opacity(store.state.currentSoundingState.selection == selection ? 1.0 : 0.0)
+                .opacity(
+                    selection.isEqualIgnoringTime(to: store.state.currentSoundingState.selection) ? 1.0 : 0.0
+                )
                 .padding(.trailing)
             
             VStack(alignment: .leading) {

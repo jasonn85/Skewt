@@ -65,6 +65,12 @@ extension SoundingSelection {
     }
 }
 
+extension SoundingSelection {
+    func isEqualIgnoringTime(to other: SoundingSelection) -> Bool {
+        type == other.type && location == other.location
+    }
+}
+
 extension SoundingSelection: CustomStringConvertible {
     var description: String {
         location.briefDescription
