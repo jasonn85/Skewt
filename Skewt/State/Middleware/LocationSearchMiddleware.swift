@@ -60,6 +60,7 @@ class LocationSearchManager {
     }
     
     init() {
+        // Set to nil so we can reference self when properly initializing it below
         searchDebouncePublisher = nil
         
         searchDebouncePublisher = searchText
