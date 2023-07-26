@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import CoreLocation
+import OSLog
 
 enum RucRequestError: Error {
     case missingCurrentLocation
@@ -16,6 +17,7 @@ enum RucRequestError: Error {
 
 extension Middlewares {
     static let rucApi: Middleware<SkewtState> = { state, action in
+        let logger = Logger()
         
         switch action as? RecentSoundingsState.Action {
         case .didReceiveList(_):
@@ -43,8 +45,11 @@ extension Middlewares {
                 let soundingRequest = try SoundingRequest(fromSoundingSelection: selection,
                                                           currentLocation: location,
                                                           recentSoundings: state.recentSoundingsState.recentSoundings)
+                let url = soundingRequest.url
                 
-                return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
+                logger.info("Requesting a sounding via \(url.absoluteString)")
+                
+                return URLSession.shared.dataTaskPublisher(for: url)
                     .map { data, response in
                         guard !data.isEmpty,
                               let text = String(data: data, encoding: .utf8),
@@ -158,12 +163,50 @@ extension SoundingRequest {
         case .now:
             startTime = nil
         case .relative(let timeInterval):
-            startTime = Date(timeIntervalSinceNow: timeInterval)
-            endTime = Date(timeIntervalSinceNow: timeInterval + .hours(1))
+            switch selection.type {
+            case .op40:
+                startTime = Date(timeIntervalSinceNow: timeInterval)
+                endTime = Date(timeIntervalSinceNow: timeInterval + .hours(1))
+            case .raob:
+                startTime = timeInterval.closestSoundingTime()
+            }
         case .specific(let date):
             startTime = date
         }
         
         self.init(location: location, modelName: modelType, startTime: startTime, endTime: endTime)
+    }
+}
+
+extension TimeInterval {
+    func closestSoundingTime(withCurrentDate now: Date = Date()) -> Date {
+        let targetTime = Date(timeInterval: self, since: now)
+        let soundingPeriodInHours = 12.0
+        let calendar = Calendar(identifier: .gregorian)
+        let nowComponents = calendar.dateComponents(in: .gmt, from: now)
+        
+        var mostRecentSoundingComponents = nowComponents
+        mostRecentSoundingComponents.hour = Int(floor(Double(nowComponents.hour!) / soundingPeriodInHours) * soundingPeriodInHours)
+        mostRecentSoundingComponents.minute = 0
+        mostRecentSoundingComponents.second = 0
+        let mostRecentSounding = calendar.date(from: mostRecentSoundingComponents)!
+        
+        if targetTime.timeIntervalSince(mostRecentSounding) > 0.0 {
+            return mostRecentSounding
+        }
+        
+        var targetTimeComponents = calendar.dateComponents(in: .gmt, from: targetTime)
+        targetTimeComponents.hour = Int(((Double(targetTimeComponents.hour!) / soundingPeriodInHours).rounded())
+                                        * soundingPeriodInHours)
+        
+        if targetTimeComponents.hour! == 24 {
+            targetTimeComponents.hour = 0
+            targetTimeComponents.day! += 1
+        }
+        
+        targetTimeComponents.minute = 0
+        targetTimeComponents.second = 0
+        
+        return calendar.date(from: targetTimeComponents)!
     }
 }
