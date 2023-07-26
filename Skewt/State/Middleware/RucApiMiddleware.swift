@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import CoreLocation
+import OSLog
 
 enum RucRequestError: Error {
     case missingCurrentLocation
@@ -16,6 +17,7 @@ enum RucRequestError: Error {
 
 extension Middlewares {
     static let rucApi: Middleware<SkewtState> = { state, action in
+        let logger = Logger()
         
         switch action as? RecentSoundingsState.Action {
         case .didReceiveList(_):
@@ -43,8 +45,11 @@ extension Middlewares {
                 let soundingRequest = try SoundingRequest(fromSoundingSelection: selection,
                                                           currentLocation: location,
                                                           recentSoundings: state.recentSoundingsState.recentSoundings)
+                let url = soundingRequest.url
                 
-                return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
+                logger.info("Requesting a sounding via \(url.absoluteString)")
+                
+                return URLSession.shared.dataTaskPublisher(for: url)
                     .map { data, response in
                         guard !data.isEmpty,
                               let text = String(data: data, encoding: .utf8),
