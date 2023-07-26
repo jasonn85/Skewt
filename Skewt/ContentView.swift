@@ -137,7 +137,7 @@ struct ContentView: View {
     }
     
     private var timeSelection: some View {
-        TimeSelectView(
+        HourlyTimeSelectView(
             value: Binding<TimeInterval>(
                 get: { selectedTimeInterval },
                 set: { setTimeInterval($0) }

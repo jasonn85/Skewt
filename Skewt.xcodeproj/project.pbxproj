@@ -16,7 +16,7 @@
 		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */; };
-		96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* TimeSelectView.swift */; };
+		96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */; };
 		965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */; };
 		965D66542A5292D30015FB4B /* RecentSelectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66532A5292D30015FB4B /* RecentSelectionsView.swift */; };
 		965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66552A5293A50015FB4B /* ForecastSelectionView.swift */; };
@@ -89,7 +89,7 @@
 		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewStore.swift; sourceTree = "<group>"; };
-		96590BA12A1D6562001143DB /* TimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSelectView.swift; sourceTree = "<group>"; };
+		96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTimeSelectView.swift; sourceTree = "<group>"; };
 		965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionRow.swift; sourceTree = "<group>"; };
 		965D66532A5292D30015FB4B /* RecentSelectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSelectionsView.swift; sourceTree = "<group>"; };
 		965D66552A5293A50015FB4B /* ForecastSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastSelectionView.swift; sourceTree = "<group>"; };
@@ -289,7 +289,7 @@
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
-				96590BA12A1D6562001143DB /* TimeSelectView.swift */,
+				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -464,7 +464,7 @@
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
 				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
-				96590BA22A1D6562001143DB /* TimeSelectView.swift in Sources */,
+				96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */,
 				961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */,
 				963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */,
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
