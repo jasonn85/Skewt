@@ -8,14 +8,21 @@
 import Foundation
 import Combine
 import CoreLocation
+import OSLog
 
 extension CLLocation {
     static var denver = CLLocation(latitude: 39.87, longitude: -104.67)
 }
 
 extension Middlewares {
+    static let locationSearchLogger = Logger()
+    
     static let locationSearchMiddleware: Middleware<SkewtState> = { state, action in
-        let defaultLocation = CLLocation.denver
+        if case .didDetermineLocation(let location) = action as? LocationState.Action,
+           case .loading = state.displayState.forecastSelectionState.searchStatus {
+            // We were waiting on location and just got it
+            return search(withState: state)
+        }
         
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
@@ -25,23 +32,43 @@ extension Middlewares {
                 }
                 .eraseToAnyPublisher()
         case .load:
-            var searchType: LocationSearchManager.SearchType
-            var forecastSearchType: ForecastSelectionState.SearchType
-            
-            if case .text(let text) = state.displayState.forecastSelectionState.searchType, text.count > 0 {
-                searchType = .text(text)
-                forecastSearchType = .text(text)
-            } else {
-                searchType = .location(state.locationState.locationIfKnown ?? defaultLocation)
-                forecastSearchType = .nearest
-            }
-            
-            return LocationSearchManager.shared.locationSearchPublisher(forType: searchType)
-                .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
-                .eraseToAnyPublisher()
+            return search(withState: state)
         default:
             return Empty().eraseToAnyPublisher()
         }
+    }
+    
+    private static func search(withState state: SkewtState) -> AnyPublisher<Action, Never> {
+        let defaultLocation = CLLocation.denver
+        var searchType: LocationSearchManager.SearchType
+        var forecastSearchType: ForecastSelectionState.SearchType
+        
+        if case .text(let text) = state.displayState.forecastSelectionState.searchType, text.count > 0 {
+            searchType = .text(text)
+            forecastSearchType = .text(text)
+        } else {
+            var location = state.locationState.locationIfKnown
+            
+            if location == nil {
+                switch state.locationState.status {
+                case .locationRequestFailed, .permissionDenied:
+                    location = defaultLocation
+                case .locationKnown(_, _, _):
+                    locationSearchLogger.error("Location is both known and unknown? Something broke.")
+                    fallthrough
+                case .requestingPermission, .none:
+                    // We're still waiting on location info. Chill for now.
+                    return Empty().eraseToAnyPublisher()
+                }
+            }
+            
+            searchType = .location(location!)
+            forecastSearchType = .nearest
+        }
+        
+        return LocationSearchManager.shared.locationSearchPublisher(forType: searchType)
+            .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
+            .eraseToAnyPublisher()
     }
 }
 
