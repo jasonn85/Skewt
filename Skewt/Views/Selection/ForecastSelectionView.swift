@@ -10,7 +10,7 @@ import MapKit
 
 struct ForecastSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    var searchCount = 10
+    var searchCount = 20
     
     private var state: ForecastSelectionState {
         store.state.displayState.forecastSelectionState
@@ -57,7 +57,7 @@ struct ForecastSelectionView: View {
             if locations.count == 0 {
                 noResultsRow
             } else {
-                ForEach(locations, id: \.id) {
+                ForEach(locations.prefix(searchCount), id: \.id) {
                     SoundingSelectionRow(
                         selection: SoundingSelection(
                             type: .op40,

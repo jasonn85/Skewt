@@ -44,7 +44,6 @@ struct ForecastSelectionState: Hashable {
     
     var searchType: SearchType
     var searchStatus: SearchStatus
-    var resultCount = 5
 }
 
 extension DisplayState {
@@ -137,7 +136,7 @@ extension ForecastSelectionState {
                 return state
             }
             
-            state.searchStatus = .done(Array(result.prefix(state.resultCount)))
+            state.searchStatus = .done(result)
         }
         
         return state
