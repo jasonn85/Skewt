@@ -43,7 +43,7 @@ struct ForecastSelectionState: Hashable {
     }
     
     var searchType: SearchType
-    var searchStatus: SearchStatus
+    var searchStatus: SearchStatus = .idle
 }
 
 extension DisplayState {
@@ -63,7 +63,6 @@ extension ForecastSelectionState {
 extension ForecastSelectionState: Codable {
     private enum CodingKeys: String, CodingKey {
         case searchType
-        case searchStatus
     }
 }
 
