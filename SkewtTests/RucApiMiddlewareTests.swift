@@ -131,7 +131,7 @@ final class RucApiMiddlewareTests: XCTestCase {
 
         XCTAssertEqual(TimeInterval(0).closestSoundingTime(withCurrentDate: testEpoch),
                        noonToday,
-                       "Closest sounding date from ~7 GMT is 12:00 GMT today")
+                       "Closest sounding date from ~19 GMT is 12:00 GMT today")
         XCTAssertEqual(TimeInterval(.twentyFourHours).closestSoundingTime(withCurrentDate: testEpoch),
                        noonToday,
                        "Closest sounding for tomorrow is also 12:00 GMT today")
