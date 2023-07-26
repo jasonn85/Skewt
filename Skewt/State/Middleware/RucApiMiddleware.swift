@@ -172,3 +172,36 @@ extension SoundingRequest {
         self.init(location: location, modelName: modelType, startTime: startTime, endTime: endTime)
     }
 }
+
+extension TimeInterval {
+    func closestSoundingTime(withCurrentDate now: Date = Date()) -> Date {
+        let targetTime = Date(timeInterval: self, since: now)
+        let soundingPeriodInHours = 12.0
+        let calendar = Calendar(identifier: .gregorian)
+        let nowComponents = calendar.dateComponents(in: .gmt, from: now)
+        
+        var mostRecentSoundingComponents = nowComponents
+        mostRecentSoundingComponents.hour = Int(floor(Double(nowComponents.hour!) / soundingPeriodInHours) * soundingPeriodInHours)
+        mostRecentSoundingComponents.minute = 0
+        mostRecentSoundingComponents.second = 0
+        let mostRecentSounding = calendar.date(from: mostRecentSoundingComponents)!
+        
+        if targetTime.timeIntervalSince(mostRecentSounding) > 0.0 {
+            return mostRecentSounding
+        }
+        
+        var targetTimeComponents = calendar.dateComponents(in: .gmt, from: targetTime)
+        targetTimeComponents.hour = Int(((Double(targetTimeComponents.hour!) / soundingPeriodInHours).rounded())
+                                        * soundingPeriodInHours)
+        
+        if targetTimeComponents.hour! == 24 {
+            targetTimeComponents.hour = 0
+            targetTimeComponents.day! += 1
+        }
+        
+        targetTimeComponents.minute = 0
+        targetTimeComponents.second = 0
+        
+        return calendar.date(from: targetTimeComponents)!
+    }
+}
