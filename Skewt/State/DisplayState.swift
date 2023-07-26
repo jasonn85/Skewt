@@ -121,13 +121,17 @@ extension ForecastSelectionState {
         case .load:
             state.searchStatus = .loading
         case .setSearchText(let text):
+            let oldSearchType = state.searchType
+            
             if let text = text, text.count > 0 {
                 state.searchType = .text(text)
             } else {
                 state.searchType = .nearest
             }
             
-            state.searchStatus = .loading
+            if state.searchType != oldSearchType {
+                state.searchStatus = .loading
+            }
         case .didFinishSearch(let searchType, let result):
             guard searchType == state.searchType else {
                 return state

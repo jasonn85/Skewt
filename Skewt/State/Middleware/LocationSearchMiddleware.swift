@@ -66,6 +66,7 @@ class LocationSearchManager {
         
         searchDebouncePublisher = searchText
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
+            .removeDuplicates()
             .dropFirst()
             .sink {
                 self.searchDidDebouncePublisher?.send($0)
