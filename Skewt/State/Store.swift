@@ -64,29 +64,32 @@ final class Store<State>: ObservableObject {
 
 struct SkewtState: Codable {
     enum Action: Skewt.Action {
-        case saveSelectionAsDefault
         case pinSelection(SoundingSelection)
         case unpinSelection(SoundingSelection)
     }
     
+    var displayState: DisplayState
     var currentSoundingState: SoundingState
-    var defaultSoundingSelection: SoundingSelection
     var pinnedSelections: [SoundingSelection]
     var recentSelections: [SoundingSelection]
     
     var plotOptions: PlotOptions
     var locationState: LocationState
+    var recentSoundingsState: RecentSoundingsState
 }
 
 // Default initializer
 extension SkewtState {
     init() {
-        defaultSoundingSelection = SoundingSelection.savedCurrentSelection ?? SoundingSelection()
-        currentSoundingState = SoundingState(selection: defaultSoundingSelection)
-        recentSelections = [defaultSoundingSelection]
-        pinnedSelections = []
+        displayState = DisplayState.saved ?? DisplayState()
+        currentSoundingState = SoundingState(
+            selection: SoundingSelection.savedCurrentSelection ?? SoundingSelection()
+        )
+        recentSelections = SkewtState.savedRecentSelections ?? [currentSoundingState.selection]
+        pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
+        recentSoundingsState = RecentSoundingsState()
     }
 }
 
@@ -95,18 +98,15 @@ extension SkewtState {
     static let reducer: Reducer<Self> = { state, action in
         var state = state
         
+        state.displayState = DisplayState.reducer(state.displayState, action)
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
-        state.defaultSoundingSelection = state.defaultSoundingSelection
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
+        state.recentSoundingsState = RecentSoundingsState.reducer(state.recentSoundingsState, action)
         
         switch action as? SkewtState.Action {
-        case .saveSelectionAsDefault:
-            state.defaultSoundingSelection = state.currentSoundingState.selection
         case .pinSelection(let selection):
-            print("state before pinning: \(state)")
             state.pinnedSelections = state.pinnedSelections.addingToHead(selection)
-            print("state after pinning: \(state)")
         case .unpinSelection(let selection):
             state.pinnedSelections = state.pinnedSelections.filter { $0 != selection }
         case .none:

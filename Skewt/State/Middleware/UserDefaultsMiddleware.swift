@@ -12,6 +12,9 @@ extension UserDefaults {
     enum SkewtKey: String {
         case currentSelection = "skewt.currentSelection"
         case plotOptions = "skewt.plotOptions"
+        case displayState = "skewt.displayState"
+        case recentSelections = "skewt.recentSelections"
+        case pinnedSelections = "skewt.pinnedSelections"
     }
     
     func save<T: Encodable>(_ value: T, forKey key: SkewtKey) {
@@ -35,9 +38,17 @@ extension UserDefaults {
 
 extension Middlewares {
     static let userDefaultsSaving: Middleware<SkewtState> = { state, action in
+        switch action as? SkewtState.Action {
+        case .pinSelection(_), .unpinSelection(_):
+            UserDefaults.standard.save(state.pinnedSelections, forKey: .pinnedSelections)
+        default:
+            break
+        }
+        
         switch action as? SoundingState.Action {
         case .changeAndLoadSelection(_):
             UserDefaults.standard.save(state.currentSoundingState.selection, forKey: .currentSelection)
+            UserDefaults.standard.save(state.recentSelections, forKey: .recentSelections)
             
         default:
             break
@@ -45,6 +56,10 @@ extension Middlewares {
         
         if action is PlotOptions.Action || action is PlotOptions.PlotStyling.Action {
             UserDefaults.standard.save(state.plotOptions, forKey: .plotOptions)
+        }
+        
+        if action is DisplayState.Action {
+            UserDefaults.standard.save(state.displayState, forKey: .displayState)
         }
         
         return Empty().eraseToAnyPublisher()
@@ -60,5 +75,21 @@ extension SoundingSelection {
 extension PlotOptions {
     static var saved: PlotOptions? {
         UserDefaults.standard.loadValue(forKey: .plotOptions) as Self?
+    }
+}
+
+extension DisplayState {
+    static var saved: DisplayState? {
+        UserDefaults.standard.loadValue(forKey: .displayState) as Self?
+    }
+}
+
+extension SkewtState {
+    static var savedRecentSelections: [SoundingSelection]? {
+        UserDefaults.standard.loadValue(forKey: .recentSelections) as [SoundingSelection]?
+    }
+    
+    static var savedPinnedSelections: [SoundingSelection]? {
+        UserDefaults.standard.loadValue(forKey: .pinnedSelections) as [SoundingSelection]?
     }
 }

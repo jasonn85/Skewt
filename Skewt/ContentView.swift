@@ -9,13 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @State var selectingTime = false
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
+    @State private var selectingTime = false
     @State private var updateTimeTask: Task<(), Error>? = nil
     private let updateTimeDebounce: Duration = .milliseconds(100)
-    
     @State private var selectedTimeInterval: TimeInterval = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
@@ -44,6 +43,7 @@ struct ContentView: View {
                 
                 AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
+                    store.dispatch(SoundingState.Action.doRefresh)
                 }
                 
                 footer
@@ -53,7 +53,39 @@ struct ContentView: View {
                 }
             }
             
-            DisplayOptionsView().environmentObject(store)
+            TabView(selection: Binding<DisplayState.TabSelection>(
+                get: { store.state.displayState.tabSelection },
+                set: { store.dispatch(DisplayState.Action.selectTab($0)) }
+            )) {
+                ForecastSelectionView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
+                    }
+                    .tag(DisplayState.TabSelection.forecastSelection)
+                
+                SoundingSelectionView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Soundings", systemImage: "balloon")
+                    }
+                    .tag(DisplayState.TabSelection.soundingSelection)
+                
+                RecentSelectionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Recents", systemImage: "list.bullet")
+                    }
+                    .tag(DisplayState.TabSelection.recentSelections)
+                
+                DisplayOptionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Options", systemImage: "slider.horizontal.3")
+                    }
+                    .tag(DisplayState.TabSelection.displayOptions)
+            }
+            .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
     }
     
@@ -138,7 +170,7 @@ struct ContentView: View {
             return "\(timeAgo) (\(dateString))"
         case .idle:
             return nil
-        case .loading:
+        case .loading, .awaitingSoundingLocationData:
             return "Loading..."
         case .failed(let error):
             switch error {
@@ -174,7 +206,7 @@ extension SoundingSelection.Time {
     }
 }
 
-extension SoundingSelection.ModelType {
+extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
         case .op40:

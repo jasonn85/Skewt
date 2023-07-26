@@ -11,10 +11,24 @@ import CoreLocation
 
 enum RucRequestError: Error {
     case missingCurrentLocation
+    case unableToFindClosestSounding
 }
 
 extension Middlewares {
     static let rucApi: Middleware<SkewtState> = { state, action in
+        
+        switch action as? RecentSoundingsState.Action {
+        case .didReceiveList(_):
+            switch state.currentSoundingState.status {
+            case .awaitingSoundingLocationData:
+                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
+            default:
+                break
+            }
+        default:
+            break
+        }
+        
         switch action as? SoundingState.Action {
         case .doRefresh, .changeAndLoadSelection(_):
             let selection = state.currentSoundingState.selection
@@ -25,23 +39,29 @@ extension Middlewares {
                     .eraseToAnyPublisher()
             }
             
-            guard let soundingRequest = try? SoundingRequest(fromSoundingSelection: selection, currentLocation: location) else {
+            do {
+                let soundingRequest = try SoundingRequest(fromSoundingSelection: selection,
+                                                          currentLocation: location,
+                                                          recentSoundings: state.recentSoundingsState.recentSoundings)
+                
+                return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
+                    .map { data, response in
+                        guard !data.isEmpty,
+                              let text = String(data: data, encoding: .utf8),
+                              let sounding = try? Sounding(fromText: text) else {
+                            return SoundingState.Action.didReceiveFailure(.unparseableResponse)
+                        }
+                        
+                        return SoundingState.Action.didReceiveResponse(sounding)
+                    }
+                    .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
+                    .eraseToAnyPublisher()
+            } catch RucRequestError.unableToFindClosestSounding {
+                return Just(SoundingState.Action.awaitSoundingLocation).eraseToAnyPublisher()
+            } catch {
                 return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
                     .eraseToAnyPublisher()
             }
-        
-            return URLSession.shared.dataTaskPublisher(for: soundingRequest.url)
-                .map { data, response in
-                    guard !data.isEmpty,
-                          let text = String(data: data, encoding: .utf8),
-                          let sounding = try? Sounding(fromText: text) else {
-                        return SoundingState.Action.didReceiveFailure(.unparseableResponse)
-                    }
-                    
-                    return SoundingState.Action.didReceiveResponse(sounding)
-                }
-                .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
-                .eraseToAnyPublisher()
             
         default:
             return Empty().eraseToAnyPublisher()
@@ -49,32 +69,89 @@ extension Middlewares {
     }
 }
 
-extension SoundingRequest {
-    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocation? = nil) throws {
-        var location: SoundingRequest.Location
-        var modelType: SoundingType
-        var startTime: Date?
-        var endTime: Date?
+extension LatestSoundingList {
+    func soundingRequestLocation(forSelectionLocation selectionLocation: SoundingSelection.Location,
+                                 currentLocation: CLLocation?) throws -> SoundingRequest.Location {
+        var searchLocation: CLLocation
+        let recentSoundingIds = recentSoundings().compactMap { $0.wmoIdOrNil }
         
-        switch selection.location {
+        switch selectionLocation {
         case .closest:
             guard let currentLocation = currentLocation else {
                 throw RucRequestError.missingCurrentLocation
             }
             
-            location = .geolocation(latitude: currentLocation.coordinate.latitude,
-                                    longitude: currentLocation.coordinate.longitude)
+            searchLocation = currentLocation
         case .point(latitude: let latitude, longitude: let longitude):
-            location = .geolocation(latitude: latitude, longitude: longitude)
-        case .named(let locationName):
-            location = .name(locationName)
+            searchLocation = CLLocation(latitude: latitude, longitude: longitude)
+        case .named(let name):
+            if let soundingLocation = try? LocationList.forType(.raob).locationNamed(name) {
+                if let wmoId = soundingLocation.wmoId,
+                   recentSoundingIds.contains(wmoId) {
+                    // This site name corresponds to an active sounding site. Use it.
+                    return .name(name)
+                } else {
+                    // This is a sounding site that has _not_ had a recent sounding
+                    searchLocation = soundingLocation.clLocation
+                }
+            } else {
+                guard let location = try? LocationList.forType(.op40).locationNamed(name) else {
+                    throw RucRequestError.unableToFindClosestSounding
+                }
+                
+                searchLocation = location.clLocation
+            }
         }
         
+        // We now have a location that does not directly correspond to a sounding location.
+        // Find the closest active sounding location.
+        guard let location = try? LocationList.forType(.raob)
+            .locationsSortedByProximity(to: searchLocation, onlyWmoIds: recentSoundingIds)
+            .first else {
+            
+            throw RucRequestError.unableToFindClosestSounding
+        }
+        
+        return .name(location.name)
+    }
+}
+
+extension SoundingRequest {
+    init(fromSoundingSelection selection: SoundingSelection,
+         currentLocation: CLLocation? = nil,
+         recentSoundings: LatestSoundingList? = nil) throws {
+        var location: SoundingRequest.Location
+        var modelType: SoundingType
+        var startTime: Date?
+        var endTime: Date?
+        
         switch selection.type {
+        case .raob:
+            guard let recentSoundings = recentSoundings else {
+                throw RucRequestError.unableToFindClosestSounding
+            }
+            
+            modelType = .raob
+            location = try recentSoundings.soundingRequestLocation(
+                forSelectionLocation: selection.location,
+                currentLocation: currentLocation
+            )
         case .op40:
             modelType = .op40
-        case .raob:
-            modelType = .raob
+            
+            switch selection.location {
+            case .closest:
+                guard let currentLocation = currentLocation else {
+                    throw RucRequestError.missingCurrentLocation
+                }
+                
+                location = .geolocation(latitude: currentLocation.coordinate.latitude,
+                                        longitude: currentLocation.coordinate.longitude)
+            case .point(latitude: let latitude, longitude: let longitude):
+                location = .geolocation(latitude: latitude, longitude: longitude)
+            case .named(let locationName):
+                location = .name(locationName)
+            }
         }
         
         switch selection.time {

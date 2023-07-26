@@ -15,9 +15,11 @@ struct SkewtApp: App {
             reducer: SkewtState.reducer,
             middlewares: [
                 Middlewares.rucApi,
+                Middlewares.soundingsListApi,
                 Middlewares.locationMiddleware,
                 Middlewares.consoleLogger,
-                Middlewares.userDefaultsSaving
+                Middlewares.userDefaultsSaving,
+                Middlewares.locationSearchMiddleware
             ]
         )
         

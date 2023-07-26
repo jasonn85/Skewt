@@ -14,6 +14,26 @@ extension Store {
         return try! Sounding(fromText: previewDataString)
     }
     
+    private static var previewPinnedSelections: [SoundingSelection] {
+        [
+            SoundingSelection(
+                type: .op40,
+                location: .closest,
+                time: .now
+            ),
+            SoundingSelection(
+                type: .raob,
+                location: .closest,
+                time: .now
+            ),
+            SoundingSelection(
+                type: .op40,
+                location: .named("SAN"),
+                time: .now
+            ),
+        ]
+    }
+    
     static var previewStore: Store<SkewtState> {
         let selection = SoundingSelection()
         
@@ -24,12 +44,13 @@ extension Store {
         
         return Store<SkewtState>(
             initial: SkewtState(
+                displayState: DisplayState(),
                 currentSoundingState: soundingState,
-                defaultSoundingSelection: soundingState.selection,
-                pinnedSelections: [],
+                pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState()
+                locationState: LocationState(),
+                recentSoundingsState: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

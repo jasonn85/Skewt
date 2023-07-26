@@ -79,6 +79,7 @@ struct SkewtPlotView: View {
                 }
             }
         }
+        .clipped()
     }
     
     private var isobarPaths: [Double: CGPath] {

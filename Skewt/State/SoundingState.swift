@@ -7,11 +7,12 @@
 
 import Foundation
 
-struct SoundingSelection: Codable, Equatable {
+struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Action: Skewt.Action {
         case selectModelType(ModelType)
         case selectLocation(Location)
         case selectTime(Time)
+        case selectModelTypeAndLocation(ModelType?, Location?)
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
@@ -21,21 +22,27 @@ struct SoundingSelection: Codable, Equatable {
         var id: Self { self }
     }
     
-    enum Location: Codable, Equatable {
+    enum Location: Codable, Hashable, Identifiable {
         case closest
         case point(latitude: Double, longitude: Double)
         case named(String)
+        
+        var id: Self { self }
     }
     
-    enum Time: Codable, Equatable {
+    enum Time: Codable, Hashable, Identifiable {
         case now
         case relative(TimeInterval)
         case specific(Date)
+        
+        var id: Self { self }
     }
     
     let type: ModelType
     let location: Location
     let time: Time
+    
+    var id: Self { self }
 }
 
 // Default initializer
@@ -58,6 +65,18 @@ extension SoundingSelection {
     }
 }
 
+extension SoundingSelection {
+    func isEqualIgnoringTime(to other: SoundingSelection) -> Bool {
+        type == other.type && location == other.location
+    }
+}
+
+extension SoundingSelection: CustomStringConvertible {
+    var description: String {
+        location.briefDescription
+    }
+}
+
 // Reducer
 extension SoundingSelection {
     static let reducer: Reducer<Self> = { state, action in
@@ -72,6 +91,12 @@ extension SoundingSelection {
             return SoundingSelection(type: state.type, location: location, time: state.time)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time)
+        case .selectModelTypeAndLocation(let type, let location):
+            return SoundingSelection(
+                type: type ?? state.type,
+                location: location ?? state.location,
+                time: .now
+            )
         }
     }
 }
@@ -89,10 +114,12 @@ struct SoundingState: Codable {
         case changeAndLoadSelection(SoundingSelection.Action)
         case didReceiveFailure(SoundingError)
         case didReceiveResponse(Sounding)
+        case awaitSoundingLocation
     }
     
     enum Status: Codable {
         case idle
+        case awaitingSoundingLocationData
         case loading
         case done(Sounding)
         case refreshing(Sounding)
@@ -119,7 +146,7 @@ extension SoundingState {
 extension SoundingState.Status {
     var isLoading: Bool {
         switch self {
-        case .loading, .refreshing(_):
+        case .loading, .refreshing(_), .awaitingSoundingLocationData:
             return true
         case .idle, .done(_), .failed(_):
             return false
@@ -138,6 +165,8 @@ extension SoundingState.Action: CustomStringConvertible {
             return "Failed to load sounding: \(error)"
         case .didReceiveResponse(let sounding):
             return "Received sounding with \(sounding.data.count) data points"
+        case .awaitSoundingLocation:
+            return "Waiting for sounding location data"
         }
     }
 }
@@ -176,6 +205,11 @@ extension SoundingState {
             state.status = .done(sounding)
             
             return state
+        case .awaitSoundingLocation:
+            var state = state
+            state.status = .awaitingSoundingLocationData
+            
+            return state
         }
     }
 }
@@ -184,6 +218,8 @@ extension SoundingSelection.Action {
     // Is this action changing the sounding type or location?
     var isCreatingNewSelection: Bool {
         switch self {
+        case .selectModelTypeAndLocation(let type, let location):
+            return type != nil || location != nil
         case .selectLocation(_), .selectModelType(_):
             return true
         case .selectTime(_):

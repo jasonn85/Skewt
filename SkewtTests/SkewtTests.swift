@@ -247,8 +247,8 @@ class SkewtTests: XCTestCase {
         let sounding = try Sounding(fromText: s)
         XCTAssertEqual(sounding.type, .raob)
         XCTAssertEqual(sounding.description, "RAOB sounding valid at:")
-        XCTAssertEqual(sounding.data.count, 176)
-        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 110)
+        XCTAssertEqual(sounding.data.count, 231)
+        XCTAssertEqual(sounding.data.filter({ $0.isPlottable }).count, 89)
         XCTAssertEqual(sounding.stationId, "NKX")
     }
     
