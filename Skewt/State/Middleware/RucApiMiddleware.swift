@@ -85,7 +85,7 @@ extension LatestSoundingList {
         case .point(latitude: let latitude, longitude: let longitude):
             searchLocation = CLLocation(latitude: latitude, longitude: longitude)
         case .named(let name):
-            if let soundingLocation = try? LocationList.forType(.raob).locations.first(where:{ $0.name == name }) {
+            if let soundingLocation = try? LocationList.forType(.raob).locationNamed(name) {
                 if let wmoId = soundingLocation.wmoId,
                    recentSoundingIds.contains(wmoId) {
                     // This site name corresponds to an active sounding site. Use it.
@@ -95,7 +95,7 @@ extension LatestSoundingList {
                     searchLocation = soundingLocation.clLocation
                 }
             } else {
-                guard let location = try? LocationList.forType(.op40).locations.first(where: { $0.name == name }) else {
+                guard let location = try? LocationList.forType(.op40).locationNamed(name) else {
                     throw RucRequestError.unableToFindClosestSounding
                 }
                 
