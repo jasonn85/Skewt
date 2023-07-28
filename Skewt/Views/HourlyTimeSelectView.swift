@@ -1,5 +1,5 @@
 //
-//  TimeSelectView.swift
+//  HourlyTimeSelectView.swift
 //  Skewt
 //
 //  Created by Jason Neel on 5/23/23.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TimeSelectView: View {
+struct HourlyTimeSelectView: View {
     @Binding var value: TimeInterval
     @State var range: ClosedRange<TimeInterval>
     @State var stepSize: TimeInterval = .hours(1)
@@ -55,7 +55,7 @@ struct TimeSelectView_Previews: PreviewProvider {
     static var previews: some View {
         var time = TimeInterval(0)
 
-        TimeSelectView(
+        HourlyTimeSelectView(
             value: Binding<TimeInterval>(get: { time }, set: { time = $0 }),
             range: .hours(-24)...TimeInterval.hours(24)
         )

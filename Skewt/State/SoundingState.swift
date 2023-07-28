@@ -121,7 +121,7 @@ struct SoundingState: Codable {
         case idle
         case awaitingSoundingLocationData
         case loading
-        case done(Sounding)
+        case done(Sounding, Date)
         case refreshing(Sounding)
         case failed(SoundingError)
     }
@@ -148,10 +148,22 @@ extension SoundingState.Status {
         switch self {
         case .loading, .refreshing(_), .awaitingSoundingLocationData:
             return true
-        case .idle, .done(_), .failed(_):
+        case .idle, .done(_, _), .failed(_):
             return false
         }
 	}
+    
+    private var staleAge: TimeInterval { 60.0 * 60.0 }  // one hour
+    
+    /// Was this data fetched so long ago that it's likely out of date?
+    var isStale: Bool {
+        switch self {
+        case .done(_, let fetchDate):
+            return -fetchDate.timeIntervalSinceNow >= staleAge
+        case .idle, .awaitingSoundingLocationData, .loading, .refreshing(_), .failed(_):
+            return false
+        }
+    }
 }
 
 extension SoundingState.Action: CustomStringConvertible {
@@ -183,8 +195,12 @@ extension SoundingState {
             var state = state
             
             switch state.status {
-            case .done(let sounding):
-                state.status = .refreshing(sounding)
+            case .done(let sounding, _):
+                if state.status.isStale {
+                    state.status = .loading
+                } else {
+                    state.status = .refreshing(sounding)
+                }
             default:
                 state.status = .loading
             }
@@ -202,7 +218,7 @@ extension SoundingState {
             return state
         case .didReceiveResponse(let sounding):
             var state = state
-            state.status = .done(sounding)
+            state.status = .done(sounding, .now)
             
             return state
         case .awaitSoundingLocation:

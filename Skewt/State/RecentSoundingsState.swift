@@ -62,7 +62,7 @@ extension RecentSoundingsState {
     var dataAge: TimeInterval? {
         switch status {
         case .done(_, let date), .refreshing(_, let date):
-            return Date().timeIntervalSince(date)
+            return Date.now.timeIntervalSince(date)
         case .failed(_), .idle, .loading:
             return nil
         }
@@ -85,7 +85,7 @@ extension RecentSoundingsState {
         case .loadingListFailed(let error):
             return RecentSoundingsState(status: .failed(error))
         case .didReceiveList(let list):
-            return RecentSoundingsState(status: .done(list, Date()))
+            return RecentSoundingsState(status: .done(list, .now))
         }
     }
 }
