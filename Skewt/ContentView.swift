@@ -11,7 +11,6 @@ import Combine
 class TimeSelectDebouncer: ObservableObject {
     @Published var timeInterval: TimeInterval = 0.0
     private var debouncer: AnyCancellable?
-    private var updateStore: AnyCancellable?
     var store: Store<SkewtState>? = nil
     
     init() {
