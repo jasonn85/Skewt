@@ -181,7 +181,7 @@ extension SoundingRequest {
 extension Date {
     static func mostRecentSoundingTime(toDate referenceDate: Date = Date()) -> Date {
         let calendar = Calendar(identifier: .gregorian)
-        let nowComponents = calendar.dateComponents(in: .gmt, from: now)
+        let nowComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
         let soundingPeriodInHours = 12.0
         
         var mostRecentSoundingComponents = nowComponents
@@ -216,6 +216,7 @@ extension TimeInterval {
         
         targetTimeComponents.minute = 0
         targetTimeComponents.second = 0
+        targetTimeComponents.nanosecond = 0
         
         return calendar.date(from: targetTimeComponents)!
     }
