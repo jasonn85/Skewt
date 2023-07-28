@@ -7,9 +7,17 @@
 
 import SwiftUI
 
-struct SoundingTimeSelectView: View {
+struct SoundingTimeSelectView: View, Equatable {
     @Binding var value: TimeInterval
-    var daysRange = 7
+    let daysRange = 7
+    var date: Date = Date()
+    
+    // Since the time intervals we show are computed based on current time, SwiftUI thinks
+    //  our Picker constantly needs to be reloaded. By instead making our view equatable based on
+    //  the most recent sounding time, the Picker will only be reloaded if we cross 0000Z/1200Z time.
+    static func == (lhs: SoundingTimeSelectView, rhs: SoundingTimeSelectView) -> Bool {
+        Date.mostRecentSoundingTime(toDate: lhs.date) == Date.mostRecentSoundingTime(toDate: rhs.date)
+    }
     
     private var relativeFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()

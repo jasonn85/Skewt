@@ -6,16 +6,31 @@
 //
 
 import SwiftUI
+import Combine
+
+class TimeSelectDebouncer: ObservableObject {
+    @Published var timeInterval: TimeInterval = 0.0
+    private var debouncer: AnyCancellable?
+    private var updateStore: AnyCancellable?
+    var store: Store<SkewtState>? = nil
+    
+    init() {
+        debouncer = $timeInterval
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink(receiveValue: { [weak self] in
+                self?.store?.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(.relative($0))))
+            })
+    }
+}
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
+    @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
     
     @State private var selectingTime = false
-    @State private var updateTimeTask: Task<(), Error>? = nil
-    private let updateTimeDebounce: Duration = .milliseconds(100)
-    @State private var selectedTimeInterval: TimeInterval = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -87,6 +102,9 @@ struct ContentView: View {
             }
             .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
+        .onAppear {
+            timeSelectDebouncer.store = store
+        }
     }
     
     private var header: some View {
@@ -141,34 +159,11 @@ struct ContentView: View {
         switch store.state.currentSoundingState.selection.type {
         case .op40:
             HourlyTimeSelectView(
-                value: Binding<TimeInterval>(
-                    get: { selectedTimeInterval },
-                    set: { setTimeInterval($0) }
-                ),
+                value: $timeSelectDebouncer.timeInterval,
                 range: .hours(-24)...TimeInterval.hours(24)
             )
         case .raob:
-            SoundingTimeSelectView(
-                value: Binding<TimeInterval>(
-                    get: { selectedTimeInterval },
-                    set: { setTimeInterval($0) }
-                ))
-        }
-    }
-    
-    private func setTimeInterval(_ interval: TimeInterval) {
-        selectedTimeInterval = interval
-        
-        updateTimeTask?.cancel()
-        updateTimeTask = nil
-        
-        let time: SoundingSelection.Time = interval == 0 ? .now : .relative(interval)
-        
-        if time != store.state.currentSoundingState.selection.time {
-            updateTimeTask = Task {
-                try await Task.sleep(for: updateTimeDebounce)
-                store.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(time)))
-            }
+            SoundingTimeSelectView(value: $timeSelectDebouncer.timeInterval)
         }
     }
     
