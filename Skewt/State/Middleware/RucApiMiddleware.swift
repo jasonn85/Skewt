@@ -195,11 +195,11 @@ extension Date {
 }
 
 extension TimeInterval {
-    func closestSoundingTime(withCurrentDate now: Date = .now) -> Date {
-        let targetTime = Date(timeInterval: self, since: now)
+    func closestSoundingTime(withCurrentDate currentDate: Date = .now) -> Date {
+        let targetTime = Date(timeInterval: self, since: currentDate)
         let soundingPeriodInHours = 12.0
         let calendar = Calendar(identifier: .gregorian)
-        let mostRecentSounding = Date.mostRecentSoundingTime(toDate: now)
+        let mostRecentSounding = Date.mostRecentSoundingTime(toDate: currentDate)
         
         if targetTime.timeIntervalSince(mostRecentSounding) > 0.0 {
             return mostRecentSounding
