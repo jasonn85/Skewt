@@ -29,6 +29,7 @@ struct ContentView: View {
     @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
+    @Environment(\.scenePhase) var scenePhase
     
     @State private var selectingTime = false
     
@@ -105,6 +106,11 @@ struct ContentView: View {
         .onAppear {
             timeSelectDebouncer.store = store
         }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
+                store.dispatch(SoundingState.Action.doRefresh)
+            }
+        }
     }
     
     private var header: some View {
@@ -169,7 +175,7 @@ struct ContentView: View {
     
     private var statusText: String? {
         switch store.state.currentSoundingState.status {
-        case .done(let sounding), .refreshing(let sounding):
+        case .done(let sounding, _), .refreshing(let sounding):
             let timeAgo = timeAgoFormatter.string(for: sounding.timestamp)!
             let dateString = dateFormatter.string(for: sounding.timestamp)!
             return "\(timeAgo) (\(dateString))"

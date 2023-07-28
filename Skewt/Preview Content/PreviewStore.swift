@@ -39,7 +39,7 @@ extension Store {
         
         let soundingState = SoundingState(
             selection: selection,
-            status: .done(previewSounding)
+            status: .done(previewSounding, .now)
         )
         
         return Store<SkewtState>(

@@ -31,8 +31,12 @@ struct AnnotatedSkewtPlotView: View {
     
     private var sounding: Sounding? {
         switch store.state.currentSoundingState.status {
-        case .done(let sounding), .refreshing(let sounding):
-            return sounding
+        case .done(let sounding, _), .refreshing(let sounding):
+            if !store.state.currentSoundingState.status.isStale {
+                return sounding
+            }
+            
+            fallthrough
         case .failed(_), .idle, .loading, .awaitingSoundingLocationData:
             return nil
         }
