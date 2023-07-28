@@ -10,7 +10,7 @@ import SwiftUI
 struct SoundingTimeSelectView: View, Equatable {
     @Binding var value: TimeInterval
     let daysRange = 7
-    var date: Date = Date()
+    var date: Date = .now
     
     // Since the time intervals we show are computed based on current time, SwiftUI thinks
     //  our Picker constantly needs to be reloaded. By instead making our view equatable based on

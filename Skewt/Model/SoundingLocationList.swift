@@ -173,7 +173,7 @@ extension TimeInterval {
 
 extension LatestSoundingList {
     func recentSoundings(_ timeInterval: TimeInterval = .twentyFourHours) -> [Entry] {
-        let now = Date()
+        let now = Date.now
         
         return soundings.filter {
             let thisInterval = now.timeIntervalSince($0.timestamp)

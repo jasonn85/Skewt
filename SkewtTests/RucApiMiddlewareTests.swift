@@ -22,9 +22,9 @@ final class RucApiMiddlewareTests: XCTestCase {
 
     override func setUpWithError() throws {
         recentSoundings = RecentSoundingsState(status: .done(LatestSoundingList(soundings: [
-            LatestSoundingList.Entry(stationId: .wmoId(activeSoundingLocation.wmoId!), timestamp: Date()),
+            LatestSoundingList.Entry(stationId: .wmoId(activeSoundingLocation.wmoId!), timestamp: .now),
             LatestSoundingList.Entry(stationId: .wmoId(inactiveSoundingLocation.wmoId!), timestamp: .aMonthAgo)
-        ]), Date()))
+        ]), .now))
     }
 
     func testSelectionForActiveSoundingLocation() throws {

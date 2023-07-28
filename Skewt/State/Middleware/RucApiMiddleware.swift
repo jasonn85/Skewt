@@ -179,7 +179,7 @@ extension SoundingRequest {
 }
 
 extension Date {
-    static func mostRecentSoundingTime(toDate referenceDate: Date = Date()) -> Date {
+    static func mostRecentSoundingTime(toDate referenceDate: Date = .now) -> Date {
         let calendar = Calendar(identifier: .gregorian)
         let nowComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
         let soundingPeriodInHours = 12.0
@@ -195,7 +195,7 @@ extension Date {
 }
 
 extension TimeInterval {
-    func closestSoundingTime(withCurrentDate now: Date = Date()) -> Date {
+    func closestSoundingTime(withCurrentDate now: Date = .now) -> Date {
         let targetTime = Date(timeInterval: self, since: now)
         let soundingPeriodInHours = 12.0
         let calendar = Calendar(identifier: .gregorian)
