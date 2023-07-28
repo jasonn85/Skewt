@@ -17,7 +17,7 @@ struct ForecastSelectionView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 12) {
                 List {
                     locationsList
