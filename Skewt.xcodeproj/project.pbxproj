@@ -22,6 +22,7 @@
 		965D66562A5293A50015FB4B /* ForecastSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66552A5293A50015FB4B /* ForecastSelectionView.swift */; };
 		965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66582A52A09A0015FB4B /* RelativeLocations.swift */; };
 		965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */; };
+		9675D33F2A71B4BC00CA1435 /* SoundingTimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */; };
 		967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24242A366064009262D9 /* SoundingLocationList.swift */; };
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
@@ -95,6 +96,7 @@
 		965D66552A5293A50015FB4B /* ForecastSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastSelectionView.swift; sourceTree = "<group>"; };
 		965D66582A52A09A0015FB4B /* RelativeLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocations.swift; sourceTree = "<group>"; };
 		965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocationTests.swift; sourceTree = "<group>"; };
+		9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTimeSelectView.swift; sourceTree = "<group>"; };
 		967E24242A366064009262D9 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
+				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
 				968998202A17323F005457D6 /* LocationState.swift in Sources */,
 				969117902A29165000A5C72D /* PlotStyling.swift in Sources */,
+				9675D33F2A71B4BC00CA1435 /* SoundingTimeSelectView.swift in Sources */,
 				96FE7E522A3A89ED0069AD3A /* RecentSoundingsState.swift in Sources */,
 				967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */,
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,

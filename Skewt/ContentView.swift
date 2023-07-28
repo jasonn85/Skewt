@@ -136,14 +136,24 @@ struct ContentView: View {
         selectingTime ? .degrees(90) : .zero
     }
     
+    @ViewBuilder
     private var timeSelection: some View {
-        HourlyTimeSelectView(
-            value: Binding<TimeInterval>(
-                get: { selectedTimeInterval },
-                set: { setTimeInterval($0) }
-            ),
-            range: .hours(-24)...TimeInterval.hours(24)
-        )
+        switch store.state.currentSoundingState.selection.type {
+        case .op40:
+            HourlyTimeSelectView(
+                value: Binding<TimeInterval>(
+                    get: { selectedTimeInterval },
+                    set: { setTimeInterval($0) }
+                ),
+                range: .hours(-24)...TimeInterval.hours(24)
+            )
+        case .raob:
+            SoundingTimeSelectView(
+                value: Binding<TimeInterval>(
+                    get: { selectedTimeInterval },
+                    set: { setTimeInterval($0) }
+                ))
+        }
     }
     
     private func setTimeInterval(_ interval: TimeInterval) {

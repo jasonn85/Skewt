@@ -178,18 +178,28 @@ extension SoundingRequest {
     }
 }
 
-extension TimeInterval {
-    func closestSoundingTime(withCurrentDate now: Date = Date()) -> Date {
-        let targetTime = Date(timeInterval: self, since: now)
-        let soundingPeriodInHours = 12.0
+extension Date {
+    static func mostRecentSoundingTime(toDate referenceDate: Date = Date()) -> Date {
         let calendar = Calendar(identifier: .gregorian)
         let nowComponents = calendar.dateComponents(in: .gmt, from: now)
+        let soundingPeriodInHours = 12.0
         
         var mostRecentSoundingComponents = nowComponents
         mostRecentSoundingComponents.hour = Int(floor(Double(nowComponents.hour!) / soundingPeriodInHours) * soundingPeriodInHours)
         mostRecentSoundingComponents.minute = 0
         mostRecentSoundingComponents.second = 0
-        let mostRecentSounding = calendar.date(from: mostRecentSoundingComponents)!
+        mostRecentSoundingComponents.nanosecond = 0
+        
+        return calendar.date(from: mostRecentSoundingComponents)!
+    }
+}
+
+extension TimeInterval {
+    func closestSoundingTime(withCurrentDate now: Date = Date()) -> Date {
+        let targetTime = Date(timeInterval: self, since: now)
+        let soundingPeriodInHours = 12.0
+        let calendar = Calendar(identifier: .gregorian)
+        let mostRecentSounding = Date.mostRecentSoundingTime(toDate: now)
         
         if targetTime.timeIntervalSince(mostRecentSounding) > 0.0 {
             return mostRecentSounding
