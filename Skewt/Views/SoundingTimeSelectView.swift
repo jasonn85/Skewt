@@ -28,7 +28,7 @@ struct SoundingTimeSelectView: View, Equatable {
     private var gmtTimeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeZone = .gmt
-        formatter.dateFormat = "HH:mm'Z'"
+        formatter.dateFormat = "EEEE HH:mm'Z'"
         return formatter
     }
 
