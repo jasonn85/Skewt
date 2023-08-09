@@ -80,14 +80,11 @@ struct WindBarb: Shape {
         Double(bearingInDegrees) * .pi / 180.0
     }
     
-    private var barbSpacingOffset: CGPoint {
-        CGPoint(
-            x: barbSpacing * sin(bearing),
-            y: barbSpacing * cos(bearing)
-        )
+    private var barbSpacingOffset: (x: CGFloat, y: CGFloat) {
+        (x: barbSpacing * sin(bearing), y: barbSpacing * cos(bearing))
     }
     
-    private func barbOffset(_ barb: Barb) -> CGPoint {
+    private func barbOffset(_ barb: Barb) -> (x: CGFloat, y: CGFloat) {
         let length: CGFloat
         
         switch barb {
@@ -99,7 +96,7 @@ struct WindBarb: Shape {
         
         let barbBearing = bearing + .pi / 2.0
         
-        return CGPoint(x: length * sin(barbBearing), y: length * cos(barbBearing))
+        return (x: length * sin(barbBearing), y: length * cos(barbBearing))
     }
     
     private var barbs: [Barb] {
