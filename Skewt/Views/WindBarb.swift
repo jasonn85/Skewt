@@ -18,7 +18,7 @@ struct WindBarb: Shape {
     let barbSpacing: CGFloat = 4.0
     let barbLength: CGFloat = 10.0
     
-    enum Barb {
+    private enum Barb {
         case flag
         case full
         case half
