@@ -102,40 +102,39 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            let plot = plot
+        let plot = plot
+
+        ZStack {
+            if case .loading = store.state.currentSoundingState.status {
+                ProgressView().controlSize(.large)
+            }
             
-            ZStack {
-                if case .loading = store.state.currentSoundingState.status {
-                    ProgressView().controlSize(.large)
+            Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
+                GridRow {
+                    yAxisLabelView(withPlot: plot)
+                        .gridCellUnsizedAxes(.vertical)
+                    
+                    SkewtPlotView(plot: plot)
+                        .environmentObject(store)
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .border(.black)
+                        .background {
+                            LinearGradient(
+                                colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                        }
                 }
                 
-                Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
-                    GridRow {
-                        yAxisLabelView(withPlot: plot)
-                            .gridCellUnsizedAxes(.vertical)
-                        
-                        SkewtPlotView(plot: plot)
-                            .environmentObject(store)
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .border(.black)
-                            .background {
-                                LinearGradient(
-                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            }
-                    }
+                GridRow {
+                    Rectangle()
+                        .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
+                        .foregroundColor(.clear)
                     
-                    GridRow {
-                        Rectangle()
-                            .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
-                            .foregroundColor(.clear)
-                        
-                        xAxisLabelView(withPlot: plot)
-                            .gridCellUnsizedAxes(.horizontal)
-                    }
+                    xAxisLabelView(withPlot: plot)
+                        .gridCellUnsizedAxes(.horizontal)
+                    
                 }
             }
         }
