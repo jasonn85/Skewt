@@ -11,12 +11,12 @@ struct WindBarb: Shape {
     let bearingInDegrees: Int
     let speed: Int
     
-    let length: CGFloat = 50.0
+    var length: CGFloat = 50.0
     
-    let endRadius: CGFloat? = nil
+    var endRadius: CGFloat? = nil
     
-    let barbSpacing: CGFloat = 4.0
-    let barbLength: CGFloat = 10.0
+    var barbSpacing: CGFloat = 4.0
+    var barbLength: CGFloat = 10.0
     
     private enum Barb {
         case flag

@@ -46,7 +46,7 @@ enum SoundingType: String, Codable, CaseIterable {
     case raob = "RAOB"
 }
 
-struct LevelDataPoint: Codable {
+struct LevelDataPoint: Codable, Hashable {
     let type: DataPointType
     let pressure: Double
     let height: Int?
@@ -360,5 +360,12 @@ extension LevelDataPoint {
         self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths()
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
+    }
+}
+
+extension Sounding {
+    /// All data points that include wind
+    var windData: [LevelDataPoint] {
+        data.filter { $0.windSpeed != nil && $0.windDirection != nil }
     }
 }
