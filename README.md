@@ -63,3 +63,19 @@ The sole data source is the US's NOAA. Forecast data is only available for the U
 - Network requests are all performed via `URLSession.shared.dataTaskPublisher`, mapping responses and failures to Redux actions
 - Debounced UI is handled via bindings and Combine
 
+## What's in the works?
+- [Wind barbs](https://github.com/jasonn85/Skewt/issues/32)
+- [Interactive details](https://github.com/jasonn85/Skewt/issues/24) (touch a specific point to see temp/dew point/wind)
+- [Lots](https://github.com/jasonn85/Skewt/issues/33) of [background](https://github.com/jasonn85/Skewt/issues/34) [animations](https://github.com/jasonn85/Skewt/issues/35) for predicted weather
+- [Pinch zooming](https://github.com/jasonn85/Skewt/issues/7)
+- [Tutorials](https://github.com/jasonn85/Skewt/issues/37)
+
+## Privacy
+- No user data is collected, period. This may be revisted later for anonymous analytics.
+- User location, if granted, is anonymized before being sent to any external API.
+
+## Free?
+Skew-T Log-P plots will stay free as long as a free API exists. Future interactive lessons, quizzes, integrations with external tools, and more advanced visualizations may appear with a cost.
+
+## Hire me to build your app
+[Itsa me](https://github.com/jasonn85)
