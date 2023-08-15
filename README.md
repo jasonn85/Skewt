@@ -2,10 +2,10 @@
 An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
 ## What's a Skew-T Log-P?
-If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. Pilots all should!
+If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. All pilots should!
 
 ### 📈 The lines
-The two plotted lines are temperature (red here) and moisture (dew point, blue here). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
+The two plotted lines are temperature (red) and moisture/dew point (blue). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
 
 ![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/19f3a25a-5d46-4b04-8932-3da5badf04f0)
 
@@ -33,7 +33,10 @@ Weather balloons are released twice a day from dozens of locations around the US
 #### 🧮 Forecasts
 NOAA forecasts provide predicted sounding data on a grid. The default model (Op40) is hourly on a 40km grid for up to 18 hours in the future.
 
-### Skew-T Log-P references
+#### 🇺🇸 US only?
+The sole data source is the US's NOAA. Forecast data is only available for the US, but 12 hour soundings _are_ available from US military bases all over the world.
+
+### Further skew-T log-P references
 - [NOAA's sounding web API](https://rucsoundings.noaa.gov/)
 - [Return of Skew-T](https://www.ifr-magazine.com/training-sims/return-of-skew-t/)
     - An explanation of Skew-T Log-P for pilots
@@ -51,7 +54,7 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 
 ### Redux
 - A dirt simple implementation of Redux, following this article: [Redux architecture and mind-blowing features](https://wojciechkulik.pl/ios/redux-architecture-and-mind-blowing-features)
-- Every view uses a `@EnvironmentObject var store: Store<SkewtState>` with `@Published private(set) var state: State` state
+- Every view uses a `@EnvironmentObject var store: Store<SkewtState>` with `@Published private(set) var state: State`
 - Each UI action dispatches an `Action` to the store's `dispatch`
 - Every state struct has a `Reducer` pure function to turn a `State` and an `Action` into a new `State`
 - `Middleware`s handle remote data, saving state, logging, and handling location data
