@@ -1,4 +1,4 @@
-# Skew-T²
+# <img alt="skewt-logo" align="top" src="https://github.com/jasonn85/Skewt/assets/1328743/760196b8-aa6d-4457-8b9b-b75fa8d3e4a6">&nbsp; Skew-T²
 An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
 ## What is a Skew-T Log-P plot?
