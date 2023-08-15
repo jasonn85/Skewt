@@ -4,12 +4,12 @@ An open-source, iOS app for viewing sounding data and forecasts from NOAA
 ## What's a Skew-T Log-P?
 If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. Pilots all should!
 
-### The lines
+### 📈 The lines
 The two plotted lines are temperature (red here) and moisture (dew point, blue here). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
 
 ![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/6850b742-454c-4136-a622-03358a4926e9)
 
-### Lines touch = clouds
+### ☁️ Lines touch = clouds
 The temperature falling to the dew point makes clouds/dew/precipitation. This would be shown as the temperature plot touching or nearly touching the dew point plot.
 
 Here is a low marine layer of clouds:
@@ -21,16 +21,16 @@ And a thick layer of rain:
 ![Rain example](https://github.com/jasonn85/Skewt/assets/1328743/56197b7e-c610-4e40-89a1-ad503917c3bb)
 
 
-### The other lines
+### 📐 The other lines
 All sorts of other weather characteristics are easily identifiable on a Skew-T Log-P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.
 
 <img width="335" alt="Guidelines" src="https://github.com/jasonn85/Skewt/assets/1328743/12f436fc-1131-4fa0-9b48-c4415c6de4ea">
 
 ### What is this data?
-#### Soundings
+#### 🎈 Soundings
 Weather balloons are released twice a day from dozens of locations around the US and hundreds around the world.
 
-#### Forecasts
+#### 🧮 Forecasts
 NOAA forecasts provide predicted sounding data on a grid. The default model (Op40) is hourly on a 40km grid for up to 18 hours in the future.
 
 ### Skew-T Log-P references
