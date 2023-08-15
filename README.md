@@ -35,10 +35,13 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 
 ### Skew-T Log-P references
 - [NOAA's sounding web API](https://rucsoundings.noaa.gov/)
-- An explanation of Skew-T Log-P for pilots: [Return of Skew-T](https://www.ifr-magazine.com/training-sims/return-of-skew-t/)
-- An overview of information that can be divined from a plot: [Skew-T tutorials](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html)
-	- Example Skew-Ts for specific types of weather: [Different Weather Soundings](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html#SKEW3)
-- A five minute video, explaining weather balloons, Skew-T plots, and how to read them: [Weather Explained: Intro to Reading Skew-T Graphs](https://youtu.be/1lJ9Kaieoco)
+- [Return of Skew-T](https://www.ifr-magazine.com/training-sims/return-of-skew-t/)
+    - An explanation of Skew-T Log-P for pilots
+- [Skew-T tutorials](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html)
+    - An overview of information that can be divined from a plot
+        - [Examples of some typical patterns](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html#SKEW3)
+- [Weather Explained: Intro to Reading Skew-T Graphs](https://youtu.be/1lJ9Kaieoco)
+    - A five minute video, explaining weather balloons, Skew-T plots, and how to read them
 	
 
 ## How was this app built?
