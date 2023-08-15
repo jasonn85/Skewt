@@ -1,7 +1,7 @@
 # <img alt="skewt-logo" align="top" src="https://github.com/jasonn85/Skewt/assets/1328743/760196b8-aa6d-4457-8b9b-b75fa8d3e4a6">&nbsp; Skew-T²
 An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
-## What is a Skew-T Log-P plot?
+## What's a Skew-T Log-P?
 If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. Pilots all should!
 
 ### The lines
@@ -49,13 +49,5 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 
 ### Combine
 - Network requests are all performed via `URLSession.shared.dataTaskPublisher`, mapping responses and failures to Redux actions
-- Debounced UI is handled via bindings and Combine, e.g.
-```swift     
-debouncer = $timeInterval
-	.debounce(for: .seconds(0.2), scheduler: RunLoop.main)
-	.removeDuplicates()
-	.sink(receiveValue: { [weak self] in
-	    self?.store?.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(.relative($0))))
-	})
-```
+- Debounced UI is handled via bindings and Combine
 
