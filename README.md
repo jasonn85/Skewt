@@ -36,7 +36,7 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 #### 🇺🇸 US only?
 The sole data source is the US's NOAA. Forecast data is only available for the US, but 12 hour soundings _are_ available from US military bases all over the world.
 
-### Further skew-T log-P references
+### Further Skew-T Log-P references
 - [NOAA's sounding web API](https://rucsoundings.noaa.gov/)
 - [Return of Skew-T](https://www.ifr-magazine.com/training-sims/return-of-skew-t/)
     - An explanation of Skew-T Log-P for pilots
