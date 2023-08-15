@@ -1,5 +1,5 @@
 # Skew-T²
-### Open-source, iOS app for viewing sounding data and forecasts from NOAA
+An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
 ## What is a Skew-T Log-P plot?
 If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. Pilots all should!
@@ -7,7 +7,7 @@ If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text
 ### The lines
 The two plotted lines are temperature and moisture (dew point). Height is height. (Pressure is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
 
-#### Lines touch = clouds
+### Lines touch = clouds
 The temperature falling to the dew point makes clouds/dew/precipitation. This would be shown as the temperature plot touching the dew point plot:
 
 Low clouds:
@@ -19,7 +19,7 @@ _TODO: sample plot_
 Rain:
 _TODO: sample plot_
 
-#### All the other lines
+### The other lines
 All sorts of other weather characteristics are easily identifiable on a Skew-T Log-P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.
 
 ### What is this data?
@@ -45,7 +45,7 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 - Every view uses a `Store` `@EnvironmentObject` with one immutable state
 - Each UI action dispatches an `Action` to the store
 - Every state struct has a `Reducer` pure function to turn a `State` and an `Action` into a new `State`
-- Middlewares handle remote data, saving state, logging, and handling location data
+- `Middleware`s handle remote data, saving state, logging, and handling location data
 
 ### Combine
 - Network requests are all performed via `URLSession.shared.dataTaskPublisher`, mapping responses and failures to Redux actions
