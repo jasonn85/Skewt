@@ -7,7 +7,7 @@ If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text
 ### 📈 The lines
 The two plotted lines are temperature (red here) and moisture (dew point, blue here). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
 
-![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/6850b742-454c-4136-a622-03358a4926e9)
+![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/19f3a25a-5d46-4b04-8932-3da5badf04f0)
 
 ### ☁️ Lines touch = clouds
 The temperature falling to the dew point makes clouds/dew/precipitation. This would be shown as the temperature plot touching or nearly touching the dew point plot.
@@ -46,11 +46,13 @@ NOAA forecasts provide predicted sounding data on a grid. The default model (Op4
 
 ## How was this app built?
 ### SwiftUI
+- Fully declarative UI
+- Immutable state managed via...
 
 ### Redux
-- A custom implementation of Redux was built, following this article: [Redux architecture and mind-blowing features](https://wojciechkulik.pl/ios/redux-architecture-and-mind-blowing-features)
-- Every view uses a `Store` `@EnvironmentObject` with one immutable state
-- Each UI action dispatches an `Action` to the store
+- A dirt simple implementation of Redux, following this article: [Redux architecture and mind-blowing features](https://wojciechkulik.pl/ios/redux-architecture-and-mind-blowing-features)
+- Every view uses a `@EnvironmentObject var store: Store<SkewtState>` with `@Published private(set) var state: State` state
+- Each UI action dispatches an `Action` to the store's `dispatch`
 - Every state struct has a `Reducer` pure function to turn a `State` and an `Action` into a new `State`
 - `Middleware`s handle remote data, saving state, logging, and handling location data
 
