@@ -2,7 +2,7 @@
 An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
 # What's a Skew-T Log-P?
-If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Metereologists and glider pilots understand. All pilots should!
+If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Meteorologists and glider pilots understand. All pilots should!
 
 ## 📈 The lines
 The two plotted lines are temperature (red) and moisture/dew point (blue). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
