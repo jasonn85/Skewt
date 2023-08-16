@@ -7,24 +7,24 @@ If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text
 ## 📈 The lines
 The two plotted lines are temperature (red) and moisture/dew point (blue). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
 
-![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/19f3a25a-5d46-4b04-8932-3da5badf04f0)
+![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/a8de626d-3a9e-4129-8153-b1dec61b286b)
 
 ## ☁️ Lines touch = clouds
 The temperature falling to the dew point makes clouds/dew/precipitation. This would be shown as the temperature plot touching or nearly touching the dew point plot.
 
 Here is a low marine layer of clouds:
 
-![Marine layer example](https://github.com/jasonn85/Skewt/assets/1328743/6c600bd6-c5ca-4d87-ba60-4afcf61f06a7)
+![Marine layer example](https://github.com/jasonn85/Skewt/assets/1328743/dfd3408b-1f67-4744-8ea8-ccd1bdbc08ac)
 
 And a thick layer of rain:
 
-![Rain example](https://github.com/jasonn85/Skewt/assets/1328743/56197b7e-c610-4e40-89a1-ad503917c3bb)
+![Rain example](https://github.com/jasonn85/Skewt/assets/1328743/3a764043-3b45-4701-ac04-4e4a1d7595a4)
 
 
 ## 📐 The other lines
 All sorts of other weather characteristics are easily identifiable on a Skew-T Log-P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.
 
-<img width="335" alt="Guidelines" src="https://github.com/jasonn85/Skewt/assets/1328743/12f436fc-1131-4fa0-9b48-c4415c6de4ea">
+<img width="335" alt="Guidelines" src="https://github.com/jasonn85/Skewt/assets/1328743/df9ceb27-a238-4f28-b29f-68123bbaf5fc">
 
 # What is this data?
 ## 🎈 Soundings
