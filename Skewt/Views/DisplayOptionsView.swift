@@ -67,6 +67,13 @@ struct DisplayOptionsView: View {
                     NavigationLink("Privacy policy") {
                         PrivacyPolicyView()
                     }
+                        
+                    Link(destination: URL(string: "https://github.com/jasonn85/Skewt")!) {
+                        HStack(alignment: .center) {
+                            Text("Skew-T² on GitHub")
+                            Image(systemName: "safari")
+                        }
+                    }
                 }
             }
             .pickerStyle(.segmented)
