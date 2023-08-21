@@ -12,6 +12,8 @@ struct DisplayOptionsView: View {
     static private let maximumAltitude = 40_000.0
     static private let minimumMaximumAltitude = 2_000.0
     
+    @State private var lineStylesExpanded = false
+    
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -23,64 +25,52 @@ struct DisplayOptionsView: View {
     }
 
     var body: some View {
-        List {
-            Section() {
-                VStack {
-                    HStack {
-                        Text("Maximum altitude")
-                        
-                        Spacer()
-                        
-                        Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
-                    }
-                    
-                    Slider(
-                        value: Binding<Double>(
-                            get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
-                            set: {
-                                store.dispatch(PlotOptions.Action.changeAltitudeRange(0.0...$0))
-                            }
-                        ),
-                        in: Self.minimumMaximumAltitude...Self.maximumAltitude,
-                        step: 1_000.0
-                    )
-                }
-            }
-            
-            Section("Isopleths") {
-                isotherms
-                isobars
-                adiabats
-                mixingLines
-                isobarLabels
-                isothermLabels
-            }
-            
-            Section("Line styles") {
-                Grid {
-                    ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
-                        LineStyleView(
-                            lineType: lineType,
-                            lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
-                                get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
-                                set: { lineStyle in
-                                    if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
-                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
-                                    } else {
-                                        store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
-                                    }
-                                }
-                            )
-                        )
-                        
-                        if lineType != PlotOptions.PlotStyling.PlotType.allCases.last {
-                            Divider()
+        NavigationStack {
+            List {
+                Section() {
+                    VStack {
+                        HStack {
+                            Text("Maximum altitude")
+                            
+                            Spacer()
+                            
+                            Text("\(altitudeFormatter.string(from: topAltitude as NSNumber)!) feet")
                         }
+                        
+                        Slider(
+                            value: Binding<Double>(
+                                get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
+                                set: {
+                                    store.dispatch(PlotOptions.Action.changeAltitudeRange(0.0...$0))
+                                }
+                            ),
+                            in: Self.minimumMaximumAltitude...Self.maximumAltitude,
+                            step: 1_000.0
+                        )
+                    }
+                }
+                
+                Section("Isopleths") {
+                    isotherms
+                    isobars
+                    adiabats
+                    mixingLines
+                    isobarLabels
+                    isothermLabels
+                }
+                
+                Section {
+                    lineStyles
+                }
+                
+                Section("About") {
+                    NavigationLink("Privacy policy") {
+                        PrivacyPolicyView()
                     }
                 }
             }
+            .pickerStyle(.segmented)
         }
-        .pickerStyle(.segmented)
     }
     
     private var isotherms: some View {
@@ -203,6 +193,33 @@ struct DisplayOptionsView: View {
                 }
             )) {
                 Text("Isotherm labels")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var lineStyles: some View {
+        DisclosureGroup("Line styles", isExpanded: $lineStylesExpanded) {
+            Grid {
+                ForEach(PlotOptions.PlotStyling.PlotType.allCases, id: \.id) { lineType in
+                    LineStyleView(
+                        lineType: lineType,
+                        lineStyle: Binding<PlotOptions.PlotStyling.LineStyle>(
+                            get: { store.state.plotOptions.plotStyling.lineStyle(forType: lineType) },
+                            set: { lineStyle in
+                                if lineStyle == PlotOptions.PlotStyling.defaultStyle(forType: lineType) {
+                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyleToDefault(lineType))
+                                } else {
+                                    store.dispatch(PlotOptions.PlotStyling.Action.setStyle(lineType, lineStyle))
+                                }
+                            }
+                        )
+                    )
+                    
+                    if lineType != PlotOptions.PlotStyling.PlotType.allCases.last {
+                        Divider()
+                    }
+                }
             }
         }
     }
