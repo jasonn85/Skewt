@@ -10,6 +10,9 @@ import SwiftUI
 struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
+    private let windBarbContainerWidth: CGFloat = 20.0
+    private let windBarbLength: CGFloat = 40.0
+    
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.multiplier = 0.001
@@ -125,6 +128,9 @@ struct AnnotatedSkewtPlotView: View {
                                 endPoint: .top
                             )
                         }
+                    
+                    windBarbView(withPlot: plot)
+                        .gridCellUnsizedAxes(.vertical)
                 }
                 
                 GridRow {
@@ -134,14 +140,14 @@ struct AnnotatedSkewtPlotView: View {
                     
                     xAxisLabelView(withPlot: plot)
                         .gridCellUnsizedAxes(.horizontal)
-                    
                 }
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
     }
     
-    @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
+    @ViewBuilder
+    private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if yAxisLabelWidthOrNil == nil {
             Rectangle()
                 .foregroundColor(.clear)
@@ -166,7 +172,8 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
+    @ViewBuilder
+    private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
@@ -189,6 +196,17 @@ struct AnnotatedSkewtPlotView: View {
                     }
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func windBarbView(withPlot plot: SkewtPlot) -> some View {
+        if !store.state.plotOptions.showWindBarbs {
+            EmptyView()
+        } else {
+            Rectangle()
+                .frame(width: windBarbContainerWidth)
+                .foregroundColor(.clear)
         }
     }
     
