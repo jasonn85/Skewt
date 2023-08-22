@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */; };
+		960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */; };
 		961202632A156B03009423D5 /* SoundingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202622A156B03009423D5 /* SoundingState.swift */; };
 		961202652A156B39009423D5 /* PlotOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202642A156B39009423D5 /* PlotOptions.swift */; };
 		961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202662A157A52009423D5 /* RucApiMiddleware.swift */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchMiddleware.swift; sourceTree = "<group>"; };
+		960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		961202622A156B03009423D5 /* SoundingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingState.swift; sourceTree = "<group>"; };
 		961202642A156B39009423D5 /* PlotOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotOptions.swift; sourceTree = "<group>"; };
 		961202662A157A52009423D5 /* RucApiMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucApiMiddleware.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				965D66572A5293A90015FB4B /* Selection */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
+				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
@@ -466,6 +469,7 @@
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
 				96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */,
+				960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */,
 				967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
@@ -656,6 +660,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Skewt/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Skew-T²";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Use location to find the nearest weather";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -689,6 +694,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Skewt/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Skew-T²";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Use location to find the nearest weather";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
