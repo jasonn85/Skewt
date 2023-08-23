@@ -218,14 +218,14 @@ RAOB sounding valid at:
     func testDataToCoordinateAndBack() {
         let plot = SkewtPlot(sounding: sounding)
 
-        let data = sounding.data.filter({ $0.isPlottable }).first!
+        let data = sounding.data.filter({ $0.temperature != nil }).first!
         let expected = (pressure: data.pressure, temperature: data.temperature!)
         let pointFromPlot = plot.point(pressure: expected.pressure, temperature: expected.temperature)
         let recalculatedData = plot.pressureAndTemperature(atPoint: pointFromPlot)
         XCTAssertEqual(recalculatedData.pressure, expected.pressure, accuracy: 0.001)
         XCTAssertEqual(recalculatedData.temperature, expected.temperature, accuracy: 0.001)
         
-        let data2 = sounding.data.filter({ $0.isPlottable }).last!
+        let data2 = sounding.data.filter({ $0.temperature != nil }).last!
         let expected2 = (pressure: data2.pressure, temperature: data2.temperature!)
         let pointFromPlot2 = plot.point(pressure: expected2.pressure, temperature: expected2.temperature)
         let recalculatedData2 = plot.pressureAndTemperature(atPoint: pointFromPlot2)
@@ -236,7 +236,7 @@ RAOB sounding valid at:
     func testCoordinateToPointAndBack() {
         let plot = SkewtPlot(sounding: sounding)
 
-        let data = sounding.data.filter({ $0.isPlottable })[15]
+        let data = sounding.data.filter({ $0.temperature != nil })[15]
         let point = plot.point(pressure: data.pressure, temperature: data.temperature!)
         let dataFromPoint = plot.pressureAndTemperature(atPoint: point)
         let recalculatedPoint = plot.point(pressure: dataFromPoint.pressure, temperature: dataFromPoint.temperature)
