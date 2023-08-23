@@ -54,11 +54,6 @@ struct LevelDataPoint: Codable, Hashable {
     let dewPoint: Double?
     let windDirection: Int?
     let windSpeed: Int?
-    
-    // Does this point contain at least temperature and dew point so it can be plotted?
-    var isPlottable: Bool {
-        temperature != nil && dewPoint != nil
-    }
 }
 
 enum SoundingParseError: Error, Codable {

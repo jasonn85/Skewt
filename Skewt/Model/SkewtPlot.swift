@@ -50,7 +50,7 @@ struct SkewtPlot {
     var skewSlope: CGFloat
     
     var temperaturePath: CGPath? {
-        guard let data = sounding?.data.filter({ $0.isPlottable }),
+        guard let data = sounding?.data.filter({ $0.temperature != nil }),
               data.count > 0 else {
             return nil
         }
@@ -76,7 +76,7 @@ struct SkewtPlot {
     }
     
     var dewPointPath: CGPath? {
-        guard let data = sounding?.data.filter({ $0.isPlottable }),
+        guard let data = sounding?.data.filter({ $0.dewPoint != nil }),
               data.count > 0 else {
             return nil
         }
