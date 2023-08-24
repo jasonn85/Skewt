@@ -30,15 +30,15 @@ struct WindBarb: Shape {
         let dx = halfLength * sin(bearing)
         let dy = halfLength * cos(bearing)
         
-        let center = CGPoint(x: rect.midX, y: rect.minY)
-        let p1 = CGPoint(x: center.x - dx, y: center.y - dy)
-        let p2 = CGPoint(x: center.x + dx, y: center.y + dy)
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let upwindPoint = CGPoint(x: center.x - dx, y: center.y - dy)
+        let downwindPoint = CGPoint(x: center.x + dx, y: center.y + dy)
         
         return Path() { path in
-            path.move(to: p1)
-            path.addLine(to: p2)
+            path.move(to: upwindPoint)
+            path.addLine(to: downwindPoint)
             
-            path.move(to: p1)
+            path.move(to: upwindPoint)
             
             for barb in barbs {
                 let startingPoint = path.currentPoint!
@@ -66,7 +66,7 @@ struct WindBarb: Shape {
 
             if let endRadius = endRadius {
                 let halfRadius = endRadius / 2.0
-                let origin = CGPoint(x: p2.x - halfRadius, y: p2.y - halfRadius)
+                let origin = CGPoint(x: downwindPoint.x - halfRadius, y: downwindPoint.y - halfRadius)
 
                 path.addEllipse(in: CGRect(
                     origin: origin,
@@ -121,6 +121,7 @@ struct WindBarb_Previews: PreviewProvider {
                     ForEach(speeds, id: \.self) { speed in
                         WindBarb(bearingInDegrees: bearing, speed: speed)
                             .stroke(.black, lineWidth: 2.0)
+                            .border(.black)
                     }
                 }
             }
