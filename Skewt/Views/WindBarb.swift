@@ -34,6 +34,13 @@ struct WindBarb: Shape {
         let upwindPoint = CGPoint(x: center.x - dx, y: center.y - dy)
         let downwindPoint = CGPoint(x: center.x + dx, y: center.y + dy)
         
+        guard speed >= 5 else {
+            return Path() { path in
+                let radius = length / 4.0
+                path.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2.0, height: radius * 2.0))
+            }
+        }
+        
         return Path() { path in
             path.move(to: upwindPoint)
             path.addLine(to: downwindPoint)
@@ -113,7 +120,7 @@ struct WindBarb: Shape {
 struct WindBarb_Previews: PreviewProvider {
     static var previews: some View {
         let dDegrees = 30
-        let speeds = [0, 5, 10, 25, 50, 135, 150]
+        let speeds = [2, 5, 10, 25, 50, 135, 150]
         
         HStack {
             ForEach(Array(stride(from: 0, to: 360 - dDegrees, by: dDegrees)), id: \.self) { bearing in
