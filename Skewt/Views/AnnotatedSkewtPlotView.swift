@@ -220,9 +220,10 @@ struct AnnotatedSkewtPlotView: View {
                                     WindBarb(
                                         bearingInDegrees: $0.windDirection!,
                                         speed: $0.windSpeed!,
-                                        length: windBarbLength
+                                        length: windBarbLength,
+                                        tickLength: windBarbLength * 0.3
                                     )
-                                    .stroke(.red, lineWidth: 2.0)
+                                    .stroke(.red, lineWidth: 1.0)
                                     .position(x: x, y: y)
                                 }
                             }
