@@ -93,7 +93,7 @@ extension PlotOptions {
         showMixingLines = false
         showIsobarLabels = true
         showIsothermLabels = true
-        showWindBarbs = true
+        showWindBarbs = false
         plotStyling = PlotStyling()
     }
 }

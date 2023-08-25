@@ -72,8 +72,8 @@ struct WindBarb: Shape {
                     ))
                     
                     path.move(to: CGPoint(
-                        x: startingPoint.x + barbSpacingOffset.x / 2.0,
-                        y: startingPoint.y + barbSpacingOffset.y / 2.0
+                        x: startingPoint.x + barbSpacingOffset.x / 4.0,
+                        y: startingPoint.y + barbSpacingOffset.y / 4.0
                     ))
                 } else {
                     path.move(to: startingPoint)
