@@ -38,7 +38,13 @@ struct WindBarb: Shape {
         guard speed >= 5 else {
             return Path() { path in
                 let radius = length / 4.0
-                path.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2.0, height: radius * 2.0))
+                
+                path.addEllipse(in: CGRect(
+                    x: center.x - radius,
+                    y: center.y - radius,
+                    width: radius * 2.0,
+                    height: radius * 2.0
+                ))
             }
         }
         
