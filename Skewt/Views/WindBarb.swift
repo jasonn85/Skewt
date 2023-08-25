@@ -15,8 +15,8 @@ struct WindBarb: Shape {
     
     var endRadius: CGFloat? = nil
     
-    var barbSpacing: CGFloat = 4.0
-    var barbLength: CGFloat = 10.0
+    var tickSpacing: CGFloat = 4.0
+    var tickLength: CGFloat = 10.0
     
     private enum Barb {
         case flag
@@ -102,7 +102,7 @@ struct WindBarb: Shape {
     }
     
     private var barbSpacingOffset: (x: CGFloat, y: CGFloat) {
-        (x: barbSpacing * sin(bearing), y: barbSpacing * cos(bearing))
+        (x: tickSpacing * sin(bearing), y: tickSpacing * cos(bearing))
     }
     
     private func barbOffset(_ barb: Barb) -> (x: CGFloat, y: CGFloat)? {
@@ -110,9 +110,9 @@ struct WindBarb: Shape {
         
         switch barb {
         case .flag, .full:
-            length = barbLength
+            length = tickLength
         case .half:
-            length = barbLength / 2.0
+            length = tickLength / 2.0
         case .blank:
             return nil
         }
