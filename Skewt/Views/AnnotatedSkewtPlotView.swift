@@ -11,7 +11,7 @@ struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
     private let windBarbContainerWidth: CGFloat = 20.0
-    private let windBarbLength: CGFloat = 40.0
+    private let windBarbLength: CGFloat = 20.0
     
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -207,6 +207,30 @@ struct AnnotatedSkewtPlotView: View {
             Rectangle()
                 .frame(width: windBarbContainerWidth)
                 .foregroundColor(.clear)
+                .overlay {
+                    if let sounding = plot.sounding {
+                        GeometryReader { geometry in
+                            let x = geometry.size.width / 2.0
+                            let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            
+                            ForEach(windData, id: \.self) {
+                                let y = plot.y(forPressure: $0.pressure) * geometry.size.height
+                                
+                                if y >= 0.0 && y <= geometry.size.height {
+                                    WindBarb(
+                                        bearingInDegrees: $0.windDirection!,
+                                        speed: $0.windSpeed!,
+                                        length: windBarbLength
+                                    )
+                                    .stroke(.red, lineWidth: 2.0)
+                                    .position(x: x, y: y)
+                                }
+                            }
+                        }
+                    } else {
+                        EmptyView()
+                    }
+                }
         }
     }
     

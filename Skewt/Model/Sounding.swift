@@ -357,10 +357,3 @@ extension LevelDataPoint {
         self.windSpeed = Int(fromSoundingString: columns[5])
     }
 }
-
-extension Sounding {
-    /// All data points that include wind
-    var windData: [LevelDataPoint] {
-        data.filter { $0.windSpeed != nil && $0.windDirection != nil }
-    }
-}
