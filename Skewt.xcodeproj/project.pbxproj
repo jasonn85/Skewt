@@ -292,13 +292,13 @@
 				965D66572A5293A90015FB4B /* Selection */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
-				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
+				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
+				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
-				96D30F2F2A83581200986E7E /* WindBarb.swift */,
-				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
 				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
+				96D30F2F2A83581200986E7E /* WindBarb.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
