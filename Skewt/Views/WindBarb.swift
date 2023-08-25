@@ -61,8 +61,13 @@ struct WindBarb: Shape {
                 
                 if case .flag = barb {
                     path.addLine(to: CGPoint(
-                        x: startingPoint.x + barbSpacingOffset.x,
-                        y: startingPoint.y + barbSpacingOffset.y
+                        x: startingPoint.x - barbSpacingOffset.x,
+                        y: startingPoint.y - barbSpacingOffset.y
+                    ))
+                    
+                    path.move(to: CGPoint(
+                        x: startingPoint.x + barbSpacingOffset.x / 2.0,
+                        y: startingPoint.y + barbSpacingOffset.y / 2.0
                     ))
                 } else {
                     path.move(to: startingPoint)
@@ -118,8 +123,11 @@ struct WindBarb: Shape {
         result.append(contentsOf: repeatElement(.full, count: (speed % 50) / 10))
         result.append(contentsOf: repeatElement(.half, count: (speed % 10) / 5))
         
-        if result.first == .half {
+        switch result.first {
+        case .flag, .half:
             result.insert(.blank, at: 0)
+        case .blank, .full, .none:
+            break
         }
         
         return result
