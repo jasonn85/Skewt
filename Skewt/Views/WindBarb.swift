@@ -22,6 +22,7 @@ struct WindBarb: Shape {
         case flag
         case full
         case half
+        case blank
     }
     
     func path(in rect: CGRect) -> Path {
@@ -51,10 +52,12 @@ struct WindBarb: Shape {
                 let startingPoint = path.currentPoint!
                 let offset = barbOffset(barb)
                 
-                path.addLine(to: CGPoint(
-                    x: startingPoint.x + offset.x,
-                    y: startingPoint.y + offset.y
-                ))
+                if let offset = offset {
+                    path.addLine(to: CGPoint(
+                        x: startingPoint.x + offset.x,
+                        y: startingPoint.y + offset.y
+                    ))
+                }
                 
                 if case .flag = barb {
                     path.addLine(to: CGPoint(
@@ -91,7 +94,7 @@ struct WindBarb: Shape {
         (x: barbSpacing * sin(bearing), y: barbSpacing * cos(bearing))
     }
     
-    private func barbOffset(_ barb: Barb) -> (x: CGFloat, y: CGFloat) {
+    private func barbOffset(_ barb: Barb) -> (x: CGFloat, y: CGFloat)? {
         let length: CGFloat
         
         switch barb {
@@ -99,9 +102,11 @@ struct WindBarb: Shape {
             length = barbLength
         case .half:
             length = barbLength / 2.0
+        case .blank:
+            return nil
         }
         
-        let barbBearing = bearing + .pi / 2.0
+        let barbBearing = bearing + 1.2 * .pi / 2.0
         
         return (x: length * sin(barbBearing), y: length * cos(barbBearing))
     }
@@ -112,6 +117,10 @@ struct WindBarb: Shape {
         result.append(contentsOf: repeatElement(.flag, count: speed / 50))
         result.append(contentsOf: repeatElement(.full, count: (speed % 50) / 10))
         result.append(contentsOf: repeatElement(.half, count: (speed % 10) / 5))
+        
+        if result.first == .half {
+            result.insert(.blank, at: 0)
+        }
         
         return result
     }
