@@ -212,6 +212,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.description, "Op40 analysis valid for grid point 6.9 nm / 66 deg from SAN:")
         XCTAssertEqual(sounding.data.count, 62)
         XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 62)
+        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 62)
         XCTAssertEqual(sounding.stationId, "SAN")
         XCTAssertEqual(sounding.cape, 0)
         XCTAssertEqual(sounding.cin, 0)
@@ -245,6 +246,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.description, "RAOB sounding valid at:")
         XCTAssertEqual(sounding.data.count, 231)
         XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 89)
+        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 162)
         XCTAssertEqual(sounding.stationId, "NKX")
     }
     
@@ -262,6 +264,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cin, 0)
         XCTAssertEqual(sounding.data.count, 39)
         XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 39)
+        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 39)
     }
     
     func testGfsParsing() throws {
@@ -278,6 +281,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(sounding.cin, 0)
         XCTAssertEqual(sounding.data.count, 31)
         XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 26)
+        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 31)
     }
     
     func testGlobalsParsing() {

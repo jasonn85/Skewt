@@ -16,6 +16,7 @@ struct PlotOptions: Codable {
         case setMixingLines(Bool)
         case setIsobarLabels(Bool)
         case setIsothermLabels(Bool)
+        case setWindBarbs(Bool)
     }
     
     struct PlotStyling: Codable {
@@ -79,6 +80,7 @@ struct PlotOptions: Codable {
     var showMixingLines: Bool
     var showIsobarLabels: Bool
     var showIsothermLabels: Bool
+    var showWindBarbs: Bool
     var plotStyling: PlotStyling
 }
 
@@ -91,6 +93,7 @@ extension PlotOptions {
         showMixingLines = false
         showIsobarLabels = true
         showIsothermLabels = true
+        showWindBarbs = false
         plotStyling = PlotStyling()
     }
 }
@@ -122,6 +125,8 @@ extension PlotOptions {
                 options.showIsobarLabels = isobarLabels
             case .setIsothermLabels(let isothermLabels):
                 options.showIsothermLabels = isothermLabels
+            case .setWindBarbs(let showWindBarbs):
+                options.showWindBarbs = showWindBarbs
             }
         }
         

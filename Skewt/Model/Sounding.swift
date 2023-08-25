@@ -46,7 +46,7 @@ enum SoundingType: String, Codable, CaseIterable {
     case raob = "RAOB"
 }
 
-struct LevelDataPoint: Codable {
+struct LevelDataPoint: Codable, Hashable {
     let type: DataPointType
     let pressure: Double
     let height: Int?

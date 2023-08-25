@@ -10,6 +10,9 @@ import SwiftUI
 struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
+    private let windBarbContainerWidth: CGFloat = 20.0
+    private let windBarbLength: CGFloat = 20.0
+    
     private var altitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.multiplier = 0.001
@@ -102,47 +105,49 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            let plot = plot
+        let plot = plot
+
+        ZStack {
+            if case .loading = store.state.currentSoundingState.status {
+                ProgressView().controlSize(.large)
+            }
             
-            ZStack {
-                if case .loading = store.state.currentSoundingState.status {
-                    ProgressView().controlSize(.large)
+            Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
+                GridRow {
+                    yAxisLabelView(withPlot: plot)
+                        .gridCellUnsizedAxes(.vertical)
+                    
+                    SkewtPlotView(plot: plot)
+                        .environmentObject(store)
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .border(.black)
+                        .background {
+                            LinearGradient(
+                                colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                        }
+                    
+                    windBarbView(withPlot: plot)
+                        .gridCellUnsizedAxes(.vertical)
                 }
                 
-                Grid(horizontalSpacing: 0.0, verticalSpacing: 0.0) {
-                    GridRow {
-                        yAxisLabelView(withPlot: plot)
-                            .gridCellUnsizedAxes(.vertical)
-                        
-                        SkewtPlotView(plot: plot)
-                            .environmentObject(store)
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .border(.black)
-                            .background {
-                                LinearGradient(
-                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            }
-                    }
+                GridRow {
+                    Rectangle()
+                        .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
+                        .foregroundColor(.clear)
                     
-                    GridRow {
-                        Rectangle()
-                            .frame(width: yAxisLabelWidthOrNil ?? 0.0, height: xAxisLabelHeightOrNil ?? 0.0)
-                            .foregroundColor(.clear)
-                        
-                        xAxisLabelView(withPlot: plot)
-                            .gridCellUnsizedAxes(.horizontal)
-                    }
+                    xAxisLabelView(withPlot: plot)
+                        .gridCellUnsizedAxes(.horizontal)
                 }
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
     }
     
-    @ViewBuilder private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
+    @ViewBuilder
+    private func yAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if yAxisLabelWidthOrNil == nil {
             Rectangle()
                 .foregroundColor(.clear)
@@ -167,7 +172,8 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    @ViewBuilder private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
+    @ViewBuilder
+    private func xAxisLabelView(withPlot plot: SkewtPlot) -> some View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
@@ -190,6 +196,42 @@ struct AnnotatedSkewtPlotView: View {
                     }
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func windBarbView(withPlot plot: SkewtPlot) -> some View {
+        if !store.state.plotOptions.showWindBarbs {
+            EmptyView()
+        } else {
+            Rectangle()
+                .frame(width: windBarbContainerWidth)
+                .foregroundColor(.clear)
+                .overlay {
+                    if let sounding = plot.sounding {
+                        GeometryReader { geometry in
+                            let x = geometry.size.width / 2.0
+                            let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            
+                            ForEach(windData, id: \.self) {
+                                let y = plot.y(forPressure: $0.pressure) * geometry.size.height
+                                
+                                if y >= 0.0 && y <= geometry.size.height {
+                                    WindBarb(
+                                        bearingInDegrees: $0.windDirection!,
+                                        speed: $0.windSpeed!,
+                                        length: windBarbLength,
+                                        tickLength: windBarbLength * 0.3
+                                    )
+                                    .stroke(.red, lineWidth: 1.0)
+                                    .position(x: x, y: y)
+                                }
+                            }
+                        }
+                    } else {
+                        EmptyView()
+                    }
+                }
         }
     }
     

@@ -50,6 +50,10 @@ struct DisplayOptionsView: View {
                     }
                 }
                 
+                Section {
+                    windBarbs
+                }
+                
                 Section("Isopleths") {
                     isotherms
                     isobars
@@ -77,6 +81,31 @@ struct DisplayOptionsView: View {
                 }
             }
             .pickerStyle(.segmented)
+        }
+    }
+    
+    @ViewBuilder
+    private var windBarbs: some View {
+        HStack {
+            Rectangle()
+                .border(.black, width: 1.0)
+                .frame(width: 20.0, height: 20.0)
+                .foregroundColor(.clear)
+                .background {
+                    WindBarb(bearingInDegrees: 45, speed: 75, length: 16.0, tickSpacing: 3.0, tickLength: 5.0)
+                        .stroke(.red, lineWidth: 1.0)
+                        .border(.black, width: 1.0)
+                }
+            
+            Toggle(isOn: Binding<Bool>(get: {
+                store.state.plotOptions.showWindBarbs
+            }, set: { showWindBarbs in
+                withAnimation {
+                    store.dispatch(PlotOptions.Action.setWindBarbs(showWindBarbs))
+                }
+            })) {
+                Text("Wind barbs")
+            }
         }
     }
     
