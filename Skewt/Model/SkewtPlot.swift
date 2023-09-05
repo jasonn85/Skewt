@@ -140,6 +140,18 @@ extension SkewtPlot {
         
         return (pressure: pressure(atY: point.y), temperature: temperature)
     }
+    
+    public func temperatureAndDewPoint(nearestY y: CGFloat) -> (temperature: Double, dewPoint: Double)? {
+        let pressure = pressure(atY: y)
+
+        guard let sounding = sounding,
+              let temperature = sounding.nearestValueToPressure(pressure, valuePath: \.temperature),
+              let dewPoint = sounding.nearestValueToPressure(pressure, valuePath: \.dewPoint) else {
+            return nil
+        }
+        
+        return (temperature, dewPoint)
+    }
 }
 
 // MARK: - Initialization
