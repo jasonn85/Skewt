@@ -361,9 +361,9 @@ extension LevelDataPoint {
 // Value interpolation
 extension Sounding {
     /// Find the nearest double value to a key value via linear interpolation
-    func nearestValueToPressure(
-        _ pressure: Double,
-        valuePath: KeyPath<LevelDataPoint, Double?>
+    func nearestValue(
+        of valuePath: KeyPath<LevelDataPoint, Double?>,
+        toPressure pressure: Double
     ) -> Double? {
         let points = data
             .filter { $0[keyPath: valuePath] != nil }

@@ -334,35 +334,35 @@ class SkewtTests: XCTestCase {
         let sounding = try Sounding(withJustData: Array(points))
         
         XCTAssertEqual(
-            sounding.nearestValueToPressure(temperaturesAndPressures[0].1, valuePath: \.temperature),
+            sounding.nearestValue(of: \.temperature, toPressure: temperaturesAndPressures[0].1),
             points[0].temperature,
             "Nearest value returns exact match if one exists"
         )
         XCTAssertEqual(
-            sounding.nearestValueToPressure(temperaturesAndPressures[4].1, valuePath: \.temperature),
+            sounding.nearestValue(of: \.temperature, toPressure: temperaturesAndPressures[4].1),
             points[4].temperature,
             "Nearest value returns exact match if one exists"
         )
         XCTAssertEqual(
-            sounding.nearestValueToPressure(temperaturesAndPressures[0].1, valuePath: \.dewPoint),
+            sounding.nearestValue(of: \.dewPoint, toPressure: temperaturesAndPressures[0].1),
             points[0].dewPoint,
             "Nearest value returns exact match if one exists"
         )
         
-        let hopefullyFive = sounding.nearestValueToPressure(
-            (temperaturesAndPressures[2].1 + temperaturesAndPressures[3].1) / 2.0,
-            valuePath: \.temperature
+        let hopefullyFive = sounding.nearestValue(
+            of: \.temperature,
+            toPressure: (temperaturesAndPressures[2].1 + temperaturesAndPressures[3].1) / 2.0
         )
         XCTAssertNotNil(hopefullyFive)
         XCTAssertTrue(hopefullyFive! > temperaturesAndPressures[2].0)
         XCTAssertTrue(hopefullyFive! < temperaturesAndPressures[3].0)
         
-        let hopefulyNegativeFifteen = sounding.nearestValueToPressure(
-            (temperaturesAndPressures[0].1 + temperaturesAndPressures[1].1) / 2.0,
-            valuePath: \.temperature
+        let hopefullyNegativeFifteen = sounding.nearestValue(
+            of: \.temperature,
+            toPressure: (temperaturesAndPressures[0].1 + temperaturesAndPressures[1].1) / 2.0
         )
-        XCTAssertNotNil(hopefulyNegativeFifteen)
-        XCTAssertTrue(hopefulyNegativeFifteen! > temperaturesAndPressures[0].0)
-        XCTAssertTrue(hopefulyNegativeFifteen! < temperaturesAndPressures[1].0)
+        XCTAssertNotNil(hopefullyNegativeFifteen)
+        XCTAssertTrue(hopefullyNegativeFifteen! > temperaturesAndPressures[0].0)
+        XCTAssertTrue(hopefullyNegativeFifteen! < temperaturesAndPressures[1].0)
     }
 }
