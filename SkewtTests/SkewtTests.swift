@@ -8,6 +8,25 @@
 import XCTest
 @testable import Skewt
 
+extension Sounding {
+    init(withJustData data: [LevelDataPoint]) throws {
+        self.init(
+            stationInfo: try StationInfo(fromText: "      1  23062  72290  32.78 117.06      9  99999"),
+            type: .op40,
+            timestamp: Date(timeIntervalSince1970: 1693945305),
+            description: "Test data",
+            stationId: "0",
+            windSpeedUnit: .kt,
+            radiosondeCode: nil,
+            cape: nil,
+            cin: nil,
+            helicity: nil,
+            precipitableWater: nil,
+            data: data
+        )
+    }
+}
+
 class SkewtTests: XCTestCase {
     func testNilSentinel() {
         XCTAssertEqual(Int(fromSoundingString: "69"), 69)
@@ -294,5 +313,56 @@ class SkewtTests: XCTestCase {
         let b = "   CAPE    170    CIN      1  Helic  99999     PW  99999".globals()
         XCTAssertEqual(b["CAPE"], 170)
         XCTAssertEqual(b["CIN"], 1)
+    }
+    
+    func testInterpolation() throws {
+        let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0), (0.0, 800.0), (10.0, 700.0), (20.0, 600.0)]
+        let dewPointSpread = 10.0
+        
+        let points = temperaturesAndPressures.map {
+            LevelDataPoint(
+                type: .significantLevel,
+                pressure: $0.1,
+                height: nil,
+                temperature: $0.0,
+                dewPoint: $0.0 - dewPointSpread,
+                windDirection: nil,
+                windSpeed: nil
+            )
+        }
+    
+        let sounding = try Sounding(withJustData: Array(points))
+        
+        XCTAssertEqual(
+            sounding.nearestValueToPressure(temperaturesAndPressures[0].1, valuePath: \.temperature),
+            points[0].temperature,
+            "Nearest value returns exact match if one exists"
+        )
+        XCTAssertEqual(
+            sounding.nearestValueToPressure(temperaturesAndPressures[4].1, valuePath: \.temperature),
+            points[4].temperature,
+            "Nearest value returns exact match if one exists"
+        )
+        XCTAssertEqual(
+            sounding.nearestValueToPressure(temperaturesAndPressures[0].1, valuePath: \.dewPoint),
+            points[0].dewPoint,
+            "Nearest value returns exact match if one exists"
+        )
+        
+        let hopefullyFive = sounding.nearestValueToPressure(
+            (temperaturesAndPressures[2].1 + temperaturesAndPressures[3].1) / 2.0,
+            valuePath: \.temperature
+        )
+        XCTAssertNotNil(hopefullyFive)
+        XCTAssertTrue(hopefullyFive! > temperaturesAndPressures[2].0)
+        XCTAssertTrue(hopefullyFive! < temperaturesAndPressures[3].0)
+        
+        let hopefulyNegativeFifteen = sounding.nearestValueToPressure(
+            (temperaturesAndPressures[0].1 + temperaturesAndPressures[1].1) / 2.0,
+            valuePath: \.temperature
+        )
+        XCTAssertNotNil(hopefulyNegativeFifteen)
+        XCTAssertTrue(hopefulyNegativeFifteen! > temperaturesAndPressures[0].0)
+        XCTAssertTrue(hopefulyNegativeFifteen! < temperaturesAndPressures[1].0)
     }
 }
