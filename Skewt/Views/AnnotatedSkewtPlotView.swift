@@ -10,6 +10,11 @@ import SwiftUI
 struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
+    /// Current point of interest in 0.0...1.0
+    @State var annotationPoint: CGPoint? = nil
+    
+    private let temperatureTickLength: CGFloat = 10.0
+        
     private let windBarbContainerWidth: CGFloat = 20.0
     private let windBarbLength: CGFloat = 20.0
     
@@ -117,17 +122,32 @@ struct AnnotatedSkewtPlotView: View {
                     yAxisLabelView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
                     
-                    SkewtPlotView(plot: plot)
-                        .environmentObject(store)
-                        .aspectRatio(1.0, contentMode: .fit)
-                        .border(.black)
-                        .background {
-                            LinearGradient(
-                                colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                startPoint: .bottom,
-                                endPoint: .top
+                    GeometryReader { geometry in
+                        ZStack {
+                            SkewtPlotView(plot: plot)
+                                .environmentObject(store)
+                                .aspectRatio(1.0, contentMode: .fit)
+                                .border(.black)
+                                .background {
+                                    LinearGradient(
+                                        colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
+                                }
+                                .gesture(
+                                    DragGesture(minimumDistance: 0.0)
+                                        .onChanged {
+                                            updateAnnotationPoint($0.location, geometryProxy: geometry)
+                                        }
+                                )
+                            
+                            annotations(
+                                inBounds: CGRect(x: 0.0, y: 0.0, width: geometry.size.width, height: geometry.size.height),
+                                fromPlot: plot
                             )
                         }
+                    }
                     
                     windBarbView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
@@ -144,6 +164,57 @@ struct AnnotatedSkewtPlotView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
+    }
+    
+    @ViewBuilder
+    private func annotations(inBounds bounds: CGRect, fromPlot plot: SkewtPlot) -> some View {
+        if let annotationPoint = annotationPoint,
+            let tempAndDewPoint = plot.temperatureAndDewPoint(nearestY: annotationPoint.y) {
+            
+            let pressure = plot.pressure(atY: annotationPoint.y)
+            let temperaturePoint = plot.point(pressure: pressure, temperature: tempAndDewPoint.temperature)
+            let dewPointPoint = plot.point(pressure: pressure, temperature: tempAndDewPoint.dewPoint)
+            
+            let style = store.state.plotOptions.plotStyling
+            
+            temperatureTick(
+                atNormalizedPoint: temperaturePoint,
+                inRect: bounds,
+                style: style.lineStyle(forType: .temperature)
+            )
+            
+            temperatureTick(
+                atNormalizedPoint: dewPointPoint,
+                inRect: bounds,
+                style: style.lineStyle(forType: .dewPoint)
+            )
+        } else {
+            EmptyView()
+        }
+    }
+    
+    private func updateAnnotationPoint(_ point: CGPoint, geometryProxy geometry: GeometryProxy) {
+        annotationPoint = CGPoint(
+            x: point.x / geometry.size.width,
+            y: point.y / geometry.size.height
+        )
+    }
+    
+    @ViewBuilder
+    private func temperatureTick(atNormalizedPoint normalizedPoint: CGPoint,
+                                 inRect rect: CGRect,
+                                 style: PlotOptions.PlotStyling.LineStyle) -> some View {
+        let halfLength = temperatureTickLength / 2.0
+        let point = CGPoint(
+            x: normalizedPoint.x * rect.size.width + rect.origin.x,
+            y: normalizedPoint.y * rect.size.height + rect.origin.y
+        )
+        
+        Path() { path in
+            path.move(to: CGPoint(x: point.x - halfLength, y: point.y))
+            path.addLine(to: CGPoint(x: point.x + halfLength, y: point.y))
+        }
+        .applyLineStyle(style)
     }
     
     @ViewBuilder
