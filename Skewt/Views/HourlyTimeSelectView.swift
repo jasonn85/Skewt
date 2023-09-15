@@ -35,7 +35,11 @@ struct HourlyTimeSelectView: View {
                 Text("Time")
             }
             
-            let absoluteString = formatter.string(from: Date.nearestHour(withIntervalFromNow: value))
+            let date = Date.nearestHour(
+                withIntervalFromNow: value,
+                hoursPerInterval: Int(stepSize / (60.0 * 60.0))
+            )
+            let absoluteString = formatter.string(from: date)
             let relativeString = relativeFormatter.localizedString(fromTimeInterval: value)
             
             Text("\(absoluteString) (\(relativeString))")
@@ -48,24 +52,6 @@ struct HourlyTimeSelectView: View {
 extension TimeInterval {
     static func hours(_ hours: Int) -> TimeInterval {
         Double(hours) * 60.0 * 60.0
-    }
-}
-
-extension Date {
-    static func nearestHour(withIntervalFromNow interval: TimeInterval) -> Date {
-        let exactDate = Date(timeIntervalSinceNow: interval)
-        
-        var hourBeforeComponents = Calendar.current.dateComponents(in: .current, from: exactDate)
-        hourBeforeComponents.minute = 0
-        hourBeforeComponents.second = 0
-        hourBeforeComponents.nanosecond = 0
-        let hourBefore = hourBeforeComponents.date!
-        let hourAfter = hourBefore.addingTimeInterval(60.0 * 60.0)
-        
-        let timeSinceHourBefore = exactDate.timeIntervalSince(hourBefore)
-        let timeToNextHour = hourAfter.timeIntervalSince(exactDate)
-        
-        return timeSinceHourBefore <= timeToNextHour ? hourBefore : hourAfter
     }
 }
 

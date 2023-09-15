@@ -77,6 +77,21 @@ extension SoundingSelection: CustomStringConvertible {
     }
 }
 
+extension SoundingSelection.ModelType {
+    var hourInterval: Int {
+        switch self {
+        case .op40:
+            return 1
+//        case .nam:
+//            return 3
+//        case .gfs:
+//            return 3
+        case .raob:
+            return 12
+        }
+    }
+}
+
 // Reducer
 extension SoundingSelection {
     static let reducer: Reducer<Self> = { state, action in
