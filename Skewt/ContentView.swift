@@ -165,7 +165,8 @@ struct ContentView: View {
         case .op40:
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.timeInterval,
-                range: .hours(-24)...TimeInterval.hours(24)
+                range: .hours(-24)...TimeInterval.hours(24),
+                stepSize: .hours(store.state.currentSoundingState.selection.type.hourInterval)
             )
         case .raob:
             SoundingTimeSelectView(value: $timeSelectDebouncer.timeInterval)

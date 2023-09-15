@@ -35,7 +35,11 @@ struct HourlyTimeSelectView: View {
                 Text("Time")
             }
             
-            let absoluteString = formatter.string(from: Date(timeIntervalSinceNow: value))
+            let date = Date.nearestHour(
+                withIntervalFromNow: value,
+                hoursPerInterval: Int(stepSize / (60.0 * 60.0))
+            )
+            let absoluteString = formatter.string(from: date)
             let relativeString = relativeFormatter.localizedString(fromTimeInterval: value)
             
             Text("\(absoluteString) (\(relativeString))")
