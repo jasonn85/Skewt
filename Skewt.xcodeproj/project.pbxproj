@@ -46,6 +46,7 @@
 		96A8F60D299DAC680021A170 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* Sounding.swift */; };
 		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
 		96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */; };
+		96B46FEF2AB4EA01008AA3A1 /* HourlyTimeSelectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FEE2AB4EA01008AA3A1 /* HourlyTimeSelectTests.swift */; };
 		96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */; };
 		96D30F302A83581200986E7E /* WindBarb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D30F2F2A83581200986E7E /* WindBarb.swift */; };
 		96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */; };
@@ -126,6 +127,7 @@
 		96A8F60C299DAC680021A170 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
 		96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucApiMiddlewareTests.swift; sourceTree = "<group>"; };
+		96B46FEE2AB4EA01008AA3A1 /* HourlyTimeSelectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTimeSelectTests.swift; sourceTree = "<group>"; };
 		96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionView.swift; sourceTree = "<group>"; };
 		96D30F2F2A83581200986E7E /* WindBarb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindBarb.swift; sourceTree = "<group>"; };
 		96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotatedSkewtPlotView.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 		96A8F5F2299DAC3F0021A170 /* SkewtTests */ = {
 			isa = PBXGroup;
 			children = (
+				96B46FEE2AB4EA01008AA3A1 /* HourlyTimeSelectTests.swift */,
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
 				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
 				969117912A29178900A5C72D /* PlotStylingTests.swift */,
@@ -505,6 +508,7 @@
 				96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */,
 				967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */,
 				96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */,
+				96B46FEF2AB4EA01008AA3A1 /* HourlyTimeSelectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
