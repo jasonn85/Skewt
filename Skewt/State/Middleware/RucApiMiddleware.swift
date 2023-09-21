@@ -170,6 +170,9 @@ extension SoundingRequest {
             case .raob:
                 startTime = timeInterval.closestSoundingTime()
             }
+        case .numberOfSoundingsAgo(let pastSoundingIndex):
+            startTime = Date.mostRecentSoundingTime()
+                .addingTimeInterval(-TimeInterval((pastSoundingIndex - 1) * selection.type.hourInterval))
         case .specific(let date):
             startTime = date
         }

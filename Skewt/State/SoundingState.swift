@@ -33,6 +33,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Time: Codable, Hashable, Identifiable {
         case now
         case relative(TimeInterval)
+        case numberOfSoundingsAgo(Int)  // .numberOfSoundingsAgo(1) is equivalent to .now
         case specific(Date)
         
         var id: Self { self }
