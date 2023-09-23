@@ -171,8 +171,10 @@ extension SoundingRequest {
                 startTime = timeInterval.closestSoundingTime()
             }
         case .numberOfSoundingsAgo(let pastSoundingIndex):
-            startTime = Date.mostRecentSoundingTime()
-                .addingTimeInterval(-TimeInterval((pastSoundingIndex - 1) * selection.type.hourInterval))
+            startTime = Date.mostRecentSoundingTimes(
+                count: pastSoundingIndex,
+                soundingIntervalInHours: selection.type.hourInterval
+            )[pastSoundingIndex - 1]
         case .specific(let date):
             startTime = date
         }
@@ -182,18 +184,34 @@ extension SoundingRequest {
 }
 
 extension Date {
-    static func mostRecentSoundingTime(toDate referenceDate: Date = .now) -> Date {
+    static func mostRecentSoundingTime(toDate referenceDate: Date = .now, soundingIntervalInHours: Int = 12) -> Date {
+        mostRecentSoundingTimes(toDate: referenceDate, soundingIntervalInHours: soundingIntervalInHours).first!
+    }
+
+    static func mostRecentSoundingTimes(toDate referenceDate: Date = .now,
+                                        count: Int = 1,
+                                        soundingIntervalInHours: Int = 12) -> [Date] {
         let calendar = Calendar(identifier: .gregorian)
         let nowComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
-        let soundingPeriodInHours = 12.0
         
         var mostRecentSoundingComponents = nowComponents
-        mostRecentSoundingComponents.hour = Int(floor(Double(nowComponents.hour!) / soundingPeriodInHours) * soundingPeriodInHours)
+        mostRecentSoundingComponents.hour = Int(
+            floor(Double(nowComponents.hour!) / Double(soundingIntervalInHours))
+            * Double(soundingIntervalInHours)
+        )
         mostRecentSoundingComponents.minute = 0
         mostRecentSoundingComponents.second = 0
         mostRecentSoundingComponents.nanosecond = 0
         
-        return calendar.date(from: mostRecentSoundingComponents)!
+        var result = [calendar.date(from: mostRecentSoundingComponents)!]
+        
+        for i in 1..<count {
+            var components = mostRecentSoundingComponents
+            components.hour! -= (i * soundingIntervalInHours)
+            result.append(calendar.date(from: components)!)
+        }
+        
+        return result
     }
 }
 
