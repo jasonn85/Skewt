@@ -100,49 +100,4 @@ final class RucApiMiddlewareTests: XCTestCase {
             XCTFail("Generating a request location for closest should return an active station by name")
         }
     }
-    
-    func testSoundingIntervalRounding() {
-        let calendar = Calendar(identifier: .gregorian)
-        let testEpoch = Date.init(timeIntervalSince1970: 1690398791)  // 26 Jul 2023 19:13:11 GMT
-        let testEpochComponents = calendar.dateComponents(in: .gmt, from: testEpoch)
-        
-        var noonTodayComponents = testEpochComponents
-        noonTodayComponents.hour = 12
-        noonTodayComponents.minute = 0
-        noonTodayComponents.second = 0
-        let noonToday = calendar.date(from: noonTodayComponents)!
-        
-        var midnightTodayComponents = noonTodayComponents
-        midnightTodayComponents.hour = 0
-        let midnightToday = calendar.date(from: midnightTodayComponents)!
-        
-        var noonYesterdayComponents = noonTodayComponents
-        noonYesterdayComponents.day! -= 1
-        let noonYesterday = calendar.date(from: noonYesterdayComponents)!
-        
-        var hourBeforeMidnightTodayComponents = midnightTodayComponents
-        hourBeforeMidnightTodayComponents.hour = 23
-        hourBeforeMidnightTodayComponents.day! -= 1
-        let hourBeforeMidnightToday = calendar.date(from: hourBeforeMidnightTodayComponents)!
-        
-        var hourAfterNoonYesterdayComponents = noonYesterdayComponents
-        hourAfterNoonYesterdayComponents.hour = 13
-        let hourAfterNoonYesterday = calendar.date(from: hourAfterNoonYesterdayComponents)!
-
-        XCTAssertEqual(TimeInterval(0).closestSoundingTime(withCurrentDate: testEpoch),
-                       noonToday,
-                       "Closest sounding date from ~19 GMT is 12:00 GMT today")
-        XCTAssertEqual(TimeInterval(.twentyFourHours).closestSoundingTime(withCurrentDate: testEpoch),
-                       noonToday,
-                       "Closest sounding for tomorrow is also 12:00 GMT today")
-        XCTAssertEqual(noonYesterday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
-                       noonYesterday,
-                       "Closest sounding for noon yesterday is noon yesterday")
-        XCTAssertEqual(hourBeforeMidnightToday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
-                       midnightToday,
-                       "Hour before midnight rounds to midnight")
-        XCTAssertEqual(hourAfterNoonYesterday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
-                       noonYesterday,
-                       "Hour after noon rounds to noon")
-    }
 }

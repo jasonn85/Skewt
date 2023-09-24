@@ -74,4 +74,103 @@ final class ClosestTimeTests: XCTestCase {
         XCTAssertEqual(Date.nearestHour(withIntervalFromNow: twoAm.timeIntervalSinceNow, hoursPerInterval: interval), threeAm)
         XCTAssertEqual(Date.nearestHour(withIntervalFromNow: fourAm.timeIntervalSinceNow, hoursPerInterval: interval), threeAm)
     }
+    
+    func testSoundingIntervalRounding() {
+        let calendar = Calendar(identifier: .gregorian)
+        let testEpoch = Date.init(timeIntervalSince1970: 1690398791)  // 26 Jul 2023 19:13:11 GMT
+        let testEpochComponents = calendar.dateComponents(in: .gmt, from: testEpoch)
+        
+        var noonTodayComponents = testEpochComponents
+        noonTodayComponents.hour = 12
+        noonTodayComponents.minute = 0
+        noonTodayComponents.second = 0
+        let noonToday = calendar.date(from: noonTodayComponents)!
+        
+        var midnightTodayComponents = noonTodayComponents
+        midnightTodayComponents.hour = 0
+        let midnightToday = calendar.date(from: midnightTodayComponents)!
+        
+        var noonYesterdayComponents = noonTodayComponents
+        noonYesterdayComponents.day! -= 1
+        let noonYesterday = calendar.date(from: noonYesterdayComponents)!
+        
+        var hourBeforeMidnightTodayComponents = midnightTodayComponents
+        hourBeforeMidnightTodayComponents.hour = 23
+        hourBeforeMidnightTodayComponents.day! -= 1
+        let hourBeforeMidnightToday = calendar.date(from: hourBeforeMidnightTodayComponents)!
+        
+        var hourAfterNoonYesterdayComponents = noonYesterdayComponents
+        hourAfterNoonYesterdayComponents.hour = 13
+        let hourAfterNoonYesterday = calendar.date(from: hourAfterNoonYesterdayComponents)!
+
+        XCTAssertEqual(TimeInterval(0).closestSoundingTime(withCurrentDate: testEpoch),
+                       noonToday,
+                       "Closest sounding date from ~19 GMT is 12:00 GMT today")
+        XCTAssertEqual(TimeInterval(.twentyFourHours).closestSoundingTime(withCurrentDate: testEpoch),
+                       noonToday,
+                       "Closest sounding for tomorrow is also 12:00 GMT today")
+        XCTAssertEqual(noonYesterday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
+                       noonYesterday,
+                       "Closest sounding for noon yesterday is noon yesterday")
+        XCTAssertEqual(hourBeforeMidnightToday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
+                       midnightToday,
+                       "Hour before midnight rounds to midnight")
+        XCTAssertEqual(hourAfterNoonYesterday.timeIntervalSince(testEpoch).closestSoundingTime(withCurrentDate: testEpoch),
+                       noonYesterday,
+                       "Hour after noon rounds to noon")
+    }
+    
+    func testArbitrarySoundingInterval() {
+        let calendar = Calendar(identifier: .gregorian)
+        let testEpoch = Date.init(timeIntervalSince1970: 1690398791)  // 26 Jul 2023 19:13:11 GMT
+        
+        var components = calendar.dateComponents(in: .gmt, from: testEpoch)
+        components.minute = 0
+        components.second = 0
+        components.nanosecond = 0
+        
+        var mostRecentSixHourComponents = components
+        mostRecentSixHourComponents.hour = 18
+        let mostRecentSixHour = calendar.date(from: mostRecentSixHourComponents)
+        
+        XCTAssertEqual(
+            Date.mostRecentSoundingTime(toDate: testEpoch, soundingIntervalInHours: 18),
+            mostRecentSixHour,
+            "Most recent six hour sounding time to 1913Z is 1800ZZ"
+        )
+        
+        var mostRecentDailyComponents = components
+        mostRecentDailyComponents.hour = 0
+        let mostRecentDaily = calendar.date(from: mostRecentDailyComponents)
+        
+        XCTAssertEqual(
+            Date.mostRecentSoundingTime(toDate: testEpoch, soundingIntervalInHours: 24),
+            mostRecentDaily,
+            "Most recent daily sounding time to 1913Z is 0000Z"
+        )
+    }
+    
+    func testSoundingTimeList() {
+        let calendar = Calendar(identifier: .gregorian)
+        let testEpoch = Date.init(timeIntervalSince1970: 1690398791)  // 26 Jul 2023 19:13:11 GMT
+        let hourInterval = 12
+        
+        var expectedMostRecentSoundingComponents = calendar.dateComponents(in: .gmt, from: testEpoch)
+        expectedMostRecentSoundingComponents.hour = 12
+        expectedMostRecentSoundingComponents.minute = 0
+        expectedMostRecentSoundingComponents.second = 0
+        expectedMostRecentSoundingComponents.nanosecond = 0
+        let expectedMostRecentSounding = calendar.date(from: expectedMostRecentSoundingComponents)
+        
+        XCTAssertEqual(Date.mostRecentSoundingTime(toDate: testEpoch, soundingIntervalInHours: hourInterval), expectedMostRecentSounding)
+        
+        let tenMostRecent = Date.mostRecentSoundingTimes(toDate: testEpoch, count: 10, soundingIntervalInHours: hourInterval)
+        
+        XCTAssertEqual(tenMostRecent.count, 10)
+        
+        for i in 1..<10 {
+            let interval = tenMostRecent[i].timeIntervalSince(tenMostRecent[i-1])
+            XCTAssertEqual(interval, TimeInterval(-Double(hourInterval) * 60.0 * 60.0))
+        }
+    }
 }
