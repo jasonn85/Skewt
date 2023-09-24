@@ -24,9 +24,6 @@ struct SoundingTimeSelectView: View, Equatable {
     
     init(value: Binding<SoundingSelection.Time>, hourInterval: Int = SoundingSelection.ModelType.raob.hourInterval, date: Date = .now) {
         _value = value
-        self.hourInterval = 12
-        self.date = .now
-        
         self.hourInterval = hourInterval
         self.date = date
 
