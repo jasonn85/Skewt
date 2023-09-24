@@ -73,11 +73,6 @@ extension TimeInterval {
         targetTimeComponents.hour = Int(((Double(targetTimeComponents.hour!) / soundingPeriodInHours).rounded())
                                         * soundingPeriodInHours)
         
-        if targetTimeComponents.hour! == 24 {
-            targetTimeComponents.hour = 0
-            targetTimeComponents.day! += 1
-        }
-        
         targetTimeComponents.minute = 0
         targetTimeComponents.second = 0
         targetTimeComponents.nanosecond = 0
