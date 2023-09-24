@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HourlyTimeSelectView: View {
-    @Binding var value: TimeInterval
+    @Binding var value: SoundingSelection.Time
     @State var range: ClosedRange<TimeInterval>
     @State var stepSize: TimeInterval = .hours(1)
     
@@ -28,20 +28,49 @@ struct HourlyTimeSelectView: View {
     var body: some View {
         VStack {
             Slider(
-                value: $value,
+                value: Binding<TimeInterval>(
+                    get: {
+                        switch value {
+                        case .relative(let interval):
+                            return interval
+                        default:
+                            return 0.0
+                        }
+                    },
+                    set: { value = $0 == 0.0 ? .now : .relative($0) }
+                ),
                 in: range,
                 step: stepSize
             ) {
                 Text("Time")
             }
             
-            let absoluteString = formatter.string(from: Date(timeIntervalSinceNow: value))
-            let relativeString = relativeFormatter.localizedString(fromTimeInterval: value)
+            let date = Date.nearestHour(
+                withIntervalFromNow: value.asInterval,
+                hoursPerInterval: Int(stepSize / (60.0 * 60.0))
+            )
+            let absoluteString = formatter.string(from: date)
+            let relativeString = relativeFormatter.localizedString(fromTimeInterval: value.asInterval)
             
             Text("\(absoluteString) (\(relativeString))")
                 .font(.footnote)
         }
         .scenePadding(.horizontal)
+    }
+}
+
+extension SoundingSelection.Time {
+    public var asInterval: TimeInterval {
+        switch self {
+        case .now:
+            return 0.0
+        case .relative(let interval):
+            return interval
+        case .specific(let date):
+            return Date.now.timeIntervalSince(date)
+        case .numberOfSoundingsAgo(_):
+            return 0.0
+        }
     }
 }
 
@@ -53,10 +82,10 @@ extension TimeInterval {
 
 struct TimeSelectView_Previews: PreviewProvider {
     static var previews: some View {
-        var time = TimeInterval(0)
+        var time = SoundingSelection.Time.now
 
         HourlyTimeSelectView(
-            value: Binding<TimeInterval>(get: { time }, set: { time = $0 }),
+            value: Binding<SoundingSelection.Time>(get: { time }, set: { time = $0 }),
             range: .hours(-24)...TimeInterval.hours(24)
         )
     }

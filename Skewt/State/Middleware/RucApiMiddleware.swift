@@ -170,54 +170,15 @@ extension SoundingRequest {
             case .raob:
                 startTime = timeInterval.closestSoundingTime()
             }
+        case .numberOfSoundingsAgo(let pastSoundingIndex):
+            startTime = Date.mostRecentSoundingTimes(
+                count: pastSoundingIndex,
+                soundingIntervalInHours: selection.type.hourInterval
+            )[pastSoundingIndex - 1]
         case .specific(let date):
             startTime = date
         }
         
         self.init(location: location, modelName: modelType, startTime: startTime, endTime: endTime)
-    }
-}
-
-extension Date {
-    static func mostRecentSoundingTime(toDate referenceDate: Date = .now) -> Date {
-        let calendar = Calendar(identifier: .gregorian)
-        let nowComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
-        let soundingPeriodInHours = 12.0
-        
-        var mostRecentSoundingComponents = nowComponents
-        mostRecentSoundingComponents.hour = Int(floor(Double(nowComponents.hour!) / soundingPeriodInHours) * soundingPeriodInHours)
-        mostRecentSoundingComponents.minute = 0
-        mostRecentSoundingComponents.second = 0
-        mostRecentSoundingComponents.nanosecond = 0
-        
-        return calendar.date(from: mostRecentSoundingComponents)!
-    }
-}
-
-extension TimeInterval {
-    func closestSoundingTime(withCurrentDate currentDate: Date = .now) -> Date {
-        let targetTime = Date(timeInterval: self, since: currentDate)
-        let soundingPeriodInHours = 12.0
-        let calendar = Calendar(identifier: .gregorian)
-        let mostRecentSounding = Date.mostRecentSoundingTime(toDate: currentDate)
-        
-        if targetTime.timeIntervalSince(mostRecentSounding) > 0.0 {
-            return mostRecentSounding
-        }
-        
-        var targetTimeComponents = calendar.dateComponents(in: .gmt, from: targetTime)
-        targetTimeComponents.hour = Int(((Double(targetTimeComponents.hour!) / soundingPeriodInHours).rounded())
-                                        * soundingPeriodInHours)
-        
-        if targetTimeComponents.hour! == 24 {
-            targetTimeComponents.hour = 0
-            targetTimeComponents.day! += 1
-        }
-        
-        targetTimeComponents.minute = 0
-        targetTimeComponents.second = 0
-        targetTimeComponents.nanosecond = 0
-        
-        return calendar.date(from: targetTimeComponents)!
     }
 }
