@@ -27,7 +27,7 @@ struct SoundingTimeSelectView: View, Equatable {
         self.hourInterval = hourInterval
         self.date = date
 
-        let soundingInterval = TimeInterval(Double(hourInterval) * 60.0 * 60.0)  // 12 hours
+        let soundingInterval = TimeInterval(Double(hourInterval) * 60.0 * 60.0)
         let startDate = Date(timeIntervalSinceNow: -Double(daysRange) * 24.0 * 60.0 * 60.0)
         let mostRecentDate = Date.mostRecentSoundingTime()
 
