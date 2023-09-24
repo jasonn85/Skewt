@@ -9,16 +9,16 @@ import SwiftUI
 import Combine
 
 class TimeSelectDebouncer: ObservableObject {
-    @Published var timeInterval: TimeInterval = 0.0
+    @Published var time = SoundingSelection.Time.now
     private var debouncer: AnyCancellable?
     var store: Store<SkewtState>? = nil
     
     init() {
-        debouncer = $timeInterval
+        debouncer = $time
             .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink(receiveValue: { [weak self] in
-                self?.store?.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime(.relative($0))))
+                self?.store?.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime($0)))
             })
     }
 }
@@ -164,12 +164,15 @@ struct ContentView: View {
         switch store.state.currentSoundingState.selection.type {
         case .op40:
             HourlyTimeSelectView(
-                value: $timeSelectDebouncer.timeInterval,
+                value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(store.state.currentSoundingState.selection.type.hourInterval)
+                stepSize: .hours(SoundingSelection.ModelType.op40.hourInterval)
             )
         case .raob:
-            SoundingTimeSelectView(value: $timeSelectDebouncer.timeInterval)
+            SoundingTimeSelectView(
+                value: $timeSelectDebouncer.time,
+                hourInterval: SoundingSelection.ModelType.raob.hourInterval
+            )
         }
     }
     
@@ -201,19 +204,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environmentObject(Store<SkewtState>.previewStore)
-    }
-}
-
-extension SoundingSelection.Time {
-    var asTimeInterval: TimeInterval {
-        switch self {
-        case .now:
-            return 0
-        case .relative(let interval):
-            return interval
-        case .specific(let date):
-            return date.timeIntervalSinceNow
-        }
     }
 }
 
