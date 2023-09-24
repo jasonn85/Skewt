@@ -28,11 +28,11 @@ extension Date {
 
 extension Date {
     static func mostRecentSoundingTime(toDate referenceDate: Date = .now, soundingIntervalInHours: Int = 12) -> Date {
-        mostRecentSoundingTimes(toDate: referenceDate, soundingIntervalInHours: soundingIntervalInHours).first!
+        mostRecentSoundingTimes(toDate: referenceDate, count: 1, soundingIntervalInHours: soundingIntervalInHours).first!
     }
 
     static func mostRecentSoundingTimes(toDate referenceDate: Date = .now,
-                                        count: Int = 1,
+                                        count: Int = 10,
                                         soundingIntervalInHours: Int = 12) -> [Date] {
         let calendar = Calendar(identifier: .gregorian)
         let nowComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
