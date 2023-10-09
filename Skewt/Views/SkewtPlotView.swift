@@ -111,6 +111,8 @@ struct SkewtPlotView: View {
     }
 }
 
+extension CGPath: @unchecked Sendable { }
+
 struct PlottedPath: Shape {
     let path: CGPath
     
