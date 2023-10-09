@@ -145,8 +145,8 @@ extension SkewtPlot {
         let pressure = pressure(atY: y)
 
         guard let sounding = sounding,
-              let temperature = sounding.nearestValue(of: \.temperature, toPressure: pressure),
-              let dewPoint = sounding.nearestValue(of: \.dewPoint, toPressure: pressure) else {
+              let temperature = sounding.interpolatedValue(for: \.temperature, atPressure: pressure),
+              let dewPoint = sounding.interpolatedValue(for: \.dewPoint, atPressure: pressure) else {
             return nil
         }
         
