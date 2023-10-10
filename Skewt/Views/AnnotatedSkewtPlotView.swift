@@ -18,22 +18,34 @@ struct AnnotatedSkewtPlotView: View {
     private let windBarbContainerWidth: CGFloat = 20.0
     private let windBarbLength: CGFloat = 20.0
     
-    private var altitudeFormatter: NumberFormatter {
+    private var shortenedAltitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.multiplier = 0.001
         return formatter
     }
     
-    private var pressureFormatter: NumberFormatter {
+    private var fullAltitudeFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }
+    
+    private var pressureAxisLabelFormatter: NumberFormatter {
         return NumberFormatter()
     }
     
-    private var isobarFormatter: NumberFormatter {
+    private var temperatureFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }
+    
+    private var isobarAxisLabelFormatter: NumberFormatter {
         switch store.state.plotOptions.isobarTypes {
         case .none, .altitude:
-            return altitudeFormatter
+            return shortenedAltitudeFormatter
         case .pressure:
-            return pressureFormatter
+            return pressureAxisLabelFormatter
         }
     }
     
@@ -68,7 +80,7 @@ struct AnnotatedSkewtPlotView: View {
             return nil
         }
         
-        let formatter = isobarFormatter
+        let formatter = isobarAxisLabelFormatter
         let sampleAltitudes = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                30_000.0, 40_000.0]
         let samplePressures = [0.0, 1050.0, 9999.0, 8888.0]
@@ -170,10 +182,10 @@ struct AnnotatedSkewtPlotView: View {
     @ViewBuilder
     private func annotations(inBounds bounds: CGRect, fromPlot plot: SkewtPlot) -> some View {
         if let annotationPoint = annotationPoint,
-            let (temperaturePoint, dewPointPoint) = plot.closestTemperatureAndDewPointData(toY: annotationPoint.y) {
+            let (temperatureData, dewPointData) = plot.closestTemperatureAndDewPointData(toY: annotationPoint.y) {
             
-            let temperaturePoint = plot.point(pressure: temperaturePoint.pressure, temperature: temperaturePoint.temperature!)
-            let dewPointPoint = plot.point(pressure: dewPointPoint.pressure, temperature: dewPointPoint.dewPoint!)
+            let temperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
+            let dewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
             
             let style = store.state.plotOptions.plotStyling
             
@@ -188,8 +200,54 @@ struct AnnotatedSkewtPlotView: View {
                 inRect: bounds,
                 style: style.lineStyle(forType: .dewPoint)
             )
+            
+            let leftRoom = dewPointPoint.x * bounds.size.width
+            let rightRoom = (1.0 - temperaturePoint.x) * bounds.size.width
+            
+            Group {
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .frame(width: leftRoom, height: 20)
+                    .padding(.horizontal, -10)
+                    .overlay {
+                        HStack {
+                            Text(altitudeDetailText(temperatureData))
+                                .padding(2)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .foregroundColor(.white.opacity(0.75))
+                                }
+                            
+                            
+                            Spacer()
+                            Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
+                        }
+                    }
+                    .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
+                
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .frame(width: rightRoom, height: 20)
+                    .padding(.horizontal, -10)
+                    .overlay(alignment: .leading) {
+                        Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
+                    }
+                    .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
+            }
+            .font(Font(axisLabelFont))
+            
         } else {
             EmptyView()
+        }
+    }
+    
+    private func altitudeDetailText(_ dataPoint: LevelDataPoint) -> String {
+        switch store.state.plotOptions.isobarTypes {
+        case .altitude, .none:
+            return fullAltitudeFormatter.string(from: dataPoint.altitudeInFeet as NSNumber)! + "'"
+            
+        case .pressure:
+            return isobarAxisLabelFormatter.string(from: dataPoint.pressure as NSNumber)! + "mb"
         }
     }
     
@@ -229,7 +287,7 @@ struct AnnotatedSkewtPlotView: View {
                     let isobars = isobars(withPlot: plot)
                     
                     ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                        Text(isobarFormatter.string(from: key as NSNumber) ?? "")
+                        Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
                             .font(Font(leftAxisLabelFont))
                             .lineLimit(1)
                             .foregroundColor(isobarColor)

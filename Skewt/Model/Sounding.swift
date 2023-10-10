@@ -49,7 +49,7 @@ enum SoundingType: String, Codable, CaseIterable {
 struct LevelDataPoint: Codable, Hashable {
     let type: DataPointType
     let pressure: Double
-    let height: Int?
+    let height: Int?  // height in m
     let temperature: Double?
     let dewPoint: Double?
     let windDirection: Int?
@@ -355,6 +355,14 @@ extension LevelDataPoint {
         self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths()
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
+    }
+}
+
+extension LevelDataPoint {
+    var altitudeInFeet: Int {
+        let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
+        
+        return Int(Double(altitudeInM) * 3.28084)
     }
 }
 
