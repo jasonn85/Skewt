@@ -365,8 +365,7 @@ extension Sounding {
         for valuePath: KeyPath<LevelDataPoint, Double?>,
         atPressure pressure: Double
     ) -> Double? {
-        let points = data
-            .filter { $0[keyPath: valuePath] != nil }
+        let points = data.filter { $0[keyPath: valuePath] != nil }
         
         guard points.count > 0 else {
             return nil
@@ -388,5 +387,15 @@ extension Sounding {
         }
         
         return (below.last![keyPath: valuePath]! + above.first![keyPath: valuePath]!) / 2.0
+    }
+    
+    func closestValue(toPressure pressure: Double, withValueFor valuePath: KeyPath<LevelDataPoint, Double?>) -> LevelDataPoint? {
+        let points = data.filter { $0[keyPath: valuePath] != nil }
+        
+        guard points.count > 0 else {
+            return nil
+        }
+        
+        return points.reduce(points[0]) { abs($1.pressure - pressure) < abs($0.pressure - pressure) ? $1 : $0 }
     }
 }

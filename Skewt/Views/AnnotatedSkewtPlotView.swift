@@ -146,6 +146,7 @@ struct AnnotatedSkewtPlotView: View {
                                 inBounds: CGRect(x: 0.0, y: 0.0, width: geometry.size.width, height: geometry.size.height),
                                 fromPlot: plot
                             )
+                            .clipped()
                         }
                     }
                     
@@ -169,11 +170,10 @@ struct AnnotatedSkewtPlotView: View {
     @ViewBuilder
     private func annotations(inBounds bounds: CGRect, fromPlot plot: SkewtPlot) -> some View {
         if let annotationPoint = annotationPoint,
-            let tempAndDewPoint = plot.temperatureAndDewPoint(nearestY: annotationPoint.y) {
+            let (temperaturePoint, dewPointPoint) = plot.closestTemperatureAndDewPointData(toY: annotationPoint.y) {
             
-            let pressure = plot.pressure(atY: annotationPoint.y)
-            let temperaturePoint = plot.point(pressure: pressure, temperature: tempAndDewPoint.temperature)
-            let dewPointPoint = plot.point(pressure: pressure, temperature: tempAndDewPoint.dewPoint)
+            let temperaturePoint = plot.point(pressure: temperaturePoint.pressure, temperature: temperaturePoint.temperature!)
+            let dewPointPoint = plot.point(pressure: dewPointPoint.pressure, temperature: dewPointPoint.dewPoint!)
             
             let style = store.state.plotOptions.plotStyling
             
