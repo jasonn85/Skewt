@@ -49,7 +49,7 @@ enum SoundingType: String, Codable, CaseIterable {
 struct LevelDataPoint: Codable, Hashable {
     let type: DataPointType
     let pressure: Double
-    let height: Int?
+    let height: Int?  // height in m
     let temperature: Double?
     let dewPoint: Double?
     let windDirection: Int?
@@ -355,5 +355,55 @@ extension LevelDataPoint {
         self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths()
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
+    }
+}
+
+extension LevelDataPoint {
+    var altitudeInFeet: Int {
+        let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
+        
+        return Int(Double(altitudeInM) * 3.28084)
+    }
+}
+
+// Value interpolation
+extension Sounding {
+    /// Find the nearest double value to a key value via linear interpolation
+    func interpolatedValue(
+        for valuePath: KeyPath<LevelDataPoint, Double?>,
+        atPressure pressure: Double
+    ) -> Double? {
+        let points = data.filter { $0[keyPath: valuePath] != nil }
+        
+        guard points.count > 0 else {
+            return nil
+        }
+        
+        if let exactMatch = points.first(where: { $0.pressure == pressure }) {
+            return exactMatch[keyPath: valuePath]
+        }
+        
+        let below = points.filter { $0.pressure > pressure }
+        let above = points.filter { $0.pressure < pressure }
+        
+        guard below.count > 0 else {
+            return above.first![keyPath: valuePath]
+        }
+        
+        guard above.count > 0 else {
+            return below.last![keyPath: valuePath]
+        }
+        
+        return (below.last![keyPath: valuePath]! + above.first![keyPath: valuePath]!) / 2.0
+    }
+    
+    func closestValue(toPressure pressure: Double, withValueFor valuePath: KeyPath<LevelDataPoint, Double?>) -> LevelDataPoint? {
+        let points = data.filter { $0[keyPath: valuePath] != nil }
+        
+        guard points.count > 0 else {
+            return nil
+        }
+        
+        return points.reduce(points[0]) { abs($1.pressure - pressure) < abs($0.pressure - pressure) ? $1 : $0 }
     }
 }

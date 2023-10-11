@@ -14,8 +14,7 @@ let dashLength: CGFloat = 6.0
 extension Shape {
     func applyLineStyle(_ lineStyle: PlotOptions.PlotStyling.LineStyle) -> some View {
         let dash = lineStyle.dashed ? [dashLength] : []
-        let cgColor = CGColor.fromHex(hexString: lineStyle.color) ?? CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
-        let color = Color(cgColor: cgColor)
+        let color = Color(cgColor: lineStyle.cgColor)
         
         return self
             .stroke(style: StrokeStyle(lineWidth: lineStyle.lineWidth, dash: dash))
@@ -67,6 +66,12 @@ extension PlotOptions.PlotStyling {
             opacity: opacity,
             dashed: dashed
         )
+    }
+}
+
+extension PlotOptions.PlotStyling.LineStyle {
+    var cgColor: CGColor {
+        CGColor.fromHex(hexString: color, alpha: opacity) ?? CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
     }
 }
 
