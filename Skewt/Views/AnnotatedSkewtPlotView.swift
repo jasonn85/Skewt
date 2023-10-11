@@ -246,9 +246,9 @@ struct AnnotatedSkewtPlotView: View {
                             
                             Spacer()
                             
-                            Image(systemName: "xmark.circle")
+                            Image(systemName: "xmark.circle.fill")
                                 .annotationFraming()
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.gray)
                                 .onTapGesture {
                                     self.annotationPoint = nil
                                 }
