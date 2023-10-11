@@ -314,6 +314,58 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(b["CAPE"], 170)
         XCTAssertEqual(b["CIN"], 1)
     }
+
+    func testNearestValue() throws {
+        let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0), (0.0, 800.0), (10.0, 700.0), (20.0, 600.0)]
+        let dewPointSpread = 10.0
+        
+        let points = temperaturesAndPressures.map {
+            LevelDataPoint(
+                type: .significantLevel,
+                pressure: $0.1,
+                height: nil,
+                temperature: $0.0,
+                dewPoint: $0.0 - dewPointSpread,
+                windDirection: nil,
+                windSpeed: nil
+            )
+        }
+        
+        let sounding = try Sounding(withJustData: Array(points))
+
+        XCTAssertEqual(
+            sounding.closestValue(toPressure: temperaturesAndPressures[0].1, withValueFor: \.temperature)!.temperature,
+            temperaturesAndPressures[0].0,
+            "Closest value to first value is first value"
+        )
+        
+        XCTAssertEqual(
+            sounding.closestValue(toPressure: 1500.0, withValueFor: \.temperature)!.temperature,
+            temperaturesAndPressures[0].0,
+            "Closest value to underground is first value"
+        )
+        
+        XCTAssertEqual(
+            sounding.closestValue(toPressure: temperaturesAndPressures.last!.1, withValueFor: \.temperature)!.temperature,
+            temperaturesAndPressures.last!.0,
+            "Closest value to last value is last value"
+        )
+        
+        XCTAssertEqual(
+            sounding.closestValue(toPressure: 0.0, withValueFor: \.temperature)!.temperature,
+            temperaturesAndPressures.last!.0,
+            "Closest value to space is last value"
+        )
+        
+        let closerToTwoThanThreePressure = (temperaturesAndPressures[2].1 
+                                            + temperaturesAndPressures[2].1
+                                            + temperaturesAndPressures[3].1) / 3.0
+        XCTAssertEqual(
+            sounding.closestValue(toPressure: closerToTwoThanThreePressure, withValueFor: \.temperature)!.temperature,
+            temperaturesAndPressures[2].0,
+            "A pressure closer to entry #2 than #3 results in #2"
+        )
+    }
     
     func testInterpolation() throws {
         let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0), (0.0, 800.0), (10.0, 700.0), (20.0, 600.0)]
@@ -336,17 +388,17 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(
             sounding.interpolatedValue(for: \.temperature, atPressure: temperaturesAndPressures[0].1),
             points[0].temperature,
-            "Nearest value returns exact match if one exists"
+            "Interpolation returns exact match if one exists"
         )
         XCTAssertEqual(
             sounding.interpolatedValue(for: \.temperature, atPressure: temperaturesAndPressures[4].1),
             points[4].temperature,
-            "Nearest value returns exact match if one exists"
+            "Interpolation returns exact match if one exists"
         )
         XCTAssertEqual(
             sounding.interpolatedValue(for: \.dewPoint, atPressure: temperaturesAndPressures[0].1),
             points[0].dewPoint,
-            "Nearest value returns exact match if one exists"
+            "Interpolation returns exact match if one exists"
         )
         
         let hopefullyFive = sounding.interpolatedValue(
