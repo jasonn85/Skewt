@@ -201,42 +201,51 @@ struct AnnotatedSkewtPlotView: View {
                 style: style.lineStyle(forType: .dewPoint)
             )
             
-            let leftRoom = dewPointPoint.x * bounds.size.width
-            let rightRoom = (1.0 - temperaturePoint.x) * bounds.size.width
+            let minimumLeftRoom = 120.0 / bounds.size.width
+            let minimumRightRoom = 90.0 / bounds.size.width
+            let leftRoom = (
+                dewPointPoint.x >= minimumLeftRoom
+                ? dewPointPoint.x * bounds.size.width
+                : minimumLeftRoom * bounds.size.width
+            )
+            let rightRoom = (
+                (1.0 - temperaturePoint.x) >= minimumRightRoom 
+                ? (1.0 - temperaturePoint.x) * bounds.size.width
+                : minimumRightRoom * bounds.size.width
+            )
             
             Group {
-                if leftRoom >= 0 {
-                    Rectangle()
-                        .foregroundColor(.clear)
-                        .frame(width: leftRoom, height: 20)
-                        .padding(.horizontal, -10)
-                        .overlay {
-                            HStack {
-                                Text(altitudeDetailText(temperatureData))
-                                    .annotationFraming()
-                                    .foregroundColor(isobarColor)
-                                
-                                Spacer()
-                                Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
-                                    .annotationFraming()
-                                    .foregroundColor(dewPointColor)
-                            }
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .frame(width: leftRoom, height: 20)
+                    .padding(.horizontal, -10)
+                    .overlay {
+                        HStack {
+                            Text(altitudeDetailText(temperatureData))
+                                .annotationFraming()
+                                .foregroundColor(isobarColor)
+                            
+                            Spacer()
+                            
+                            Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
+                                .annotationFraming()
+                                .foregroundColor(dewPointColor)
                         }
-                        .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
-                }
+                    }
+                    .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
                 
-                if rightRoom >= 0 {
-                    Rectangle()
-                        .foregroundColor(.clear)
-                        .frame(width: rightRoom, height: 20)
-                        .padding(.horizontal, -10)
-                        .overlay(alignment: .leading) {
+                Rectangle()
+                    .foregroundColor(.clear)
+                    .frame(width: rightRoom, height: 20)
+                    .padding(.horizontal, -10)
+                    .overlay(alignment: .leading) {
+                        HStack {
                             Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
                                 .annotationFraming()
                                 .foregroundColor(temperatureColor)
                         }
-                        .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
-                }
+                    }
+                    .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
             }
             .font(Font(axisLabelFont))
             
