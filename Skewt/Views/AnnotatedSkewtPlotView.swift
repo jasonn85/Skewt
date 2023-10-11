@@ -404,23 +404,19 @@ struct AnnotatedSkewtPlotView: View {
             : .altitudeIsobars
             )
         
-        guard let cgColor = CGColor.fromHex(
-            hexString: store.state.plotOptions.plotStyling.lineStyle(forType: type).color
-        ) else {
-            return .black
-        }
-        
-        return Color(cgColor: cgColor)
+        return Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: type).cgColor)
     }
     
     private var isothermColor: Color {
-        guard let cgColor = CGColor.fromHex(
-            hexString: store.state.plotOptions.plotStyling.lineStyle(forType: .temperature).color
-        ) else {
-            return .black
-        }
-        
-        return Color(cgColor: cgColor)
+        temperatureColor
+    }
+    
+    private var temperatureColor: Color {
+        Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: .temperature).cgColor)
+    }
+    
+    private var dewPointColor: Color {
+        Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: .dewPoint).cgColor)
     }
     
     private func yForIsobar(_ value: Double, inPlot plot: SkewtPlot) -> CGFloat {
