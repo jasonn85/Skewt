@@ -243,6 +243,15 @@ struct AnnotatedSkewtPlotView: View {
                             Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
                                 .annotationFraming()
                                 .foregroundColor(temperatureColor)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "xmark.circle")
+                                .annotationFraming()
+                                .foregroundColor(.secondary)
+                                .onTapGesture {
+                                    self.annotationPoint = nil
+                                }
                         }
                     }
                     .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
