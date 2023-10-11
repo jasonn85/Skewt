@@ -58,6 +58,7 @@ struct ContentView: View {
                 
                 AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
+                    store.dispatch(RecentSoundingsState.Action.refresh)
                     store.dispatch(SoundingState.Action.doRefresh)
                 }
                 
