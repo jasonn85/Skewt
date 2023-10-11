@@ -212,15 +212,11 @@ struct AnnotatedSkewtPlotView: View {
                     .overlay {
                         HStack {
                             Text(altitudeDetailText(temperatureData))
-                                .padding(2)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .foregroundColor(.white.opacity(0.75))
-                                }
-                            
+                                .annotationFraming()
                             
                             Spacer()
                             Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
+                                .annotationFraming()
                         }
                     }
                     .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
@@ -231,6 +227,7 @@ struct AnnotatedSkewtPlotView: View {
                     .padding(.horizontal, -10)
                     .overlay(alignment: .leading) {
                         Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
+                            .annotationFraming()
                     }
                     .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
             }
@@ -418,6 +415,36 @@ struct AnnotatedSkewtPlotView: View {
         }
         
         return plot
+    }
+}
+
+struct AnnotationFraming: ViewModifier {
+    var padding: CGFloat = 3.0
+    var backgroundColor: Color = .white.opacity(0.75)
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(padding)
+            .background {
+                RoundedRectangle(cornerRadius: 6)
+                    .foregroundColor(backgroundColor)
+            }
+    }
+}
+
+extension View {
+    func annotationFraming(padding: CGFloat? = nil, backgroundColor: Color? = nil) -> some View {
+        var framing = AnnotationFraming()
+        
+        if let padding = padding {
+            framing.padding = padding
+        }
+        
+        if let backgroundColor = backgroundColor {
+            framing.backgroundColor = backgroundColor
+        }
+        
+        return self.modifier(framing)
     }
 }
 
