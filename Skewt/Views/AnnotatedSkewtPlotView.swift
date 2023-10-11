@@ -205,31 +205,38 @@ struct AnnotatedSkewtPlotView: View {
             let rightRoom = (1.0 - temperaturePoint.x) * bounds.size.width
             
             Group {
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(width: leftRoom, height: 20)
-                    .padding(.horizontal, -10)
-                    .overlay {
-                        HStack {
-                            Text(altitudeDetailText(temperatureData))
-                                .annotationFraming()
-                            
-                            Spacer()
-                            Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
-                                .annotationFraming()
+                if leftRoom >= 0 {
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: leftRoom, height: 20)
+                        .padding(.horizontal, -10)
+                        .overlay {
+                            HStack {
+                                Text(altitudeDetailText(temperatureData))
+                                    .annotationFraming()
+                                    .foregroundColor(isobarColor)
+                                
+                                Spacer()
+                                Text(temperatureFormatter.string(from: dewPointData.dewPoint! as NSNumber)! + "°")
+                                    .annotationFraming()
+                                    .foregroundColor(dewPointColor)
+                            }
                         }
-                    }
-                    .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
+                        .position(x: leftRoom / 2.0, y: dewPointPoint.y * bounds.size.height)
+                }
                 
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(width: rightRoom, height: 20)
-                    .padding(.horizontal, -10)
-                    .overlay(alignment: .leading) {
-                        Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
-                            .annotationFraming()
-                    }
-                    .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
+                if rightRoom >= 0 {
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: rightRoom, height: 20)
+                        .padding(.horizontal, -10)
+                        .overlay(alignment: .leading) {
+                            Text(temperatureFormatter.string(from: temperatureData.temperature! as NSNumber)! + "°")
+                                .annotationFraming()
+                                .foregroundColor(temperatureColor)
+                        }
+                        .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
+                }
             }
             .font(Font(axisLabelFont))
             
