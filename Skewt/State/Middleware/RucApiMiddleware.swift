@@ -161,12 +161,13 @@ extension SoundingRequest {
         
         switch selection.time {
         case .now:
-            startTime = nil
+            startTime = Date.nearestHour(withIntervalFromNow: 0, hoursPerInterval: selection.type.hourInterval)
+            endTime = startTime!.addingTimeInterval(.hours(selection.type.hourInterval))
         case .relative(let timeInterval):
             switch selection.type {
             case .op40:
-                startTime = Date(timeIntervalSinceNow: timeInterval)
-                endTime = Date(timeIntervalSinceNow: timeInterval + .hours(1))
+                startTime = Date.nearestHour(withIntervalFromNow: timeInterval, hoursPerInterval: selection.type.hourInterval)
+                endTime = startTime!.addingTimeInterval(.hours(selection.type.hourInterval))
             case .raob:
                 startTime = timeInterval.closestSoundingTime()
             }
