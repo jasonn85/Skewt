@@ -58,7 +58,8 @@ struct SoundingSelectionView: View {
     private var closestLocations: [LocationList.Location] {
         var wmoIds: [Int]? = nil
         
-        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings() else {
+        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings(),
+              recentSoundings.count > 0 else {
             return []
         }
         
