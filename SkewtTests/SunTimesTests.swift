@@ -21,6 +21,17 @@ final class SunTimesTests: XCTestCase {
         let may7 = Date(timeIntervalSince1970: 484297200)  // Tuesday, May 7, 1985 07:00:00 GMT
         XCTAssertEqual(may7.fractionalYearInRadians, 2.18, accuracy: 0.1)
     }
+    
+    func testSolarDeclination() {
+        let jan17 = Date(timeIntervalSince1970: 1673942400)  // Tuesday, January 17, 2023 8:00:00 GMT
+        XCTAssertEqual(jan17.solarDeclination, -21.0 * .pi / 180.0, accuracy: 0.01)
+        
+        let march16 = Date(timeIntervalSince1970: 1678950000)  // Thursday, March 16, 2023 7:00:00 GMT
+        XCTAssertEqual(march16.solarDeclination, -2.4 * .pi / 180.0, accuracy: 0.01)
+
+        let july17 = Date(timeIntervalSince1970: 1689577200)  // Monday, July 17, 2023 7:00:00 GMT
+        XCTAssertEqual(july17.solarDeclination, 21.2 * .pi / 180.0, accuracy: 0.01)
+    }
 
     func testExactTimesNoLocationSpecified() {
         let sunriseInDenver = Date(timeIntervalSince1970: 1697465520)  // Mon, 16 Oct 2023 07:12:00 MDT

@@ -18,6 +18,18 @@ extension Date {
 
         return 2.0 * .pi / Double(daysThisYear) * Double(dayOfTheYear - 1)
     }
+    
+    // Solar declination in radians 
+    public var solarDeclination: Double {
+        let fractionalYear = fractionalYearInRadians
+        
+        return (
+            0.006918
+            - 0.399912 * cos(fractionalYear) + 0.070257 * sin(fractionalYear)
+            - 0.006758 * cos(2.0 * fractionalYear) + 0.000907 * sin(2.0 * fractionalYear)
+            - 0.002697 * cos(3.0 * fractionalYear) + 0.00148 * sin(3.0 * fractionalYear)
+        )
+    }
 }
 
 // Calculations for sunrise/sunset, ref: https://gml.noaa.gov/grad/solcalc/solareqns.PDF
@@ -35,12 +47,7 @@ extension TimeInterval {
             - 0.014615 * cos(2.0 * fractionalYear) - 0.040849 * sin(2.0 * fractionalYear)
         )
         
-        let solarDeclination = (
-            0.006918
-            - 0.399912 * cos(fractionalYear) + 0.070257 * sin(fractionalYear)
-            - 0.006758 * cos(2.0 * fractionalYear) + 0.000907 * sin(2.0 * fractionalYear)
-            - 0.002697 * cos(3.0 * fractionalYear) + 0.00148 * sin(3.0 * fractionalYear)
-        )
+        let solarDeclination = referenceDate.solarDeclination
         
         let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
         let latitude = location.coordinate.latitude * .pi / 180.0
