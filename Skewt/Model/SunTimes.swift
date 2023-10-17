@@ -46,36 +46,40 @@ extension Date {
 extension TimeInterval {
     // Time interval to the closest sunrise, either positive or negative.
     // If no location is provided, Denver, CO local sunrise time is used.
-    static func timeToNearestSunrise(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
+    static private func timeToNearestSunriseOrSunset(sunrise: Bool, atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
         let location = location ?? .denver
         let calendar = Calendar(identifier: .gregorian)
         
         let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
         let latitude = location.coordinate.latitude * .pi / 180.0
-        let longitude = location.coordinate.longitude * .pi / 180.0
         let solarDeclination = referenceDate.solarDeclination
-        let hourAngle = acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
+        let sign = sunrise ? 1.0 : -1.0
+        let hourAngle = sign * acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
         
-        let sunriseSeconds = 43_200.0 - 4.0 * (longitude + hourAngle) - referenceDate.equationOfTime
+        let minutesUtc = 720.0 - 4.0 * (location.coordinate.longitude + hourAngle * 180.0 / .pi) - (referenceDate.equationOfTime / 60.0)
+        let secondsUtc = minutesUtc * 60.0
         
-        var sunriseComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
-        sunriseComponents.hour = 0
-        sunriseComponents.minute = 0
-        sunriseComponents.second = Int(sunriseSeconds)
+        var components = calendar.dateComponents(in: .gmt, from: referenceDate)
+        components.hour = 0
+        components.minute = 0
+        components.second = Int(secondsUtc)
+        let today = calendar.date(from: components)!
         
-        let sunriseToday = calendar.date(from: sunriseComponents)!
-        sunriseComponents.day! += 1
-        let sunriseTomorrow = calendar.date(from: sunriseComponents)!
+        components.day! += sunrise ? 1 : -1
+        let otherDay = calendar.date(from: components)!
         
-        let todayDiff = sunriseToday.timeIntervalSince(referenceDate)
-        let tomorrowDiff = sunriseTomorrow.timeIntervalSince(referenceDate)
+        let todayDiff = today.timeIntervalSince(referenceDate)
+        let otherDiff = otherDay.timeIntervalSince(referenceDate)
         
-        return abs(todayDiff) < abs(tomorrowDiff) ? todayDiff : tomorrowDiff
+        return abs(todayDiff) < abs(otherDiff) ? todayDiff : otherDiff
+    }
+    
+    static func timeToNearestSunrise(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
+        timeToNearestSunriseOrSunset(sunrise: true, atLocation: location, referenceDate: referenceDate)
     }
     
     static func timeToNearestSunset(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
-        //TODO:
-        return 0
+        timeToNearestSunriseOrSunset(sunrise: false, atLocation: location, referenceDate: referenceDate)
     }
     
 }
