@@ -8,6 +8,18 @@
 import Foundation
 import CoreLocation
 
+extension Date {
+    // The percent of the year [0,2π], accurate to 24 hours
+    public var fractionalYearInRadians: Double {
+        let calendar = Calendar(identifier: .gregorian)
+        let dayOfTheYear = calendar.ordinality(of: .day, in: .year, for: self)!
+        let dayRangeThisYear = calendar.range(of: .day, in: .year, for: self)!
+        let daysThisYear = dayRangeThisYear.upperBound - dayRangeThisYear.lowerBound
+
+        return 2.0 * .pi / Double(daysThisYear) * Double(dayOfTheYear - 1)
+    }
+}
+
 // Calculations for sunrise/sunset, ref: https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 extension TimeInterval {
     // Time interval to the closest sunrise, either positive or negative.
@@ -15,10 +27,7 @@ extension TimeInterval {
     static func timeToNearestSunrise(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
         let location = location ?? .denver
         let calendar = Calendar(identifier: .gregorian)
-        let dayOfTheYear = calendar.ordinality(of: .day, in: .year, for: referenceDate)!
-        let dayRangeThisYear = calendar.range(of: .day, in: .year, for: referenceDate)!
-        let daysThisYear = dayRangeThisYear.upperBound - dayRangeThisYear.lowerBound
-        let fractionalYear = 2.0 * .pi / Double(daysThisYear) * Double(dayOfTheYear - 1)
+        let fractionalYear = referenceDate.fractionalYearInRadians
         
         let equationOfTime = 229.18 * (
             0.000075

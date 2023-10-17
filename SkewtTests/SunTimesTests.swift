@@ -10,6 +10,17 @@ import XCTest
 import CoreLocation
 
 final class SunTimesTests: XCTestCase {
+    
+    func testFractionalYear() {
+        let jan1 = Date(timeIntervalSince1970: 1672560000)  // Sunday, January 1, 2023 08:00:00 GMT
+        XCTAssertEqual(jan1.fractionalYearInRadians, 0.0, accuracy: 0.1)
+        
+        let dec31 = Date(timeIntervalSince1970: 1704009600)  // Sunday, December 31, 2023 08:00:00 GMT
+        XCTAssertEqual(dec31.fractionalYearInRadians, 2.0 * .pi, accuracy: 0.1)
+        
+        let may7 = Date(timeIntervalSince1970: 484297200)  // Tuesday, May 7, 1985 07:00:00 GMT
+        XCTAssertEqual(may7.fractionalYearInRadians, 2.18, accuracy: 0.1)
+    }
 
     func testExactTimesNoLocationSpecified() {
         let sunriseInDenver = Date(timeIntervalSince1970: 1697465520)  // Mon, 16 Oct 2023 07:12:00 MDT
