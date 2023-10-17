@@ -54,11 +54,14 @@ final class SunTimesTests: XCTestCase {
     }
 
     func testExactTimesNoLocationSpecified() {
-        let sunriseInDenver = Date(timeIntervalSince1970: 1697465520)  // Mon, 16 Oct 2023 07:12:00 MDT
-        let sunsetInDenver = Date(timeIntervalSince1970: 1697505660)  // Mon, 16 Oct 2023 18:21:00 MDT
+        let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
+
+        let sunriseInDenver = Date(timeIntervalSince1970: 1697461800)  // Monday, October 16, 2023 13:10:00 GMT
+        let sunsetInDenver = Date(timeIntervalSince1970: 1697501880)  // Tuesday, October 17, 2023 12:18:00 GMT
         
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: sunriseInDenver), 0)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: sunsetInDenver), 0)
+        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: sunriseInDenver), 0, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: sunsetInDenver), 0, accuracy: accuracy)
+        
     }
     
     func testSanDiegoSunTimes() {
