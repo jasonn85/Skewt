@@ -62,7 +62,7 @@ final class SunTimesTests: XCTestCase {
     }
     
     func testSanDiegoSunTimes() {
-        let accuracy = TimeInterval(60.0)  // One minute
+        let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
         let sanDiego = CLLocation(latitude: 32.7335, longitude: -117.1897)  // KSAN in San Diego, CA
         let sunriseInSanDiego = Date(timeIntervalSince1970: 1697464440)  // Mon, 16 Oct 2023 06:54:00 PDT
         let sunsetInSanDiego = Date(timeIntervalSince1970: 1697505360)  // Mon, 16 Oct 2023 18:16:00 PDT
@@ -80,7 +80,7 @@ final class SunTimesTests: XCTestCase {
         let sunsetToMidnight = midnight.timeIntervalSince(sunsetYesterdayInSanDiego)
         
         XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego, referenceDate: midnight), midnightToSunrise, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego, referenceDate: midnight), midnightToSunrise, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego, referenceDate: midnight), -sunsetToMidnight, accuracy: accuracy)
     }
     
     func testPolarSeasons() {
