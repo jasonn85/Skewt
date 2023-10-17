@@ -61,7 +61,33 @@ final class SunTimesTests: XCTestCase {
         
         XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: sunriseInDenver), 0, accuracy: accuracy)
         XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: sunsetInDenver), 0, accuracy: accuracy)
+    }
+    
+    func testExactTimesSpecificLocations() {
+        let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
+
+        let locationSunriseAndSunset = [
+            (
+                CLLocation(latitude: 3.16, longitude: 101.71),
+                Date(timeIntervalSince1970: 1697583420),
+                Date(timeIntervalSince1970: 1697626740)
+            ),  // Kuala Lumpur
+            (
+                CLLocation(latitude: -33.93, longitude: 18.46),
+                Date(timeIntervalSince1970: 1697515320),
+                Date(timeIntervalSince1970: 1697562060)
+            ),  // Cape Town
+            (
+                CLLocation(latitude: 35.67, longitude: 139.8),
+                Date(timeIntervalSince1970: 1697575740),
+                Date(timeIntervalSince1970: 1697616120)
+            )  // Tokyo
+        ]
         
+        locationSunriseAndSunset.forEach {
+            XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: $0.0, referenceDate: $0.1), 0.0, accuracy: accuracy)
+            XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: $0.0, referenceDate: $0.2), 0.0, accuracy: accuracy)
+        }
     }
     
     func testSanDiegoSunTimes() {
