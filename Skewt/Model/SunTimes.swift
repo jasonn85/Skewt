@@ -49,13 +49,11 @@ extension TimeInterval {
     static func timeToNearestSunrise(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval {
         let location = location ?? .denver
         let calendar = Calendar(identifier: .gregorian)
-        let fractionalYear = referenceDate.fractionalYearInRadians
-        
-        let solarDeclination = referenceDate.solarDeclination
         
         let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
         let latitude = location.coordinate.latitude * .pi / 180.0
         let longitude = location.coordinate.longitude * .pi / 180.0
+        let solarDeclination = referenceDate.solarDeclination
         let hourAngle = acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
         
         let sunriseSeconds = 43_200.0 - 4.0 * (longitude + hourAngle) - referenceDate.equationOfTime
