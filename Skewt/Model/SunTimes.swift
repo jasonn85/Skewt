@@ -30,6 +30,16 @@ extension Date {
             - 0.002697 * cos(3.0 * fractionalYear) + 0.00148 * sin(3.0 * fractionalYear)
         )
     }
+    
+    public var equationOfTime: TimeInterval {
+        let fractionalYear = fractionalYearInRadians
+        
+        return 60.0 * 229.18 * (
+            0.000075
+            + 0.001868 * cos(fractionalYear) - 0.032077 * sin(fractionalYear)
+            - 0.014615 * cos(2.0 * fractionalYear) - 0.040849 * sin(2.0 * fractionalYear)
+        )
+    }
 }
 
 // Calculations for sunrise/sunset, ref: https://gml.noaa.gov/grad/solcalc/solareqns.PDF
@@ -41,12 +51,6 @@ extension TimeInterval {
         let calendar = Calendar(identifier: .gregorian)
         let fractionalYear = referenceDate.fractionalYearInRadians
         
-        let equationOfTime = 229.18 * (
-            0.000075
-            + 0.001868 * cos(fractionalYear) - 0.032077 * sin(fractionalYear)
-            - 0.014615 * cos(2.0 * fractionalYear) - 0.040849 * sin(2.0 * fractionalYear)
-        )
-        
         let solarDeclination = referenceDate.solarDeclination
         
         let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
@@ -54,7 +58,7 @@ extension TimeInterval {
         let longitude = location.coordinate.longitude * .pi / 180.0
         let hourAngle = acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
         
-        let sunriseSeconds = 43_200.0 - 4.0 * (longitude + hourAngle) - equationOfTime
+        let sunriseSeconds = 43_200.0 - 4.0 * (longitude + hourAngle) - referenceDate.equationOfTime
         
         var sunriseComponents = calendar.dateComponents(in: .gmt, from: referenceDate)
         sunriseComponents.hour = 0
