@@ -64,8 +64,6 @@ The sole data source is the US's NOAA. Forecast data is only available for the U
 - Debounced UI is handled via bindings and Combine
 
 # What's in the works?
-- [Wind barbs](https://github.com/jasonn85/Skewt/issues/32)
-- [Interactive details](https://github.com/jasonn85/Skewt/issues/24) (touch a specific point to see temp/dew point/wind)
 - [Parcel analysis/CAPE](https://github.com/jasonn85/Skewt/issues/44)
 - [Lots](https://github.com/jasonn85/Skewt/issues/33) of [background](https://github.com/jasonn85/Skewt/issues/34) [animations](https://github.com/jasonn85/Skewt/issues/35) for predicted weather
 - [Pinch zooming](https://github.com/jasonn85/Skewt/issues/7)
