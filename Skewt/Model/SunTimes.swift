@@ -8,6 +8,63 @@
 import Foundation
 import CoreLocation
 
+extension Double {
+    static let sunriseZenith = 1.58533492  // 90.833° zenith for sunrise/sunset
+}
+
+/// Struct used to represent sun rise/set events during a date range.
+/// Day/night events are used to bookend a range.
+struct SunState {
+    enum StateType {
+        case day
+        case night
+        case sunrise
+        case sunset
+    }
+    
+    let type: StateType
+    let date: Date
+}
+ 
+extension SunState {
+    private var isDayThereafter: Bool {
+        switch type {
+        case .day, .sunrise:
+            return true
+        case .night, .sunset:
+            return false
+        }
+    }
+    
+    static func states(inRange range: ClosedRange<Date>, at location: CLLocation) -> [SunState] {
+        var nextState: SunState? = SunState(
+            type: range.lowerBound.isDaylight(at: location) ? .day : .night,
+            date: range.lowerBound
+        )
+        var result: [SunState] = []
+        
+        repeat {
+            result.append(nextState!)
+            
+            let lookingForSunriseNext = !result.last!.isDayThereafter
+            let nextDate = Date.nextSunriseOrSunset(sunrise: lookingForSunriseNext, at: location, afterDate: result.last!.date)
+            
+            if let nextDate = nextDate {
+                nextState = SunState(type: lookingForSunriseNext ? .sunrise : .sunset, date: nextDate)
+            } else {
+                nextState = nil
+            }
+        } while (nextState != nil)
+        
+        result.append(SunState(
+            type: range.upperBound.isDaylight(at: location) ? .day : .night,
+            date: range.upperBound
+        ))
+        
+        return result
+    }
+}
+
 extension Date {
     // The percent of the year [0,2π], accurate to 24 hours
     var fractionalYearInRadians: Double {
@@ -41,14 +98,36 @@ extension Date {
         )
     }
     
+    private func solarAngle(at location: CLLocation) -> Double {
+        let latitude = location.coordinate.latitude * .pi / 180.0
+        let solarDeclination = solarDeclination
+        let timeOffset: TimeInterval = equationOfTime * 4.0 * location.coordinate.longitude
+        
+        let calendar = Calendar(identifier: .gregorian)
+        let components = calendar.dateComponents(in: .gmt, from: self)
+        let solarTime: TimeInterval = (
+            Double(components.hour!) * 360.0 
+            + Double(components.minute!) * 60.0
+            + Double(components.second!)
+            + timeOffset
+        )
+        
+        let hourAngle = ((solarTime * 60.0 / 4.0) - 180.0) * .pi / 180.0
+        
+        return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
+    }
+    
+    func isDaylight(at location: CLLocation) -> Bool {
+        solarAngle(at: location) >= Double.sunriseZenith
+    }
+    
     // Sunrise or sunset on the same calendar UTC day.
     // Returns nil if the day occurs during polar night or polar day.
     private static func sunriseOrSunset(sunrise: Bool, at location: CLLocation, onDate date: Date = .now) -> Date? {
-        let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
         let latitude = location.coordinate.latitude * .pi / 180.0
         let solarDeclination = date.solarDeclination
         let sign = sunrise ? 1.0 : -1.0
-        let hourAngle = sign * acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
+        let hourAngle = sign * acos((cos(Double.sunriseZenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
 
         if hourAngle.isNaN {
             // Polar night or day

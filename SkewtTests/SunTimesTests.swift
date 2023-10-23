@@ -101,6 +101,12 @@ final class SunTimesTests: XCTestCase {
         let sunriseToNoon = noon.timeIntervalSince(sunriseInSanDiego)
         let noonToSunset = sunsetInSanDiego.timeIntervalSince(noon)
         
+        XCTAssertFalse(sunriseInSanDiego.addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego))
+        XCTAssertTrue(sunriseInSanDiego.addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego))
+        XCTAssertTrue(noon.isDaylight(at: sanDiego))
+        XCTAssertTrue(sunsetInSanDiego.addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego))
+        XCTAssertFalse(sunsetInSanDiego.addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego))
+        
         XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego, referenceDate: noon)!, -sunriseToNoon, accuracy: accuracy)
         XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego, referenceDate: noon)!, noonToSunset, accuracy: accuracy)
         
@@ -118,12 +124,16 @@ final class SunTimesTests: XCTestCase {
         let northPole = CLLocation(latitude: 90.0, longitude: 0.0)
         let twoWeeks = TimeInterval(14.0 * 24.0 * 60.0 * 60.0)
         let southPoleNightDate = Date(timeIntervalSince1970: 1686691830)  // Tuesday, June 13, 2023 21:30:30 GMT
-        let southPoleDayDayDate = Date(timeIntervalSince1970: 1703799030)  //  Thursday, December 28, 2023 21:30:30 GMT
+        let southPoleDayDate = Date(timeIntervalSince1970: 1703799030)  //  Thursday, December 28, 2023 21:30:30 GMT
         
         XCTAssertNil(Date.sunrise(at: southPole, onDate: southPoleNightDate))
-        XCTAssertNil(Date.sunset(at: southPole, onDate: southPoleDayDayDate))
+        XCTAssertFalse(southPoleNightDate.isDaylight(at: southPole))
+        XCTAssertNil(Date.sunset(at: southPole, onDate: southPoleDayDate))
+        XCTAssertTrue(southPoleDayDate.isDaylight(at: southPole))
         XCTAssertNil(Date.sunrise(at: northPole, onDate: southPoleNightDate))
-        XCTAssertNil(Date.sunset(at: northPole, onDate: southPoleDayDayDate))
+        XCTAssertTrue(southPoleNightDate.isDaylight(at: northPole))
+        XCTAssertNil(Date.sunset(at: northPole, onDate: southPoleDayDate))
+        XCTAssertFalse(southPoleDayDate.isDaylight(at: northPole))
         
         // We just ensure that near polar sunrise/sunsets are at least two weeks away rather than expecting any
         //  sort of precision.
