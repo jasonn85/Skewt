@@ -9,7 +9,140 @@ import XCTest
 @testable import Skewt
 import CoreLocation
 
+struct Location {
+    let location: CLLocation
+    let name: String
+    
+    let sunrises: [Date]?
+    let sunsets: [Date]?
+    let solarNoons: [Date]?
+    let solarMidnights: [Date]?
+}
+
 final class SunTimesTests: XCTestCase {
+    var denver: Location!
+    var sanDiego: Location!
+    var kualaLumpur: Location!
+    var capeTown: Location!
+    var tokyo: Location!
+    var southPole: Location!
+    var northPole: Location!
+    var mcmurdo: Location!
+    
+    var locations: [Location]!
+    
+    override func setUp() {
+        denver = Location(
+            location: CLLocation(latitude: 39.87, longitude: -104.67),
+            name: "Denver",
+            sunrises: [
+                Date(timeIntervalSince1970: 1697461800)  // Monday, October 16, 2023 13:10:00 GMT
+            ],
+            sunsets: [
+                Date(timeIntervalSince1970: 1697501880)  // Tuesday, October 17, 2023 12:18:00 GMT
+            ],
+            solarNoons: [
+                Date(timeIntervalSince1970: 484340160)  // Tuesday, May 7, 1985 18:56:00 GMT
+            ],
+            solarMidnights: nil
+        )
+        
+        kualaLumpur = Location(
+            location: CLLocation(latitude: 3.16, longitude: 101.71),
+            name: "Kuala Lumpur",
+            sunrises: [
+                Date(timeIntervalSince1970: 1697583420)
+            ],
+            sunsets: [
+                Date(timeIntervalSince1970: 1697626740)
+            ],
+            solarNoons: nil,
+            solarMidnights: nil
+        )
+        
+        capeTown = Location(
+            location: CLLocation(latitude: -33.93, longitude: 18.46),
+            name: "Cape Town",
+            sunrises: [
+                Date(timeIntervalSince1970: 1697515320)
+            ],
+            sunsets: [
+                Date(timeIntervalSince1970: 1697562060)
+            ],
+            solarNoons: nil,
+            solarMidnights: nil
+        )
+        
+        tokyo = Location(
+            location: CLLocation(latitude: 35.67, longitude: 139.8),
+            name: "Tokyo",
+            sunrises: [
+                Date(timeIntervalSince1970: 1697575740)
+            ],
+            sunsets: [
+                Date(timeIntervalSince1970: 1697616120)
+            ],
+            solarNoons: [
+                Date(timeIntervalSince1970: 1577933100)  // Thursday, January 2, 2020 02:45:00 GMT
+            ],
+            solarMidnights: nil
+        )
+        
+        sanDiego = Location(
+            location: CLLocation(latitude: 32.7335, longitude: -117.1897),
+            name: "San Diego",
+            sunrises: [
+                Date(timeIntervalSince1970: 1697464440)  // Mon, 16 Oct 2023 06:54:00 PDT
+            ],
+            sunsets: [
+                Date(timeIntervalSince1970: 1697505360),  // Mon, 16 Oct 2023 18:16:00 PDT
+                Date(timeIntervalSince1970: 1697418900)  // Sun, 15 Oct 2023 18:15:00 PDT
+            ],
+            solarNoons: [
+                Date(timeIntervalSince1970: 1683488700),  // Sunday, May 7, 2023 12:45:00 PM GMT-07:00 DST
+                Date(timeIntervalSince1970: 1577908380)  // Wednesday, January 1, 2020 11:53:00 AM GMT-08:00
+            ],
+            solarMidnights: nil
+        )
+        
+        southPole = Location(
+            location: CLLocation(latitude: -90.0, longitude: 0.0),
+            name: "South Pole",
+            sunrises: nil,
+            sunsets: nil,
+            solarNoons: nil,
+            solarMidnights: nil
+        )
+        
+        mcmurdo = Location(
+            location: CLLocation(latitude: -77.85, longitude: 166.6),
+            name: "McMurdo Station",
+            sunrises: nil,
+            sunsets: nil,
+            solarNoons: nil,
+            solarMidnights: nil
+        )
+        
+        northPole = Location(
+            location: CLLocation(latitude: 90.0, longitude: 0.0),
+            name: "North Pole",
+            sunrises: nil,
+            sunsets: nil,
+            solarNoons: nil,
+            solarMidnights: nil
+        )
+        
+        locations = [
+            denver,
+            kualaLumpur,
+            capeTown,
+            tokyo,
+            sanDiego,
+            southPole,
+            mcmurdo,
+            northPole
+        ]
+    }
     
     func testFractionalYear() {
         let accuracy = 0.1
