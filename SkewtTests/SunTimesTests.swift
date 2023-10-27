@@ -16,11 +16,11 @@ struct Location {
     let sunrises: [Date]?
     let sunsets: [Date]?
     let solarNoons: [Date]?
-    let solarMidnights: [Date]?
 }
 
 final class SunTimesTests: XCTestCase {
     var denver: Location!
+    var greenwich: Location!
     var sanDiego: Location!
     var kualaLumpur: Location!
     var capeTown: Location!
@@ -32,6 +32,8 @@ final class SunTimesTests: XCTestCase {
     var locations: [Location]!
     
     override func setUp() {
+        // Source to calculate sunrise/sunset/noon times: https://gml.noaa.gov/grad/solcalc/
+        
         denver = Location(
             location: CLLocation(latitude: 39.87, longitude: -104.67),
             name: "Denver",
@@ -39,53 +41,66 @@ final class SunTimesTests: XCTestCase {
                 Date(timeIntervalSince1970: 1697461800)  // Monday, October 16, 2023 13:10:00 GMT
             ],
             sunsets: [
-                Date(timeIntervalSince1970: 1697501880)  // Tuesday, October 17, 2023 12:18:00 GMT
+                Date(timeIntervalSince1970: 1697501880)  // Tuesday, October 17, 2023 00:18:00 GMT
             ],
             solarNoons: [
-                Date(timeIntervalSince1970: 484340160)  // Tuesday, May 7, 1985 18:56:00 GMT
+                Date(timeIntervalSince1970: 484340113)  //  Tuesday, May 7, 1985 18:55:13 GMT
+            ]
+        )
+        
+        greenwich = Location(
+            location: CLLocation(latitude: 51.47783, longitude: -0.00139),
+            name: "Greenwich",
+            sunrises: [
+                Date(timeIntervalSince1970: 1651897260),  // Saturday, May 7, 2022 04:21:00 GMT
+                Date(timeIntervalSince1970: 1672560360)  // Sunday, January 1, 2023 08:06:00 GMT
             ],
-            solarMidnights: nil
+            sunsets: [
+                Date(timeIntervalSince1970: 1651951980),  // Saturday, May 7, 2022 19:33:00 GMT
+                Date(timeIntervalSince1970: 1672588860)  // Sunday, January 1, 2023 16:01:00 GMT
+            ],
+            solarNoons: [
+                Date(timeIntervalSince1970: 1651924596),  // Saturday, May 7, 2022 11:56:36 AM
+                Date(timeIntervalSince1970: 1672574640)  // Sunday, January 1, 2023 12:04:00 GMT
+            ]
         )
         
         kualaLumpur = Location(
             location: CLLocation(latitude: 3.16, longitude: 101.71),
             name: "Kuala Lumpur",
             sunrises: [
-                Date(timeIntervalSince1970: 1697583420)
+                Date(timeIntervalSince1970: 1697583420)  // Tuesday, October 17, 2023 22:57:00 GMT
             ],
             sunsets: [
-                Date(timeIntervalSince1970: 1697626740)
+                Date(timeIntervalSince1970: 1697626740)  // Wednesday, October 18, 2023 10:59:00 GMT
             ],
-            solarNoons: nil,
-            solarMidnights: nil
+            solarNoons: nil
         )
         
         capeTown = Location(
             location: CLLocation(latitude: -33.93, longitude: 18.46),
             name: "Cape Town",
             sunrises: [
-                Date(timeIntervalSince1970: 1697515320)
+                Date(timeIntervalSince1970: 1697515380)  //  Tuesday, October 17, 2023 04:03:00 GMT
             ],
             sunsets: [
-                Date(timeIntervalSince1970: 1697562060)
+                Date(timeIntervalSince1970: 1697562060)  // Tuesday, October 17, 2023 17:01:00 GMT
             ],
-            solarNoons: nil,
-            solarMidnights: nil
+            solarNoons: nil
         )
         
         tokyo = Location(
             location: CLLocation(latitude: 35.67, longitude: 139.8),
             name: "Tokyo",
             sunrises: [
-                Date(timeIntervalSince1970: 1697575740)
+                Date(timeIntervalSince1970: 1697575740)  // Tuesday, October 17, 2023 20:49:00 GMT
             ],
             sunsets: [
-                Date(timeIntervalSince1970: 1697616120)
+                Date(timeIntervalSince1970: 1697616120)  // Wednesday, October 18, 2023 8:02:00 AM
             ],
             solarNoons: [
-                Date(timeIntervalSince1970: 1577933100)  // Thursday, January 2, 2020 02:45:00 GMT
-            ],
-            solarMidnights: nil
+                Date(timeIntervalSince1970: 1577933051)  // Thursday, January 2, 2020 02:44:11 GMT
+            ]
         )
         
         sanDiego = Location(
@@ -99,10 +114,9 @@ final class SunTimesTests: XCTestCase {
                 Date(timeIntervalSince1970: 1697418900)  // Sun, 15 Oct 2023 18:15:00 PDT
             ],
             solarNoons: [
-                Date(timeIntervalSince1970: 1683488700),  // Sunday, May 7, 2023 12:45:00 PM GMT-07:00 DST
-                Date(timeIntervalSince1970: 1577908380)  // Wednesday, January 1, 2020 11:53:00 AM GMT-08:00
-            ],
-            solarMidnights: nil
+                Date(timeIntervalSince1970: 1683488721),  // Sunday, May 7, 2023 19:45:21 GMT
+                Date(timeIntervalSince1970: 1577908320)  // Wednesday, January 1, 2020 19:52:00 GMT
+            ]
         )
         
         southPole = Location(
@@ -110,8 +124,7 @@ final class SunTimesTests: XCTestCase {
             name: "South Pole",
             sunrises: nil,
             sunsets: nil,
-            solarNoons: nil,
-            solarMidnights: nil
+            solarNoons: nil
         )
         
         mcmurdo = Location(
@@ -119,8 +132,7 @@ final class SunTimesTests: XCTestCase {
             name: "McMurdo Station",
             sunrises: nil,
             sunsets: nil,
-            solarNoons: nil,
-            solarMidnights: nil
+            solarNoons: nil
         )
         
         northPole = Location(
@@ -128,12 +140,12 @@ final class SunTimesTests: XCTestCase {
             name: "North Pole",
             sunrises: nil,
             sunsets: nil,
-            solarNoons: nil,
-            solarMidnights: nil
+            solarNoons: nil
         )
         
         locations = [
             denver,
+            greenwich,
             kualaLumpur,
             capeTown,
             tokyo,
@@ -188,90 +200,153 @@ final class SunTimesTests: XCTestCase {
 
     func testExactTimesNoLocationSpecified() {
         let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-
-        let sunriseInDenver = Date(timeIntervalSince1970: 1697461800)  // Monday, October 16, 2023 13:10:00 GMT
-        let sunsetInDenver = Date(timeIntervalSince1970: 1697501880)  // Tuesday, October 17, 2023 12:18:00 GMT
         
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: sunriseInDenver)!, 0, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: sunsetInDenver)!, 0, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: denver.sunrises![0])!, 0, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: denver.sunsets![0])!, 0, accuracy: accuracy)
+    }
+    
+    func testGmtSunTimes() {
+        let angleAccuracy = 5.0 * .pi / 180.0  // 5°
+
+        greenwich.sunrises?.forEach { sunrise in
+            let hourBeforeSunrise = sunrise.addingTimeInterval(-60.0 * 60.0)
+            let hourAfterSunrise = sunrise.addingTimeInterval(60.0 * 60.0)
+            
+            XCTAssertFalse(hourBeforeSunrise.isDaylight(at: greenwich.location))
+            XCTAssertTrue(hourAfterSunrise.isDaylight(at: greenwich.location))
+            XCTAssertEqual(sunrise.solarZenithAngle(at: greenwich.location), Double.sunriseZenith, accuracy: angleAccuracy)
+        }
+        
+        greenwich.sunsets?.forEach { sunset in
+            let hourBeforeSunset = sunset.addingTimeInterval(-60.0 * 60.0)
+            let hourAfterSunset = sunset.addingTimeInterval(60.0 * 60.0)
+            
+            XCTAssertTrue(hourBeforeSunset.isDaylight(at: greenwich.location))
+            XCTAssertFalse(hourAfterSunset.isDaylight(at: greenwich.location))
+            XCTAssertEqual(sunset.solarZenithAngle(at: greenwich.location), Double.sunriseZenith, accuracy: angleAccuracy)
+        }
+        
+        greenwich.solarNoons?.forEach { noon in
+            XCTAssertTrue(noon.isDaylight(at: greenwich.location))
+        }
+        
     }
     
     func testExactTimesSpecificLocations() {
         let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
 
-        let locationSunriseAndSunset = [
-            (
-                CLLocation(latitude: 3.16, longitude: 101.71),
-                Date(timeIntervalSince1970: 1697583420),
-                Date(timeIntervalSince1970: 1697626740)
-            ),  // Kuala Lumpur
-            (
-                CLLocation(latitude: -33.93, longitude: 18.46),
-                Date(timeIntervalSince1970: 1697515320),
-                Date(timeIntervalSince1970: 1697562060)
-            ),  // Cape Town
-            (
-                CLLocation(latitude: 35.67, longitude: 139.8),
-                Date(timeIntervalSince1970: 1697575740),
-                Date(timeIntervalSince1970: 1697616120)
-            )  // Tokyo
-        ]
+        locations.forEach { location in
+            location.sunrises?.forEach { sunriseTime in
+                XCTAssertEqual(
+                    TimeInterval.timeToNearestSunrise(atLocation: location.location, referenceDate: sunriseTime)!,
+                    0.0,
+                    accuracy: accuracy,
+                    "Sunrise is ~0 seconds from \(sunriseTime) at \(location.name)"
+                )
+            }
+            
+            location.sunsets?.forEach { sunsetTime in
+                XCTAssertEqual(
+                    TimeInterval.timeToNearestSunset(atLocation: location.location, referenceDate: sunsetTime)!,
+                    0.0,
+                    accuracy: accuracy,
+                    "Sunrise is ~0 seconds from \(sunsetTime) at \(location.name)"
+                )
+            }
+        }
+    }
+    
+    func testSunAngleAtDifferentLocations() {
+        let accuracy = 5.0 * .pi / 180.0  // 5°
         
-        locationSunriseAndSunset.forEach {
-            XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: $0.0, referenceDate: $0.1)!, 0.0, accuracy: accuracy)
-            XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: $0.0, referenceDate: $0.2)!, 0.0, accuracy: accuracy)
+        locations.forEach { location in
+            location.solarNoons?.forEach { solarNoon in
+                XCTAssertTrue(
+                    solarNoon.isDaylight(at: location.location),
+                    "isDaylight on \(solarNoon) at \(location.name)"
+                )
+            }
+        }
+        
+        let nonPolarLocations = locations.filter { abs($0.location.coordinate.latitude) > 33.0 }
+        
+        nonPolarLocations.forEach { location in
+            location.solarNoons?.forEach { solarNoon in
+                let nightTime = solarNoon.addingTimeInterval(12.0 * 60.0 * 60.0)  // 12 hours after solar noon
+                
+                XCTAssertFalse(
+                    nightTime.isDaylight(at: location.location),
+                    "isDaylight is false on \(nightTime) at \(location)"
+                )
+            }
+        }
+        
+        locations.forEach { location in
+            location.sunrises?.forEach { sunrise in
+                XCTAssertEqual(
+                    sunrise.solarZenithAngle(at: location.location),
+                    Double.sunriseZenith,
+                    accuracy: accuracy,
+                    "Solar angle is ~-90° on \(sunrise) at \(location.name)"
+                )
+            }
+            
+            location.sunsets?.forEach { sunset in
+                XCTAssertEqual(
+                    sunset.solarZenithAngle(at: location.location),
+                    Double.sunriseZenith,
+                    accuracy: accuracy,
+                    "Solar angle is ~-90° on \(sunset) at \(location.name)"
+                )
+            }
         }
     }
     
     func testSanDiegoSunTimes() {
         let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-        let sanDiego = CLLocation(latitude: 32.7335, longitude: -117.1897)  // KSAN in San Diego, CA
+        
         let sunriseInSanDiego = Date(timeIntervalSince1970: 1697464440)  // Mon, 16 Oct 2023 06:54:00 PDT
         let sunsetInSanDiego = Date(timeIntervalSince1970: 1697505360)  // Mon, 16 Oct 2023 18:16:00 PDT
         let sunsetYesterdayInSanDiego = Date(timeIntervalSince1970: 1697418900)  // Sun, 15 Oct 2023 18:15:00 PDT
-        
         let noon = Date(timeIntervalSince1970: 1697482800)  // Mon, 16 Oct 2023 12:00:00 PDT
         let sunriseToNoon = noon.timeIntervalSince(sunriseInSanDiego)
         let noonToSunset = sunsetInSanDiego.timeIntervalSince(noon)
         
-        XCTAssertFalse(sunriseInSanDiego.addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego))
-        XCTAssertTrue(sunriseInSanDiego.addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego))
-        XCTAssertTrue(noon.isDaylight(at: sanDiego))
-        XCTAssertTrue(sunsetInSanDiego.addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego))
-        XCTAssertFalse(sunsetInSanDiego.addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego))
+        XCTAssertFalse(sanDiego.sunrises![0].addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego.location))
+        XCTAssertTrue(sanDiego.sunrises![0].addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego.location))
+        XCTAssertTrue(sanDiego.solarNoons![0].isDaylight(at: sanDiego.location))
+        XCTAssertTrue(sanDiego.sunsets![0].addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego.location))
+        XCTAssertFalse(sanDiego.sunsets![0].addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego.location))
         
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego, referenceDate: noon)!, -sunriseToNoon, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego, referenceDate: noon)!, noonToSunset, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego.location, referenceDate: noon)!, -sunriseToNoon, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego.location, referenceDate: noon)!, noonToSunset, accuracy: accuracy)
         
         let midnight = Date(timeIntervalSince1970: 1697439600)  // Mon, 16 Oct 2023 00:00:00 PDT
         let midnightToSunrise = sunriseInSanDiego.timeIntervalSince(midnight)
         let sunsetToMidnight = midnight.timeIntervalSince(sunsetYesterdayInSanDiego)
         
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego, referenceDate: midnight)!, midnightToSunrise, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego, referenceDate: midnight)!, -sunsetToMidnight, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego.location, referenceDate: midnight)!, midnightToSunrise, accuracy: accuracy)
+        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego.location, referenceDate: midnight)!, -sunsetToMidnight, accuracy: accuracy)
     }
     
     func testPolarSeasons() {
-        let southPole = CLLocation(latitude: -90.0, longitude: 0.0)
-        let mcmurdo = CLLocation(latitude: -77.85, longitude: 166.6)
-        let northPole = CLLocation(latitude: 90.0, longitude: 0.0)
         let twoWeeks = TimeInterval(14.0 * 24.0 * 60.0 * 60.0)
         let southPoleNightDate = Date(timeIntervalSince1970: 1686691830)  // Tuesday, June 13, 2023 21:30:30 GMT
         let southPoleDayDate = Date(timeIntervalSince1970: 1703799030)  //  Thursday, December 28, 2023 21:30:30 GMT
         
-        XCTAssertNil(Date.sunrise(at: southPole, onDate: southPoleNightDate))
-        XCTAssertFalse(southPoleNightDate.isDaylight(at: southPole))
-        XCTAssertNil(Date.sunset(at: southPole, onDate: southPoleDayDate))
-        XCTAssertTrue(southPoleDayDate.isDaylight(at: southPole))
-        XCTAssertNil(Date.sunrise(at: northPole, onDate: southPoleNightDate))
-        XCTAssertTrue(southPoleNightDate.isDaylight(at: northPole))
-        XCTAssertNil(Date.sunset(at: northPole, onDate: southPoleDayDate))
-        XCTAssertFalse(southPoleDayDate.isDaylight(at: northPole))
+        XCTAssertNil(Date.sunrise(at: southPole.location, onDate: southPoleNightDate))
+        XCTAssertFalse(southPoleNightDate.isDaylight(at: southPole.location))
+        XCTAssertNil(Date.sunset(at: southPole.location, onDate: southPoleDayDate))
+        XCTAssertTrue(southPoleDayDate.isDaylight(at: southPole.location))
+        XCTAssertNil(Date.sunrise(at: northPole.location, onDate: southPoleNightDate))
+        XCTAssertTrue(southPoleNightDate.isDaylight(at: northPole.location))
+        XCTAssertNil(Date.sunset(at: northPole.location, onDate: southPoleDayDate))
+        XCTAssertFalse(southPoleDayDate.isDaylight(at: northPole.location))
         
         // We just ensure that near polar sunrise/sunsets are at least two weeks away rather than expecting any
         //  sort of precision.
-        let lastSunrise = Date.priorSunriseOrSunset(sunrise: true, at: mcmurdo, toDate: southPoleNightDate)
-        let nextSunrise = Date.nextSunriseOrSunset(sunrise: true, at: mcmurdo, afterDate: southPoleNightDate)
+        let lastSunrise = Date.priorSunriseOrSunset(sunrise: true, at: mcmurdo.location, toDate: southPoleNightDate)
+        let nextSunrise = Date.nextSunriseOrSunset(sunrise: true, at: mcmurdo.location, afterDate: southPoleNightDate)
         XCTAssertNotNil(lastSunrise)
         XCTAssertNotNil(nextSunrise)
         XCTAssertTrue(southPoleNightDate.timeIntervalSince(lastSunrise!) > twoWeeks)
@@ -279,9 +354,9 @@ final class SunTimesTests: XCTestCase {
         
         // We don't care about return value for sunrise/sunset exactly at the pole, but we will
         //  check that it does not cause an infinite loop
-        _ = Date.priorSunriseOrSunset(sunrise: true, at: southPole, toDate: southPoleNightDate)
-        _ = Date.nextSunriseOrSunset(sunrise: true, at: southPole, afterDate: southPoleNightDate)
-        _ = Date.priorSunriseOrSunset(sunrise: true, at: northPole, toDate: southPoleNightDate)
-        _ = Date.nextSunriseOrSunset(sunrise: true, at: northPole, afterDate: southPoleNightDate)
+        _ = Date.priorSunriseOrSunset(sunrise: true, at: southPole.location, toDate: southPoleNightDate)
+        _ = Date.nextSunriseOrSunset(sunrise: true, at: southPole.location, afterDate: southPoleNightDate)
+        _ = Date.priorSunriseOrSunset(sunrise: true, at: northPole.location, toDate: southPoleNightDate)
+        _ = Date.nextSunriseOrSunset(sunrise: true, at: northPole.location, afterDate: southPoleNightDate)
     }
 }
