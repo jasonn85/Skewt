@@ -98,27 +98,28 @@ extension Date {
         )
     }
     
-    private func solarAngle(at location: CLLocation) -> Double {
+    func solarZenithAngle(at location: CLLocation) -> Double {
         let latitude = location.coordinate.latitude * .pi / 180.0
         let solarDeclination = solarDeclination
-        let timeOffset: TimeInterval = equationOfTime * 4.0 * location.coordinate.longitude
+        let equationOfTime = equationOfTime
+        let timeOffset: TimeInterval = equationOfTime + 4.0 * location.coordinate.longitude * 60.0
         
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents(in: .gmt, from: self)
         let solarTime: TimeInterval = (
-            Double(components.hour!) * 360.0 
+            Double(components.hour!) * 3600.0
             + Double(components.minute!) * 60.0
             + Double(components.second!)
             + timeOffset
         )
         
-        let hourAngle = ((solarTime * 60.0 / 4.0) - 180.0) * .pi / 180.0
-        
+        let hourAngle = 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
+            
         return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
     }
     
     func isDaylight(at location: CLLocation) -> Bool {
-        solarAngle(at: location) >= Double.sunriseZenith
+        solarZenithAngle(at: location) <= Double.sunriseZenith
     }
     
     // Sunrise or sunset on the same calendar UTC day.
