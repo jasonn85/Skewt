@@ -49,7 +49,7 @@ extension SunState {
             let lookingForSunriseNext = !result.last!.isDayThereafter
             let nextDate = Date.nextSunriseOrSunset(sunrise: lookingForSunriseNext, at: location, afterDate: result.last!.date)
             
-            if let nextDate = nextDate {
+            if let nextDate = nextDate, range.upperBound.timeIntervalSince(nextDate) >= 0.0 {
                 nextState = SunState(type: lookingForSunriseNext ? .sunrise : .sunset, date: nextDate)
             } else {
                 nextState = nil
