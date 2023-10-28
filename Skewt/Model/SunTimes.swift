@@ -15,7 +15,7 @@ extension Double {
 /// Struct used to represent sun rise/set events during a date range.
 /// Day/night events are used to bookend a range.
 struct SunState {
-    enum StateType {
+    enum StateType: Equatable {
         case day
         case night
         case sunrise

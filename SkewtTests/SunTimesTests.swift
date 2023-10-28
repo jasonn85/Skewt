@@ -359,4 +359,45 @@ final class SunTimesTests: XCTestCase {
         _ = Date.priorSunriseOrSunset(sunrise: true, at: northPole.location, toDate: southPoleNightDate)
         _ = Date.nextSunriseOrSunset(sunrise: true, at: northPole.location, afterDate: southPoleNightDate)
     }
+    
+    func testSunStatesInNormalRange() {
+        let date = Date(timeIntervalSince1970: 1698390000)  // Friday, October 27, 2023 07:00:00 GMT
+        let tomorrow = date.addingTimeInterval(24.0 * 60.0 * 60.0)
+        let sunrise = Date.nextSunriseOrSunset(sunrise: true, at: sanDiego.location, afterDate: date)
+        let sunset = Date.nextSunriseOrSunset(sunrise: false, at: sanDiego.location, afterDate: date)
+        
+        let sunStates = SunState.states(inRange: date...tomorrow, at: sanDiego.location)
+        
+        XCTAssertEqual(sunStates[0].date, date, "SunStates in range starts with starting date")
+        XCTAssertEqual(sunStates[0].type, .night, "SunStates in range starting at midnight begins with night")
+        
+        XCTAssertEqual(sunStates[1].date, sunrise)
+        XCTAssertEqual(sunStates[1].type, .sunrise)
+        XCTAssertEqual(sunStates[2].date, sunset)
+        XCTAssertEqual(sunStates[2].type, .sunset)
+        
+        XCTAssertEqual(sunStates.last!.date, tomorrow, "SunStates in range ends with ending date")
+        XCTAssertEqual(sunStates.last!.type, .night, "SunStates in range midnight...midnight ends with night")
+        
+        XCTAssertEqual(sunStates.count, 4)
+    }
+    
+    func testSunStatesLongerRanges() {
+        let rangeLengthsInDays = [7, 30, 365]
+        let startDate = Date(timeIntervalSince1970: 1698390000)  // Friday, October 27, 2023 07:00:00 GMT
+        
+        rangeLengthsInDays.forEach {
+            let endDate = startDate.addingTimeInterval(Double($0) * 24.0 * 60.0 * 60.0)
+            
+            let sunStates = SunState.states(inRange: startDate...endDate, at: sanDiego.location)
+            
+            XCTAssertEqual(sunStates.first!.date, startDate, "SunStates in \($0) day range starts with starting date")
+            XCTAssertEqual(sunStates.last!.date, endDate, "SunStates in \($0) day range ends with ending date")
+            
+            XCTAssertEqual(sunStates.filter({ $0.type == .sunrise }).count, $0,
+                           "SunStates in \($0) day range includes \($0) sunrises")
+            XCTAssertEqual(sunStates.filter({ $0.type == .sunset }).count, $0,
+                           "SunStates in \($0) day range includes \($0) sunsets")
+        }
+    }
 }
