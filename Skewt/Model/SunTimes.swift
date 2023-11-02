@@ -183,15 +183,19 @@ extension Date {
     
     // Next sunrise or sunset after a time at a specified location, including appropriate, estimated polar
     //  sunrise/sunset if it is 24+ hours hence.
-    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate date: Date = .now) -> Date? {
+    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate initialDate: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
-        let maximumDate = date.addingTimeInterval(eightMonths)
-        var date = date
+        let maximumDate = initialDate.addingTimeInterval(eightMonths)
+        var date = initialDate.addingTimeInterval(-24.0 * 60.0 * 60.0)
         var result: Date? = nil
         
         while result == nil {
             result = Date.sunriseOrSunset(sunrise: sunrise, at: location, onDate: date)
             date = date.tomorrow
+            
+            if let nonNilResult = result, nonNilResult.timeIntervalSince(initialDate) <= 0.0 {
+                result = nil
+            }
             
             if date.timeIntervalSince(maximumDate) > 0.0 {
                 return nil
