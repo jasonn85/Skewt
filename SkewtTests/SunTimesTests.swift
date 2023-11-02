@@ -360,7 +360,7 @@ final class SunTimesTests: XCTestCase {
         _ = Date.nextSunriseOrSunset(sunrise: true, at: northPole.location, afterDate: southPoleNightDate)
     }
     
-    func testSunStatesInNormalRange() {
+    func testSunStatesAroundMidnight() {
         let date = Date(timeIntervalSince1970: 1698390000)  // Friday, October 27, 2023 07:00:00 GMT
         let tomorrow = date.addingTimeInterval(24.0 * 60.0 * 60.0)
         let sunrise = Date.nextSunriseOrSunset(sunrise: true, at: sanDiego.location, afterDate: date)
@@ -380,6 +380,22 @@ final class SunTimesTests: XCTestCase {
         XCTAssertEqual(sunStates.last!.type, .night, "SunStates in range midnight...midnight ends with night")
         
         XCTAssertEqual(sunStates.count, 4)
+    }
+    
+    func testSunStatesNormalRanges() {
+        let startDate = Date(timeIntervalSince1970: 1698883200)  // Thursday, November 2, 2023 00:00:00 GMT
+        let location = sanDiego.location
+        let oneHour = TimeInterval(60.0 * 60.0)
+        let oneDay = TimeInterval(24.0 * oneHour)
+        
+        stride(from: TimeInterval(0), to: oneDay, by: oneHour).forEach {
+            let date = startDate.addingTimeInterval($0)
+            let events = SunState.states(inRange: date...date.addingTimeInterval(oneDay), at: location)
+            
+            XCTAssertEqual(events.count, 4)
+            XCTAssertEqual(events.filter({ $0.type == .sunrise }).count, 1)
+            XCTAssertEqual(events.filter({ $0.type == .sunset }).count, 1)
+        }
     }
     
     func testSunStatesLongerRanges() {
