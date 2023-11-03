@@ -197,13 +197,6 @@ final class SunTimesTests: XCTestCase {
         let dec25 = Date(timeIntervalSince1970: 977731200)  // Monday, December 25, 2000 08:00:00 GMT
         XCTAssertEqual(dec25.equationOfTime, 0.0, accuracy: accuracy)
     }
-
-    func testExactTimesNoLocationSpecified() {
-        let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-        
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: nil, referenceDate: denver.sunrises![0])!, 0, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: nil, referenceDate: denver.sunsets![0])!, 0, accuracy: accuracy)
-    }
     
     func testGmtSunTimes() {
         let angleAccuracy = 5.0 * .pi / 180.0  // 5°
@@ -234,23 +227,30 @@ final class SunTimesTests: XCTestCase {
     
     func testExactTimesSpecificLocations() {
         let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm 'GMT'"
+        
         locations.forEach { location in
             location.sunrises?.forEach { sunriseTime in
                 XCTAssertEqual(
-                    TimeInterval.timeToNearestSunrise(atLocation: location.location, referenceDate: sunriseTime)!,
+                    Date.sunrise(at: location.location, onDate: sunriseTime)!.timeIntervalSince(sunriseTime),
                     0.0,
                     accuracy: accuracy,
-                    "Sunrise is ~0 seconds from \(sunriseTime) at \(location.name)"
+                    "Sunrise on \(dateFormatter.string(from: sunriseTime)) at \(location.name) is \(timeFormatter.string(from: sunriseTime))"
                 )
             }
             
             location.sunsets?.forEach { sunsetTime in
                 XCTAssertEqual(
-                    TimeInterval.timeToNearestSunset(atLocation: location.location, referenceDate: sunsetTime)!,
+                    Date.sunset(at: location.location, onDate: sunsetTime)!.timeIntervalSince(sunsetTime),
                     0.0,
                     accuracy: accuracy,
-                    "Sunrise is ~0 seconds from \(sunsetTime) at \(location.name)"
+                    "Sunset on \(dateFormatter.string(from: sunsetTime)) at \(location.name) is \(timeFormatter.string(from: sunsetTime))"
                 )
             }
         }
@@ -302,31 +302,12 @@ final class SunTimesTests: XCTestCase {
         }
     }
     
-    func testSanDiegoSunTimes() {
-        let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-        
-        let sunriseInSanDiego = Date(timeIntervalSince1970: 1697464440)  // Mon, 16 Oct 2023 06:54:00 PDT
-        let sunsetInSanDiego = Date(timeIntervalSince1970: 1697505360)  // Mon, 16 Oct 2023 18:16:00 PDT
-        let sunsetYesterdayInSanDiego = Date(timeIntervalSince1970: 1697418900)  // Sun, 15 Oct 2023 18:15:00 PDT
-        let noon = Date(timeIntervalSince1970: 1697482800)  // Mon, 16 Oct 2023 12:00:00 PDT
-        let sunriseToNoon = noon.timeIntervalSince(sunriseInSanDiego)
-        let noonToSunset = sunsetInSanDiego.timeIntervalSince(noon)
-        
+    func testSanDiegoDaylight() {
         XCTAssertFalse(sanDiego.sunrises![0].addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego.location))
         XCTAssertTrue(sanDiego.sunrises![0].addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego.location))
         XCTAssertTrue(sanDiego.solarNoons![0].isDaylight(at: sanDiego.location))
         XCTAssertTrue(sanDiego.sunsets![0].addingTimeInterval(-60.0 * 60.0).isDaylight(at: sanDiego.location))
         XCTAssertFalse(sanDiego.sunsets![0].addingTimeInterval(60.0 * 60.0).isDaylight(at: sanDiego.location))
-        
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego.location, referenceDate: noon)!, -sunriseToNoon, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego.location, referenceDate: noon)!, noonToSunset, accuracy: accuracy)
-        
-        let midnight = Date(timeIntervalSince1970: 1697439600)  // Mon, 16 Oct 2023 00:00:00 PDT
-        let midnightToSunrise = sunriseInSanDiego.timeIntervalSince(midnight)
-        let sunsetToMidnight = midnight.timeIntervalSince(sunsetYesterdayInSanDiego)
-        
-        XCTAssertEqual(TimeInterval.timeToNearestSunrise(atLocation: sanDiego.location, referenceDate: midnight)!, midnightToSunrise, accuracy: accuracy)
-        XCTAssertEqual(TimeInterval.timeToNearestSunset(atLocation: sanDiego.location, referenceDate: midnight)!, -sunsetToMidnight, accuracy: accuracy)
     }
     
     func testPolarSeasons() {
