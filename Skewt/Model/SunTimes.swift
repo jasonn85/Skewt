@@ -141,6 +141,7 @@ extension Date {
         let calendar = Calendar(identifier: .gregorian)
 
         var components = calendar.dateComponents(in: .gmt, from: date)
+        components.day! += minutesUtc > 1440 ? -1 : (minutesUtc < 0 ? 1 : 0)  // Correct for off-by-one day
         components.hour = 0
         components.minute = 0
         components.nanosecond = 0
