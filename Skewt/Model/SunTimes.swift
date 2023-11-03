@@ -8,6 +8,63 @@
 import Foundation
 import CoreLocation
 
+extension Double {
+    static let sunriseZenith = 1.58533492  // 90.833° zenith for sunrise/sunset
+}
+
+/// Struct used to represent sun rise/set events during a date range.
+/// Day/night events are used to bookend a range.
+struct SunState {
+    enum StateType: Equatable {
+        case day
+        case night
+        case sunrise
+        case sunset
+    }
+    
+    let type: StateType
+    let date: Date
+}
+ 
+extension SunState {
+    private var isDayThereafter: Bool {
+        switch type {
+        case .day, .sunrise:
+            return true
+        case .night, .sunset:
+            return false
+        }
+    }
+    
+    static func states(inRange range: ClosedRange<Date>, at location: CLLocation) -> [SunState] {
+        var nextState: SunState? = SunState(
+            type: range.lowerBound.isDaylight(at: location) ? .day : .night,
+            date: range.lowerBound
+        )
+        var result: [SunState] = []
+        
+        repeat {
+            result.append(nextState!)
+            
+            let lookingForSunriseNext = !result.last!.isDayThereafter
+            let nextDate = Date.nextSunriseOrSunset(sunrise: lookingForSunriseNext, at: location, afterDate: result.last!.date)
+            
+            if let nextDate = nextDate, range.upperBound.timeIntervalSince(nextDate) >= 0.0 {
+                nextState = SunState(type: lookingForSunriseNext ? .sunrise : .sunset, date: nextDate)
+            } else {
+                nextState = nil
+            }
+        } while (nextState != nil)
+        
+        result.append(SunState(
+            type: range.upperBound.isDaylight(at: location) ? .day : .night,
+            date: range.upperBound
+        ))
+        
+        return result
+    }
+}
+
 extension Date {
     // The percent of the year [0,2π], accurate to 24 hours
     var fractionalYearInRadians: Double {
@@ -41,14 +98,37 @@ extension Date {
         )
     }
     
+    func solarZenithAngle(at location: CLLocation) -> Double {
+        let latitude = location.coordinate.latitude * .pi / 180.0
+        let solarDeclination = solarDeclination
+        let equationOfTime = equationOfTime
+        let timeOffset: TimeInterval = equationOfTime + 4.0 * location.coordinate.longitude * 60.0
+        
+        let calendar = Calendar(identifier: .gregorian)
+        let components = calendar.dateComponents(in: .gmt, from: self)
+        let solarTime: TimeInterval = (
+            Double(components.hour!) * 3600.0
+            + Double(components.minute!) * 60.0
+            + Double(components.second!)
+            + timeOffset
+        )
+        
+        let hourAngle = 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
+            
+        return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
+    }
+    
+    func isDaylight(at location: CLLocation) -> Bool {
+        solarZenithAngle(at: location) <= Double.sunriseZenith
+    }
+    
     // Sunrise or sunset on the same calendar UTC day.
     // Returns nil if the day occurs during polar night or polar day.
     private static func sunriseOrSunset(sunrise: Bool, at location: CLLocation, onDate date: Date = .now) -> Date? {
-        let zenith = 1.58533492  // 90.833° zenith for sunrise/sunset
         let latitude = location.coordinate.latitude * .pi / 180.0
         let solarDeclination = date.solarDeclination
         let sign = sunrise ? 1.0 : -1.0
-        let hourAngle = sign * acos((cos(zenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
+        let hourAngle = sign * acos((cos(Double.sunriseZenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
 
         if hourAngle.isNaN {
             // Polar night or day
@@ -61,6 +141,7 @@ extension Date {
         let calendar = Calendar(identifier: .gregorian)
 
         var components = calendar.dateComponents(in: .gmt, from: date)
+        components.day! += minutesUtc > 1440 ? -1 : (minutesUtc < 0 ? 1 : 0)  // Correct for off-by-one day
         components.hour = 0
         components.minute = 0
         components.nanosecond = 0
@@ -103,15 +184,19 @@ extension Date {
     
     // Next sunrise or sunset after a time at a specified location, including appropriate, estimated polar
     //  sunrise/sunset if it is 24+ hours hence.
-    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate date: Date = .now) -> Date? {
+    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate initialDate: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
-        let maximumDate = date.addingTimeInterval(eightMonths)
-        var date = date
+        let maximumDate = initialDate.addingTimeInterval(eightMonths)
+        var date = initialDate.addingTimeInterval(-24.0 * 60.0 * 60.0)
         var result: Date? = nil
         
         while result == nil {
             result = Date.sunriseOrSunset(sunrise: sunrise, at: location, onDate: date)
             date = date.tomorrow
+            
+            if let nonNilResult = result, nonNilResult.timeIntervalSince(initialDate) <= 0.0 {
+                result = nil
+            }
             
             if date.timeIntervalSince(maximumDate) > 0.0 {
                 return nil
@@ -127,54 +212,5 @@ extension Date {
     
     var yesterday: Date {
         addingTimeInterval(-24.0 * 60.0 * 60.0)
-    }
-}
-
-// Calculations for sunrise/sunset, ref: https://gml.noaa.gov/grad/solcalc/solareqns.PDF
-extension TimeInterval {
-    static func timeToNearestSunrise(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval? {
-        let location = location ?? .denver
-        let sunriseToday = Date.sunrise(at: location, onDate: referenceDate)
-        let sunriseTomorrow = Date.sunrise(at: location, onDate: referenceDate.tomorrow)
-        
-        guard let sunriseToday = sunriseToday, let sunriseTomorrow = sunriseTomorrow else {
-            guard let lastSunrise = Date.priorSunriseOrSunset(sunrise: true, at: location, toDate: referenceDate),
-                  let nextSunrise = Date.nextSunriseOrSunset(sunrise: true, at: location, afterDate: referenceDate) else {
-                return nil
-            }
-            
-            let lastDiff = lastSunrise.timeIntervalSince(referenceDate)
-            let nextDiff = nextSunrise.timeIntervalSince(referenceDate)
-            
-            return abs(lastDiff) <= abs(nextDiff) ? lastDiff : nextDiff
-        }
-        
-        let todayDiff = sunriseToday.timeIntervalSince(referenceDate)
-        let tomorrowDiff = sunriseTomorrow.timeIntervalSince(referenceDate)
-        
-        return abs(todayDiff) <= abs(tomorrowDiff) ? todayDiff : tomorrowDiff
-    }
-    
-    static func timeToNearestSunset(atLocation location: CLLocation?, referenceDate: Date = .now) -> TimeInterval? {
-        let location = location ?? .denver
-        let sunsetToday = Date.sunset(at: location, onDate: referenceDate)
-        let sunsetYesterday = Date.sunset(at: location, onDate: referenceDate.yesterday)
-        
-        guard let sunsetToday = sunsetToday, let sunsetYesterday = sunsetYesterday else {
-            guard let lastSunset = Date.priorSunriseOrSunset(sunrise: false, at: location, toDate: referenceDate),
-                  let nextSunset = Date.nextSunriseOrSunset(sunrise: false, at: location, afterDate: referenceDate) else {
-                return nil
-            }
-            
-            let lastDiff = lastSunset.timeIntervalSince(referenceDate)
-            let nextDiff = nextSunset.timeIntervalSince(referenceDate)
-            
-            return abs(lastDiff) <= abs(nextDiff) ? lastDiff : nextDiff
-        }
-        
-        let todayDiff = sunsetToday.timeIntervalSince(referenceDate)
-        let yesterdayDiff = sunsetYesterday.timeIntervalSince(referenceDate)
-        
-        return abs(todayDiff) <= abs(yesterdayDiff) ? todayDiff : yesterdayDiff   
     }
 }
