@@ -227,13 +227,21 @@ final class SunTimesTests: XCTestCase {
     
     func testExactTimesSpecificLocations() {
         let accuracy = TimeInterval(5.0 * 60.0)  // Five minutes
-
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm 'GMT'"
+        
         locations.forEach { location in
             location.sunrises?.forEach { sunriseTime in
                 XCTAssertEqual(
                     Date.sunrise(at: location.location, onDate: sunriseTime)!.timeIntervalSince(sunriseTime),
                     0.0,
-                    accuracy: accuracy
+                    accuracy: accuracy,
+                    "Sunrise on \(dateFormatter.string(from: sunriseTime)) at \(location.name) is \(timeFormatter.string(from: sunriseTime))"
                 )
             }
             
@@ -241,7 +249,8 @@ final class SunTimesTests: XCTestCase {
                 XCTAssertEqual(
                     Date.sunset(at: location.location, onDate: sunsetTime)!.timeIntervalSince(sunsetTime),
                     0.0,
-                    accuracy: accuracy
+                    accuracy: accuracy,
+                    "Sunset on \(dateFormatter.string(from: sunsetTime)) at \(location.name) is \(timeFormatter.string(from: sunsetTime))"
                 )
             }
         }
