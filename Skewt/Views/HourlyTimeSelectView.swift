@@ -29,9 +29,13 @@ struct HourlyTimeSelectView: View {
         return formatter
     }
     
-    private var valueAsPercentage: Double {
-        var interval: TimeInterval
+    private func timeIntervalAsPercentage(_ interval: TimeInterval) -> Double {
+        let rawPercentage = (interval - range.lowerBound) / (range.upperBound - range.lowerBound)
         
+        return min(max(rawPercentage, 0.0), 1.0)
+    }
+    
+    private var valueAsPercentage: Double {
         switch value {
         case .now:
             return 0.5
@@ -39,14 +43,10 @@ struct HourlyTimeSelectView: View {
             // Not supported by this time selection UI
             return 0.5
         case .specific(let date):
-            interval = date.timeIntervalSinceNow
-        case .relative(let theInterval):
-            interval = theInterval
+            return timeIntervalAsPercentage(date.timeIntervalSinceNow)
+        case .relative(let interval):
+            return timeIntervalAsPercentage(interval)
         }
-        
-        let rawPercentage = (interval - range.lowerBound) / (range.upperBound - range.lowerBound)
-        
-        return min(max(rawPercentage, 0.0), 1.0)
     }
     
     var body: some View {
@@ -58,23 +58,33 @@ struct HourlyTimeSelectView: View {
                         .frame(height: 4)
                         .overlay {
                             GeometryReader { geometry in
-                                let circleSize = dragging ? 16.0 : 10.0
+                                let circleSize = dragging ? 18.0 : 12.0
                                 
                                 Circle()
-                                    .stroke(.black, lineWidth: 1.0)
-                                    .fill(.white)
+                                    .stroke(.foreground, lineWidth: 1.0)
+                                    .fill(.background.opacity(dragging ? 0.66 : 1.0))
                                     .position(x: valueAsPercentage * geometry.size.width, y: geometry.size.height / 2.0)
-                                    .foregroundColor(.black)
                                     .frame(width: circleSize, height: circleSize)
                             }
                         }
                         .background {
-                            let now = Date(timeIntervalSince1970: 1698962060)
-                            let start = Date(timeInterval: range.lowerBound, since: now)
-                            let end = Date(timeInterval: range.upperBound, since: now)
-                            
-                            LinearGradient.horizontalSunGradient(inTimeRange: start...end, at: location ?? .denver)
-                                .clipShape(RoundedRectangle(cornerRadius: 2))
+                            GeometryReader { geometry in
+                                let start = Date(timeIntervalSinceNow: range.lowerBound)
+                                let end = Date(timeIntervalSinceNow: range.upperBound)
+                                
+                                ZStack {
+                                    LinearGradient.horizontalSunGradient(inTimeRange: start...end, at: location ?? .denver)
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                                    
+                                    Rectangle()
+                                        .fill(.yellow)
+                                        .frame(width: 2.0, height: geometry.size.height)
+                                        .position(
+                                            x: timeIntervalAsPercentage(0.0) * geometry.size.width,
+                                            y: geometry.size.height / 2.0
+                                        )
+                                }
+                            }
                         }
                         .gesture(
                             DragGesture(minimumDistance: 0.0)
