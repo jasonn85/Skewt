@@ -106,7 +106,7 @@ struct ContentView: View {
         .onAppear {
             timeSelectDebouncer.store = store
         }
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 store.dispatch(SoundingState.Action.doRefresh)
             }
