@@ -106,7 +106,7 @@ struct ContentView: View {
         .onAppear {
             timeSelectDebouncer.store = store
         }
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 store.dispatch(SoundingState.Action.doRefresh)
             }
@@ -167,7 +167,8 @@ struct ContentView: View {
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.op40.hourInterval)
+                stepSize: .hours(SoundingSelection.ModelType.op40.hourInterval),
+                location: store.state.locationState.locationIfKnown
             )
         case .raob:
             SoundingTimeSelectView(

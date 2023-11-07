@@ -12,6 +12,14 @@ extension Double {
     static let sunriseZenith = 1.58533492  // 90.833° zenith for sunrise/sunset
 }
 
+extension CLLocation {
+    static func equatorialLocation(inTimeZone timeZone: TimeZone = Calendar.current.timeZone) -> CLLocation {
+        let gmtOffset = timeZone.secondsFromGMT() / 3_600
+        
+        return CLLocation(latitude: 0.0, longitude: 15.0 * Double(gmtOffset))
+    }
+}
+
 /// Struct used to represent sun rise/set events during a date range.
 /// Day/night events are used to bookend a range.
 struct SunState {
