@@ -68,8 +68,11 @@ struct HourlyTimeSelectView: View {
                                     let end = Date(timeIntervalSinceNow: range.upperBound)
                                     
                                     ZStack {
-                                        LinearGradient.horizontalSunGradient(inTimeRange: start...end, at: location ?? .denver)
-                                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        LinearGradient.horizontalSunGradient(
+                                            inTimeRange: start...end,
+                                            at: location ?? .equatorialLocationForCurrentTimeZone
+                                        )
+                                        .clipShape(RoundedRectangle(cornerRadius: 2))
                                         
                                         Rectangle()
                                             .fill(.yellow)
