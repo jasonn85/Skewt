@@ -10,6 +10,7 @@ import Foundation
 
 fileprivate let columnWidth = 7
 fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB format
+fileprivate let temperatureRange = -270.0...100.0
 
 /// A rawindsonde sounding
 struct Sounding: Codable {
@@ -105,6 +106,13 @@ internal extension LosslessStringConvertible {
         }
         
         self.init(trimmed)
+    }
+}
+
+internal extension Double {
+    /// The value if it is within a reasonable atmospheric temperature range, otherwise nil
+    var safeTemperatureValue: Double? {
+        temperatureRange.contains(self) ? self : nil
     }
 }
 
@@ -347,12 +355,12 @@ extension LevelDataPoint {
         guard let pressure = Int(fromSoundingString: columns[0]) else {
             throw SoundingParseError.unparseableLine(text)
         }
-            
+    
         self.type = type
         self.pressure = pressure.doubleFromTenths()
         self.height = Int(fromSoundingString: columns[1])
-        self.temperature = Int(fromSoundingString: columns[2])?.doubleFromTenths()
-        self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths()
+        self.temperature = Int(fromSoundingString: columns[2])?.doubleFromTenths().safeTemperatureValue
+        self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths().safeTemperatureValue
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
     }

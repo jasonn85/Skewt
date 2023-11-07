@@ -254,6 +254,28 @@ class SkewtTests: XCTestCase {
         }
     }
     
+    func testOutOfBoundsValueIgnoring() throws {
+        let bundle = Bundle(for: type(of: self))
+        let fileUrl = bundle.url(forResource: "out-of-bounds-op40", withExtension: "txt")!
+        let d = try Data(contentsOf: fileUrl)
+        let s = String(data: d, encoding: .utf8)!
+        let sounding = try Sounding(fromText: s)
+
+        sounding.data.filter({ $0.temperature != nil }).forEach {
+            XCTAssertTrue(
+                $0.temperature! >= -270.0 && $0.temperature! <= 100.0,
+                "Temperature \($0.temperature!) is between absolute zero and boiling water temperature"
+            )
+        }
+        
+        sounding.data.filter({ $0.dewPoint != nil }).forEach {
+            XCTAssertTrue(
+                $0.dewPoint! >= -270.0 && $0.dewPoint! <= 100.0,
+                "Dew point of \($0.dewPoint!) is between absolute zero and boiling water temperature"
+            )
+        }
+    }
+    
     func testRaobParsing() throws {
         let bundle = Bundle(for: type(of: self))
         let fileUrl = bundle.url(forResource: "nkx-raob-1", withExtension: "txt")!
