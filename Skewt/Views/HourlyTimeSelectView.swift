@@ -16,19 +16,6 @@ struct HourlyTimeSelectView: View {
     
     @State private var dragging = false
     
-    private var formatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h a"
-        return formatter
-    }
-    
-    private var relativeFormatter: RelativeDateTimeFormatter {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.formattingContext = .middleOfSentence
-        formatter.dateTimeStyle = .named
-        return formatter
-    }
-    
     private func timeIntervalAsPercentage(_ interval: TimeInterval) -> Double {
         let rawPercentage = (interval - range.lowerBound) / (range.upperBound - range.lowerBound)
         
@@ -51,6 +38,9 @@ struct HourlyTimeSelectView: View {
     
     var body: some View {
         VStack {
+            Spacer()
+                .frame(height: 12.0)
+            
             ZStack {
                 GeometryReader { geometry in
                     Rectangle()
@@ -101,6 +91,35 @@ struct HourlyTimeSelectView: View {
                 .frame(height: 4)
             }
             .scenePadding(.horizontal)
+            
+            Text(valueDescription)
+                .font(.system(size: 12.0))
+                .opacity(dragging ? 1.0 : 0.0)
+        }
+    }
+    
+    private var shortTimeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h a"
+        
+        return formatter
+    }
+    
+    private var valueDescription: String {
+        switch value {
+        case .numberOfSoundingsAgo(let count):
+            return "\(count) soundings ago"
+        case .specific(let date):
+            return shortTimeFormatter.string(from: date)
+        case .relative(let interval):
+            let date = Date.nearestHour(
+                withIntervalFromNow: interval,
+                hoursPerInterval: Int(stepSize / 3_600.0)
+            )
+            
+            return shortTimeFormatter.string(from: date)
+        case .now:
+            return "Now"
         }
     }
     
