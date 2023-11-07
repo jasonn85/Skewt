@@ -158,11 +158,7 @@ struct HourlyTimeSelectView: View {
     }
     
     private func setValue(toRelativeTimeInterval interval: TimeInterval) {
-        if interval == 0.0 {
-            value = .now
-        } else {
-            value = .relative(interval)
-        }
+        value = interval == 0.0 ? .now : .relative(interval)
     }
 }
 
