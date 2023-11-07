@@ -471,6 +471,9 @@ extension View {
 
 struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
     static var previews: some View {
-        AnnotatedSkewtPlotView().environmentObject(Store<SkewtState>.previewStore)
+        let store = Store<SkewtState>.previewStore
+        let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
+        
+        AnnotatedSkewtPlotView().environmentObject(store)
     }
 }
