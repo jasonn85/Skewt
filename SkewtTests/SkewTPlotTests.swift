@@ -69,6 +69,10 @@ extension CGPath {
     func intersectsRect(_ rect: CGRect) -> Bool {
         return componentEndPoints.first(where: { rect.contains($0) }) != nil
     }
+    
+    func isContainedWithinRect(_ rect: CGRect) -> Bool {
+        return componentEndPoints.first(where: { !rect.contains($0) }) == nil
+    }
 }
 
 final class SkewTPlotTests: XCTestCase {
@@ -115,6 +119,21 @@ RAOB sounding valid at:
         let plot = SkewtPlot(sounding: constantTempSounding)
         
         XCTAssertTrue(plot.temperaturePath!.isPositiveSlope)
+    }
+    
+    func testNonsenseTemperaturesStayInBounds() throws {
+        let bundle = Bundle(for: type(of: self))
+        let fileUrl = bundle.url(forResource: "out-of-bounds-op40", withExtension: "txt")!
+        let d = try Data(contentsOf: fileUrl)
+        let s = String(data: d, encoding: .utf8)!
+        let sounding = try Sounding(fromText: s)
+        let plot = SkewtPlot(sounding: sounding)
+        
+        // Allow off-screen left, right, and up by a factor of 1. Down should always be in bounds.
+        let bounds = CGRect(x: -1.0, y: -1.0, width: 3.0, height: 2.0)
+        
+        XCTAssertTrue(plot.temperaturePath!.isContainedWithinRect(bounds), "Temperature path stays within reasonable bounds")
+        XCTAssertTrue(plot.dewPointPath!.isContainedWithinRect(bounds), "Dew point path stays within reasonable bounds")
     }
     
     func testIsobarNonLinearScale() {
