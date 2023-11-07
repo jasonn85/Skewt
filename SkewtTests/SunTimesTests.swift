@@ -12,7 +12,8 @@ import CoreLocation
 struct Location {
     let location: CLLocation
     let name: String
-    
+    let gmtOffset: Int?
+
     let sunrises: [Date]?
     let sunsets: [Date]?
     let solarNoons: [Date]?
@@ -37,6 +38,7 @@ final class SunTimesTests: XCTestCase {
         denver = Location(
             location: CLLocation(latitude: 39.87, longitude: -104.67),
             name: "Denver",
+            gmtOffset: -7,
             sunrises: [
                 Date(timeIntervalSince1970: 1697461800)  // Monday, October 16, 2023 13:10:00 GMT
             ],
@@ -51,6 +53,7 @@ final class SunTimesTests: XCTestCase {
         greenwich = Location(
             location: CLLocation(latitude: 51.47783, longitude: -0.00139),
             name: "Greenwich",
+            gmtOffset: 0,
             sunrises: [
                 Date(timeIntervalSince1970: 1651897260),  // Saturday, May 7, 2022 04:21:00 GMT
                 Date(timeIntervalSince1970: 1672560360)  // Sunday, January 1, 2023 08:06:00 GMT
@@ -68,6 +71,7 @@ final class SunTimesTests: XCTestCase {
         kualaLumpur = Location(
             location: CLLocation(latitude: 3.16, longitude: 101.71),
             name: "Kuala Lumpur",
+            gmtOffset: nil,
             sunrises: [
                 Date(timeIntervalSince1970: 1697583420)  // Tuesday, October 17, 2023 22:57:00 GMT
             ],
@@ -80,6 +84,7 @@ final class SunTimesTests: XCTestCase {
         capeTown = Location(
             location: CLLocation(latitude: -33.93, longitude: 18.46),
             name: "Cape Town",
+            gmtOffset: 2,
             sunrises: [
                 Date(timeIntervalSince1970: 1697515380)  //  Tuesday, October 17, 2023 04:03:00 GMT
             ],
@@ -92,6 +97,7 @@ final class SunTimesTests: XCTestCase {
         tokyo = Location(
             location: CLLocation(latitude: 35.67, longitude: 139.8),
             name: "Tokyo",
+            gmtOffset: 9,
             sunrises: [
                 Date(timeIntervalSince1970: 1697575740)  // Tuesday, October 17, 2023 20:49:00 GMT
             ],
@@ -106,6 +112,7 @@ final class SunTimesTests: XCTestCase {
         sanDiego = Location(
             location: CLLocation(latitude: 32.7335, longitude: -117.1897),
             name: "San Diego",
+            gmtOffset: -8,
             sunrises: [
                 Date(timeIntervalSince1970: 1697464440)  // Mon, 16 Oct 2023 06:54:00 PDT
             ],
@@ -122,6 +129,7 @@ final class SunTimesTests: XCTestCase {
         southPole = Location(
             location: CLLocation(latitude: -90.0, longitude: 0.0),
             name: "South Pole",
+            gmtOffset: nil,
             sunrises: nil,
             sunsets: nil,
             solarNoons: nil
@@ -130,6 +138,7 @@ final class SunTimesTests: XCTestCase {
         mcmurdo = Location(
             location: CLLocation(latitude: -77.85, longitude: 166.6),
             name: "McMurdo Station",
+            gmtOffset: nil,
             sunrises: nil,
             sunsets: nil,
             solarNoons: nil
@@ -138,6 +147,7 @@ final class SunTimesTests: XCTestCase {
         northPole = Location(
             location: CLLocation(latitude: 90.0, longitude: 0.0),
             name: "North Pole",
+            gmtOffset: nil,
             sunrises: nil,
             sunsets: nil,
             solarNoons: nil
@@ -180,6 +190,21 @@ final class SunTimesTests: XCTestCase {
 
         let july17 = Date(timeIntervalSince1970: 1689577200)  // Monday, July 17, 2023 07:00:00 GMT
         XCTAssertEqual(july17.solarDeclination, 21.2 * .pi / 180.0, accuracy: accuracy)
+    }
+    
+    func testEquatorialLocationEstimate() {
+        let longitudeAccuracy = 15.0
+        
+        locations.filter({ $0.gmtOffset != nil }).forEach {
+            let timeZone = TimeZone(secondsFromGMT: $0.gmtOffset! * 3_600)!
+            
+            XCTAssertEqual(
+                CLLocation.equatorialLocation(inTimeZone: timeZone).coordinate.longitude,
+                $0.location.coordinate.longitude,
+                accuracy: longitudeAccuracy,
+                "\($0.name) GMT \($0.gmtOffset! >= 0 ? "+" : "-") \($0.gmtOffset!) estimated longitude is ~\($0.location.coordinate.longitude)"
+            )
+        }
     }
     
     func testEquationOfTime() {

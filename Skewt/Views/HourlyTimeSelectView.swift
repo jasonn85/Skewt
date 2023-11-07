@@ -70,7 +70,7 @@ struct HourlyTimeSelectView: View {
                                     ZStack {
                                         LinearGradient.horizontalSunGradient(
                                             inTimeRange: start...end,
-                                            at: location ?? .equatorialLocationForCurrentTimeZone
+                                            at: location ?? .equatorialLocation()
                                         )
                                         .clipShape(RoundedRectangle(cornerRadius: 2))
                                         

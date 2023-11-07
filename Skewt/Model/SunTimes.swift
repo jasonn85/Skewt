@@ -13,9 +13,8 @@ extension Double {
 }
 
 extension CLLocation {
-    static var equatorialLocationForCurrentTimeZone: CLLocation {
-        let calendar = Calendar.current
-        let gmtOffset = calendar.timeZone.secondsFromGMT() / 3_600
+    static func equatorialLocation(inTimeZone timeZone: TimeZone = Calendar.current.timeZone) -> CLLocation {
+        let gmtOffset = timeZone.secondsFromGMT() / 3_600
         
         return CLLocation(latitude: 0.0, longitude: 15.0 * Double(gmtOffset))
     }
