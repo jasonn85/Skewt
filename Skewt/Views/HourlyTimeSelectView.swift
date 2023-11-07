@@ -41,60 +41,83 @@ struct HourlyTimeSelectView: View {
             Spacer()
                 .frame(height: 12.0)
             
-            ZStack {
-                GeometryReader { geometry in
-                    Rectangle()
-                        .foregroundColor(.clear)
-                        .frame(height: 4)
-                        .overlay {
-                            GeometryReader { geometry in
-                                let circleSize = dragging ? 18.0 : 12.0
-                                
-                                Circle()
-                                    .stroke(.foreground, lineWidth: 1.0)
-                                    .fill(.background.opacity(dragging ? 0.66 : 1.0))
-                                    .position(x: valueAsPercentage * geometry.size.width, y: geometry.size.height / 2.0)
-                                    .frame(width: circleSize, height: circleSize)
-                            }
-                        }
-                        .background {
-                            GeometryReader { geometry in
-                                let start = Date(timeIntervalSinceNow: range.lowerBound)
-                                let end = Date(timeIntervalSinceNow: range.upperBound)
-                                
-                                ZStack {
-                                    LinearGradient.horizontalSunGradient(inTimeRange: start...end, at: location ?? .denver)
-                                        .clipShape(RoundedRectangle(cornerRadius: 2))
+            HStack {
+                Button(action: { incrementValue(by: -stepSize) }, label: {
+                    Image(systemName: "minus.circle")
+                })
+                
+                ZStack {
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .frame(height: 4)
+                            .overlay {
+                                GeometryReader { geometry in
+                                    let circleSize = dragging ? 18.0 : 12.0
                                     
-                                    Rectangle()
-                                        .fill(.yellow)
-                                        .frame(width: 2.0, height: geometry.size.height)
-                                        .position(
-                                            x: timeIntervalAsPercentage(0.0) * geometry.size.width,
-                                            y: geometry.size.height / 2.0
-                                        )
+                                    Circle()
+                                        .stroke(.foreground, lineWidth: 1.0)
+                                        .fill(.background.opacity(dragging ? 0.66 : 1.0))
+                                        .position(x: valueAsPercentage * geometry.size.width, y: geometry.size.height / 2.0)
+                                        .frame(width: circleSize, height: circleSize)
                                 }
                             }
-                        }
-                        .gesture(
-                            DragGesture(minimumDistance: 0.0)
-                                .onChanged { value in
-                                    dragging = true
+                            .background {
+                                GeometryReader { geometry in
+                                    let start = Date(timeIntervalSinceNow: range.lowerBound)
+                                    let end = Date(timeIntervalSinceNow: range.upperBound)
                                     
-                                    setValueToX(value.location.x / geometry.size.width)
+                                    ZStack {
+                                        LinearGradient.horizontalSunGradient(inTimeRange: start...end, at: location ?? .denver)
+                                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                                        
+                                        Rectangle()
+                                            .fill(.yellow)
+                                            .frame(width: 2.0, height: geometry.size.height)
+                                            .position(
+                                                x: timeIntervalAsPercentage(0.0) * geometry.size.width,
+                                                y: geometry.size.height / 2.0
+                                            )
+                                    }
                                 }
-                                .onEnded { _ in
-                                    dragging = false
-                                }
-                        )
+                            }
+                            .gesture(
+                                DragGesture(minimumDistance: 0.0)
+                                    .onChanged { value in
+                                        dragging = true
+                                        
+                                        setValue(toX: value.location.x / geometry.size.width)
+                                    }
+                                    .onEnded { _ in
+                                        dragging = false
+                                    }
+                            )
+                    }
+                    .frame(height: 4)
                 }
-                .frame(height: 4)
+                
+                Button(action: { incrementValue(by: stepSize) }, label: {
+                    Image(systemName: "plus.circle")
+                })
             }
             .scenePadding(.horizontal)
             
             Text(valueDescription)
                 .font(.system(size: 12.0))
                 .opacity(dragging ? 1.0 : 0.0)
+        }
+    }
+    
+    private func incrementValue(by d: TimeInterval) {
+        switch value {
+        case .numberOfSoundingsAgo(_):
+            return  // not supported
+        case .relative(let interval):
+            setValue(toRelativeTimeInterval: interval + d)
+        case .now:
+            setValue(toRelativeTimeInterval: d)
+        case .specific(let date):
+            setValue(toRelativeTimeInterval: date.addingTimeInterval(d).timeIntervalSinceNow)
         }
     }
     
@@ -123,15 +146,19 @@ struct HourlyTimeSelectView: View {
         }
     }
     
-    private func setValueToX(_ x: CGFloat) {
+    private func setValue(toX x: CGFloat) {
         let x = min(max(x, 0.0), 1.0)
         let exactValue = x * (range.upperBound - range.lowerBound) + range.lowerBound
         let newValue = round(exactValue / stepSize) * stepSize
         
-        if newValue == 0 {
+        setValue(toRelativeTimeInterval: newValue)
+    }
+    
+    private func setValue(toRelativeTimeInterval interval: TimeInterval) {
+        if interval == 0.0 {
             value = .now
         } else {
-            value = .relative(newValue)
+            value = .relative(interval)
         }
     }
 }
