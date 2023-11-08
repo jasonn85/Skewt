@@ -7,11 +7,25 @@
 
 import SwiftUI
 
+struct PlotSizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        let newValue = nextValue()
+        
+        if newValue != .zero {
+            value = newValue
+        }
+    }
+}
+
 struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
     /// Current point of interest in 0.0...1.0
     @State var annotationPoint: CGPoint? = nil
+    
+    @State private var plotSize: CGSize = .zero
     
     private let temperatureTickLength: CGFloat = 10.0
         
@@ -140,6 +154,13 @@ struct AnnotatedSkewtPlotView: View {
                                 .environmentObject(store)
                                 .aspectRatio(1.0, contentMode: .fit)
                                 .border(.black)
+                                .overlay {
+                                    GeometryReader { geometry in
+                                        Rectangle()
+                                            .opacity(0.0)
+                                            .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
+                                    }
+                                }
                                 .background {
                                     LinearGradient(
                                         colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
@@ -177,6 +198,9 @@ struct AnnotatedSkewtPlotView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
+        .onPreferenceChange(PlotSizePreferenceKey.self) {
+            self.plotSize = $0
+        }
     }
     
     @ViewBuilder
@@ -286,8 +310,8 @@ struct AnnotatedSkewtPlotView: View {
                                  style: PlotOptions.PlotStyling.LineStyle) -> some View {
         let halfLength = temperatureTickLength / 2.0
         let point = CGPoint(
-            x: normalizedPoint.x * rect.size.width + rect.origin.x,
-            y: normalizedPoint.y * rect.size.height + rect.origin.y
+            x: normalizedPoint.x * plotSize.width + rect.origin.x,
+            y: normalizedPoint.y * plotSize.height + rect.origin.y
         )
         
         Path() { path in
@@ -315,7 +339,7 @@ struct AnnotatedSkewtPlotView: View {
                             .foregroundColor(isobarColor)
                             .position(
                                 x: geometry.size.width / 2.0,
-                                y: yForIsobar(key, inPlot: plot) * geometry.size.height
+                                y: yForIsobar(key, inPlot: plot) * plotSize.height
                             )
                     }
                 }
@@ -333,7 +357,7 @@ struct AnnotatedSkewtPlotView: View {
                     if store.state.plotOptions.showIsothermLabels {
                         let isotherms = plot.isothermPaths
                         ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                            let x = plot.x(forSurfaceTemperature: temperature) * geometry.size.width
+                            let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
                             if x >= 0 {
                                 Text(String(Int(temperature)))
                                     .font(Font(bottomAxisLabelFont))
@@ -365,7 +389,7 @@ struct AnnotatedSkewtPlotView: View {
                             let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
-                                let y = plot.y(forPressure: $0.pressure) * geometry.size.height
+                                let y = plot.y(forPressure: $0.pressure) * plotSize.height
                                 
                                 if y >= 0.0 && y <= geometry.size.height {
                                     WindBarb(
