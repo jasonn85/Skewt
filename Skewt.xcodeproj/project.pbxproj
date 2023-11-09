@@ -232,21 +232,12 @@
 				96A8F5E4299DAC3E0021A170 /* ContentView.swift */,
 				968998232A17F8E2005457D6 /* Info.plist */,
 				96A8F5E6299DAC3F0021A170 /* Assets.xcassets */,
-				96A8F5E8299DAC3F0021A170 /* Preview Content */,
+				96CB76B92AFD88FE000B1FAD /* Preview */,
 				96AA78DC2A2E763A003338D8 /* Model */,
 				961202612A156AC2009423D5 /* State */,
 				96AA78DB2A2E75E2003338D8 /* Views */,
 			);
 			path = Skewt;
-			sourceTree = "<group>";
-		};
-		96A8F5E8299DAC3F0021A170 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */,
-				963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		96A8F5F2299DAC3F0021A170 /* SkewtTests */ = {
@@ -329,6 +320,15 @@
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		96CB76B92AFD88FE000B1FAD /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */,
+				96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */,
+			);
+			path = Preview;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
