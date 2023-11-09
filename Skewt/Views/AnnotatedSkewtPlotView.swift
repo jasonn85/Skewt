@@ -7,11 +7,25 @@
 
 import SwiftUI
 
+struct PlotSizePreferenceKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        let newValue = nextValue()
+        
+        if newValue != .zero {
+            value = newValue
+        }
+    }
+}
+
 struct AnnotatedSkewtPlotView: View {
     @EnvironmentObject var store: Store<SkewtState>
     
     /// Current point of interest in 0.0...1.0
     @State var annotationPoint: CGPoint? = nil
+    
+    @State private var plotSize: CGSize = .zero
     
     private let temperatureTickLength: CGFloat = 10.0
         
@@ -134,32 +148,40 @@ struct AnnotatedSkewtPlotView: View {
                     yAxisLabelView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
                     
-                    GeometryReader { geometry in
-                        ZStack {
-                            SkewtPlotView(plot: plot)
-                                .environmentObject(store)
-                                .aspectRatio(1.0, contentMode: .fit)
-                                .border(.black)
-                                .background {
-                                    LinearGradient(
-                                        colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
-                                }
-                                .gesture(
-                                    DragGesture(minimumDistance: 0.0)
-                                        .onChanged {
-                                            updateAnnotationPoint($0.location, geometryProxy: geometry)
+                    ZStack {
+                        SkewtPlotView(plot: plot)
+                            .environmentObject(store)
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .border(.black)
+                            .overlay {
+                                GeometryReader { geometry in
+                                    Rectangle()
+                                        .foregroundColor(.clear)
+                                        .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
+                                        .overlay {
+                                            annotations(
+                                                inBounds: CGRect(origin: .zero, size: plotSize),
+                                                fromPlot: plot
+                                            )
+                                            .clipped()
                                         }
+                                }
+                            }
+                            .background {
+                                LinearGradient(
+                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                    startPoint: .bottom,
+                                    endPoint: .top
                                 )
-                            
-                            annotations(
-                                inBounds: CGRect(x: 0.0, y: 0.0, width: geometry.size.width, height: geometry.size.height),
-                                fromPlot: plot
+                            }
+                            .gesture(
+                                DragGesture(minimumDistance: 0.0)
+                                    .onChanged {
+                                        updateAnnotationPoint($0.location)
+                                    }
                             )
-                            .clipped()
-                        }
+                        
+                        
                     }
                     
                     windBarbView(withPlot: plot)
@@ -177,6 +199,11 @@ struct AnnotatedSkewtPlotView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
+        .onPreferenceChange(PlotSizePreferenceKey.self) { preference in
+            withAnimation {
+                self.plotSize = preference
+            }
+        }
     }
     
     @ViewBuilder
@@ -273,10 +300,10 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    private func updateAnnotationPoint(_ point: CGPoint, geometryProxy geometry: GeometryProxy) {
+    private func updateAnnotationPoint(_ point: CGPoint) {
         annotationPoint = CGPoint(
-            x: point.x / geometry.size.width,
-            y: point.y / geometry.size.height
+            x: point.x / plotSize.width,
+            y: point.y / plotSize.height
         )
     }
     
@@ -286,8 +313,8 @@ struct AnnotatedSkewtPlotView: View {
                                  style: PlotOptions.PlotStyling.LineStyle) -> some View {
         let halfLength = temperatureTickLength / 2.0
         let point = CGPoint(
-            x: normalizedPoint.x * rect.size.width + rect.origin.x,
-            y: normalizedPoint.y * rect.size.height + rect.origin.y
+            x: normalizedPoint.x * plotSize.width + rect.origin.x,
+            y: normalizedPoint.y * plotSize.height + rect.origin.y
         )
         
         Path() { path in
@@ -304,22 +331,26 @@ struct AnnotatedSkewtPlotView: View {
                 .foregroundColor(.clear)
                 .frame(width: 0.0, height: 0.0)
         } else {
-            Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
-                GeometryReader { geometry in
-                    let isobars = isobars(withPlot: plot)
-                    
-                    ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                        Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
-                            .font(Font(leftAxisLabelFont))
-                            .lineLimit(1)
-                            .foregroundColor(isobarColor)
-                            .position(
-                                x: geometry.size.width / 2.0,
-                                y: yForIsobar(key, inPlot: plot) * geometry.size.height
-                            )
+            Rectangle()
+                .frame(width: yAxisLabelWidthOrNil!)
+                .foregroundColor(.clear)
+                .overlay {
+                    GeometryReader { geometry in
+                        let isobars = isobars(withPlot: plot)
+                        
+                        ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
+                            Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
+                                .font(Font(leftAxisLabelFont))
+                                .lineLimit(1)
+                                .foregroundColor(isobarColor)
+                                .position(
+                                    x: geometry.size.width / 2.0,
+                                    y: yForIsobar(key, inPlot: plot) * plotSize.height
+                                )
+                        }
                     }
+                    
                 }
-            }
         }
     }
     
@@ -328,25 +359,28 @@ struct AnnotatedSkewtPlotView: View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
-            Rectangle().frame(height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
-                GeometryReader { geometry in
-                    if store.state.plotOptions.showIsothermLabels {
-                        let isotherms = plot.isothermPaths
-                        ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                            let x = plot.x(forSurfaceTemperature: temperature) * geometry.size.width
-                            if x >= 0 {
-                                Text(String(Int(temperature)))
-                                    .font(Font(bottomAxisLabelFont))
-                                    .foregroundColor(isothermColor)
-                                    .position(
-                                        x: x,
-                                        y: geometry.size.height / 2.0
-                                    )
+            Rectangle()
+                .frame(height: xAxisLabelHeightOrNil!)
+                .foregroundColor(.clear)
+                .overlay {
+                    GeometryReader { geometry in
+                        if store.state.plotOptions.showIsothermLabels {
+                            let isotherms = plot.isothermPaths
+                            ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
+                                let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
+                                if x >= 0 {
+                                    Text(String(Int(temperature)))
+                                        .font(Font(bottomAxisLabelFont))
+                                        .foregroundColor(isothermColor)
+                                        .position(
+                                            x: x,
+                                            y: geometry.size.height / 2.0
+                                        )
+                                }
                             }
                         }
                     }
                 }
-            }
         }
     }
     
@@ -365,7 +399,7 @@ struct AnnotatedSkewtPlotView: View {
                             let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
-                                let y = plot.y(forPressure: $0.pressure) * geometry.size.height
+                                let y = plot.y(forPressure: $0.pressure) * plotSize.height
                                 
                                 if y >= 0.0 && y <= geometry.size.height {
                                     WindBarb(
@@ -471,6 +505,9 @@ extension View {
 
 struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
     static var previews: some View {
-        AnnotatedSkewtPlotView().environmentObject(Store<SkewtState>.previewStore)
+        let store = Store<SkewtState>.previewStore
+        let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
+        
+        AnnotatedSkewtPlotView().environmentObject(store)
     }
 }
