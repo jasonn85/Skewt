@@ -148,39 +148,37 @@ struct AnnotatedSkewtPlotView: View {
                     yAxisLabelView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
                     
-                    GeometryReader { geometry in
-                        ZStack {
-                            SkewtPlotView(plot: plot)
-                                .environmentObject(store)
-                                .aspectRatio(1.0, contentMode: .fit)
-                                .border(.black)
-                                .overlay {
-                                    GeometryReader { geometry in
-                                        Rectangle()
-                                            .opacity(0.0)
-                                            .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
-                                    }
+                    ZStack {
+                        SkewtPlotView(plot: plot)
+                            .environmentObject(store)
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .border(.black)
+                            .overlay {
+                                GeometryReader { geometry in
+                                    Rectangle()
+                                        .opacity(0.0)
+                                        .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
                                 }
-                                .background {
-                                    LinearGradient(
-                                        colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
-                                }
-                                .gesture(
-                                    DragGesture(minimumDistance: 0.0)
-                                        .onChanged {
-                                            updateAnnotationPoint($0.location, geometryProxy: geometry)
-                                        }
+                            }
+                            .background {
+                                LinearGradient(
+                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
+                                    startPoint: .bottom,
+                                    endPoint: .top
                                 )
-                            
-                            annotations(
-                                inBounds: CGRect(x: 0.0, y: 0.0, width: geometry.size.width, height: geometry.size.height),
-                                fromPlot: plot
+                            }
+                            .gesture(
+                                DragGesture(minimumDistance: 0.0)
+                                    .onChanged {
+                                        updateAnnotationPoint($0.location, inRect: CGRect(origin: .zero, size: plotSize))
+                                    }
                             )
-                            .clipped()
-                        }
+                        
+                        annotations(
+                            inBounds: CGRect(origin: .zero, size: plotSize),
+                            fromPlot: plot
+                        )
+                        .clipped()
                     }
                     
                     windBarbView(withPlot: plot)
@@ -299,10 +297,10 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    private func updateAnnotationPoint(_ point: CGPoint, geometryProxy geometry: GeometryProxy) {
+    private func updateAnnotationPoint(_ point: CGPoint, inRect rect: CGRect) {
         annotationPoint = CGPoint(
-            x: point.x / geometry.size.width,
-            y: point.y / geometry.size.height
+            x: point.x / rect.size.width,
+            y: point.y / rect.size.height
         )
     }
     
