@@ -198,8 +198,10 @@ struct AnnotatedSkewtPlotView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
-        .onPreferenceChange(PlotSizePreferenceKey.self) {
-            self.plotSize = $0
+        .onPreferenceChange(PlotSizePreferenceKey.self) { preference in
+            withAnimation {
+                self.plotSize = preference
+            }
         }
     }
     
