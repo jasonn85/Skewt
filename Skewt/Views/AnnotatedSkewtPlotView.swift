@@ -156,8 +156,15 @@ struct AnnotatedSkewtPlotView: View {
                             .overlay {
                                 GeometryReader { geometry in
                                     Rectangle()
-                                        .opacity(0.0)
+                                        .foregroundColor(.clear)
                                         .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
+                                        .overlay {
+                                            annotations(
+                                                inBounds: CGRect(origin: .zero, size: plotSize),
+                                                fromPlot: plot
+                                            )
+                                            .clipped()
+                                        }
                                 }
                             }
                             .background {
@@ -174,11 +181,7 @@ struct AnnotatedSkewtPlotView: View {
                                     }
                             )
                         
-                        annotations(
-                            inBounds: CGRect(origin: .zero, size: plotSize),
-                            fromPlot: plot
-                        )
-                        .clipped()
+                        
                     }
                     
                     windBarbView(withPlot: plot)
