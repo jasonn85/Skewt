@@ -330,22 +330,26 @@ struct AnnotatedSkewtPlotView: View {
                 .foregroundColor(.clear)
                 .frame(width: 0.0, height: 0.0)
         } else {
-            Rectangle().frame(width: yAxisLabelWidthOrNil!).foregroundColor(.clear).overlay {
-                GeometryReader { geometry in
-                    let isobars = isobars(withPlot: plot)
-                    
-                    ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                        Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
-                            .font(Font(leftAxisLabelFont))
-                            .lineLimit(1)
-                            .foregroundColor(isobarColor)
-                            .position(
-                                x: geometry.size.width / 2.0,
-                                y: yForIsobar(key, inPlot: plot) * plotSize.height
-                            )
+            Rectangle()
+                .frame(width: yAxisLabelWidthOrNil!)
+                .foregroundColor(.clear)
+                .overlay {
+                    GeometryReader { geometry in
+                        let isobars = isobars(withPlot: plot)
+                        
+                        ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
+                            Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
+                                .font(Font(leftAxisLabelFont))
+                                .lineLimit(1)
+                                .foregroundColor(isobarColor)
+                                .position(
+                                    x: geometry.size.width / 2.0,
+                                    y: yForIsobar(key, inPlot: plot) * plotSize.height
+                                )
+                        }
                     }
+                    
                 }
-            }
         }
     }
     
@@ -354,25 +358,28 @@ struct AnnotatedSkewtPlotView: View {
         if xAxisLabelHeightOrNil == nil {
             EmptyView()
         } else {
-            Rectangle().frame(height: xAxisLabelHeightOrNil!).foregroundColor(.clear).overlay {
-                GeometryReader { geometry in
-                    if store.state.plotOptions.showIsothermLabels {
-                        let isotherms = plot.isothermPaths
-                        ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                            let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
-                            if x >= 0 {
-                                Text(String(Int(temperature)))
-                                    .font(Font(bottomAxisLabelFont))
-                                    .foregroundColor(isothermColor)
-                                    .position(
-                                        x: x,
-                                        y: geometry.size.height / 2.0
-                                    )
+            Rectangle()
+                .frame(height: xAxisLabelHeightOrNil!)
+                .foregroundColor(.clear)
+                .overlay {
+                    GeometryReader { geometry in
+                        if store.state.plotOptions.showIsothermLabels {
+                            let isotherms = plot.isothermPaths
+                            ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
+                                let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
+                                if x >= 0 {
+                                    Text(String(Int(temperature)))
+                                        .font(Font(bottomAxisLabelFont))
+                                        .foregroundColor(isothermColor)
+                                        .position(
+                                            x: x,
+                                            y: geometry.size.height / 2.0
+                                        )
+                                }
                             }
                         }
                     }
                 }
-            }
         }
     }
     
