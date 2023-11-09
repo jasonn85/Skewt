@@ -177,7 +177,7 @@ struct AnnotatedSkewtPlotView: View {
                             .gesture(
                                 DragGesture(minimumDistance: 0.0)
                                     .onChanged {
-                                        updateAnnotationPoint($0.location, inRect: CGRect(origin: .zero, size: plotSize))
+                                        updateAnnotationPoint($0.location)
                                     }
                             )
                         
@@ -300,10 +300,10 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    private func updateAnnotationPoint(_ point: CGPoint, inRect rect: CGRect) {
+    private func updateAnnotationPoint(_ point: CGPoint) {
         annotationPoint = CGPoint(
-            x: point.x / rect.size.width,
-            y: point.y / rect.size.height
+            x: point.x / plotSize.width,
+            y: point.y / plotSize.height
         )
     }
     
