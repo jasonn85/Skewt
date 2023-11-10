@@ -149,7 +149,7 @@ struct AnnotatedSkewtPlotView: View {
                         .gridCellUnsizedAxes(.vertical)
                     
                     ZStack {
-                        SkewtPlotView(plot: plot)
+                        SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot)
                             .environmentObject(store)
                             .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
