@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct SkewtPlotView: View {
-    @EnvironmentObject var store: Store<SkewtState>
+    let plotOptions: PlotOptions
     let plot: SkewtPlot
     
     var body: some View {
-        let plotStyling = store.state.plotOptions.plotStyling
+        let plotStyling = plotOptions.plotStyling
         
         ZStack() {
             if let temperaturePath = plot.temperaturePath {
@@ -35,7 +35,7 @@ struct SkewtPlotView: View {
             
             let isotherms = plot.isothermPaths
             
-            if case .tens = store.state.plotOptions.isothermTypes {
+            if case .tens = plotOptions.isothermTypes {
                 ForEach(isotherms.keys.sorted(), id: \.self) { t in
                     PlottedPath(path: isotherms[t]!)
                         .applyLineStyle(plotStyling.lineStyle(forType: .isotherms))
@@ -51,7 +51,7 @@ struct SkewtPlotView: View {
                 }
             }
             
-            switch store.state.plotOptions.adiabatTypes {
+            switch plotOptions.adiabatTypes {
             case .none:
                 EmptyView()
             case .tens:
@@ -70,7 +70,7 @@ struct SkewtPlotView: View {
                 }
             }
             
-            if store.state.plotOptions.showMixingLines {
+            if plotOptions.showMixingLines {
                 let isohumes = plot.isohumePaths
                 ForEach(isohumes.keys.sorted(), id: \.self) { t in
                     PlottedPath(path: isohumes[t]!)
@@ -83,7 +83,7 @@ struct SkewtPlotView: View {
     }
     
     private var isobarPaths: [Double: CGPath] {
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .none:
             return [:]
         case .altitude:
@@ -95,14 +95,14 @@ struct SkewtPlotView: View {
     
     private var isobarStyle: PlotOptions.PlotStyling.LineStyle {
         let type: PlotOptions.PlotStyling.PlotType = (
-            store.state.plotOptions.isobarTypes == .altitude ? .altitudeIsobars : .pressureIsobars
+            plotOptions.isobarTypes == .altitude ? .altitudeIsobars : .pressureIsobars
             )
         
-        return store.state.plotOptions.plotStyling.lineStyle(forType: type)
+        return plotOptions.plotStyling.lineStyle(forType: type)
     }
     
     private var showZeroIsotherm: Bool {
-        switch store.state.plotOptions.isothermTypes {
+        switch plotOptions.isothermTypes {
         case .tens, .zeroOnly:
             return true
         case .none:
@@ -128,7 +128,7 @@ struct SkewtPlotView_Previews: PreviewProvider {
             let store = Store<SkewtState>.previewStore
             let plot = SkewtPlot(sounding: Store<SkewtState>.previewSounding)
             
-            SkewtPlotView(plot: plot).environmentObject(store)
+            SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot)
         }
     }
 }
