@@ -56,11 +56,12 @@ struct ContentView: View {
             VStack (alignment: .center) {
                 header
                 
-                AnnotatedSkewtPlotView().environmentObject(store).onAppear() {
-                    store.dispatch(LocationState.Action.requestLocation)
-                    store.dispatch(RecentSoundingsState.Action.refresh)
-                    store.dispatch(SoundingState.Action.doRefresh)
-                }
+                AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
+                    .onAppear() {
+                        store.dispatch(LocationState.Action.requestLocation)
+                        store.dispatch(RecentSoundingsState.Action.refresh)
+                        store.dispatch(SoundingState.Action.doRefresh)
+                    }
                 
                 footer
                 

@@ -20,7 +20,8 @@ struct PlotSizePreferenceKey: PreferenceKey {
 }
 
 struct AnnotatedSkewtPlotView: View {
-    @EnvironmentObject var store: Store<SkewtState>
+    let soundingState: SoundingState
+    let plotOptions: PlotOptions
     
     /// Current point of interest in 0.0...1.0
     @State var annotationPoint: CGPoint? = nil
@@ -55,7 +56,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var isobarAxisLabelFormatter: NumberFormatter {
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .none, .altitude:
             return shortenedAltitudeFormatter
         case .pressure:
@@ -64,9 +65,9 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var sounding: Sounding? {
-        switch store.state.currentSoundingState.status {
+        switch soundingState.status {
         case .done(let sounding, _), .refreshing(let sounding):
-            if !store.state.currentSoundingState.status.isStale {
+            if !soundingState.status.isStale {
                 return sounding
             }
             
@@ -89,8 +90,8 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func widestAltitudeText() -> CGFloat? {
-        guard store.state.plotOptions.showIsobarLabels,
-                store.state.plotOptions.isobarTypes != .none else {
+        guard plotOptions.showIsobarLabels,
+                plotOptions.isobarTypes != .none else {
             return nil
         }
         
@@ -101,7 +102,7 @@ struct AnnotatedSkewtPlotView: View {
         var widest: CGFloat = 0.0
         var samples: [Double]
         
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .none, .altitude:
             samples = sampleAltitudes
         case .pressure:
@@ -126,7 +127,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var xAxisLabelHeightOrNil: CGFloat? {
-        guard store.state.plotOptions.showIsothermLabels else {
+        guard plotOptions.showIsothermLabels else {
             return nil
         }
         
@@ -139,7 +140,7 @@ struct AnnotatedSkewtPlotView: View {
         let plot = plot
 
         ZStack {
-            if case .loading = store.state.currentSoundingState.status {
+            if case .loading = soundingState.status {
                 ProgressView().controlSize(.large)
             }
             
@@ -149,8 +150,7 @@ struct AnnotatedSkewtPlotView: View {
                         .gridCellUnsizedAxes(.vertical)
                     
                     ZStack {
-                        SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot)
-                            .environmentObject(store)
+                        SkewtPlotView(plotOptions: plotOptions, plot: plot)
                             .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
                             .overlay {
@@ -214,7 +214,7 @@ struct AnnotatedSkewtPlotView: View {
             let temperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
             let dewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
             
-            let style = store.state.plotOptions.plotStyling
+            let style = plotOptions.plotStyling
             
             temperatureTick(
                 atNormalizedPoint: temperaturePoint,
@@ -291,7 +291,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func altitudeDetailText(_ dataPoint: LevelDataPoint) -> String {
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .altitude, .none:
             return fullAltitudeFormatter.string(from: dataPoint.altitudeInFeet as NSNumber)! + "'"
             
@@ -364,7 +364,7 @@ struct AnnotatedSkewtPlotView: View {
                 .foregroundColor(.clear)
                 .overlay {
                     GeometryReader { geometry in
-                        if store.state.plotOptions.showIsothermLabels {
+                        if plotOptions.showIsothermLabels {
                             let isotherms = plot.isothermPaths
                             ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
                                 let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
@@ -386,7 +386,7 @@ struct AnnotatedSkewtPlotView: View {
     
     @ViewBuilder
     private func windBarbView(withPlot plot: SkewtPlot) -> some View {
-        if !store.state.plotOptions.showWindBarbs {
+        if !plotOptions.showWindBarbs {
             EmptyView()
         } else {
             Rectangle()
@@ -421,7 +421,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func isobars(withPlot plot: SkewtPlot) -> [Double: CGPath] {
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .none:
             return [:]
         case .altitude:
@@ -433,12 +433,12 @@ struct AnnotatedSkewtPlotView: View {
     
     private var isobarColor: Color {
         let type = (
-            store.state.plotOptions.isobarTypes == .pressure
+            plotOptions.isobarTypes == .pressure
             ? PlotOptions.PlotStyling.PlotType.pressureIsobars
             : .altitudeIsobars
-            )
+        )
         
-        return Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: type).cgColor)
+        return Color(cgColor: plotOptions.plotStyling.lineStyle(forType: type).cgColor)
     }
     
     private var isothermColor: Color {
@@ -446,15 +446,15 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var temperatureColor: Color {
-        Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: .temperature).cgColor)
+        Color(cgColor: plotOptions.plotStyling.lineStyle(forType: .temperature).cgColor)
     }
     
     private var dewPointColor: Color {
-        Color(cgColor: store.state.plotOptions.plotStyling.lineStyle(forType: .dewPoint).cgColor)
+        Color(cgColor: plotOptions.plotStyling.lineStyle(forType: .dewPoint).cgColor)
     }
     
     private func yForIsobar(_ value: Double, inPlot plot: SkewtPlot) -> CGFloat {
-        switch store.state.plotOptions.isobarTypes {
+        switch plotOptions.isobarTypes {
         case .none, .altitude:
             return plot.y(forPressureAltitude: value)
         case .pressure:
@@ -465,7 +465,7 @@ struct AnnotatedSkewtPlotView: View {
     private var plot: SkewtPlot {
         var plot = SkewtPlot(sounding: sounding)
         
-        if let altitudeRange = store.state.plotOptions.altitudeRange {
+        if let altitudeRange = plotOptions.altitudeRange {
             plot.altitudeRange = altitudeRange
         }
         
@@ -508,6 +508,6 @@ struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
         let store = Store<SkewtState>.previewStore
         let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
         
-        AnnotatedSkewtPlotView().environmentObject(store)
+        AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
     }
 }
