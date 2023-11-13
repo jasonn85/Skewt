@@ -151,6 +151,7 @@ struct WindBarb_Previews: PreviewProvider {
                     ForEach(speeds, id: \.self) { speed in
                         WindBarb(bearingInDegrees: bearing, speed: speed)
                             .stroke(.black, lineWidth: 2.0)
+                            .fill(speed >= 5 ? .black : .clear)
                             .border(.black)
                     }
                 }

@@ -409,6 +409,7 @@ struct AnnotatedSkewtPlotView: View {
                                         tickLength: windBarbLength * 0.3
                                     )
                                     .stroke(.red, lineWidth: 1.0)
+                                    .fill($0.windSpeed! >= 5 ? .red : .clear)
                                     .position(x: x, y: y)
                                 }
                             }
