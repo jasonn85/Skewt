@@ -39,6 +39,8 @@
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
 		969117902A29165000A5C72D /* PlotStyling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9691178F2A29165000A5C72D /* PlotStyling.swift */; };
 		969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969117912A29178900A5C72D /* PlotStylingTests.swift */; };
+		969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */; };
+		969B8BC62AFEEB94002D0F20 /* SoundingWindDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
@@ -121,6 +123,8 @@
 		968998232A17F8E2005457D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9691178F2A29165000A5C72D /* PlotStyling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStyling.swift; sourceTree = "<group>"; };
 		969117912A29178900A5C72D /* PlotStylingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStylingTests.swift; sourceTree = "<group>"; };
+		969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingWindData.swift; sourceTree = "<group>"; };
+		969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingWindDataTests.swift; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtApp.swift; sourceTree = "<group>"; };
 		96A8F5E4299DAC3E0021A170 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -253,6 +257,7 @@
 				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
 				967E24282A366110009262D9 /* SoundingLocationListTests.swift */,
 				9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */,
+				969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */,
 				964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */,
 				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
@@ -314,6 +319,7 @@
 				965D66582A52A09A0015FB4B /* RelativeLocations.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96A8F60C299DAC680021A170 /* Sounding.swift */,
+				969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */,
 				967E24242A366064009262D9 /* SoundingLocationList.swift */,
 				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
 				964A81A42ADDDD2300E3E1EC /* SunTimes.swift */,
@@ -489,6 +495,7 @@
 				96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */,
 				960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */,
 				967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */,
+				969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
@@ -519,6 +526,7 @@
 				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
 				964A81A72ADDE28100E3E1EC /* SunTimesTests.swift in Sources */,
+				969B8BC62AFEEB94002D0F20 /* SoundingWindDataTests.swift in Sources */,
 				967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */,
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
 				96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */,
