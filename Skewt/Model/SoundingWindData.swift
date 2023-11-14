@@ -70,3 +70,30 @@ extension Sounding {
         }
     }
 }
+
+extension Sounding {
+    typealias WindReducer = (Int, Int) -> Double
+    
+    static var magnitudeWindReducer: WindReducer = { _, speed in Double(speed) }
+    
+    func maximumWindReducer() -> WindReducer {
+        let windData = windData
+        
+        guard windData.count > 0 else {
+            return Sounding.magnitudeWindReducer
+        }
+        
+        let maximumWindPoint = windData.reduce(windData.first!) { $1.windSpeed! > $0.windSpeed! ? $1 : $0 }
+        let maximumWindAngle = Double(maximumWindPoint.windDirection!) * .pi / 180.0
+        
+        return { direction, speed in
+            let thisAngle = Double(direction) * .pi / 180.0
+            
+            return cos(thisAngle - maximumWindAngle) * Double(speed)
+        }
+    }
+    
+    func reducedWindData(_ reducer: WindReducer) -> [Double] {
+        windData.map { reducer($0.windDirection!, $0.windSpeed!) }
+    }
+}
