@@ -1,0 +1,116 @@
+//
+//  BackgroundView.swift
+//  Skewt
+//
+//  Created by Jason Neel on 11/23/23.
+//
+
+import SwiftUI
+
+struct BackgroundView: UIViewRepresentable {
+    let frame: CGRect
+    let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
+    let skyGradientEnd: CGPoint = CGPoint(x: 0.5, y: 1.0)
+    let skyColors: [Color] = [Color("HighSkyBlue"), Color("LowSkyBlue")]
+    
+    /// Dictionary of 1d wind data keyed by [0...1] height
+    let winds: [Double: Double]?
+    
+    private let windParticleColor = CGColor(gray: 0.5, alpha: 0.25)
+    private let windParticleScale = 0.5
+    private let windParticleLifetime: Float = 100.0
+    private let velocityScale = 1.0
+    private let velocityRangeMultiplier = 0.1
+    private let birthRate: Float = 100.0
+    private let emitterWidth: CGFloat = 10.0
+    
+    @Environment(\.self) var environment
+
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+    }
+    
+    func makeUIView(context: Context) -> some UIView {
+        let view = UIView(frame: frame)
+                
+        let gradient = CAGradientLayer()
+        gradient.frame = frame
+        gradient.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
+        gradient.startPoint = skyGradientStart
+        gradient.endPoint = skyGradientEnd
+        
+        view.layer.addSublayer(gradient)
+        
+        windByRange?.forEach {
+            view.layer.addSublayer(windEmitter(verticalSpan: $0.0, velocity: $0.1))
+        }
+        
+        return view
+    }
+    
+    private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer {
+        let emitterSize = CGSize(
+            width: emitterWidth,
+            height: (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
+        )
+        
+        let emitter = CAEmitterLayer()
+        emitter.frame = CGRect(
+            x: 0.0,
+            y: verticalSpan.lowerBound * frame.size.height,
+            width: frame.size.width,
+            height: emitterSize.height
+        )
+        
+        emitter.emitterShape = .rectangle
+        emitter.emitterSize = emitterSize
+        emitter.emitterPosition = CGPoint(
+            x: velocity >= 0.0 ? -emitterWidth : frame.size.width + emitterWidth,
+            y: (verticalSpan.upperBound + verticalSpan.lowerBound) / 2.0 * frame.size.height
+        )
+        
+        let cell = CAEmitterCell()
+        cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
+        cell.color = windParticleColor
+        cell.scale = windParticleScale
+        cell.velocity = velocity * velocityScale
+        cell.velocityRange = velocityRangeMultiplier * velocity
+        cell.birthRate = birthRate * Float(verticalSpan.upperBound - verticalSpan.lowerBound)
+        cell.lifetime = windParticleLifetime
+        
+        emitter.emitterCells = [cell]
+        
+        return emitter
+    }
+    
+    private var windByRange: [(ClosedRange<CGFloat>, Double)]? {
+        guard let winds = winds else {
+            return nil
+        }
+        
+        let windHeights = [Double](winds.keys).sorted()
+        
+        return stride(from: 0, to: Int(windHeights.count) - 1, by: 1).map {
+            let height = windHeights[$0]
+            let beforeHeight = $0 > 0 ? windHeights[$0 - 1] : 0.0
+            let afterHeight = $0 < (windHeights.count - 1) ? windHeights[$0 + 1] : 1.0
+            
+            return (beforeHeight...afterHeight, winds[height]!)
+        }
+    }
+}
+
+#Preview {
+    GeometryReader { geometry in
+        BackgroundView(
+            frame: CGRect(origin: .zero, size: geometry.size),
+            winds: [
+                0.0: -25.0,
+                0.1: -15.0,
+                0.25: -5.0,
+                0.4: 0.0,
+                0.5: 25.0,
+                0.75: 40.0
+            ]
+        )
+    }
+}
