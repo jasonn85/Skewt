@@ -168,11 +168,18 @@ struct AnnotatedSkewtPlotView: View {
                                 }
                             }
                             .background {
-                                LinearGradient(
-                                    colors: [Color("LowSkyBlue"), Color("HighSkyBlue")],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
+                                GeometryReader { geometry in
+                                    let winds = sounding?.reducedWindData(Sounding.magnitudeWindReducer).reduce(into: [Double:Double]()) {
+                                        $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
+                                    }
+                                    
+                                    BackgroundView(
+                                        frame: CGRect(origin: .zero, size: geometry.size),
+                                        winds: winds
+                                    )
+                                    .id(winds)  // Use the wind data as an ID to force the UIViewRepresentable to rebuild with new wind data
+                                    .clipped()
+                                }
                             }
                             .gesture(
                                 DragGesture(minimumDistance: 0.0)
