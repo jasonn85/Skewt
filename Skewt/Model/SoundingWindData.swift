@@ -71,6 +71,11 @@ extension Sounding {
     }
 }
 
+struct ReducedWindDataPoint {
+    let pressure: Double
+    let windMagnitude: Double
+}
+
 extension Sounding {
     typealias WindReducer = (Int, Int) -> Double
     
@@ -93,7 +98,9 @@ extension Sounding {
         }
     }
     
-    func reducedWindData(_ reducer: WindReducer) -> [Double] {
-        windData.map { reducer($0.windDirection!, $0.windSpeed!) }
+    func reducedWindData(_ reducer: WindReducer) -> [ReducedWindDataPoint] {
+        windData.map {
+            ReducedWindDataPoint(pressure: $0.pressure, windMagnitude: reducer($0.windDirection!, $0.windSpeed!))
+        }
     }
 }
