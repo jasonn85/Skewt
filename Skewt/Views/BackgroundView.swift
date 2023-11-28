@@ -89,12 +89,14 @@ struct BackgroundView: UIViewRepresentable {
         
         let windHeights = [Double](winds.keys).filter({ (0.0...1.0).contains($0) }).sorted()
         
-        return stride(from: 0, to: Int(windHeights.count) - 1, by: 1).map {
+        return stride(from: 0, to: Int(windHeights.count), by: 1).map {
             let height = windHeights[$0]
             let beforeHeight = $0 > 0 ? windHeights[$0 - 1] : 0.0
             let afterHeight = $0 < (windHeights.count - 1) ? windHeights[$0 + 1] : 1.0
+            let halfBefore = beforeHeight > 0.0 ? height - ((height - beforeHeight) / 2.0) : 0.0
+            let halfAfter = afterHeight < 1.0 ? height + ((afterHeight - height) / 2.0) : 1.0
             
-            return (beforeHeight...afterHeight, winds[height]!)
+            return (halfBefore...halfAfter, winds[height]!)
         }
     }
 }
