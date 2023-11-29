@@ -19,6 +19,8 @@ struct BackgroundView: UIViewRepresentable {
     let winds: [Double: Double]?
     
     private let gradientName = "backgroundGradient"
+    private let windSpanKey = "windVerticalSpan"
+    private let windVelocityKey = "windVelocity"
 
     private let windParticleColor = CGColor(gray: 0.5, alpha: 0.25)
     private let windParticleScale = 0.5
@@ -42,17 +44,8 @@ struct BackgroundView: UIViewRepresentable {
     }
     
     private func updateLayers(inView view: UIViewType) {
-        var gradient: CAGradientLayer? = nil
+        var gradient: CAGradientLayer? = view.layer.sublayers?.first(where: { $0.name == gradientName }) as? CAGradientLayer
         
-        // Remove any existing wind layers and grab a reference to the background
-        view.layer.sublayers?.forEach {
-            if $0.name == gradientName {
-                gradient = $0 as? CAGradientLayer
-            } else {
-                $0.removeFromSuperlayer()
-            }
-        }
-
         if gradient == nil {
             gradient = CAGradientLayer()
             gradient!.name = gradientName
@@ -63,32 +56,29 @@ struct BackgroundView: UIViewRepresentable {
         gradient!.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
         gradient!.startPoint = skyGradientStart
         gradient!.endPoint = skyGradientEnd
-                        
-        windByRange?.forEach {
-            view.layer.addSublayer(windEmitter(verticalSpan: $0.0, velocity: $0.1))
+        
+        var windEmitters: [CAEmitterLayer] = (view.layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
+        
+        if windEmitters.count == 0 {
+            windEmitters = windByRange?.map { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
+            windEmitters.forEach { view.layer.addSublayer($0) }
+        }
+        
+        windEmitters.forEach {
+            let span = $0.value(forKey: windSpanKey) as! ClosedRange<CGFloat>
+            let velocity = $0.value(forKey: windVelocityKey) as! Double
+            
+            $0.emitterSize = windEmitterSize(verticalSpan: span)
+            $0.position = windEmitterPosition(verticalSpan: span, velocity: velocity)
+            $0.frame = windEmitterFrame(verticalSpan: span)
         }
     }
     
     private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer {
-        let emitterSize = CGSize(
-            width: emitterWidth,
-            height: (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
-        )
-        
         let emitter = CAEmitterLayer()
-        emitter.frame = CGRect(
-            x: 0.0,
-            y: verticalSpan.lowerBound * frame.size.height,
-            width: frame.size.width,
-            height: emitterSize.height
-        )
-        
+        emitter.setValue(verticalSpan, forKey: windSpanKey)
+        emitter.setValue(velocity, forKey: windVelocityKey)
         emitter.emitterShape = .rectangle
-        emitter.emitterSize = emitterSize
-        emitter.emitterPosition = CGPoint(
-            x: velocity >= 0.0 ? -emitterWidth : frame.size.width + emitterWidth,
-            y: (verticalSpan.upperBound + verticalSpan.lowerBound) / 2.0 * frame.size.height
-        )
         
         let cell = CAEmitterCell()
         cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
@@ -102,6 +92,29 @@ struct BackgroundView: UIViewRepresentable {
         emitter.emitterCells = [cell]
         
         return emitter
+    }
+    
+    private func windEmitterSize(verticalSpan: ClosedRange<CGFloat>) -> CGSize {
+        CGSize(
+            width: emitterWidth,
+            height: (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
+        )
+    }
+    
+    private func windEmitterFrame(verticalSpan: ClosedRange<CGFloat>) -> CGRect {
+        CGRect(
+            x: 0.0,
+            y: verticalSpan.lowerBound * frame.size.height,
+            width: frame.size.width,
+            height: windEmitterSize(verticalSpan: verticalSpan).height
+        )
+    }
+    
+    private func windEmitterPosition(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CGPoint {
+        CGPoint(
+            x: velocity >= 0.0 ? -emitterWidth : frame.size.width + emitterWidth,
+            y: (verticalSpan.upperBound + verticalSpan.lowerBound) / 2.0 * frame.size.height
+        )
     }
     
     private var windByRange: [(ClosedRange<CGFloat>, Double)]? {
