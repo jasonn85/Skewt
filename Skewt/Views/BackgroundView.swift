@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BackgroundView: UIViewRepresentable {
+    typealias UIViewType = UIView
+    
     let frame: CGRect
     let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
     let skyGradientEnd: CGPoint = CGPoint(x: 0.5, y: 1.0)
@@ -26,12 +28,20 @@ struct BackgroundView: UIViewRepresentable {
     
     @Environment(\.self) var environment
 
-    func updateUIView(_ uiView: UIViewType, context: Context) {
+    func updateUIView(_ uiView: UIView, context: Context) {
+        removeAndRecreateLayers(inView: uiView)
     }
     
-    func makeUIView(context: Context) -> some UIView {
+    func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: frame)
-                
+        removeAndRecreateLayers(inView: view)
+        
+        return view
+    }
+    
+    private func removeAndRecreateLayers(inView view: UIViewType) {
+        view.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+        
         let gradient = CAGradientLayer()
         gradient.frame = frame
         gradient.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
@@ -43,8 +53,6 @@ struct BackgroundView: UIViewRepresentable {
         windByRange?.forEach {
             view.layer.addSublayer(windEmitter(verticalSpan: $0.0, velocity: $0.1))
         }
-        
-        return view
     }
     
     private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer {
