@@ -18,6 +18,8 @@ struct BackgroundView: UIViewRepresentable {
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
     
+    private let gradientName = "backgroundGradient"
+
     private let windParticleColor = CGColor(gray: 0.5, alpha: 0.25)
     private let windParticleScale = 0.5
     private let windParticleLifetime: Float = 100.0
@@ -29,27 +31,39 @@ struct BackgroundView: UIViewRepresentable {
     @Environment(\.self) var environment
 
     func updateUIView(_ uiView: UIView, context: Context) {
-        removeAndRecreateLayers(inView: uiView)
+        updateLayers(inView: uiView)
     }
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: frame)
-        removeAndRecreateLayers(inView: view)
+        updateLayers(inView: view)
         
         return view
     }
     
-    private func removeAndRecreateLayers(inView view: UIViewType) {
-        view.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+    private func updateLayers(inView view: UIViewType) {
+        var gradient: CAGradientLayer? = nil
         
-        let gradient = CAGradientLayer()
-        gradient.frame = frame
-        gradient.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
-        gradient.startPoint = skyGradientStart
-        gradient.endPoint = skyGradientEnd
+        // Remove any existing wind layers and grab a reference to the background
+        view.layer.sublayers?.forEach {
+            if $0.name == gradientName {
+                gradient = $0 as? CAGradientLayer
+            } else {
+                $0.removeFromSuperlayer()
+            }
+        }
+
+        if gradient == nil {
+            gradient = CAGradientLayer()
+            gradient!.name = gradientName
+            view.layer.addSublayer(gradient!)
+        }
         
-        view.layer.addSublayer(gradient)
-        
+        gradient!.frame = frame
+        gradient!.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
+        gradient!.startPoint = skyGradientStart
+        gradient!.endPoint = skyGradientEnd
+                        
         windByRange?.forEach {
             view.layer.addSublayer(windEmitter(verticalSpan: $0.0, velocity: $0.1))
         }
