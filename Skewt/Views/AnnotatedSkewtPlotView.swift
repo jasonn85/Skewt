@@ -169,7 +169,7 @@ struct AnnotatedSkewtPlotView: View {
                             }
                             .background {
                                 GeometryReader { geometry in
-                                    let winds = sounding?.reducedWindData(Sounding.magnitudeWindReducer).reduce(into: [Double:Double]()) {
+                                    let winds = sounding?.reducedWindData(sounding!.maximumWindReducer()).reduce(into: [Double:Double]()) {
                                         $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
                                     }
                                     
