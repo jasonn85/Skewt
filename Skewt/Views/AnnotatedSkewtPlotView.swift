@@ -177,7 +177,6 @@ struct AnnotatedSkewtPlotView: View {
                                         frame: CGRect(origin: .zero, size: geometry.size),
                                         winds: winds
                                     )
-                                    .id(winds)  // Use the wind data as an ID to force the UIViewRepresentable to rebuild with new wind data
                                     .clipped()
                                 }
                             }
