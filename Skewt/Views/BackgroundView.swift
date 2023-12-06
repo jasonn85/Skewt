@@ -22,12 +22,10 @@ struct BackgroundView: UIViewRepresentable {
     private let windSpanKey = "windVerticalSpan"
     private let windVelocityKey = "windVelocity"
 
-    private let windParticleColor = CGColor(gray: 0.5, alpha: 0.25)
+    private let windParticleColor = CGColor(gray: 0.5, alpha: 0.2)
     private let windParticleScale = 0.5
-    private let windParticleLifetime: Float = 100.0
-    private let velocityScale = 1.0
+    private let velocityScale = 1.25
     private let velocityRangeMultiplier = 0.1
-    private let birthRate: Float = 100.0
     private let emitterWidth: CGFloat = 10.0
     
     @Environment(\.self) var environment
@@ -86,8 +84,8 @@ struct BackgroundView: UIViewRepresentable {
         cell.scale = windParticleScale
         cell.velocity = velocity * velocityScale
         cell.velocityRange = velocityRangeMultiplier * velocity
-        cell.birthRate = birthRate * Float(verticalSpan.upperBound - verticalSpan.lowerBound)
-        cell.lifetime = windParticleLifetime
+        cell.lifetime = Float(frame.size.width / (velocity - velocity * velocityRangeMultiplier))
+        cell.birthRate = 25.0 / cell.lifetime
         
         emitter.emitterCells = [cell]
         
