@@ -152,7 +152,7 @@ struct BackgroundView: UIViewRepresentable {
     private func windEmitterPosition(verticalSpan: WindSpan, velocity: Double) -> CGPoint {
         CGPoint(
             x: velocity >= 0.0 ? -emitterWidth : frame.size.width,
-            y: (verticalSpan.upperBound + verticalSpan.lowerBound) / 2.0 * frame.size.height
+            y: 0.0
         )
     }
     
