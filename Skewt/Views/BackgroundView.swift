@@ -10,15 +10,29 @@ import SwiftUI
 fileprivate let windSpanKey = "windVerticalSpan"
 fileprivate let windVelocityKey = "windVelocity"
 
+fileprivate typealias WindSpan = ClosedRange<CGFloat>
+fileprivate typealias WindEmitter = CAEmitterLayer
+
+fileprivate extension WindEmitter {
+    var windSpan: WindSpan? {
+        get { value(forKey: windSpanKey) as? WindSpan }
+        set { setValue(newValue, forKey: windSpanKey) }
+    }
+    
+    var windVelocity: Double? {
+        get { value(forKey: windVelocityKey) as? Double }
+        set { setValue(newValue, forKey: windVelocityKey) }
+    }
+}
+
 fileprivate extension UIView {
-    var windEmitters: [CAEmitterLayer] {
-        (layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
+    var windEmitters: [WindEmitter] {
+        (layer.sublayers ?? []).filter({ ($0 as? WindEmitter)?.windSpan != nil }) as! [WindEmitter]
     }
 }
 
 struct BackgroundView: UIViewRepresentable {
     typealias UIViewType = UIView
-    private typealias WindSpan = ClosedRange<CGFloat>
     
     let frame: CGRect
     let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
@@ -66,7 +80,7 @@ struct BackgroundView: UIViewRepresentable {
     private func rebuildWindEmittersIfNeeded(inView view: UIView) {
         let wind = windByRange
         let existingWindEmitters = view.windEmitters
-        let existingWindRanges = Set(existingWindEmitters.compactMap({ $0.value(forKey: windSpanKey) as? WindSpan }))
+        let existingWindRanges = Set(existingWindEmitters.compactMap({ $0.windSpan }))
     
         if existingWindRanges != Set(wind.keys) {
             existingWindEmitters.forEach { $0.removeFromSuperlayer() }
@@ -76,9 +90,9 @@ struct BackgroundView: UIViewRepresentable {
         }
     }
     
-    private func updateWindEmitter(_ windEmitter: CAEmitterLayer) {
-        guard let span = windEmitter.value(forKey: windSpanKey) as? WindSpan,
-              let velocity = windEmitter.value(forKey: windVelocityKey) as? Double else {
+    private func updateWindEmitter(_ windEmitter: WindEmitter) {
+        guard let span = windEmitter.windSpan,
+              let velocity = windEmitter.windVelocity else {
             return
         }
         
@@ -87,16 +101,16 @@ struct BackgroundView: UIViewRepresentable {
         windEmitter.frame = windEmitterFrame(verticalSpan: span)
     }
     
-    private func windEmitter(verticalSpan: WindSpan, velocity: Double) -> CAEmitterLayer? {
+    private func windEmitter(verticalSpan: WindSpan, velocity: Double) -> WindEmitter? {
         let positiveVelocity = abs(velocity)
 
         guard positiveVelocity >= minimumWindToAnimate else {
             return nil
         }
         
-        let emitter = CAEmitterLayer()
-        emitter.setValue(verticalSpan, forKey: windSpanKey)
-        emitter.setValue(velocity, forKey: windVelocityKey)
+        let emitter = WindEmitter()
+        emitter.windSpan = verticalSpan
+        emitter.windVelocity = velocity
         emitter.emitterShape = .rectangle
         
         let cell = CAEmitterCell()
