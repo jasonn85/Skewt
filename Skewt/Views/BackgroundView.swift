@@ -7,8 +7,18 @@
 
 import SwiftUI
 
+fileprivate let windSpanKey = "windVerticalSpan"
+fileprivate let windVelocityKey = "windVelocity"
+
+fileprivate extension UIView {
+    var windEmitters: [CAEmitterLayer] {
+        (layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
+    }
+}
+
 struct BackgroundView: UIViewRepresentable {
     typealias UIViewType = UIView
+    private typealias WindSpan = ClosedRange<CGFloat>
     
     let frame: CGRect
     let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
@@ -20,8 +30,6 @@ struct BackgroundView: UIViewRepresentable {
     let minimumWind = 5.0
     
     private let gradientName = "backgroundGradient"
-    private let windSpanKey = "windVerticalSpan"
-    private let windVelocityKey = "windVelocity"
 
     private let windParticleColor = CGColor(gray: 0.5, alpha: 0.2)
     private let windParticleScale = 0.5
@@ -39,16 +47,9 @@ struct BackgroundView: UIViewRepresentable {
         gradient!.startPoint = skyGradientStart
         gradient!.endPoint = skyGradientEnd
         
-        let windEmitters: [CAEmitterLayer] = (uiView.layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
-        
-        windEmitters.forEach {
-            let span = $0.value(forKey: windSpanKey) as! ClosedRange<CGFloat>
-            let velocity = $0.value(forKey: windVelocityKey) as! Double
-            
-            $0.emitterSize = windEmitterSize(verticalSpan: span)
-            $0.emitterPosition = windEmitterPosition(verticalSpan: span, velocity: velocity)
-            $0.frame = windEmitterFrame(verticalSpan: span)
-        }    }
+        rebuildWindEmittersIfNeeded(inView: uiView)
+        uiView.windEmitters.forEach { updateWindEmitter($0) }
+    }
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: frame)
@@ -57,13 +58,38 @@ struct BackgroundView: UIViewRepresentable {
         gradient.name = gradientName
         view.layer.addSublayer(gradient)
         
-        let windEmitters = windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
-        windEmitters.forEach { view.layer.addSublayer($0) }
+        rebuildWindEmittersIfNeeded(inView: view)
                 
         return view
     }
     
-    private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer? {
+    private func rebuildWindEmittersIfNeeded(inView view: UIView) {
+        let wind = windByRange
+        let existingWindEmitters = view.windEmitters
+        
+        let windRanges = Set(wind?.map({ $0.0 }) ?? [])
+        let existingWindRanges = Set(existingWindEmitters.compactMap({ $0.value(forKey: windSpanKey) as? WindSpan }))
+    
+        if existingWindRanges != windRanges {
+            existingWindEmitters.forEach { $0.removeFromSuperlayer() }
+            
+            (windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? [])
+                .forEach { view.layer.addSublayer($0) }
+        }
+    }
+    
+    private func updateWindEmitter(_ windEmitter: CAEmitterLayer) {
+        guard let span = windEmitter.value(forKey: windSpanKey) as? WindSpan,
+              let velocity = windEmitter.value(forKey: windVelocityKey) as? Double else {
+            return
+        }
+        
+        windEmitter.emitterSize = windEmitterSize(verticalSpan: span)
+        windEmitter.emitterPosition = windEmitterPosition(verticalSpan: span, velocity: velocity)
+        windEmitter.frame = windEmitterFrame(verticalSpan: span)
+    }
+    
+    private func windEmitter(verticalSpan: WindSpan, velocity: Double) -> CAEmitterLayer? {
         let positiveVelocity = abs(velocity)
 
         guard positiveVelocity >= minimumWind else {
@@ -89,14 +115,14 @@ struct BackgroundView: UIViewRepresentable {
         return emitter
     }
     
-    private func windEmitterSize(verticalSpan: ClosedRange<CGFloat>) -> CGSize {
+    private func windEmitterSize(verticalSpan: WindSpan) -> CGSize {
         CGSize(
             width: emitterWidth,
             height: (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
         )
     }
     
-    private func windEmitterFrame(verticalSpan: ClosedRange<CGFloat>) -> CGRect {
+    private func windEmitterFrame(verticalSpan: WindSpan) -> CGRect {
         CGRect(
             x: 0.0,
             y: verticalSpan.lowerBound * frame.size.height,
@@ -105,14 +131,14 @@ struct BackgroundView: UIViewRepresentable {
         )
     }
     
-    private func windEmitterPosition(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CGPoint {
+    private func windEmitterPosition(verticalSpan: WindSpan, velocity: Double) -> CGPoint {
         CGPoint(
             x: velocity >= 0.0 ? -emitterWidth : frame.size.width,
             y: (verticalSpan.upperBound + verticalSpan.lowerBound) / 2.0 * frame.size.height
         )
     }
     
-    private var windByRange: [(ClosedRange<CGFloat>, Double)]? {
+    private var windByRange: [(WindSpan, Double)]? {
         guard let winds = winds else {
             return nil
         }
