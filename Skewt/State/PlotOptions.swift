@@ -17,6 +17,7 @@ struct PlotOptions: Codable {
         case setIsobarLabels(Bool)
         case setIsothermLabels(Bool)
         case setWindBarbs(Bool)
+        case setShowAnimatedWind(Bool)
     }
     
     struct PlotStyling: Codable {
@@ -81,6 +82,7 @@ struct PlotOptions: Codable {
     var showIsobarLabels: Bool
     var showIsothermLabels: Bool
     var showWindBarbs: Bool
+    var showAnimatedWind: Bool
     var plotStyling: PlotStyling
 }
 
@@ -94,6 +96,7 @@ extension PlotOptions {
         showIsobarLabels = true
         showIsothermLabels = true
         showWindBarbs = false
+        showAnimatedWind = true
         plotStyling = PlotStyling()
     }
 }
@@ -127,6 +130,8 @@ extension PlotOptions {
                 options.showIsothermLabels = isothermLabels
             case .setWindBarbs(let showWindBarbs):
                 options.showWindBarbs = showWindBarbs
+            case .setShowAnimatedWind(let showAnimatedWind):
+                options.showAnimatedWind = showAnimatedWind
             }
         }
         

@@ -37,7 +37,7 @@ struct BackgroundView: UIViewRepresentable {
     let frame: CGRect
     let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
     let skyGradientEnd: CGPoint = CGPoint(x: 0.5, y: 1.0)
-    let skyColors: [Color] = [Color("HighSkyBlue"), Color("LowSkyBlue")]
+    let skyColors: [Color]
     
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
@@ -52,6 +52,12 @@ struct BackgroundView: UIViewRepresentable {
     private let emitterWidth: CGFloat = 10.0
     
     @Environment(\.self) var environment
+    
+    init(frame: CGRect, winds: [Double : Double]?, skyColors: [Color] = [Color("HighSkyBlue"), Color("LowSkyBlue")]) {
+        self.frame = frame
+        self.winds = winds
+        self.skyColors = skyColors
+    }
 
     func updateUIView(_ uiView: UIView, context: Context) {
         let gradient: CAGradientLayer? = uiView.layer.sublayers?.first(where: { $0.name == gradientName }) as? CAGradientLayer

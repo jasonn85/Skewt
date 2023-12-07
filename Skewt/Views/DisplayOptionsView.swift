@@ -52,6 +52,7 @@ struct DisplayOptionsView: View {
                 
                 Section {
                     windBarbs
+                    animatedWind
                 }
                 
                 Section("Isopleths") {
@@ -105,6 +106,36 @@ struct DisplayOptionsView: View {
                 }
             })) {
                 Text("Wind barbs")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var animatedWind: some View {
+        HStack {
+            Rectangle()
+                .border(.black, width: 1.0)
+                .frame(width: 20.0, height: 20.0)
+                .foregroundColor(.clear)
+                .background {
+                    GeometryReader { geometry in
+                        BackgroundView(
+                            frame: CGRect(origin: .zero, size: geometry.size),
+                            winds: [0.5: -15.0],
+                            skyColors: []
+                        )
+                    }
+                }
+                .clipped()
+            
+            Toggle(isOn: Binding<Bool>(get: {
+                store.state.plotOptions.showAnimatedWind
+            }, set: { showAnimatedWind in
+                withAnimation {
+                    store.dispatch(PlotOptions.Action.setShowAnimatedWind(showAnimatedWind))
+                }
+            })) {
+                Text("Animated wind")
             }
         }
     }
