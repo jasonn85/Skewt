@@ -27,7 +27,7 @@ struct BackgroundView: UIViewRepresentable {
     
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
-    let minimumWind = 5.0
+    let minimumWindToAnimate = 5.0
     
     private let gradientName = "backgroundGradient"
 
@@ -90,7 +90,7 @@ struct BackgroundView: UIViewRepresentable {
     private func windEmitter(verticalSpan: WindSpan, velocity: Double) -> CAEmitterLayer? {
         let positiveVelocity = abs(velocity)
 
-        guard positiveVelocity >= minimumWind else {
+        guard positiveVelocity >= minimumWindToAnimate else {
             return nil
         }
         
