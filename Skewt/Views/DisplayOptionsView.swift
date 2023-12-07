@@ -119,11 +119,16 @@ struct DisplayOptionsView: View {
                 .foregroundColor(.clear)
                 .background {
                     GeometryReader { geometry in
-                        BackgroundView(
-                            frame: CGRect(origin: .zero, size: geometry.size),
-                            winds: [0.5: -15.0],
-                            skyColors: []
-                        )
+                        ZStack {
+                            Rectangle()
+                                .foregroundColor(.white)
+                            
+                            BackgroundView(
+                                frame: CGRect(origin: .zero, size: geometry.size),
+                                winds: [0.5: -15.0],
+                                skyColors: []
+                            )
+                        }
                     }
                 }
                 .clipped()
