@@ -32,36 +32,14 @@ struct BackgroundView: UIViewRepresentable {
     @Environment(\.self) var environment
 
     func updateUIView(_ uiView: UIView, context: Context) {
-        updateLayers(inView: uiView)
-    }
-    
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: frame)
-        updateLayers(inView: view)
-        
-        return view
-    }
-    
-    private func updateLayers(inView view: UIViewType) {
-        var gradient: CAGradientLayer? = view.layer.sublayers?.first(where: { $0.name == gradientName }) as? CAGradientLayer
-        
-        if gradient == nil {
-            gradient = CAGradientLayer()
-            gradient!.name = gradientName
-            view.layer.addSublayer(gradient!)
-        }
+        let gradient: CAGradientLayer? = uiView.layer.sublayers?.first(where: { $0.name == gradientName }) as? CAGradientLayer
         
         gradient!.frame = frame
         gradient!.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
         gradient!.startPoint = skyGradientStart
         gradient!.endPoint = skyGradientEnd
         
-        var windEmitters: [CAEmitterLayer] = (view.layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
-        
-        if windEmitters.count == 0 {
-            windEmitters = windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
-            windEmitters.forEach { view.layer.addSublayer($0) }
-        }
+        let windEmitters: [CAEmitterLayer] = (uiView.layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
         
         windEmitters.forEach {
             let span = $0.value(forKey: windSpanKey) as! ClosedRange<CGFloat>
@@ -70,7 +48,19 @@ struct BackgroundView: UIViewRepresentable {
             $0.emitterSize = windEmitterSize(verticalSpan: span)
             $0.emitterPosition = windEmitterPosition(verticalSpan: span, velocity: velocity)
             $0.frame = windEmitterFrame(verticalSpan: span)
-        }
+        }    }
+    
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView(frame: frame)
+
+        let gradient = CAGradientLayer()
+        gradient.name = gradientName
+        view.layer.addSublayer(gradient)
+        
+        let windEmitters = windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
+        windEmitters.forEach { view.layer.addSublayer($0) }
+                
+        return view
     }
     
     private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer? {
