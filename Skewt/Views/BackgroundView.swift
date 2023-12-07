@@ -17,6 +17,7 @@ struct BackgroundView: UIViewRepresentable {
     
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
+    let minimumWind = 5.0
     
     private let gradientName = "backgroundGradient"
     private let windSpanKey = "windVerticalSpan"
@@ -58,7 +59,7 @@ struct BackgroundView: UIViewRepresentable {
         var windEmitters: [CAEmitterLayer] = (view.layer.sublayers ?? []).filter({ $0.value(forKey: windSpanKey) != nil }) as! [CAEmitterLayer]
         
         if windEmitters.count == 0 {
-            windEmitters = windByRange?.map { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
+            windEmitters = windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? []
             windEmitters.forEach { view.layer.addSublayer($0) }
         }
         
@@ -72,7 +73,13 @@ struct BackgroundView: UIViewRepresentable {
         }
     }
     
-    private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer {
+    private func windEmitter(verticalSpan: ClosedRange<CGFloat>, velocity: Double) -> CAEmitterLayer? {
+        let positiveVelocity = abs(velocity)
+
+        guard positiveVelocity >= minimumWind else {
+            return nil
+        }
+        
         let emitter = CAEmitterLayer()
         emitter.setValue(verticalSpan, forKey: windSpanKey)
         emitter.setValue(velocity, forKey: windVelocityKey)
@@ -83,8 +90,8 @@ struct BackgroundView: UIViewRepresentable {
         cell.color = windParticleColor
         cell.scale = windParticleScale
         cell.velocity = velocity * velocityScale
-        cell.velocityRange = velocityRangeMultiplier * velocity
-        cell.lifetime = Float(frame.size.width / (velocity - velocity * velocityRangeMultiplier))
+        cell.velocityRange = velocityRangeMultiplier * positiveVelocity
+        cell.lifetime = Float(frame.size.width / (positiveVelocity - positiveVelocity * velocityRangeMultiplier))
         cell.birthRate = 25.0 / cell.lifetime
         
         emitter.emitterCells = [cell]
