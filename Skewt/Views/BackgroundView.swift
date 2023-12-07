@@ -66,14 +66,12 @@ struct BackgroundView: UIViewRepresentable {
     private func rebuildWindEmittersIfNeeded(inView view: UIView) {
         let wind = windByRange
         let existingWindEmitters = view.windEmitters
-        
-        let windRanges = Set(wind?.map({ $0.0 }) ?? [])
         let existingWindRanges = Set(existingWindEmitters.compactMap({ $0.value(forKey: windSpanKey) as? WindSpan }))
     
-        if existingWindRanges != windRanges {
+        if existingWindRanges != Set(wind.keys) {
             existingWindEmitters.forEach { $0.removeFromSuperlayer() }
             
-            (windByRange?.compactMap { windEmitter(verticalSpan: $0.0, velocity: $0.1) } ?? [])
+            wind.compactMap { windEmitter(verticalSpan: $0, velocity: $1) }
                 .forEach { view.layer.addSublayer($0) }
         }
     }
@@ -138,21 +136,21 @@ struct BackgroundView: UIViewRepresentable {
         )
     }
     
-    private var windByRange: [(WindSpan, Double)]? {
+    private var windByRange: [WindSpan: Double] {
         guard let winds = winds else {
-            return nil
+            return [:]
         }
         
         let windHeights = [Double](winds.keys).filter({ (0.0...1.0).contains($0) }).sorted()
         
-        return stride(from: 0, to: Int(windHeights.count), by: 1).map {
-            let height = windHeights[$0]
-            let beforeHeight = $0 > 0 ? windHeights[$0 - 1] : 0.0
-            let afterHeight = $0 < (windHeights.count - 1) ? windHeights[$0 + 1] : 1.0
+        return stride(from: 0, to: Int(windHeights.count), by: 1).reduce(into: [WindSpan: Double]()) {
+            let height = windHeights[$1]
+            let beforeHeight = $1 > 0 ? windHeights[$1 - 1] : 0.0
+            let afterHeight = $1 < (windHeights.count - 1) ? windHeights[$1 + 1] : 1.0
             let halfBefore = beforeHeight > 0.0 ? height - ((height - beforeHeight) / 2.0) : 0.0
             let halfAfter = afterHeight < 1.0 ? height + ((afterHeight - height) / 2.0) : 1.0
             
-            return (halfBefore...halfAfter, winds[height]!)
+            $0[halfBefore...halfAfter] = winds[height]!
         }
     }
 }
