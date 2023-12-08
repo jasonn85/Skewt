@@ -46,10 +46,11 @@ struct BackgroundView: UIViewRepresentable {
     private let gradientName = "backgroundGradient"
 
     private let windParticleColor = CGColor(gray: 0.5, alpha: 0.2)
-    private let windParticleScale = 0.5
+    private let windParticleScale = 1.0
     private let velocityScale = 0.75
-    private let velocityRangeMultiplier = 0.1
+    private let velocityRangeMultiplier = 0.2
     private let emitterWidth: CGFloat = 10.0
+    private let windParticleBirthRateMultiplier: Float = 3.0
     
     @Environment(\.self) var environment
     
@@ -118,18 +119,20 @@ struct BackgroundView: UIViewRepresentable {
         emitter.windSpan = verticalSpan
         emitter.windVelocity = velocity
         emitter.emitterShape = .rectangle
+        emitter.contentsScale = UIScreen.main.scale
         
         // Prevent all wind emitters from weirdly aligning at first appearance
         emitter.seed = UInt32(verticalSpan.hashValue & Int(UInt32.max))
         
         let cell = CAEmitterCell()
+        cell.contentsScale = UIScreen.main.scale
         cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
         cell.color = windParticleColor
         cell.scale = windParticleScale
         cell.velocity = velocity * velocityScale
         cell.velocityRange = velocityRangeMultiplier * positiveVelocity
         cell.lifetime = Float(frame.size.width / (velocityScale * positiveVelocity - positiveVelocity * velocityRangeMultiplier * velocityScale))
-        cell.birthRate = 25.0 / cell.lifetime
+        cell.birthRate = Float((verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height) * windParticleBirthRateMultiplier / cell.lifetime
         
         emitter.emitterCells = [cell]
         
