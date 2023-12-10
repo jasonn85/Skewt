@@ -69,7 +69,7 @@ struct BackgroundView: UIViewRepresentable {
         gradient!.endPoint = skyGradientEnd
         
         rebuildWindEmittersIfNeeded(inView: uiView)
-        uiView.windEmitters.forEach { updateWindEmitter($0) }
+        uiView.windEmitters.forEach { updateWindEmitterPosition($0) }
     }
     
     func makeUIView(context: Context) -> UIView {
@@ -99,7 +99,7 @@ struct BackgroundView: UIViewRepresentable {
         }
     }
     
-    private func updateWindEmitter(_ windEmitter: WindEmitter) {
+    private func updateWindEmitterPosition(_ windEmitter: WindEmitter) {
         guard let span = windEmitter.windSpan,
               let velocity = windEmitter.windVelocity else {
             return
