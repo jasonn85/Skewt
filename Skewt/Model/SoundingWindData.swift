@@ -52,6 +52,7 @@ extension Sounding {
         let maximumWindPoint = windData.reduce(windData.first!) { $1.windSpeed! > $0.windSpeed! ? $1 : $0 }
         var maximumWindAngle = Double(maximumWindPoint.windDirection!) * .pi / 180.0
         
+        // Pick an easterly direction so that westerly values will be negative when reduced
         if maximumWindAngle >= .pi {
             maximumWindAngle -= .pi
         }
