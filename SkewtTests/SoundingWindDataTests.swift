@@ -9,16 +9,6 @@ import XCTest
 @testable import Skewt
 
 final class SoundingWindDataTests: XCTestCase {
-//    var sounding: Sounding!
-//    
-//    override func setUpWithError() throws {
-//        let bundle = Bundle(for: type(of: self))
-//        let fileUrl = bundle.url(forResource: "nkx-raob-1", withExtension: "txt")!
-//        let d = try Data(contentsOf: fileUrl)
-//        let s = String(data: d, encoding: .utf8)!
-//        sounding = try Sounding(fromText: s)
-//    }
-    
     func testWindDataFiltering() throws {
         let types: [DataPointType] = [.mandatoryLevel, .significantLevel, .windLevel]
         
