@@ -86,11 +86,13 @@ struct BackgroundView: UIViewRepresentable {
     
     private func rebuildWindEmittersIfNeeded(inView view: UIView) {
         let wind = windByRange
-        let existingWindEmitters = view.windEmitters
-        let existingWindRanges = Set(existingWindEmitters.compactMap({ $0.windSpan }))
-    
-        if existingWindRanges != Set(wind.keys) {
-            existingWindEmitters.forEach { $0.removeFromSuperlayer() }
+        
+        let existingWind = view.windEmitters.reduce(into: [WindSpan:Double]()) {
+            $0[$1.windSpan!] = $1.windVelocity!
+        }
+        
+        if existingWind != wind {
+            view.windEmitters.forEach { $0.removeFromSuperlayer() }
             
             wind.compactMap { windEmitter(verticalSpan: $0, velocity: $1) }
                 .forEach { view.layer.addSublayer($0) }
