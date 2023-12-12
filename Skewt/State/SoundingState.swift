@@ -113,7 +113,7 @@ extension SoundingSelection {
         
         switch action {
         case .selectModelType(let type):
-            return SoundingSelection(type: type, location: state.location, time: state.time)
+            return SoundingSelection(type: type, location: state.location, time: .now)
         case .selectLocation(let location):
             return SoundingSelection(type: state.type, location: location, time: state.time)
         case .selectTime(let time):
