@@ -9,10 +9,10 @@ import Foundation
 
 struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Action: Skewt.Action {
-        case selectModelType(ModelType)
-        case selectLocation(Location)
+        case selectModelType(ModelType, Time = .now)
+        case selectLocation(Location, Time = .now)
         case selectTime(Time)
-        case selectModelTypeAndLocation(ModelType?, Location?)
+        case selectModelTypeAndLocation(ModelType?, Location?, Time = .now)
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
@@ -112,17 +112,17 @@ extension SoundingSelection {
         }
         
         switch action {
-        case .selectModelType(let type):
-            return SoundingSelection(type: type, location: state.location, time: .now)
-        case .selectLocation(let location):
-            return SoundingSelection(type: state.type, location: location, time: state.time)
+        case .selectModelType(let type, let time):
+            return SoundingSelection(type: type, location: state.location, time: time)
+        case .selectLocation(let location, let time):
+            return SoundingSelection(type: state.type, location: location, time: time)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time)
-        case .selectModelTypeAndLocation(let type, let location):
+        case .selectModelTypeAndLocation(let type, let location, let time):
             return SoundingSelection(
                 type: type ?? state.type,
                 location: location ?? state.location,
-                time: .now
+                time: time
             )
         }
     }
@@ -261,9 +261,9 @@ extension SoundingSelection.Action {
     // Is this action changing the sounding type or location?
     var isCreatingNewSelection: Bool {
         switch self {
-        case .selectModelTypeAndLocation(let type, let location):
+        case .selectModelTypeAndLocation(let type, let location, _):
             return type != nil || location != nil
-        case .selectLocation(_), .selectModelType(_):
+        case .selectLocation(_, _), .selectModelType(_, _):
             return true
         case .selectTime(_):
             // Just changing time is not creating a new selection type
