@@ -83,6 +83,25 @@ extension SoundingSelection {
     }
 }
 
+extension Date {
+    func soundingSelectionTime(forModelType modelType: SoundingSelection.ModelType, referenceDate: Date = .now) -> SoundingSelection.Time {
+        let timeInterval = timeIntervalSince(referenceDate)
+
+        switch modelType {
+        case .op40:
+            return timeInterval == 0.0 ? .now : .relative(timeInterval)
+        case .raob:
+            let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
+            
+            if abs(intervalCount) <= 1 {
+                return .now
+            } else {
+                return .numberOfSoundingsAgo(-intervalCount)
+            }
+        }
+    }
+}
+
 extension SoundingSelection: CustomStringConvertible {
     var description: String {
         location.briefDescription
