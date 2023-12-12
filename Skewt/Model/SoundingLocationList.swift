@@ -32,9 +32,7 @@ struct LatestSoundingList: Codable, Equatable {
 
 extension LatestSoundingList {
     func lastSoundingTime(forWmoId wmoId: Int) -> Date? {
-        let entry = soundings.first(where: { $0.stationId == .wmoId(wmoId) })
-        
-        return entry?.timestamp
+        soundings.first(where: { $0.stationId == .wmoId(wmoId) })?.timestamp
     }
 }
 
