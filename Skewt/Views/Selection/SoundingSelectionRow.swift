@@ -146,9 +146,32 @@ struct SoundingSelectionRow: View {
                 store.dispatch(SoundingState.Action.changeAndLoadSelection(
                     .selectModelTypeAndLocation(
                         selection.type,
-                        selection.location
+                        selection.location,
+                        mostRecentTime(forType: selection.type, location: selection.location)
                     )
                 ))
+            }
+        }
+    }
+    
+    private func mostRecentTime(
+        forType type: SoundingSelection.ModelType,
+        location: SoundingSelection.Location
+    ) -> SoundingSelection.Time {
+        switch type {
+        case .op40:
+            return .now
+        case .raob:
+            switch location {
+            case .closest, .point(_, _):
+                return .now
+            case .named(let name):
+                guard let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId,
+                      let mostRecentSounding = store.state.recentSoundingsState.recentSoundings?.lastSoundingTime(forWmoId: wmoId) else {
+                    return .now
+                }
+                
+                return mostRecentSounding.soundingSelectionTime(forModelType: type)
             }
         }
     }

@@ -173,4 +173,34 @@ final class ClosestTimeTests: XCTestCase {
             XCTAssertEqual(interval, TimeInterval(-Double(hourInterval) * 60.0 * 60.0))
         }
     }
+    
+    func testDateToSoundingSelectionTime() {
+        let referenceDate = Date(timeIntervalSince1970: 1702412771)  // December 12, 2023 20:26:11 UTC
+        
+        // op40 just spits back the time interval (or .now)
+        XCTAssertEqual(referenceDate.soundingSelectionTime(forModelType: .op40, referenceDate: referenceDate), .now)
+        let oneHour = TimeInterval(60.0 * 60.0)
+        let oneHourAgo = referenceDate.addingTimeInterval(-oneHour)
+        XCTAssertEqual(oneHourAgo.soundingSelectionTime(forModelType: .op40, referenceDate: referenceDate), .relative(-oneHour))
+        
+        // RAOB now is most recent
+        XCTAssertEqual(referenceDate.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .now)
+        
+        // RAOB minus one hour is most recent
+        XCTAssertEqual(oneHourAgo.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .now)
+        
+        // RAOB 12 hours ago is most recent
+        let twelveHoursAgo = referenceDate.addingTimeInterval(-12.0 * 60.0 * 60.0)
+        XCTAssertEqual(twelveHoursAgo.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .now)
+        
+        // RAOB 24 hours ago is +2
+        let dayAgo = referenceDate.addingTimeInterval(-24.0 * 60.0 * 60.0)
+        XCTAssertEqual(dayAgo.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .numberOfSoundingsAgo(2))
+        
+        // RAOB 23/25 hours ago is +2
+        let dayAgoMinusHour = referenceDate.addingTimeInterval(-23.0 * 60.0 * 60.0)
+        let dayAgoPlusHour = referenceDate.addingTimeInterval(-25.0 * 60.0 * 60.0)
+        XCTAssertEqual(dayAgoMinusHour.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .numberOfSoundingsAgo(2))
+        XCTAssertEqual(dayAgoPlusHour.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .numberOfSoundingsAgo(2))
+    }
 }

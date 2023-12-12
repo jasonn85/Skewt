@@ -9,10 +9,10 @@ import Foundation
 
 struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Action: Skewt.Action {
-        case selectModelType(ModelType)
-        case selectLocation(Location)
+        case selectModelType(ModelType, Time = .now)
+        case selectLocation(Location, Time = .now)
         case selectTime(Time)
-        case selectModelTypeAndLocation(ModelType?, Location?)
+        case selectModelTypeAndLocation(ModelType?, Location?, Time = .now)
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
@@ -72,6 +72,25 @@ extension SoundingSelection {
     }
 }
 
+extension Date {
+    func soundingSelectionTime(forModelType modelType: SoundingSelection.ModelType, referenceDate: Date = .now) -> SoundingSelection.Time {
+        let timeInterval = timeIntervalSince(referenceDate)
+
+        switch modelType {
+        case .op40:
+            return timeInterval == 0.0 ? .now : .relative(timeInterval)
+        case .raob:
+            let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
+            
+            if abs(intervalCount) <= 1 {
+                return .now
+            } else {
+                return .numberOfSoundingsAgo(-intervalCount)
+            }
+        }
+    }
+}
+
 extension SoundingSelection: CustomStringConvertible {
     var description: String {
         location.briefDescription
@@ -101,17 +120,17 @@ extension SoundingSelection {
         }
         
         switch action {
-        case .selectModelType(let type):
-            return SoundingSelection(type: type, location: state.location, time: state.time)
-        case .selectLocation(let location):
-            return SoundingSelection(type: state.type, location: location, time: state.time)
+        case .selectModelType(let type, let time):
+            return SoundingSelection(type: type, location: state.location, time: time)
+        case .selectLocation(let location, let time):
+            return SoundingSelection(type: state.type, location: location, time: time)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time)
-        case .selectModelTypeAndLocation(let type, let location):
+        case .selectModelTypeAndLocation(let type, let location, let time):
             return SoundingSelection(
                 type: type ?? state.type,
                 location: location ?? state.location,
-                time: .now
+                time: time
             )
         }
     }
@@ -120,6 +139,7 @@ extension SoundingSelection {
 struct SoundingState: Codable {
     enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
+        case emptyResponse
         case unparseableResponse
         case requestFailed
         case lackingLocationPermission  // We can't do closest weather if we lack CL permission
@@ -250,9 +270,9 @@ extension SoundingSelection.Action {
     // Is this action changing the sounding type or location?
     var isCreatingNewSelection: Bool {
         switch self {
-        case .selectModelTypeAndLocation(let type, let location):
+        case .selectModelTypeAndLocation(let type, let location, _):
             return type != nil || location != nil
-        case .selectLocation(_), .selectModelType(_):
+        case .selectLocation(_, _), .selectModelType(_, _):
             return true
         case .selectTime(_):
             // Just changing time is not creating a new selection type

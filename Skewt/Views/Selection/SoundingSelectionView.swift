@@ -101,12 +101,12 @@ struct SoundingSelectionView: View {
     }
     
     private func lastSoundingComponent(forWmoId wmoId: Int) -> SoundingSelectionRow.DescriptionComponent? {
-        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.soundings,
-              let entry = recentSoundings.first(where:{ $0.wmoIdOrNil == wmoId }) else {
+        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings,
+              let soundingTime = recentSoundings.lastSoundingTime(forWmoId: wmoId) else {
             return nil
         }
         
-        return .age(entry.timestamp)
+        return .age(soundingTime)
     }
 }
 

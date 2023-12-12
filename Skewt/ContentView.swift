@@ -197,6 +197,8 @@ struct ContentView: View {
                 return "Request failed"
             case .unableToGenerateRequestFromSelection:
                 return "Error creating request"
+            case .emptyResponse:
+                return "No data is available"
             case .unparseableResponse:
                 return "Data was not parseable"
             }
