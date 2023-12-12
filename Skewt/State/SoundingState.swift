@@ -55,6 +55,17 @@ extension SoundingSelection {
     }
 }
 
+extension SoundingSelection.Location {
+    var nameOrNil: String? {
+        switch self {
+        case .named(let name):
+            return name
+        case .closest, .point(_, _):
+            return nil
+        }
+    }
+}
+
 extension SoundingSelection {
     var requiresLocation: Bool {
         switch self.location {

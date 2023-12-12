@@ -30,6 +30,14 @@ struct LatestSoundingList: Codable, Equatable {
     var soundings: [Entry]
 }
 
+extension LatestSoundingList {
+    func lastSoundingTime(forWmoId wmoId: Int) -> Date? {
+        let entry = soundings.first(where: { $0.stationId == .wmoId(wmoId) })
+        
+        return entry?.timestamp
+    }
+}
+
 struct LocationList: Codable {
     struct Location: Codable, Hashable, Identifiable {
         var name: String
