@@ -52,8 +52,12 @@ extension Middlewares {
                 return URLSession.shared.dataTaskPublisher(for: url)
                     .map { data, response in
                         guard !data.isEmpty,
-                              let text = String(data: data, encoding: .utf8),
-                              let sounding = try? Sounding(fromText: text) else {
+                                let text = String(data: data, encoding: .utf8),
+                                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                            return SoundingState.Action.didReceiveFailure(.emptyResponse)
+                        }
+                        
+                        guard let sounding = try? Sounding(fromText: text) else {
                             return SoundingState.Action.didReceiveFailure(.unparseableResponse)
                         }
                         

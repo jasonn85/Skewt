@@ -150,6 +150,7 @@ extension SoundingSelection {
 struct SoundingState: Codable {
     enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
+        case emptyResponse
         case unparseableResponse
         case requestFailed
         case lackingLocationPermission  // We can't do closest weather if we lack CL permission
