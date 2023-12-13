@@ -53,7 +53,10 @@ struct SkewtPlotView: View {
             
             switch plotOptions.adiabatTypes {
             case .none:
-                EmptyView()
+                // Draw a transparent rectangle instead of an EmptyView so that the plot takes up some space
+                // if there is no data at all.
+                Rectangle()
+                    .foregroundColor(.clear)
             case .tens:
                 let dryAdiabats = plot.dryAdiabatPaths
                 ForEach(dryAdiabats.keys.sorted(), id: \.self) { t in
