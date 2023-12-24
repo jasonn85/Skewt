@@ -178,7 +178,7 @@ RAOB sounding valid at:
         XCTAssertEqual(halfOffLeftLine.0, middleLeft)
         XCTAssertEqual(halfOffLeftLine.1, middleTop)
         
-        let skewedUpSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 2.0)
+        let skewedUpSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
         let steepFromBottomLeft = skewedUpSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         let steepFromBottomMiddle = skewedUpSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(steepFromBottomLeft.0, bottomLeft)
@@ -186,7 +186,7 @@ RAOB sounding valid at:
         XCTAssertEqual(steepFromBottomMiddle.0, middleBottom)
         XCTAssertEqual(steepFromBottomMiddle.1, squareTopRight)
         
-        let skewedDownSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
+        let skewedDownSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 2.0)
         let shallowFromBottomLeft = skewedDownSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         XCTAssertEqual(shallowFromBottomLeft.0, bottomLeft)
         XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
