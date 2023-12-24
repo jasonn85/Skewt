@@ -225,9 +225,10 @@ extension SkewtPlot {
         let surfaceX = x(forSurfaceTemperature: temperature)
         
         let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skew)) : nil
-        let intersectingRightY = 1.0 - ((1.0 - surfaceX) * skew)
-        let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY) : nil
-        let intersectingTop = intersectingRight == nil ? CGPoint(x: 1.0 / skew + surfaceX, y: 0.0) : nil
+        let intersectingRightY = skew > 0.0 ? 1.0 - ((1.0 - surfaceX) * (1.0 / skew)) : nil
+        let intersectingRight = intersectingRightY != nil && intersectingRightY! >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY!) : nil
+        let intersectingTopX = intersectingRight == nil ? surfaceX + skew : nil
+        let intersectingTop = intersectingTopX != nil ? CGPoint(x: intersectingTopX!, y: 0.0) : nil
         
         let start = intersectingLeft ?? CGPoint(x: surfaceX, y: 1.0)
         let end = intersectingRight ?? intersectingTop!
