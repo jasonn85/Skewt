@@ -14,7 +14,7 @@ fileprivate let defaultPressureRange = 100...1050.0
 fileprivate let defaultAdiabatSpacing = 10.0
 fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
-fileprivate let defaultSkewSlope = 1.0
+fileprivate let defaultSkew = 1.0
 fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0, 20.0]
 fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                           30_000.0, 40_000.0]
@@ -47,7 +47,7 @@ struct SkewtPlot {
     var isohumes: [Double]  // in g/kg
     var altitudeIsobars: [Double]  // in ft
     
-    var skewSlope: CGFloat
+    var skew: CGFloat
     
     var temperaturePath: CGPath? {
         guard let data = sounding?.data.filter({ $0.temperature != nil }),
@@ -127,13 +127,13 @@ extension SkewtPlot {
     public func point(pressure: Double, temperature: Double) -> CGPoint {
         let y = y(forPressure: pressure)
         let surfaceX = x(forSurfaceTemperature: temperature)
-        let skewedX = surfaceX + ((1.0 - y) * skewSlope)
+        let skewedX = surfaceX + ((1.0 - y) * skew)
         
         return CGPoint(x: skewedX, y: y)
     }
     
     public func pressureAndTemperature(atPoint point: CGPoint) -> (pressure: Double, temperature: Double) {
-        let skewedX = point.x - ((1.0 - point.y) * skewSlope)
+        let skewedX = point.x - ((1.0 - point.y) * skew)
         let temperature = (skewedX
                             * (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
                             + surfaceTemperatureRange.lowerBound)
@@ -171,7 +171,7 @@ extension SkewtPlot {
 extension SkewtPlot {
     init(sounding: Sounding?) {
         self.sounding = sounding
-        skewSlope = defaultSkewSlope
+        skew = defaultSkew
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
         pressureRange = defaultPressureRange
@@ -224,10 +224,10 @@ extension SkewtPlot {
     func isotherm(forTemperature temperature: Double) -> Line {
         let surfaceX = x(forSurfaceTemperature: temperature)
         
-        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skewSlope)) : nil
-        let intersectingRightY = 1.0 - ((1.0 - surfaceX) * skewSlope)
+        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skew)) : nil
+        let intersectingRightY = 1.0 - ((1.0 - surfaceX) * skew)
         let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY) : nil
-        let intersectingTop = intersectingRight == nil ? CGPoint(x: 1.0 / skewSlope + surfaceX, y: 0.0) : nil
+        let intersectingTop = intersectingRight == nil ? CGPoint(x: 1.0 / skew + surfaceX, y: 0.0) : nil
         
         let start = intersectingLeft ?? CGPoint(x: surfaceX, y: 1.0)
         let end = intersectingRight ?? intersectingTop!
