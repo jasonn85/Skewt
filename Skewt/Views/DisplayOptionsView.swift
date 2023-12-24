@@ -11,6 +11,7 @@ struct DisplayOptionsView: View {
     @EnvironmentObject var store: Store<SkewtState>
     static private let maximumAltitude = 40_000.0
     static private let minimumMaximumAltitude = 2_000.0
+    static private let skewRange = 0.0...2.0
     
     @State private var lineStylesExpanded = false
     
@@ -46,6 +47,23 @@ struct DisplayOptionsView: View {
                             ),
                             in: Self.minimumMaximumAltitude...Self.maximumAltitude,
                             step: 1_000.0
+                        )
+                    }
+                    
+                    VStack {
+                        HStack {
+                            Text("Skew")
+                            Spacer()
+                            Text(String(store.state.plotOptions.skew))
+                        }
+                        
+                        Slider(
+                            value: Binding<Double>(
+                                get: { store.state.plotOptions.skew },
+                                set: { store.dispatch(PlotOptions.Action.changeSkew($0)) }
+                            ),
+                            in: Self.skewRange,
+                            step: 0.25
                         )
                     }
                 }
