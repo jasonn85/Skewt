@@ -391,8 +391,6 @@ extension CGRect {
         let ySorted = [line.0, line.1].sorted { $0.y < $1.y }
         let left = xSorted[0]
         let right = xSorted[1]
-        let bottom = ySorted[0]
-        let top = ySorted[1]
         let originallySwapped = left != line.0
                 
         let a = (right.y - left.y) / (right.x - left.x)
