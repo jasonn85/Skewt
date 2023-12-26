@@ -176,7 +176,7 @@ struct BackgroundView: UIViewRepresentable {
             let height = windHeights[$1]
             let beforeHeight = $1 > 0 ? windHeights[$1 - 1] : 0.0
             let afterHeight = $1 < (windHeights.count - 1) ? windHeights[$1 + 1] : 1.0
-            let halfBefore = beforeHeight > 0.0 ? height - ((height - beforeHeight) / 2.0) : 0.0
+            let halfBefore = beforeHeight > 0.0 ? height - ((height - beforeHeight) / 2.0) : windHeights[0]
             let halfAfter = afterHeight < 1.0 ? height + ((afterHeight - height) / 2.0) : 1.0
             
             $0[halfBefore...halfAfter] = winds[height]!
