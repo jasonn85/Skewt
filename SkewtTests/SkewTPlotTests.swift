@@ -159,15 +159,12 @@ RAOB sounding valid at:
         let squarePlot = SkewtPlot(sounding: sounding)
         
         let bottomLeft = CGPoint(x: 0.0, y: 1.0)
-//        let bottomRight = CGPoint(x: 1.0, y: 1.0)
         let middleBottom = CGPoint(x: 0.5, y: 1.0)
         let middleLeft = CGPoint(x: 0.0, y: 0.5)
         let middleRight = CGPoint(x: 1.0, y: 0.5)
         let middleTop = CGPoint(x: 0.5, y: 0.0)
-//        let topLeft = CGPoint(x: 0.0, y: 0.0)
         let topRight = CGPoint(x: 1.0, y: 0.0)
         let (_, bottomLeftTemp) = squarePlot.pressureAndTemperature(atPoint: bottomLeft)
-//        let (_, bottomRightTemp) = squarePlot.pressureAndTemperature(atPoint: bottomRight)
         let (_, middleTemp) = squarePlot.pressureAndTemperature(atPoint: middleBottom)
         let (_, halfOffLeftTemp) = squarePlot.pressureAndTemperature(atPoint: CGPoint(x: -0.5, y: 1.0))
         let fullLine = squarePlot.isotherm(forTemperature: bottomLeftTemp)
@@ -185,12 +182,6 @@ RAOB sounding valid at:
         let vertical = unskewedSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(vertical.0, middleBottom)
         XCTAssertEqual(vertical.1, middleTop)
-        
-        // TODO: Decide whether this is worth supporting and either reimplement isotherm code or not
-//        let reverseSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.0)
-//        let leftwardLine = squarePlot.isotherm(forTemperature: bottomRightTemp)
-//        XCTAssertEqual(leftwardLine.0, bottomRight)
-//        XCTAssertEqual(leftwardLine.1, topLeft)
         
         let lessSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
         let steepFromBottomLeft = lessSkewedSquarePlot.isotherm(forTemperature: bottomLeftTemp)
