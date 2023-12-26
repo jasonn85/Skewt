@@ -49,23 +49,6 @@ struct DisplayOptionsView: View {
                             step: 1_000.0
                         )
                     }
-                    
-                    VStack {
-                        HStack {
-                            Text("Skew")
-                            Spacer()
-                            Text(String(store.state.plotOptions.skew))
-                        }
-                        
-                        Slider(
-                            value: Binding<Double>(
-                                get: { store.state.plotOptions.skew },
-                                set: { store.dispatch(PlotOptions.Action.changeSkew($0)) }
-                            ),
-                            in: Self.skewRange,
-                            step: 0.25
-                        )
-                    }
                 }
                 
                 Section {
