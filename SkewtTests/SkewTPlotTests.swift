@@ -159,15 +159,15 @@ RAOB sounding valid at:
         let squarePlot = SkewtPlot(sounding: sounding)
         
         let bottomLeft = CGPoint(x: 0.0, y: 1.0)
-        let bottomRight = CGPoint(x: 1.0, y: 1.0)
+//        let bottomRight = CGPoint(x: 1.0, y: 1.0)
         let middleBottom = CGPoint(x: 0.5, y: 1.0)
         let middleLeft = CGPoint(x: 0.0, y: 0.5)
         let middleRight = CGPoint(x: 1.0, y: 0.5)
         let middleTop = CGPoint(x: 0.5, y: 0.0)
-        let topLeft = CGPoint(x: 0.0, y: 0.0)
+//        let topLeft = CGPoint(x: 0.0, y: 0.0)
         let topRight = CGPoint(x: 1.0, y: 0.0)
         let (_, bottomLeftTemp) = squarePlot.pressureAndTemperature(atPoint: bottomLeft)
-        let (_, bottomRightTemp) = squarePlot.pressureAndTemperature(atPoint: bottomRight)
+//        let (_, bottomRightTemp) = squarePlot.pressureAndTemperature(atPoint: bottomRight)
         let (_, middleTemp) = squarePlot.pressureAndTemperature(atPoint: middleBottom)
         let (_, halfOffLeftTemp) = squarePlot.pressureAndTemperature(atPoint: CGPoint(x: -0.5, y: 1.0))
         let fullLine = squarePlot.isotherm(forTemperature: bottomLeftTemp)
@@ -185,6 +185,12 @@ RAOB sounding valid at:
         let vertical = unskewedSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(vertical.0, middleBottom)
         XCTAssertEqual(vertical.1, middleTop)
+        
+        // TODO: Decide whether this is worth supporting and either reimplement isotherm code or not
+//        let reverseSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.0)
+//        let leftwardLine = squarePlot.isotherm(forTemperature: bottomRightTemp)
+//        XCTAssertEqual(leftwardLine.0, bottomRight)
+//        XCTAssertEqual(leftwardLine.1, topLeft)
         
         let lessSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
         let steepFromBottomLeft = lessSkewedSquarePlot.isotherm(forTemperature: bottomLeftTemp)
@@ -310,5 +316,52 @@ RAOB sounding valid at:
         XCTAssertEqual(plot.pressureRange.lowerBound,
                        Pressure.standardPressure(atAltitude: altitudeRange.upperBound),
                        accuracy: pressureTolerance)
+    }
+    
+    func testLineConstraint() {
+        let normalBounds = CGRect(origin: .zero, size: CGSize(width: 1.0, height: 1.0))
+        
+        let bottomLeft = CGPoint(x: 0.0, y: 1.0)
+        let bottomRight = CGPoint(x: 1.0, y: 1.0)
+        let middleBottomish = CGPoint(x: 0.5, y: 0.88)
+        let middleLeftish = CGPoint(x: 0.15, y: 0.5)
+        let middleRightish = CGPoint(x: 0.9, y: 0.5)
+        let middleTopish = CGPoint(x: 0.5, y: 0.1)
+        let topLeft = CGPoint(x: 0.0, y: 0.0)
+        let topRight = CGPoint(x: 1.0, y: 0.0)
+        let insidePoints = [bottomLeft, bottomRight, middleBottomish, middleLeftish,
+                            middleRightish, middleTopish, topLeft, topRight]
+                
+        insidePoints.forEach { a in
+            insidePoints.forEach { b in
+                let constrained = normalBounds.constrainLine((a, b))!
+                
+                XCTAssertEqual(constrained.0, a, "Line already within rect, when constrained, is the same")
+                XCTAssertEqual(constrained.1, b, "Line already within rect, when constrained, is the same")
+            }
+        }
+        
+        let diagonalAcross = (CGPoint(x: -1.0, y: 2.0), CGPoint(x: 2.0, y: -1.0))
+        let diagonalConstrained = normalBounds.constrainLine(diagonalAcross)!
+        XCTAssertEqual(diagonalConstrained.0, bottomLeft)
+        XCTAssertEqual(diagonalConstrained.1, topRight)
+        
+        stride(from: 0.0, through: 1.0, by: 0.1).forEach {
+            let horizontal = (CGPoint(x: $0, y: -1.0), CGPoint(x: $0, y: 2.0))
+            let constrainedHorizontal = normalBounds.constrainLine(horizontal)!
+            
+            XCTAssertEqual(constrainedHorizontal.0.x, $0)
+            XCTAssertEqual(constrainedHorizontal.0.y, 0.0)
+            XCTAssertEqual(constrainedHorizontal.1.x, $0)
+            XCTAssertEqual(constrainedHorizontal.1.y, 1.0)
+            
+            let vertical = (CGPoint(x: -1.0, y: $0), CGPoint(x: 2.0, y: $0))
+            let constraintedVertical = normalBounds.constrainLine(vertical)!
+            
+            XCTAssertEqual(constraintedVertical.0.x, 0.0)
+            XCTAssertEqual(constraintedVertical.0.y, $0)
+            XCTAssertEqual(constraintedVertical.1.x, 1.0)
+            XCTAssertEqual(constraintedVertical.1.y, $0)
+        }
     }
 }

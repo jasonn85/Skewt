@@ -223,17 +223,12 @@ extension SkewtPlot {
     /// Calculates the isotherm line and then crops it to our bounds
     func isotherm(forTemperature temperature: Double) -> Line {
         let surfaceX = x(forSurfaceTemperature: temperature)
+        let start = CGPoint(x: surfaceX, y: 1.0)
+        let end = CGPoint(x: surfaceX + skew, y: 0.0)
         
-        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skew)) : nil
-        let intersectingRightY = skew > 0.0 ? 1.0 - ((1.0 - surfaceX) * (1.0 / skew)) : nil
-        let intersectingRight = intersectingRightY != nil && intersectingRightY! >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY!) : nil
-        let intersectingTopX = intersectingRight == nil ? surfaceX + skew : nil
-        let intersectingTop = intersectingTopX != nil ? CGPoint(x: intersectingTopX!, y: 0.0) : nil
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         
-        let start = intersectingLeft ?? CGPoint(x: surfaceX, y: 1.0)
-        let end = intersectingRight ?? intersectingTop!
-        
-        return (start, end)
+        return bounds.constrainLine((start, end)) ?? (.zero, .zero)
     }
     
     /// CGPaths for isotherms, keyed by temperature C
@@ -381,6 +376,72 @@ extension SkewtPlot {
         }
         
         return path
+    }
+}
+
+extension CGRect {
+    /// Return the entire line if it is fully contained by the CGRect, a segment of the line that intersects the bounds of the CGRect,
+    /// or nil if it does not intersect the CGRect
+    func constrainLine(_ line: SkewtPlot.Line) -> SkewtPlot.Line? {
+        guard line.0.x != line.1.x else {
+            return constrainVerticalOrHorizontalLine(line)
+        }
+        
+        let xSorted = [line.0, line.1].sorted { $0.x < $1.x }
+        let ySorted = [line.0, line.1].sorted { $0.y < $1.y }
+        let left = xSorted[0]
+        let right = xSorted[1]
+        let bottom = ySorted[0]
+        let top = ySorted[1]
+        let originallySwapped = left != line.0
+                
+        let a = (right.y - left.y) / (right.x - left.x)
+        let b = -left.x * a + left.y
+        let fx: (CGFloat) -> CGFloat = { a * $0 + b }
+        let fy: (CGFloat) -> CGFloat = { (b - $0) / a }
+        
+        guard a != 0 else {
+            return constrainVerticalOrHorizontalLine(line)
+        }
+        
+        let x0 = left.x < origin.x ? CGPoint(x: origin.x, y: fy(origin.x)) : nil
+        let x1 = right.x > origin.x + size.width ? CGPoint(x: origin.x + size.width, y: fy(origin.x + size.width)) : nil
+        let y0 = bottom.y < origin.y ? CGPoint(x: fx(origin.y), y: origin.y) : nil
+        let y1 = top.y > origin.y + size.height ? CGPoint(x: fx(origin.y + size.height), y: origin.y + size.height) : nil
+        
+        let possibleLefts = [left, x0, y0, y1, x1].compactMap({ $0 }).filter { self.containsIncludingEdge($0) }
+        let possibleRights = [right, x1, y1, y0, x0].compactMap({ $0 }).filter { self.containsIncludingEdge($0) }
+        
+        guard var newLeft = possibleLefts.first, var newRight = possibleRights.first(where: { $0 != newLeft }) else {
+            return nil
+        }
+        
+        if (newRight.y - newLeft.y).sign != a.sign {
+            swap(&newLeft, &newRight)
+        }
+        
+        if originallySwapped {
+            swap(&newLeft, &newRight)
+        }
+        
+        return (newLeft, newRight)
+    }
+    
+    private func constrainVerticalOrHorizontalLine(_ line: SkewtPlot.Line) -> SkewtPlot.Line? {
+        (
+            CGPoint(
+                x: max(origin.x, min(origin.x + size.width, line.0.x)),
+                y: max(origin.y, min(origin.y + size.height, line.0.y))
+            ),
+            CGPoint(
+                x: max(origin.x, min(origin.x + size.width, line.1.x)),
+                y: max(origin.y, min(origin.y + size.height, line.1.y))
+            )
+        )
+    }
+    
+    private func containsIncludingEdge(_ point: CGPoint) -> Bool {
+        point.x >= origin.x && point.x <= origin.x + size.width && point.y >= origin.y && point.y <= origin.y + size.height
     }
 }
 
