@@ -404,13 +404,13 @@ extension CGRect {
             return constrainVerticalOrHorizontalLine(line)
         }
         
-        let x0 = left.x < origin.x ? CGPoint(x: origin.x, y: fy(origin.x)) : nil
-        let x1 = right.x > origin.x + size.width ? CGPoint(x: origin.x + size.width, y: fy(origin.x + size.width)) : nil
-        let y0 = bottom.y < origin.y ? CGPoint(x: fx(origin.y), y: origin.y) : nil
-        let y1 = top.y > origin.y + size.height ? CGPoint(x: fx(origin.y + size.height), y: origin.y + size.height) : nil
+        let x0 = CGPoint(x: origin.x, y: fx(origin.x))
+        let x1 = CGPoint(x: origin.x + size.width, y: fx(origin.x + size.width))
+        let y0 = CGPoint(x: fy(origin.y), y: origin.y)
+        let y1 = CGPoint(x: fy(origin.y + size.height), y: origin.y + size.height)
         
-        let possibleLefts = [left, x0, y0, y1, x1].compactMap({ $0 }).filter { self.containsIncludingEdge($0) }
-        let possibleRights = [right, x1, y1, y0, x0].compactMap({ $0 }).filter { self.containsIncludingEdge($0) }
+        let possibleLefts = [left, x0, y0, y1, x1].filter { self.containsIncludingEdge($0) }
+        let possibleRights = [right, x1, y1, y0, x0].filter { self.containsIncludingEdge($0) }
         
         guard var newLeft = possibleLefts.first, var newRight = possibleRights.first(where: { $0 != newLeft }) else {
             return nil
