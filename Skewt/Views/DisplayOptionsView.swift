@@ -11,7 +11,6 @@ struct DisplayOptionsView: View {
     @EnvironmentObject var store: Store<SkewtState>
     static private let maximumAltitude = 40_000.0
     static private let minimumMaximumAltitude = 2_000.0
-    static private let skewRange = 0.0...2.0
     
     @State private var lineStylesExpanded = false
     
