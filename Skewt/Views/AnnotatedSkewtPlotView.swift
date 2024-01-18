@@ -492,6 +492,7 @@ struct AnnotatedSkewtPlotView: View {
     
     private var plot: SkewtPlot {
         var plot = SkewtPlot(sounding: sounding)
+        plot.skew = plotOptions.skew
         
         if let altitudeRange = plotOptions.altitudeRange {
             plot.altitudeRange = altitudeRange

@@ -14,7 +14,7 @@ fileprivate let defaultPressureRange = 100...1050.0
 fileprivate let defaultAdiabatSpacing = 10.0
 fileprivate let defaultIsothermSpacing = defaultAdiabatSpacing
 fileprivate let defaultIsobarSpacing = 100.0
-fileprivate let defaultSkewSlope = 1.0
+fileprivate let defaultSkew = 1.0
 fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0, 20.0]
 fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                           30_000.0, 40_000.0]
@@ -47,7 +47,7 @@ struct SkewtPlot {
     var isohumes: [Double]  // in g/kg
     var altitudeIsobars: [Double]  // in ft
     
-    var skewSlope: CGFloat
+    var skew: CGFloat
     
     var temperaturePath: CGPath? {
         guard let data = sounding?.data.filter({ $0.temperature != nil }),
@@ -127,13 +127,13 @@ extension SkewtPlot {
     public func point(pressure: Double, temperature: Double) -> CGPoint {
         let y = y(forPressure: pressure)
         let surfaceX = x(forSurfaceTemperature: temperature)
-        let skewedX = surfaceX + ((1.0 - y) * skewSlope)
+        let skewedX = surfaceX + ((1.0 - y) * skew)
         
         return CGPoint(x: skewedX, y: y)
     }
     
     public func pressureAndTemperature(atPoint point: CGPoint) -> (pressure: Double, temperature: Double) {
-        let skewedX = point.x - ((1.0 - point.y) * skewSlope)
+        let skewedX = point.x - ((1.0 - point.y) * skew)
         let temperature = (skewedX
                             * (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound)
                             + surfaceTemperatureRange.lowerBound)
@@ -171,7 +171,7 @@ extension SkewtPlot {
 extension SkewtPlot {
     init(sounding: Sounding?) {
         self.sounding = sounding
-        skewSlope = defaultSkewSlope
+        skew = defaultSkew
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
         pressureRange = defaultPressureRange
@@ -223,16 +223,12 @@ extension SkewtPlot {
     /// Calculates the isotherm line and then crops it to our bounds
     func isotherm(forTemperature temperature: Double) -> Line {
         let surfaceX = x(forSurfaceTemperature: temperature)
+        let start = CGPoint(x: surfaceX, y: 1.0)
+        let end = CGPoint(x: surfaceX + skew, y: 0.0)
         
-        let intersectingLeft = surfaceX < 0.0 ? CGPoint(x: 0.0, y: 1.0 + (surfaceX * skewSlope)) : nil
-        let intersectingRightY = 1.0 - ((1.0 - surfaceX) * skewSlope)
-        let intersectingRight = intersectingRightY >= 0.0 ? CGPoint(x: 1.0, y:intersectingRightY) : nil
-        let intersectingTop = intersectingRight == nil ? CGPoint(x: 1.0 / skewSlope + surfaceX, y: 0.0) : nil
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         
-        let start = intersectingLeft ?? CGPoint(x: surfaceX, y: 1.0)
-        let end = intersectingRight ?? intersectingTop!
-        
-        return (start, end)
+        return bounds.constrainLine((start, end)) ?? (.zero, .zero)
     }
     
     /// CGPaths for isotherms, keyed by temperature C
@@ -380,6 +376,69 @@ extension SkewtPlot {
         }
         
         return path
+    }
+}
+
+extension CGRect {
+    /// Return the entire line if it is fully contained by the CGRect, a segment of the line that intersects the bounds of the CGRect,
+    /// or nil if it does not intersect the CGRect
+    func constrainLine(_ line: SkewtPlot.Line) -> SkewtPlot.Line? {
+        guard line.0.x != line.1.x else {
+            return constrainVerticalOrHorizontalLine(line)
+        }
+        
+        let xSorted = [line.0, line.1].sorted { $0.x < $1.x }
+        let left = xSorted[0]
+        let right = xSorted[1]
+        let originallySwapped = left != line.0
+                
+        let a = (right.y - left.y) / (right.x - left.x)
+        let b = -left.x * a + left.y
+        let fx: (CGFloat) -> CGFloat = { a * $0 + b }
+        let fy: (CGFloat) -> CGFloat = { (b - $0) / a }
+        
+        guard a != 0 else {
+            return constrainVerticalOrHorizontalLine(line)
+        }
+        
+        let x0 = CGPoint(x: origin.x, y: fx(origin.x))
+        let x1 = CGPoint(x: origin.x + size.width, y: fx(origin.x + size.width))
+        let y0 = CGPoint(x: fy(origin.y), y: origin.y)
+        let y1 = CGPoint(x: fy(origin.y + size.height), y: origin.y + size.height)
+        
+        let possibleLefts = [left, x0, y0, y1, x1].filter { self.containsIncludingEdge($0) }
+        let possibleRights = [right, x1, y1, y0, x0].filter { self.containsIncludingEdge($0) }
+        
+        guard var newLeft = possibleLefts.first, var newRight = possibleRights.first(where: { $0 != newLeft }) else {
+            return nil
+        }
+        
+        if (newRight.y - newLeft.y).sign != a.sign {
+            swap(&newLeft, &newRight)
+        }
+        
+        if originallySwapped {
+            swap(&newLeft, &newRight)
+        }
+        
+        return (newLeft, newRight)
+    }
+    
+    private func constrainVerticalOrHorizontalLine(_ line: SkewtPlot.Line) -> SkewtPlot.Line? {
+        (
+            CGPoint(
+                x: max(origin.x, min(origin.x + size.width, line.0.x)),
+                y: max(origin.y, min(origin.y + size.height, line.0.y))
+            ),
+            CGPoint(
+                x: max(origin.x, min(origin.x + size.width, line.1.x)),
+                y: max(origin.y, min(origin.y + size.height, line.1.y))
+            )
+        )
+    }
+    
+    private func containsIncludingEdge(_ point: CGPoint) -> Bool {
+        point.x >= origin.x && point.x <= origin.x + size.width && point.y >= origin.y && point.y <= origin.y + size.height
     }
 }
 
