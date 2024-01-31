@@ -25,10 +25,9 @@ struct AnnotatedSkewtPlotView: View {
     
     /// Current point of interest in 0.0...1.0
     @State var annotationPoint: CGPoint? = nil
-    @State private var plotZoom = 1.0
-    @State private var isZooming = false
-    @GestureState private var magnificationState = 1.0
-    private let zoomRange: ClosedRange<CGFloat> = 1.0...3.0
+    
+    @State var zoom: CGFloat = 1.0
+    @State var offset: CGPoint = CGPoint(x: 0.0, y: 0.0)
     
     @State private var plotSize: CGSize = .zero
     
@@ -157,20 +156,24 @@ struct AnnotatedSkewtPlotView: View {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot)
                             .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
-                            .scaleEffect(isZooming ? magnificationState : plotZoom)
+                            .scaleEffect(zoom, anchor: UnitPoint(x: offset.x, y: offset.y))
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
-                                    Rectangle()
-                                        .foregroundColor(.clear)
-                                        .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
-                                        .overlay {
-                                            annotations(
-                                                inBounds: CGRect(origin: .zero, size: plotSize),
-                                                fromPlot: plot
-                                            )
-                                            .clipped()
-                                        }
+                                    ZStack {
+                                        Rectangle()
+                                            .foregroundColor(.clear)
+                                            .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
+                                            .overlay {
+                                                annotations(
+                                                    inBounds: CGRect(origin: .zero, size: plotSize),
+                                                    fromPlot: plot
+                                                )
+                                                .clipped()
+                                            }
+                                        
+                                        TouchCatchView(annotationPoint: $annotationPoint, zoom: $zoom, zoomOffset: $offset)
+                                    }
                                 }
                             }
                             .background {
@@ -188,27 +191,6 @@ struct AnnotatedSkewtPlotView: View {
                                     .clipped()
                                 }
                             }
-//                            .gesture(
-//                                DragGesture(minimumDistance: 0.0)
-//                                    .onChanged {
-//                                        updateAnnotationPoint($0.location)
-//                                    }
-//                            )
-                            .gesture(
-                                MagnifyGesture(minimumScaleDelta: 1.0 / plotZoom)
-                                    .updating($magnificationState) { value, scale, transaction in
-                                        scale = max(zoomRange.lowerBound, min(zoomRange.upperBound, value.magnification))
-                                    }
-                                    .onChanged { _ in
-                                       isZooming = true
-                                    }
-                                    .onEnded {
-                                        isZooming = false
-                                        plotZoom = max(zoomRange.lowerBound, min(zoomRange.upperBound, $0.magnification))
-                                    }
-                            )
-                        
-                        
                     }
                     
                     windBarbView(withPlot: plot)
