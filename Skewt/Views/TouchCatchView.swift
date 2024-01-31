@@ -130,7 +130,7 @@ extension TouchCatchView {
         
         @objc func tapperUpdated(_ gesture: UIPinchGestureRecognizer) {
             switch gesture.state {
-            case .changed:
+            case .ended:
                 guard let bounds = gesture.view?.bounds else {
                     return
                 }
