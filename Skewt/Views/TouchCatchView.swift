@@ -61,7 +61,7 @@ extension TouchCatchView {
         var startingZoom: CGFloat = 1.0
         
         var panStart: CGPoint = .zero
-        var panStartZoomAnchor: UnitPoint = .center
+        var panStartSquare: InsetSquare? = nil
         
         init(_ parent: TouchCatchView) {
             self.parent = parent
@@ -74,31 +74,17 @@ extension TouchCatchView {
         @objc func pinchUpdated(_ gesture: UIPinchGestureRecognizer) {
             switch gesture.state {
             case .began:                
-                guard let bounds = gesture.view?.bounds else {
+                guard let bounds = gesture.view?.bounds,
+                        let currentRect = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
                     return
                 }
                 
                 let location = gesture.location(in: gesture.view)
-                let distanceFromCenterOfVisible = UnitPoint(
-                    x: (location.x - bounds.midX) / bounds.size.width,
-                    y: (location.y - bounds.midY) / bounds.size.height
-                )
-                let existingOffset = UnitPoint(
-                    x: parent.zoomAnchor.x - 0.5,
-                    y: parent.zoomAnchor.y - 0.5
-                )
-                let visibleBounds = CGRect(
-                    x: (1.0 - (1.0 / parent.zoom) + existingOffset.x) / 2.0,
-                    y: (1.0 - (1.0 / parent.zoom) + existingOffset.y) / 2.0,
-                    width: 1.0 / parent.zoom,
-                    height: 1.0 / parent.zoom
-                )
+                let normalizedLocation = UnitPoint(x: location.x / bounds.size.width,
+                                                   y: location.y / bounds.size.height)
                 
                 startingZoom = parent.zoom
-                parent.zoomAnchor = UnitPoint(
-                    x: visibleBounds.midX + (distanceFromCenterOfVisible.x * visibleBounds.size.width),
-                    y: visibleBounds.midY + (distanceFromCenterOfVisible.y * visibleBounds.size.height)
-                )
+                parent.zoomAnchor = currentRect.actualPointForVisiblePoint(normalizedLocation)
                 
                 return
             case .changed:
@@ -110,34 +96,38 @@ extension TouchCatchView {
         }
         
         @objc func panUpdated(_ gesture: UIPanGestureRecognizer) {
+            var bounceBackToContent = false
+            
             switch gesture.state {
             case .began:
-                panStartZoomAnchor = parent.zoomAnchor
+                panStartSquare = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor)
                 panStart = gesture.location(in: gesture.view)
                 
                 return
+            case .ended:
+                bounceBackToContent = true
+                fallthrough
             case .changed:
-                guard let bounds = gesture.view?.bounds else {
+                guard let bounds = gesture.view?.bounds, let panStartSquare = panStartSquare else {
                     return
                 }
                 
                 let location = gesture.location(in: gesture.view)
+                let visibleNormalizedLocation = UnitPoint(x: location.x / bounds.size.width,
+                                                          y: location.y / bounds.size.height)
+                let normalizedLocation = panStartSquare.actualPointForVisiblePoint(visibleNormalizedLocation)
                 
                 if parent.zoom == 1.0 {
-                    updateAnnotationPoint(UnitPoint(
-                        x: location.x / bounds.size.width,
-                        y: location.y / bounds.size.height
-                    ))
+                    updateAnnotationPoint(normalizedLocation)
                 } else {
-                    guard parent.zoom > 1.0 else {
-                        parent.zoomAnchor = .center
-                        return
-                    }
+                    let distance = (x: location.x - panStart.x, y: location.y - panStart.y)
+                    let normalizedDistance = (x: distance.x / bounds.size.width, y: distance.y / bounds.size.height)
                     
-                    parent.zoomAnchor = UnitPoint(
-                        x: panStartZoomAnchor.x - (location.x - panStart.x) / (bounds.size.width * parent.zoom),
-                        y: panStartZoomAnchor.y - (location.y - panStart.y) / (bounds.size.height * parent.zoom)
-                    )
+                    parent.zoomAnchor = panStartSquare.pannedBy(
+                        x: normalizedDistance.x,
+                        y: normalizedDistance.y,
+                        constrainToContent: bounceBackToContent
+                    ).anchor
                 }
             
                 return
@@ -166,6 +156,80 @@ extension TouchCatchView {
                 return
             }
         }
+    }
+}
+
+enum InsetRectError: Error {
+    case invalidZoom
+}
+
+/// A struct to represent a zoomed in area of a square UnitRect with an arbitrary anchor point
+struct InsetSquare {
+    let zoom: CGFloat
+    let anchor: UnitPoint
+    
+    init(zoom: CGFloat, anchor: UnitPoint) throws {
+        if zoom <= 0.0 {
+            throw InsetRectError.invalidZoom
+        }
+        
+        self.zoom = zoom
+        self.anchor = anchor
+    }
+    
+    var visibleRect: CGRect {
+        let centerOffset = UnitPoint(
+            x: anchor.x - 0.5,
+            y: anchor.y - 0.5
+        )
+        
+        return CGRect(
+            x: (1.0 - (1.0 / zoom) + centerOffset.x) / 2.0,
+            y: (1.0 - (1.0 / zoom) + centerOffset.y) / 2.0,
+            width: 1.0 / zoom,
+            height: 1.0 / zoom
+        )
+    }
+    
+    /// The range of anchor values fill the visible area with content
+    var anchorRange: ClosedRange<CGFloat> {
+        let contentSize = 1.0 / zoom
+        let totalSpillOver = 1.0 - contentSize
+        let oneDirectionSpillOver = totalSpillOver / 2.0
+        
+        return (0.5 - oneDirectionSpillOver)...(0.5 + oneDirectionSpillOver)
+    }
+    
+    /// Takes a UnitPoint that represents a position in the currently-zoomed view and returns its unzoomed coordinate.
+    func actualPointForVisiblePoint(_ p: UnitPoint) -> UnitPoint {
+        let visibleCenter = UnitPoint(x: visibleRect.midX, y: visibleRect.midY)
+        let distanceFromVisibleCenter = (x: (p.x - visibleCenter.x) / zoom, y: (p.y - visibleCenter.y) / zoom)
+        
+        return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
+    }
+    
+    func pannedBy(x: CGFloat, y: CGFloat, constrainToContent: Bool = false) -> InsetSquare {
+        let scaledX = x / zoom
+        let scaledY = y / zoom
+        
+        var newAnchor = UnitPoint(x: anchor.x - scaledX, y: anchor.y - scaledY)
+        let anchorRange = anchorRange
+        
+        if constrainToContent {
+            if newAnchor.x < anchorRange.lowerBound {
+                newAnchor.x = anchorRange.lowerBound
+            } else if newAnchor.x > anchorRange.upperBound {
+                newAnchor.x = anchorRange.upperBound
+            }
+            
+            if newAnchor.y < anchorRange.lowerBound {
+                newAnchor.y = anchorRange.lowerBound
+            } else if newAnchor.y > anchorRange.upperBound {
+                newAnchor.y = anchorRange.upperBound
+            }
+        }
+        
+        return try! InsetSquare(zoom: zoom, anchor: newAnchor)
     }
 }
 
