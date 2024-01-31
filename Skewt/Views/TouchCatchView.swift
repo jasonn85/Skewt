@@ -7,12 +7,13 @@
 
 import SwiftUI
 
+/// A UIKit view and coordinator to handle zoom/pan/touch gestures better than is yet possible in SwiftUI
 struct TouchCatchView: UIViewRepresentable {
     typealias UIViewType = UIView
     
-    @Binding var annotationPoint: CGPoint?
+    @Binding var annotationPoint: UnitPoint?
     @Binding var zoom: CGFloat
-    @Binding var zoomOffset: CGPoint
+    @Binding var zoomOffset: UnitPoint
     
     var zoomRange: ClosedRange<CGFloat> = 1.0...3.0
 
@@ -31,7 +32,8 @@ struct TouchCatchView: UIViewRepresentable {
         view.addGestureRecognizer(tapper)
         context.coordinator.tapper = tapper
         
-        let panner = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.panUpdated(_:)))
+        let panner = UIPanGestureRecognizer(target: context.coordinator, 
+                                            action: #selector(Coordinator.panUpdated(_:)))
         panner.delegate = context.coordinator
         view.addGestureRecognizer(panner)
         context.coordinator.panner = panner
@@ -59,7 +61,7 @@ extension TouchCatchView {
         var startingZoom: CGFloat = 1.0
         var pinchCenter: CGPoint = .zero
         
-        var startingOffset: CGPoint = .zero
+        var startingOffset: UnitPoint = .zero
         var longPressStart: CGPoint = .zero
         
         init(_ parent: TouchCatchView) {
@@ -73,13 +75,13 @@ extension TouchCatchView {
             }
             
             // TODO: Constrain to bounds
-            parent.zoomOffset = CGPoint(
+            parent.zoomOffset = UnitPoint(
                 x: startingOffset.x - dx,
                 y: startingOffset.y - dy
             )
         }
         
-        private func updateAnnotationPoint(_ point: CGPoint) {
+        private func updateAnnotationPoint(_ point: UnitPoint) {
             parent.annotationPoint = point
         }
         
@@ -111,7 +113,7 @@ extension TouchCatchView {
                 let location = gesture.location(in: gesture.view)
                 
                 if parent.zoom == 1.0 {
-                    updateAnnotationPoint(CGPoint(
+                    updateAnnotationPoint(UnitPoint(
                         x: location.x / bounds.size.width,
                         y: location.y / bounds.size.height
                     ))
@@ -137,7 +139,7 @@ extension TouchCatchView {
                 
                 let location = gesture.location(in: gesture.view)
                 
-                updateAnnotationPoint(CGPoint(
+                updateAnnotationPoint(UnitPoint(
                     x: location.x / bounds.size.width,
                     y: location.y / bounds.size.height
                 ))

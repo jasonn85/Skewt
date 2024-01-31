@@ -23,11 +23,10 @@ struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
     
-    /// Current point of interest in 0.0...1.0
-    @State var annotationPoint: CGPoint? = nil
+    @State var annotationPoint: UnitPoint? = nil
     
     @State var zoom: CGFloat = 1.0
-    @State var offset: CGPoint = CGPoint(x: 0.0, y: 0.0)
+    @State var offset: UnitPoint = .zero
     
     @State private var plotSize: CGSize = .zero
     
@@ -310,7 +309,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func updateAnnotationPoint(_ point: CGPoint) {
-        annotationPoint = CGPoint(
+        annotationPoint = UnitPoint(
             x: point.x / plotSize.width,
             y: point.y / plotSize.height
         )
