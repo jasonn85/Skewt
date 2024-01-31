@@ -26,7 +26,7 @@ struct AnnotatedSkewtPlotView: View {
     @State var annotationPoint: UnitPoint? = nil
     
     @State var zoom: CGFloat = 1.0
-    @State var zoomAnchor = UnitPoint(x: 0.5, y: 0.5)
+    @State var zoomAnchor: UnitPoint = .center
     
     @State private var plotSize: CGSize = .zero
     
