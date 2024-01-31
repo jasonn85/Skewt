@@ -154,8 +154,8 @@ struct AnnotatedSkewtPlotView: View {
                     ZStack {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot)
                             .aspectRatio(1.0, contentMode: .fit)
-                            .border(.black)
                             .scaleEffect(zoom, anchor: zoomAnchor)
+                            .border(.black)
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
