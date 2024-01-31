@@ -22,19 +22,16 @@ struct TouchCatchView: UIViewRepresentable {
         
         let pincher = UIPinchGestureRecognizer(target: context.coordinator, 
                                                action: #selector(Coordinator.pinchUpdated(_:)))
-        pincher.delegate = context.coordinator
         view.addGestureRecognizer(pincher)
         context.coordinator.pincher = pincher
         
         let tapper = UITapGestureRecognizer(target: context.coordinator, 
                                             action: #selector(Coordinator.tapperUpdated(_:)))
-        tapper.delegate = context.coordinator
         view.addGestureRecognizer(tapper)
         context.coordinator.tapper = tapper
         
         let panner = UIPanGestureRecognizer(target: context.coordinator, 
                                             action: #selector(Coordinator.panUpdated(_:)))
-        panner.delegate = context.coordinator
         view.addGestureRecognizer(panner)
         context.coordinator.panner = panner
         
@@ -51,7 +48,7 @@ struct TouchCatchView: UIViewRepresentable {
 }
 
 extension TouchCatchView {
-    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+    class Coordinator {
         var parent: TouchCatchView
         
         var pincher: UIPinchGestureRecognizer?
