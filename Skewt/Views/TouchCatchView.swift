@@ -13,7 +13,7 @@ struct TouchCatchView: UIViewRepresentable {
     
     @Binding var annotationPoint: UnitPoint?
     @Binding var zoom: CGFloat
-    @Binding var zoomOffset: UnitPoint
+    @Binding var zoomAnchor: UnitPoint
     
     var zoomRange: ClosedRange<CGFloat> = 1.0...3.0
 
@@ -61,7 +61,7 @@ extension TouchCatchView {
         var startingZoom: CGFloat = 1.0
         var pinchCenter: CGPoint = .zero
         
-        var startingOffset: UnitPoint = .zero
+        var startingZoomAnchor: UnitPoint = .zero
         var longPressStart: CGPoint = .zero
         
         init(_ parent: TouchCatchView) {
@@ -70,14 +70,14 @@ extension TouchCatchView {
         
         private func updateOffset(dx: CGFloat, dy: CGFloat) {
             guard parent.zoom > 1.0 else {
-                parent.zoomOffset = .zero
+                parent.zoomAnchor = .zero
                 return
             }
             
             // TODO: Constrain to bounds
-            parent.zoomOffset = UnitPoint(
-                x: startingOffset.x - dx,
-                y: startingOffset.y - dy
+            parent.zoomAnchor = UnitPoint(
+                x: startingZoomAnchor.x - dx,
+                y: startingZoomAnchor.y - dy
             )
         }
         
@@ -101,7 +101,7 @@ extension TouchCatchView {
         @objc func panUpdated(_ gesture: UIPanGestureRecognizer) {
             switch gesture.state {
             case .began:
-                startingOffset = parent.zoomOffset
+                startingZoomAnchor = parent.zoomAnchor
                 longPressStart = gesture.location(in: gesture.view)
                 
                 return

@@ -26,7 +26,7 @@ struct AnnotatedSkewtPlotView: View {
     @State var annotationPoint: UnitPoint? = nil
     
     @State var zoom: CGFloat = 1.0
-    @State var offset: UnitPoint = .zero
+    @State var zoomAnchor = UnitPoint(x: 0.5, y: 0.5)
     
     @State private var plotSize: CGSize = .zero
     
@@ -155,7 +155,7 @@ struct AnnotatedSkewtPlotView: View {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot)
                             .aspectRatio(1.0, contentMode: .fit)
                             .border(.black)
-                            .scaleEffect(zoom, anchor: UnitPoint(x: offset.x, y: offset.y))
+                            .scaleEffect(zoom, anchor: zoomAnchor)
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
@@ -171,7 +171,11 @@ struct AnnotatedSkewtPlotView: View {
                                                 .clipped()
                                             }
                                         
-                                        TouchCatchView(annotationPoint: $annotationPoint, zoom: $zoom, zoomOffset: $offset)
+                                        TouchCatchView(
+                                            annotationPoint: $annotationPoint,
+                                            zoom: $zoom,
+                                            zoomAnchor: $zoomAnchor
+                                        )
                                     }
                                 }
                             }
