@@ -53,6 +53,7 @@
 		96A8F60D299DAC680021A170 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* Sounding.swift */; };
 		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
 		96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */; };
+		96B436E32B6AF73700C8A01A /* InsetSquareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B436E22B6AF73700C8A01A /* InsetSquareTests.swift */; };
 		96B46FEF2AB4EA01008AA3A1 /* ClosestTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */; };
 		96B46FF12AB4F8AE008AA3A1 /* ClosestTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */; };
 		96D0A4312A3AFA1E009BE6FD /* SoundingSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */; };
@@ -143,6 +144,7 @@
 		96A8F60C299DAC680021A170 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
 		96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucApiMiddlewareTests.swift; sourceTree = "<group>"; };
+		96B436E22B6AF73700C8A01A /* InsetSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetSquareTests.swift; sourceTree = "<group>"; };
 		96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTimeTests.swift; sourceTree = "<group>"; };
 		96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTime.swift; sourceTree = "<group>"; };
 		96D0A4302A3AFA1E009BE6FD /* SoundingSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionView.swift; sourceTree = "<group>"; };
@@ -254,6 +256,7 @@
 			isa = PBXGroup;
 			children = (
 				96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */,
+				96B436E22B6AF73700C8A01A /* InsetSquareTests.swift */,
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
 				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
 				969117912A29178900A5C72D /* PlotStylingTests.swift */,
@@ -538,6 +541,7 @@
 				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
 				964A81A72ADDE28100E3E1EC /* SunTimesTests.swift in Sources */,
+				96B436E32B6AF73700C8A01A /* InsetSquareTests.swift in Sources */,
 				969B8BC62AFEEB94002D0F20 /* SoundingWindDataTests.swift in Sources */,
 				967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */,
 				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,

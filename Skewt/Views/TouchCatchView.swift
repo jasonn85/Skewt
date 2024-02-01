@@ -117,7 +117,7 @@ extension TouchCatchView {
                 if parent.zoom == 1.0 {
                     updateAnnotationPoint(normalizedLocation)
                 } else {
-                    let distance = (x: location.x - panStart.x, y: location.y - panStart.y)
+                    let distance = (x: panStart.x - location.x, y: panStart.y - location.y)
                     let normalizedDistance = (x: distance.x / bounds.size.width, y: distance.y / bounds.size.height)
                     
                     parent.zoomAnchor = panStartSquare.pannedBy(
@@ -181,15 +181,15 @@ struct InsetSquare {
         )
         
         return CGRect(
-            x: (1.0 - (1.0 / zoom) + centerOffset.x) / 2.0,
-            y: (1.0 - (1.0 / zoom) + centerOffset.y) / 2.0,
+            x: (1.0 - (1.0 / zoom)) / 2.0 + centerOffset.x,
+            y: (1.0 - (1.0 / zoom)) / 2.0 + centerOffset.y,
             width: 1.0 / zoom,
             height: 1.0 / zoom
         )
     }
     
     /// The range of anchor values fill the visible area with content
-    var anchorRange: ClosedRange<CGFloat> {
+    private var anchorRange: ClosedRange<CGFloat> {
         let contentSize = 1.0 / zoom
         let totalSpillOver = 1.0 - contentSize
         let oneDirectionSpillOver = totalSpillOver / 2.0
@@ -209,7 +209,7 @@ struct InsetSquare {
         let scaledX = x / zoom
         let scaledY = y / zoom
         
-        var newAnchor = UnitPoint(x: anchor.x - scaledX, y: anchor.y - scaledY)
+        var newAnchor = UnitPoint(x: anchor.x + scaledX, y: anchor.y + scaledY)
         let anchorRange = anchorRange
         
         if constrainToContent {
