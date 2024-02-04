@@ -64,19 +64,19 @@ final class InsetSquareTests: XCTestCase {
     func testTwoXPanConstraining() {
         let square = try! InsetSquare(zoom: 2.0, anchor: .center)
 
-        XCTAssertEqual(square.pannedBy(x: -0.5, y: -0.5, constrainToContent: true).anchor, UnitPoint(x: 0.25, y: 0.25))
-        XCTAssertEqual(square.pannedBy(x: -1.5, y: -1.5, constrainToContent: true).anchor, UnitPoint(x: 0.25, y: 0.25))
-        XCTAssertEqual(square.pannedBy(x: 0.5, y: 0.5, constrainToContent: true).anchor, UnitPoint(x: 0.75, y: 0.75))
-        XCTAssertEqual(square.pannedBy(x: 1.5, y: 1.5, constrainToContent: true).anchor, UnitPoint(x: 0.75, y: 0.75))
+        XCTAssertEqual(square.pannedBy(x: -1.0, y: -1.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
+        XCTAssertEqual(square.pannedBy(x: -2.0, y: -2.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
+        XCTAssertEqual(square.pannedBy(x: 1.0, y: 1.0, constrainToContent: true).anchor, UnitPoint(x: 1.0, y: 1.0))
+        XCTAssertEqual(square.pannedBy(x: 2.0, y: 2.0, constrainToContent: true).anchor, UnitPoint(x: 1.0, y: 1.0))
     }
     
     func testFourXPanConstrainint() {
         let square = try! InsetSquare(zoom: 4.0, anchor: .center)
 
-        XCTAssertEqual(square.pannedBy(x: -2.0, y: -2.0, constrainToContent: true).anchor, UnitPoint(x: 0.125, y: 0.125))
-        XCTAssertEqual(square.pannedBy(x: -10.0, y: -10.0, constrainToContent: true).anchor, UnitPoint(x: 0.125, y: 0.125))
-        XCTAssertEqual(square.pannedBy(x: 2.0, y: 2.0, constrainToContent: true).anchor, UnitPoint(x: 1.0 - 0.125, y:  1.0 - 0.125))
-        XCTAssertEqual(square.pannedBy(x: 10.0, y: 10.0, constrainToContent: true).anchor, UnitPoint(x: 1.0 - 0.125, y: 1.0 - 0.125))
+        XCTAssertEqual(square.pannedBy(x: -2.0, y: -2.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
+        XCTAssertEqual(square.pannedBy(x: -10.0, y: -10.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
+        XCTAssertEqual(square.pannedBy(x: 2.0, y: 2.0, constrainToContent: true).anchor, UnitPoint(x: 1.0, y:  1.0))
+        XCTAssertEqual(square.pannedBy(x: 10.0, y: 10.0, constrainToContent: true).anchor, UnitPoint(x: 1.0, y: 1.0))
     }
     
     func testPanning() {
