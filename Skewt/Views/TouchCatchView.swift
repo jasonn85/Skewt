@@ -175,26 +175,12 @@ struct InsetSquare {
     }
     
     var visibleRect: CGRect {
-        let centerOffset = UnitPoint(
-            x: anchor.x - 0.5,
-            y: anchor.y - 0.5
-        )
-        
-        return CGRect(
-            x: (1.0 - (1.0 / zoom)) / 2.0 + centerOffset.x,
-            y: (1.0 - (1.0 / zoom)) / 2.0 + centerOffset.y,
+        CGRect(
+            x: anchor.x - (anchor.x / zoom),
+            y: anchor.y - (anchor.y / zoom),
             width: 1.0 / zoom,
             height: 1.0 / zoom
         )
-    }
-    
-    /// The range of anchor values fill the visible area with content
-    private var anchorRange: ClosedRange<CGFloat> {
-        let contentSize = 1.0 / zoom
-        let totalSpillOver = 1.0 - contentSize
-        let oneDirectionSpillOver = totalSpillOver / 2.0
-        
-        return (0.5 - oneDirectionSpillOver)...(0.5 + oneDirectionSpillOver)
     }
     
     /// Takes a UnitPoint that represents a position in the currently-zoomed view and returns its unzoomed coordinate.
@@ -210,7 +196,7 @@ struct InsetSquare {
         let scaledY = y / zoom
         
         var newAnchor = UnitPoint(x: anchor.x + scaledX, y: anchor.y + scaledY)
-        let anchorRange = anchorRange
+        let anchorRange = 0.0...1.0
         
         if constrainToContent {
             if newAnchor.x < anchorRange.lowerBound {
