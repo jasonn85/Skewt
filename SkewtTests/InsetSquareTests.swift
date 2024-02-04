@@ -47,6 +47,15 @@ final class InsetSquareTests: XCTestCase {
         XCTAssertEqual(square.pannedBy(x: 0.0, y: 0.0, constrainToContent: true).visibleRect, square.visibleRect)
     }
     
+    func testUnzoomedVisibleRect() {
+        let unzoomed = try! InsetSquare(zoom: 1.0, anchor: .center)
+        let anchors: [UnitPoint] = [.top, .bottom, .leading, .trailing, .topLeading, .topTrailing, .bottomLeading, .bottomTrailing]
+        
+        anchors.forEach {
+            XCTAssertEqual(try! InsetSquare(zoom: 1.0, anchor: $0).visibleRect, unzoomed.visibleRect)
+        }
+    }
+    
     func testUnzoomedPanConstraining() {
         let square = try! InsetSquare(zoom: 1.0, anchor: .center)
         let delta = 0.1
