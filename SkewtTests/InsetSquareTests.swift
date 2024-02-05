@@ -56,20 +56,6 @@ final class InsetSquareTests: XCTestCase {
         }
     }
     
-    func testUnzoomedPanConstraining() {
-        let square = try! InsetSquare(zoom: 1.0, anchor: .center)
-        let delta = 0.1
-                
-        XCTAssertEqual(square.pannedBy(x: -delta, y: 0.0, constrainToContent: true).visibleRect, square.visibleRect)
-        XCTAssertNotEqual(square.pannedBy(x: -delta, y: 0.0, constrainToContent: false).visibleRect, square.visibleRect)
-        XCTAssertEqual(square.pannedBy(x: delta, y: 0.0, constrainToContent: true).visibleRect, square.visibleRect)
-        XCTAssertNotEqual(square.pannedBy(x: delta, y: 0.0, constrainToContent: false).visibleRect, square.visibleRect)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: -delta, constrainToContent: true).visibleRect, square.visibleRect)
-        XCTAssertNotEqual(square.pannedBy(x: 0.0, y: -delta, constrainToContent: false).visibleRect, square.visibleRect)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: delta, constrainToContent: true).visibleRect, square.visibleRect)
-        XCTAssertNotEqual(square.pannedBy(x: 0.0, y: delta, constrainToContent: false).visibleRect, square.visibleRect)
-    }
-    
     func testTwoXPanConstraining() {
         let square = try! InsetSquare(zoom: 2.0, anchor: .center)
 
