@@ -192,8 +192,12 @@ struct InsetSquare {
     }
     
     func pannedBy(x: CGFloat, y: CGFloat, constrainToContent: Bool = false) -> InsetSquare {
-        let scaledX = x / zoom
-        let scaledY = y / zoom
+        guard zoom != 1.0 else {
+            return self
+        }
+        
+        let scaledX = x / (zoom - 1.0)
+        let scaledY = y / (zoom - 1.0)
         
         var newAnchor = UnitPoint(x: anchor.x + scaledX, y: anchor.y + scaledY)
         let anchorRange = 0.0...1.0
