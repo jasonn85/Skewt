@@ -160,6 +160,12 @@ struct AnnotatedSkewtPlotView: View {
                             .overlay {
                                 GeometryReader { geometry in
                                     ZStack {
+                                        TouchCatchView(
+                                            annotationPoint: $annotationPoint,
+                                            zoom: $zoom,
+                                            zoomAnchor: $zoomAnchor.animation(.easeOut(duration: 0.1))
+                                        )
+                                        
                                         Rectangle()
                                             .foregroundColor(.clear)
                                             .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
@@ -170,12 +176,6 @@ struct AnnotatedSkewtPlotView: View {
                                                 )
                                                 .clipped()
                                             }
-                                        
-                                        TouchCatchView(
-                                            annotationPoint: $annotationPoint,
-                                            zoom: $zoom,
-                                            zoomAnchor: $zoomAnchor.animation(.easeOut(duration: 0.1))
-                                        )
                                     }
                                 }
                             }
