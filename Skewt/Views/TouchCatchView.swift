@@ -193,7 +193,7 @@ struct InsetSquare {
     
     func visiblePointForActualPoint(_ p: UnitPoint) -> UnitPoint {
         let visibleCenter = UnitPoint(x: visibleRect.midX, y: visibleRect.midY)
-        let distanceFromVisibleCenter = (x: (p.x - visibleCenter.x) * zoom, y: (p.y - visibleCenter.y) * zoom)
+        let distanceFromVisibleCenter = (x: p.x * zoom - visibleCenter.x, y: p.y * zoom - visibleCenter.y)
         
         return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
     }

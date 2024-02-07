@@ -97,9 +97,9 @@ final class InsetSquareTests: XCTestCase {
         XCTAssertEqual(square.pannedBy(x: 0.0, y: 2.0, constrainToContent: true).visibleRect.maxY, 1.0, accuracy: 0.05)
     }
     
-    func testPointConversions() {
-        let unzoomedSquare = try! InsetSquare(zoom: 1.0, anchor: .center)
-        let zooms: [CGFloat] = [1.0, 2.0, 3.0, 5.0]
+    func testUnzoomedPointConversions() {
+        let square = try! InsetSquare(zoom: 1.0, anchor: .center)
+
         let points: [UnitPoint] = [
             .center, .top, .bottom, .leading, .trailing, .topLeading,
             .topTrailing, .bottomLeading, .bottomTrailing
@@ -107,12 +107,20 @@ final class InsetSquareTests: XCTestCase {
         let tolerance = 0.001
         
         for p in points {
-            XCTAssertEqual(unzoomedSquare.visiblePointForActualPoint(p).x, p.x, accuracy: tolerance)
-            XCTAssertEqual(unzoomedSquare.visiblePointForActualPoint(p).y, p.y, accuracy: tolerance)
-            XCTAssertEqual(unzoomedSquare.actualPointForVisiblePoint(p).x, p.x, accuracy: tolerance)
-            XCTAssertEqual(unzoomedSquare.actualPointForVisiblePoint(p).y, p.y, accuracy: tolerance)
-
+            XCTAssertEqual(square.visiblePointForActualPoint(p).x, p.x, accuracy: tolerance)
+            XCTAssertEqual(square.visiblePointForActualPoint(p).y, p.y, accuracy: tolerance)
+            XCTAssertEqual(square.actualPointForVisiblePoint(p).x, p.x, accuracy: tolerance)
+            XCTAssertEqual(square.actualPointForVisiblePoint(p).y, p.y, accuracy: tolerance)
         }
+    }
+    
+    func testPointConversionCommutativity() {
+        let zooms: [CGFloat] = [1.0, 2.0, 3.0, 5.0]
+        let points: [UnitPoint] = [
+            .center, .top, .bottom, .leading, .trailing, .topLeading,
+            .topTrailing, .bottomLeading, .bottomTrailing
+        ]
+        let tolerance = 0.001
         
         for zoom in zooms {
             for anchor in points {
@@ -121,11 +129,20 @@ final class InsetSquareTests: XCTestCase {
                 for p in points {
                     XCTAssertEqual(square.visiblePointForActualPoint(square.actualPointForVisiblePoint(p)).x, p.x, accuracy: tolerance)
                     XCTAssertEqual(square.visiblePointForActualPoint(square.actualPointForVisiblePoint(p)).y, p.y, accuracy: tolerance)
-
                     XCTAssertEqual(square.actualPointForVisiblePoint(square.visiblePointForActualPoint(p)).x, p.x, accuracy: tolerance)
                     XCTAssertEqual(square.actualPointForVisiblePoint(square.visiblePointForActualPoint(p)).y, p.y, accuracy: tolerance)
                 }
             }
         }
+    }
+    
+    func testPointConversions() {
+        let topLeftDoubled = try! InsetSquare(zoom: 2.0, anchor: .topLeading)
+        XCTAssertEqual(topLeftDoubled.visiblePointForActualPoint(.center), .bottomTrailing)
+        XCTAssertEqual(topLeftDoubled.actualPointForVisiblePoint(.bottomTrailing), .center)
+        
+        let bottomRightDoubled = try! InsetSquare(zoom: 2.0, anchor: .bottomTrailing)
+        XCTAssertEqual(bottomRightDoubled.visiblePointForActualPoint(.center), .topLeading)
+        XCTAssertEqual(bottomRightDoubled.actualPointForVisiblePoint(.topLeading), .center)
     }
 }
