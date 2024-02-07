@@ -191,6 +191,13 @@ struct InsetSquare {
         return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
     }
     
+    func visiblePointForActualPoint(_ p: UnitPoint) -> UnitPoint {
+        let visibleCenter = UnitPoint(x: visibleRect.midX, y: visibleRect.midY)
+        let distanceFromVisibleCenter = (x: (p.x - visibleCenter.x) * zoom, y: (p.y - visibleCenter.y) * zoom)
+        
+        return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
+    }
+    
     func pannedBy(x: CGFloat, y: CGFloat, constrainToContent: Bool = false) -> InsetSquare {
         guard zoom != 1.0 else {
             return self
