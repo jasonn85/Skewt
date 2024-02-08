@@ -65,7 +65,11 @@ extension TouchCatchView {
         }
                 
         private func updateAnnotationPoint(_ point: UnitPoint) {
-            parent.annotationPoint = point
+            guard let visibleSquare = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
+                return
+            }
+            
+            parent.annotationPoint = visibleSquare.actualPointForVisiblePoint(point)
         }
         
         @objc func pinchUpdated(_ gesture: UIPinchGestureRecognizer) {
@@ -112,10 +116,9 @@ extension TouchCatchView {
                 let location = gesture.location(in: gesture.view)
                 let visibleNormalizedLocation = UnitPoint(x: location.x / bounds.size.width,
                                                           y: location.y / bounds.size.height)
-                let normalizedLocation = panStartSquare.actualPointForVisiblePoint(visibleNormalizedLocation)
                 
                 if parent.zoom == 1.0 {
-                    updateAnnotationPoint(normalizedLocation)
+                    updateAnnotationPoint(visibleNormalizedLocation)
                 } else {
                     let distance = (x: panStart.x - location.x, y: panStart.y - location.y)
                     let normalizedDistance = (x: distance.x / bounds.size.width, y: distance.y / bounds.size.height)
@@ -141,11 +144,9 @@ extension TouchCatchView {
                 }
                 
                 let location = gesture.location(in: gesture.view)
-                
-                updateAnnotationPoint(UnitPoint(
-                    x: location.x / bounds.size.width,
-                    y: location.y / bounds.size.height
-                ))
+                let visibleNormalizedLocation = UnitPoint(x: location.x / bounds.size.width,
+                                                          y: location.y / bounds.size.height)
+                updateAnnotationPoint(visibleNormalizedLocation)
                 
                 return
             
