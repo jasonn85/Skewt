@@ -185,17 +185,17 @@ struct InsetSquare {
     
     /// Takes a UnitPoint that represents a position in the currently-zoomed view and returns its unzoomed coordinate.
     func actualPointForVisiblePoint(_ p: UnitPoint) -> UnitPoint {
-        let visibleCenter = UnitPoint(x: visibleRect.midX, y: visibleRect.midY)
-        let distanceFromVisibleCenter = (x: (p.x - visibleCenter.x) / zoom, y: (p.y - visibleCenter.y) / zoom)
-        
-        return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
+        UnitPoint(
+            x: p.x / zoom - anchor.x / zoom + anchor.x,
+            y: p.y / zoom - anchor.y / zoom + anchor.y
+        )
     }
     
     func visiblePointForActualPoint(_ p: UnitPoint) -> UnitPoint {
-        let visibleCenter = UnitPoint(x: visibleRect.midX, y: visibleRect.midY)
-        let distanceFromVisibleCenter = (x: p.x * zoom - visibleCenter.x, y: p.y * zoom - visibleCenter.y)
-        
-        return UnitPoint(x: visibleCenter.x + distanceFromVisibleCenter.x, y: visibleCenter.y + distanceFromVisibleCenter.y)
+        UnitPoint(
+            x: p.x * zoom - anchor.x * zoom + anchor.x,
+            y: p.y * zoom - anchor.y * zoom + anchor.y
+        )
     }
     
     func pannedBy(x: CGFloat, y: CGFloat, constrainToContent: Bool = false) -> InsetSquare {
