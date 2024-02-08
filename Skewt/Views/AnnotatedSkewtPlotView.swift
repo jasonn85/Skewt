@@ -167,7 +167,8 @@ struct AnnotatedSkewtPlotView: View {
                                         TouchCatchView(
                                             annotationPoint: $annotationPoint,
                                             zoom: $zoom,
-                                            zoomAnchor: $zoomAnchor.animation(.easeOut(duration: 0.1))
+                                            zoomAnchor: $zoomAnchor,
+                                            bounceBackAnimation: .easeOut(duration: 0.25)
                                         )
                                         
                                         Rectangle()

@@ -15,6 +15,8 @@ struct TouchCatchView: UIViewRepresentable {
     @Binding var zoom: CGFloat
     @Binding var zoomAnchor: UnitPoint
     
+    var bounceBackAnimation: Animation?
+    
     var zoomRange: ClosedRange<CGFloat> = 1.0...3.0
 
     func makeUIView(context: Context) -> UIView {
@@ -123,11 +125,15 @@ extension TouchCatchView {
                     let distance = (x: panStart.x - location.x, y: panStart.y - location.y)
                     let normalizedDistance = (x: distance.x / bounds.size.width, y: distance.y / bounds.size.height)
                     
-                    parent.zoomAnchor = panStartSquare.pannedBy(
-                        x: normalizedDistance.x,
-                        y: normalizedDistance.y,
-                        constrainToContent: bounceBackToContent
-                    ).anchor
+                    let transaction = Transaction(animation: bounceBackToContent ? parent.bounceBackAnimation : nil)
+                    
+                    withTransaction(transaction) {
+                        parent.zoomAnchor = panStartSquare.pannedBy(
+                            x: normalizedDistance.x,
+                            y: normalizedDistance.y,
+                            constrainToContent: bounceBackToContent
+                        ).anchor
+                    }
                 }
             
                 return
