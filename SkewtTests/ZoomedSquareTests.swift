@@ -79,25 +79,26 @@ final class ZoomedSquareTests: XCTestCase {
     
     func testPanning() {
         let square = try! ZoomedSquare(zoom: 3.0, anchor: .center)
+        let tolerance = 0.05
         
-        XCTAssertEqual(square.visibleRect.minX, 0.33, accuracy: 0.05)
-        XCTAssertEqual(square.visibleRect.minY, 0.33, accuracy: 0.05)
-        XCTAssertEqual(square.visibleRect.maxX, 0.66, accuracy: 0.05)
-        XCTAssertEqual(square.visibleRect.maxY, 0.66, accuracy: 0.05)
+        XCTAssertEqual(square.visibleRect.minX, 0.33, accuracy: tolerance)
+        XCTAssertEqual(square.visibleRect.minY, 0.33, accuracy: tolerance)
+        XCTAssertEqual(square.visibleRect.maxX, 0.66, accuracy: tolerance)
+        XCTAssertEqual(square.visibleRect.maxY, 0.66, accuracy: tolerance)
 
-        XCTAssertEqual(square.pannedBy(x: -1.0, y: 0.0).visibleRect.minX, 0.0, accuracy: 0.05)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: -1.0).visibleRect.minY, 0.0, accuracy: 0.05)
-        XCTAssertEqual(square.pannedBy(x: 1.0, y: 0.0).visibleRect.maxX, 1.0, accuracy: 0.05)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: 1.0).visibleRect.maxY, 1.0, accuracy: 0.05)
+        XCTAssertEqual(square.pannedBy(x: -1.0, y: 0.0).visibleRect.minX, 0.0, accuracy: tolerance)
+        XCTAssertEqual(square.pannedBy(x: 0.0, y: -1.0).visibleRect.minY, 0.0, accuracy: tolerance)
+        XCTAssertEqual(square.pannedBy(x: 1.0, y: 0.0).visibleRect.maxX, 1.0, accuracy: tolerance)
+        XCTAssertEqual(square.pannedBy(x: 0.0, y: 1.0).visibleRect.maxY, 1.0, accuracy: tolerance)
         
         XCTAssert(square.pannedBy(x: -2.0, y: 0.0, constrainToContent: false).visibleRect.minX < 0.0)
-        XCTAssertEqual(square.pannedBy(x: -2.0, y: 0.0, constrainToContent: true).visibleRect.minX, 0.0, accuracy: 0.05)
+        XCTAssertEqual(square.pannedBy(x: -2.0, y: 0.0, constrainToContent: true).visibleRect.minX, 0.0, accuracy: tolerance)
         XCTAssert(square.pannedBy(x: 2.0, y: 0.0, constrainToContent: false).visibleRect.maxX > 1.0)
-        XCTAssertEqual(square.pannedBy(x: 2.0, y: 0.0, constrainToContent: true).visibleRect.maxX, 1.0, accuracy: 0.05)
+        XCTAssertEqual(square.pannedBy(x: 2.0, y: 0.0, constrainToContent: true).visibleRect.maxX, 1.0, accuracy: tolerance)
         XCTAssert(square.pannedBy(x: 0.0, y: -2.0, constrainToContent: false).visibleRect.minY < 0.0)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: -2.0, constrainToContent: true).visibleRect.minY, 0.0, accuracy: 0.05)
+        XCTAssertEqual(square.pannedBy(x: 0.0, y: -2.0, constrainToContent: true).visibleRect.minY, 0.0, accuracy: tolerance)
         XCTAssert(square.pannedBy(x: 0.0, y: 2.0, constrainToContent: false).visibleRect.maxY > 1.0)
-        XCTAssertEqual(square.pannedBy(x: 0.0, y: 2.0, constrainToContent: true).visibleRect.maxY, 1.0, accuracy: 0.05)
+        XCTAssertEqual(square.pannedBy(x: 0.0, y: 2.0, constrainToContent: true).visibleRect.maxY, 1.0, accuracy: tolerance)
     }
     
     func testUnzoomedPointConversions() {
