@@ -168,7 +168,7 @@ struct AnnotatedSkewtPlotView: View {
                                             annotationPoint: $annotationPoint,
                                             zoom: $zoom,
                                             zoomAnchor: $zoomAnchor,
-                                            bounceBackAnimation: .easeOut(duration: 0.25)
+                                            bounceBackAnimation: .easeOut(duration: 0.2)
                                         )
                                         
                                         Rectangle()
