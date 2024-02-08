@@ -23,8 +23,14 @@ struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
     
-    /// Current point of interest in 0.0...1.0
-    @State var annotationPoint: CGPoint? = nil
+    @State var annotationPoint: UnitPoint? = nil
+    
+    @State var zoom: CGFloat = 1.0
+    @State var zoomAnchor: UnitPoint = .center
+    
+    private var zoomedSquare: ZoomedSquare {
+        try! ZoomedSquare(zoom: zoom, anchor: zoomAnchor)
+    }
     
     @State private var plotSize: CGSize = .zero
     
@@ -152,19 +158,30 @@ struct AnnotatedSkewtPlotView: View {
                     ZStack {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot)
                             .aspectRatio(1.0, contentMode: .fit)
+                            .scaleEffect(zoom, anchor: zoomAnchor)
                             .border(.black)
+                            .clipped()
                             .overlay {
                                 GeometryReader { geometry in
-                                    Rectangle()
-                                        .foregroundColor(.clear)
-                                        .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
-                                        .overlay {
-                                            annotations(
-                                                inBounds: CGRect(origin: .zero, size: plotSize),
-                                                fromPlot: plot
-                                            )
-                                            .clipped()
-                                        }
+                                    ZStack {
+                                        TouchCatchView(
+                                            annotationPoint: $annotationPoint,
+                                            zoom: $zoom,
+                                            zoomAnchor: $zoomAnchor,
+                                            bounceBackAnimation: .easeOut(duration: 0.2)
+                                        )
+                                        
+                                        Rectangle()
+                                            .foregroundColor(.clear)
+                                            .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
+                                            .overlay {
+                                                annotations(
+                                                    inBounds: CGRect(origin: .zero, size: plotSize),
+                                                    fromPlot: plot
+                                                )
+                                                .clipped()
+                                            }
+                                    }
                                 }
                             }
                             .background {
@@ -179,17 +196,10 @@ struct AnnotatedSkewtPlotView: View {
                                         frame: CGRect(origin: .zero, size: geometry.size),
                                         winds: winds
                                     )
+                                    .scaleEffect(zoom, anchor: zoomAnchor)
                                     .clipped()
                                 }
                             }
-                            .gesture(
-                                DragGesture(minimumDistance: 0.0)
-                                    .onChanged {
-                                        updateAnnotationPoint($0.location)
-                                    }
-                            )
-                        
-                        
                     }
                     
                     windBarbView(withPlot: plot)
@@ -219,19 +229,25 @@ struct AnnotatedSkewtPlotView: View {
         if let annotationPoint = annotationPoint,
             let (temperatureData, dewPointData) = plot.closestTemperatureAndDewPointData(toY: annotationPoint.y) {
             
-            let temperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
-            let dewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
+            let unzoomedTemperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
+            let temperaturePoint = zoomedSquare.visiblePointForActualPoint(
+                UnitPoint(x: unzoomedTemperaturePoint.x, y: unzoomedTemperaturePoint.y)
+            )
+            let unzoomedDewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
+            let dewPointPoint = zoomedSquare.visiblePointForActualPoint(
+                UnitPoint(x: unzoomedDewPointPoint.x, y: unzoomedDewPointPoint.y)
+            )
             
             let style = plotOptions.plotStyling
             
             temperatureTick(
-                atNormalizedPoint: temperaturePoint,
+                atNormalizedPoint: CGPoint(x: temperaturePoint.x, y: temperaturePoint.y),
                 inRect: bounds,
                 style: style.lineStyle(forType: .temperature)
             )
             
             temperatureTick(
-                atNormalizedPoint: dewPointPoint,
+                atNormalizedPoint: CGPoint(x: dewPointPoint.x, y: dewPointPoint.y),
                 inRect: bounds,
                 style: style.lineStyle(forType: .dewPoint)
             )
@@ -309,7 +325,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private func updateAnnotationPoint(_ point: CGPoint) {
-        annotationPoint = CGPoint(
+        annotationPoint = UnitPoint(
             x: point.x / plotSize.width,
             y: point.y / plotSize.height
         )
@@ -347,14 +363,19 @@ struct AnnotatedSkewtPlotView: View {
                         let isobars = isobars(withPlot: plot)
                         
                         ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                            Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
-                                .font(Font(leftAxisLabelFont))
-                                .lineLimit(1)
-                                .foregroundColor(isobarColor)
-                                .position(
-                                    x: geometry.size.width / 2.0,
-                                    y: yForIsobar(key, inPlot: plot) * plotSize.height
-                                )
+                            let unitPoint = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: yForIsobar(key, inPlot: plot)))
+                            let y = unitPoint.y * plotSize.height
+                            
+                            if y >= 0.0 && y < plotSize.height {
+                                Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
+                                    .font(Font(leftAxisLabelFont))
+                                    .lineLimit(1)
+                                    .foregroundColor(isobarColor)
+                                    .position(
+                                        x: geometry.size.width / 2.0,
+                                        y: y
+                                    )
+                            }
                         }
                     }
                     
@@ -374,9 +395,14 @@ struct AnnotatedSkewtPlotView: View {
                     GeometryReader { geometry in
                         if plotOptions.showIsothermLabels {
                             let isotherms = plot.isothermPaths
+                            let bottom = zoomedSquare.visibleRect.maxY
+                            
                             ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                                let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
-                                if x >= 0 {
+                                let unzoomedX = plot.x(forIsotherm: temperature, atY: bottom)
+                                let normalizedPoint = UnitPoint(x: unzoomedX, y: bottom)
+                                let x = zoomedSquare.visiblePointForActualPoint(normalizedPoint).x * plotSize.width
+                                
+                                if x >= 0 && x < plotSize.width {
                                     Text(String(Int(temperature)))
                                         .font(Font(bottomAxisLabelFont))
                                         .foregroundColor(isothermColor)
@@ -407,7 +433,9 @@ struct AnnotatedSkewtPlotView: View {
                             let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
-                                let y = plot.y(forPressure: $0.pressure) * plotSize.height
+                                let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)
+                                let normalizedY = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: unzoomedNormalizedY)).y
+                                let y = normalizedY * plotSize.height
                                 
                                 if y >= 0.0 && y <= geometry.size.height {
                                     WindBarb(

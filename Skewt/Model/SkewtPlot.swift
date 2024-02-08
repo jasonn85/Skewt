@@ -124,6 +124,10 @@ extension SkewtPlot {
          / (surfaceTemperatureRange.upperBound - surfaceTemperatureRange.lowerBound))
     }
     
+    public func x(forIsotherm temperature: Double, atY y: CGFloat) -> CGFloat {
+        x(forSurfaceTemperature: temperature) + ((1.0 - y) * skew)
+    }
+    
     public func point(pressure: Double, temperature: Double) -> CGPoint {
         let y = y(forPressure: pressure)
         let surfaceX = x(forSurfaceTemperature: temperature)
