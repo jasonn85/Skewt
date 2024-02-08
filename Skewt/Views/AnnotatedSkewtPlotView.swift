@@ -28,6 +28,10 @@ struct AnnotatedSkewtPlotView: View {
     @State var zoom: CGFloat = 1.0
     @State var zoomAnchor: UnitPoint = .center
     
+    private var zoomedSquare: InsetSquare {
+        try! InsetSquare(zoom: zoom, anchor: zoomAnchor)
+    }
+    
     @State private var plotSize: CGSize = .zero
     
     private let temperatureTickLength: CGFloat = 10.0
@@ -351,14 +355,19 @@ struct AnnotatedSkewtPlotView: View {
                         let isobars = isobars(withPlot: plot)
                         
                         ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
-                            Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
-                                .font(Font(leftAxisLabelFont))
-                                .lineLimit(1)
-                                .foregroundColor(isobarColor)
-                                .position(
-                                    x: geometry.size.width / 2.0,
-                                    y: yForIsobar(key, inPlot: plot) * plotSize.height
-                                )
+                            let unitPoint = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: yForIsobar(key, inPlot: plot)))
+                            let y = unitPoint.y * plotSize.height
+                            
+                            if y >= 0.0 && y < plotSize.height {
+                                Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
+                                    .font(Font(leftAxisLabelFont))
+                                    .lineLimit(1)
+                                    .foregroundColor(isobarColor)
+                                    .position(
+                                        x: geometry.size.width / 2.0,
+                                        y: y
+                                    )
+                            }
                         }
                     }
                     
@@ -378,9 +387,14 @@ struct AnnotatedSkewtPlotView: View {
                     GeometryReader { geometry in
                         if plotOptions.showIsothermLabels {
                             let isotherms = plot.isothermPaths
+                            
                             ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                                let x = plot.x(forSurfaceTemperature: temperature) * plotSize.width
-                                if x >= 0 {
+                                let unitPoint = zoomedSquare.visiblePointForActualPoint(
+                                    UnitPoint(x: plot.x(forSurfaceTemperature: temperature), y: 0.0)
+                                )
+                                let x = unitPoint.x * plotSize.width
+                                
+                                if x >= 0 && x < plotSize.width {
                                     Text(String(Int(temperature)))
                                         .font(Font(bottomAxisLabelFont))
                                         .foregroundColor(isothermColor)
