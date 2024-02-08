@@ -1,5 +1,5 @@
 //
-//  InsetSquareTests.swift
+//  ZoomedSquareTests.swift
 //  SkewtTests
 //
 //  Created by Jason Neel on 1/31/24.
@@ -9,23 +9,23 @@ import XCTest
 import SwiftUI
 @testable import Skewt
 
-final class InsetSquareTests: XCTestCase {
+final class ZoomedSquareTests: XCTestCase {
     func testDisallowBadZooms() {
         do {
-            let _ = try InsetSquare(zoom: 0.0, anchor: .center)
+            let _ = try ZoomedSquare(zoom: 0.0, anchor: .center)
             XCTFail("0 zoom is disallowed")
         } catch {
         }
         
         do {
-            let _ = try InsetSquare(zoom: -1.0, anchor: .center)
+            let _ = try ZoomedSquare(zoom: -1.0, anchor: .center)
             XCTFail("negative zoom is disallowed")
         } catch {
         }
     }
     
     func testUnzoomed() {
-        let square = try! InsetSquare(zoom: 1.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 1.0, anchor: .center)
         
         let unitRect = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
         
@@ -35,7 +35,7 @@ final class InsetSquareTests: XCTestCase {
     
     func testZoomingDoesNotChangeCenter() {
         for zoom in [1.0, 2.0, 5.0] {
-            let square = try! InsetSquare(zoom: zoom, anchor: .center)
+            let square = try! ZoomedSquare(zoom: zoom, anchor: .center)
             XCTAssertEqual(square.visiblePointForActualPoint(.center), .center,
                            "Actual center at zoom \(zoom) is the center of the visible content")
             XCTAssertEqual(square.actualPointForVisiblePoint(.center), .center,
@@ -44,23 +44,23 @@ final class InsetSquareTests: XCTestCase {
     }
     
     func testPanIdentity() {
-        let square = try! InsetSquare(zoom: 2.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 2.0, anchor: .center)
 
         XCTAssertEqual(square.pannedBy(x: 0.0, y: 0.0, constrainToContent: false).visibleRect, square.visibleRect)
         XCTAssertEqual(square.pannedBy(x: 0.0, y: 0.0, constrainToContent: true).visibleRect, square.visibleRect)
     }
     
     func testUnzoomedVisibleRect() {
-        let unzoomed = try! InsetSquare(zoom: 1.0, anchor: .center)
+        let unzoomed = try! ZoomedSquare(zoom: 1.0, anchor: .center)
         let anchors: [UnitPoint] = [.top, .bottom, .leading, .trailing, .topLeading, .topTrailing, .bottomLeading, .bottomTrailing]
         
         anchors.forEach {
-            XCTAssertEqual(try! InsetSquare(zoom: 1.0, anchor: $0).visibleRect, unzoomed.visibleRect)
+            XCTAssertEqual(try! ZoomedSquare(zoom: 1.0, anchor: $0).visibleRect, unzoomed.visibleRect)
         }
     }
     
     func testTwoXPanConstraining() {
-        let square = try! InsetSquare(zoom: 2.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 2.0, anchor: .center)
 
         XCTAssertEqual(square.pannedBy(x: -1.0, y: -1.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
         XCTAssertEqual(square.pannedBy(x: -2.0, y: -2.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
@@ -69,7 +69,7 @@ final class InsetSquareTests: XCTestCase {
     }
     
     func testFourXPanConstrainint() {
-        let square = try! InsetSquare(zoom: 4.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 4.0, anchor: .center)
 
         XCTAssertEqual(square.pannedBy(x: -2.0, y: -2.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
         XCTAssertEqual(square.pannedBy(x: -10.0, y: -10.0, constrainToContent: true).anchor, UnitPoint(x: 0.0, y: 0.0))
@@ -78,7 +78,7 @@ final class InsetSquareTests: XCTestCase {
     }
     
     func testPanning() {
-        let square = try! InsetSquare(zoom: 3.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 3.0, anchor: .center)
         
         XCTAssertEqual(square.visibleRect.minX, 0.33, accuracy: 0.05)
         XCTAssertEqual(square.visibleRect.minY, 0.33, accuracy: 0.05)
@@ -101,7 +101,7 @@ final class InsetSquareTests: XCTestCase {
     }
     
     func testUnzoomedPointConversions() {
-        let square = try! InsetSquare(zoom: 1.0, anchor: .center)
+        let square = try! ZoomedSquare(zoom: 1.0, anchor: .center)
 
         let points: [UnitPoint] = [
             .center, .top, .bottom, .leading, .trailing, .topLeading,
@@ -127,7 +127,7 @@ final class InsetSquareTests: XCTestCase {
         
         for zoom in zooms {
             for anchor in points {
-                let square = try! InsetSquare(zoom: zoom, anchor: anchor)
+                let square = try! ZoomedSquare(zoom: zoom, anchor: anchor)
                 
                 for p in points {
                     XCTAssertEqual(square.visiblePointForActualPoint(square.actualPointForVisiblePoint(p)).x, p.x, accuracy: tolerance)
@@ -140,11 +140,11 @@ final class InsetSquareTests: XCTestCase {
     }
     
     func testPointConversions() {
-        let topLeftDoubled = try! InsetSquare(zoom: 2.0, anchor: .topLeading)
+        let topLeftDoubled = try! ZoomedSquare(zoom: 2.0, anchor: .topLeading)
         XCTAssertEqual(topLeftDoubled.visiblePointForActualPoint(.center), .bottomTrailing)
         XCTAssertEqual(topLeftDoubled.actualPointForVisiblePoint(.bottomTrailing), .center)
         
-        let bottomRightDoubled = try! InsetSquare(zoom: 2.0, anchor: .bottomTrailing)
+        let bottomRightDoubled = try! ZoomedSquare(zoom: 2.0, anchor: .bottomTrailing)
         XCTAssertEqual(bottomRightDoubled.visiblePointForActualPoint(.center), .topLeading)
         XCTAssertEqual(bottomRightDoubled.actualPointForVisiblePoint(.topLeading), .center)
     }

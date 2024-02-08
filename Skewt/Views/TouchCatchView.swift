@@ -58,14 +58,14 @@ extension TouchCatchView {
         var startingZoom: CGFloat = 1.0
         
         var panStart: CGPoint = .zero
-        var panStartSquare: InsetSquare? = nil
+        var panStartSquare: ZoomedSquare? = nil
         
         init(_ parent: TouchCatchView) {
             self.parent = parent
         }
                 
         private func updateAnnotationPoint(_ point: UnitPoint) {
-            guard let visibleSquare = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
+            guard let visibleSquare = try? ZoomedSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
                 return
             }
             
@@ -76,7 +76,7 @@ extension TouchCatchView {
             switch gesture.state {
             case .began:                
                 guard let bounds = gesture.view?.bounds,
-                        let currentRect = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
+                        let currentRect = try? ZoomedSquare(zoom: parent.zoom, anchor: parent.zoomAnchor) else {
                     return
                 }
                 
@@ -101,7 +101,7 @@ extension TouchCatchView {
             
             switch gesture.state {
             case .began:
-                panStartSquare = try? InsetSquare(zoom: parent.zoom, anchor: parent.zoomAnchor)
+                panStartSquare = try? ZoomedSquare(zoom: parent.zoom, anchor: parent.zoomAnchor)
                 panStart = gesture.location(in: gesture.view)
                 
                 return
@@ -156,76 +156,3 @@ extension TouchCatchView {
         }
     }
 }
-
-enum InsetRectError: Error {
-    case invalidZoom
-}
-
-/// A struct to represent a zoomed in area of a square UnitRect with an arbitrary anchor point
-struct InsetSquare {
-    let zoom: CGFloat
-    let anchor: UnitPoint
-    
-    init(zoom: CGFloat, anchor: UnitPoint) throws {
-        if zoom <= 0.0 {
-            throw InsetRectError.invalidZoom
-        }
-        
-        self.zoom = zoom
-        self.anchor = anchor
-    }
-    
-    var visibleRect: CGRect {
-        CGRect(
-            x: anchor.x - (anchor.x / zoom),
-            y: anchor.y - (anchor.y / zoom),
-            width: 1.0 / zoom,
-            height: 1.0 / zoom
-        )
-    }
-    
-    /// Takes a UnitPoint that represents a position in the currently-zoomed view and returns its unzoomed coordinate.
-    func actualPointForVisiblePoint(_ p: UnitPoint) -> UnitPoint {
-        UnitPoint(
-            x: p.x / zoom - anchor.x / zoom + anchor.x,
-            y: p.y / zoom - anchor.y / zoom + anchor.y
-        )
-    }
-    
-    func visiblePointForActualPoint(_ p: UnitPoint) -> UnitPoint {
-        UnitPoint(
-            x: p.x * zoom - anchor.x * zoom + anchor.x,
-            y: p.y * zoom - anchor.y * zoom + anchor.y
-        )
-    }
-    
-    func pannedBy(x: CGFloat, y: CGFloat, constrainToContent: Bool = false) -> InsetSquare {
-        guard zoom != 1.0 else {
-            return self
-        }
-        
-        let scaledX = x / (zoom - 1.0)
-        let scaledY = y / (zoom - 1.0)
-        
-        var newAnchor = UnitPoint(x: anchor.x + scaledX, y: anchor.y + scaledY)
-        let anchorRange = 0.0...1.0
-        
-        if constrainToContent {
-            if newAnchor.x < anchorRange.lowerBound {
-                newAnchor.x = anchorRange.lowerBound
-            } else if newAnchor.x > anchorRange.upperBound {
-                newAnchor.x = anchorRange.upperBound
-            }
-            
-            if newAnchor.y < anchorRange.lowerBound {
-                newAnchor.y = anchorRange.lowerBound
-            } else if newAnchor.y > anchorRange.upperBound {
-                newAnchor.y = anchorRange.upperBound
-            }
-        }
-        
-        return try! InsetSquare(zoom: zoom, anchor: newAnchor)
-    }
-}
-
-

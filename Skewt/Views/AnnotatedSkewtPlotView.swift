@@ -28,8 +28,8 @@ struct AnnotatedSkewtPlotView: View {
     @State var zoom: CGFloat = 1.0
     @State var zoomAnchor: UnitPoint = .center
     
-    private var zoomedSquare: InsetSquare {
-        try! InsetSquare(zoom: zoom, anchor: zoomAnchor)
+    private var zoomedSquare: ZoomedSquare {
+        try! ZoomedSquare(zoom: zoom, anchor: zoomAnchor)
     }
     
     @State private var plotSize: CGSize = .zero
