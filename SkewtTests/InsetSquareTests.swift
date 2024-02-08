@@ -36,8 +36,10 @@ final class InsetSquareTests: XCTestCase {
     func testZoomingDoesNotChangeCenter() {
         for zoom in [1.0, 2.0, 5.0] {
             let square = try! InsetSquare(zoom: zoom, anchor: .center)
-            XCTAssertEqual(square.visiblePointForActualPoint(.center), .center, "Actual center at zoom \(zoom) is the center of the visible content")
-            XCTAssertEqual(square.actualPointForVisiblePoint(.center), .center, "Visible center at zoom \(zoom) is the center of the actual content")
+            XCTAssertEqual(square.visiblePointForActualPoint(.center), .center,
+                           "Actual center at zoom \(zoom) is the center of the visible content")
+            XCTAssertEqual(square.actualPointForVisiblePoint(.center), .center,
+                           "Visible center at zoom \(zoom) is the center of the actual content")
         }
     }
     
