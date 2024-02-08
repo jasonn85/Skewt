@@ -195,6 +195,7 @@ struct AnnotatedSkewtPlotView: View {
                                         frame: CGRect(origin: .zero, size: geometry.size),
                                         winds: winds
                                     )
+                                    .scaleEffect(zoom, anchor: zoomAnchor)
                                     .clipped()
                                 }
                             }
@@ -387,12 +388,12 @@ struct AnnotatedSkewtPlotView: View {
                     GeometryReader { geometry in
                         if plotOptions.showIsothermLabels {
                             let isotherms = plot.isothermPaths
+                            let bottom = zoomedSquare.visibleRect.maxY
                             
                             ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
-                                let unitPoint = zoomedSquare.visiblePointForActualPoint(
-                                    UnitPoint(x: plot.x(forSurfaceTemperature: temperature), y: 0.0)
-                                )
-                                let x = unitPoint.x * plotSize.width
+                                let unzoomedX = plot.x(forIsotherm: temperature, atY: bottom)
+                                let normalizedPoint = UnitPoint(x: unzoomedX, y: bottom)
+                                let x = zoomedSquare.visiblePointForActualPoint(normalizedPoint).x * plotSize.width
                                 
                                 if x >= 0 && x < plotSize.width {
                                     Text(String(Int(temperature)))
