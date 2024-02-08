@@ -433,7 +433,9 @@ struct AnnotatedSkewtPlotView: View {
                             let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
-                                let y = plot.y(forPressure: $0.pressure) * plotSize.height
+                                let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)
+                                let normalizedY = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: unzoomedNormalizedY)).y
+                                let y = normalizedY * plotSize.height
                                 
                                 if y >= 0.0 && y <= geometry.size.height {
                                     WindBarb(
