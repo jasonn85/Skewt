@@ -228,19 +228,25 @@ struct AnnotatedSkewtPlotView: View {
         if let annotationPoint = annotationPoint,
             let (temperatureData, dewPointData) = plot.closestTemperatureAndDewPointData(toY: annotationPoint.y) {
             
-            let temperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
-            let dewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
+            let unzoomedTemperaturePoint = plot.point(pressure: temperatureData.pressure, temperature: temperatureData.temperature!)
+            let temperaturePoint = zoomedSquare.visiblePointForActualPoint(
+                UnitPoint(x: unzoomedTemperaturePoint.x, y: unzoomedTemperaturePoint.y)
+            )
+            let unzoomedDewPointPoint = plot.point(pressure: dewPointData.pressure, temperature: dewPointData.dewPoint!)
+            let dewPointPoint = zoomedSquare.visiblePointForActualPoint(
+                UnitPoint(x: unzoomedDewPointPoint.x, y: unzoomedDewPointPoint.y)
+            )
             
             let style = plotOptions.plotStyling
             
             temperatureTick(
-                atNormalizedPoint: temperaturePoint,
+                atNormalizedPoint: CGPoint(x: temperaturePoint.x, y: temperaturePoint.y),
                 inRect: bounds,
                 style: style.lineStyle(forType: .temperature)
             )
             
             temperatureTick(
-                atNormalizedPoint: dewPointPoint,
+                atNormalizedPoint: CGPoint(x: dewPointPoint.x, y: dewPointPoint.y),
                 inRect: bounds,
                 style: style.lineStyle(forType: .dewPoint)
             )
