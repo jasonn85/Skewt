@@ -69,7 +69,8 @@ struct ContentView: View {
                     timeSelection
                 }
             }
-            
+            .layoutPriority(1.0)
+                                    
             TabView(selection: Binding<DisplayState.TabSelection>(
                 get: { store.state.displayState.tabSelection },
                 set: { store.dispatch(DisplayState.Action.selectTab($0)) }
