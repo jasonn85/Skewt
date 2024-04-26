@@ -88,37 +88,37 @@ struct ContentView: View {
     }
     
     private var optionsView: some View {
-        TabView(selection: Binding<DisplayState.TabSelection>(
-            get: { store.state.displayState.tabSelection },
-            set: { store.dispatch(DisplayState.Action.selectTab($0)) }
+        TabView(selection: Binding<DisplayState.DialogSelection>(
+            get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
+            set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
             ForecastSelectionView()
                 .environmentObject(store)
                 .tabItem {
                     Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
                 }
-                .tag(DisplayState.TabSelection.forecastSelection)
+                .tag(DisplayState.DialogSelection.locationSelection(.forecast))
             
             SoundingSelectionView()
                 .environmentObject(store)
                 .tabItem {
                     Label("Soundings", systemImage: "balloon")
                 }
-                .tag(DisplayState.TabSelection.soundingSelection)
+                .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             RecentSelectionsView()
                 .environmentObject(store)
                 .tabItem {
                     Label("Recents", systemImage: "list.bullet")
                 }
-                .tag(DisplayState.TabSelection.recentSelections)
+                .tag(DisplayState.DialogSelection.locationSelection(.recent))
             
             DisplayOptionsView()
                 .environmentObject(store)
                 .tabItem {
                     Label("Options", systemImage: "slider.horizontal.3")
                 }
-                .tag(DisplayState.TabSelection.displayOptions)
+                .tag(DisplayState.DialogSelection.displayOptions)
         }
     }
     
