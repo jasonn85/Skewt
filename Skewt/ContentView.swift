@@ -49,59 +49,13 @@ struct ContentView: View {
     
     var body: some View {
         let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-        let horizontal = isPhone && verticalSizeClass == .compact
-        let layout = horizontal ? AnyLayout(HStackLayout()) : AnyLayout(VStackLayout())
+        let horizontal = verticalSizeClass == .compact
+        let layout = !isPhone ? AnyLayout(HStackLayout()) : AnyLayout(VStackLayout())
         
         layout {
-            VStack (alignment: .center) {
-                header
-                
-                AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
-                    .onAppear() {
-                        store.dispatch(LocationState.Action.requestLocation)
-                        store.dispatch(RecentSoundingsState.Action.refresh)
-                        store.dispatch(SoundingState.Action.doRefresh)
-                    }
-                
-                footer
-                
-                if selectingTime {
-                    timeSelection
-                }
-            }
+            plotView
             
-            TabView(selection: Binding<DisplayState.TabSelection>(
-                get: { store.state.displayState.tabSelection },
-                set: { store.dispatch(DisplayState.Action.selectTab($0)) }
-            )) {
-                ForecastSelectionView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
-                    }
-                    .tag(DisplayState.TabSelection.forecastSelection)
-                
-                SoundingSelectionView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Soundings", systemImage: "balloon")
-                    }
-                    .tag(DisplayState.TabSelection.soundingSelection)
-                
-                RecentSelectionsView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Recents", systemImage: "list.bullet")
-                    }
-                    .tag(DisplayState.TabSelection.recentSelections)
-                
-                DisplayOptionsView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Options", systemImage: "slider.horizontal.3")
-                    }
-                    .tag(DisplayState.TabSelection.displayOptions)
-            }
+            optionsView
             .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
         }
         .onAppear {
@@ -111,6 +65,60 @@ struct ContentView: View {
             if newPhase == .active {
                 store.dispatch(SoundingState.Action.doRefresh)
             }
+        }
+    }
+    
+    private var plotView: some View {
+        VStack (alignment: .center) {
+            header
+            
+            AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
+                .onAppear() {
+                    store.dispatch(LocationState.Action.requestLocation)
+                    store.dispatch(RecentSoundingsState.Action.refresh)
+                    store.dispatch(SoundingState.Action.doRefresh)
+                }
+            
+            footer
+            
+            if selectingTime {
+                timeSelection
+            }
+        }
+    }
+    
+    private var optionsView: some View {
+        TabView(selection: Binding<DisplayState.TabSelection>(
+            get: { store.state.displayState.tabSelection },
+            set: { store.dispatch(DisplayState.Action.selectTab($0)) }
+        )) {
+            ForecastSelectionView()
+                .environmentObject(store)
+                .tabItem {
+                    Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
+                }
+                .tag(DisplayState.TabSelection.forecastSelection)
+            
+            SoundingSelectionView()
+                .environmentObject(store)
+                .tabItem {
+                    Label("Soundings", systemImage: "balloon")
+                }
+                .tag(DisplayState.TabSelection.soundingSelection)
+            
+            RecentSelectionsView()
+                .environmentObject(store)
+                .tabItem {
+                    Label("Recents", systemImage: "list.bullet")
+                }
+                .tag(DisplayState.TabSelection.recentSelections)
+            
+            DisplayOptionsView()
+                .environmentObject(store)
+                .tabItem {
+                    Label("Options", systemImage: "slider.horizontal.3")
+                }
+                .tag(DisplayState.TabSelection.displayOptions)
         }
     }
     
