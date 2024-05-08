@@ -49,14 +49,45 @@ struct ContentView: View {
     
     var body: some View {
         let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-        let horizontal = verticalSizeClass == .compact
-        let layout = !isPhone ? AnyLayout(HStackLayout()) : AnyLayout(VStackLayout())
+        let vertical = verticalSizeClass != .compact
         
-        layout {
-            plotView
-            
-            optionsView
-            .environment(\.horizontalSizeClass, isPhone && !horizontal ? .compact : .regular)
+        Group {
+            if isPhone && vertical {
+                VStack {
+                    plotView
+                        .layoutPriority(store.state.displayState.dialogSelection != nil ? 1.0 : 0.0)
+                    
+                    optionsView(includeSettings: true)
+                }
+            } else {
+                HStack {
+                    VStack {
+                        if isShowingLocationSelection {
+                            HStack {
+                                Spacer()
+                                
+                                Button(action: {
+                                    withAnimation {
+                                        store.dispatch(DisplayState.Action.hideDialog)
+                                    }
+                                }, label: {
+                                    Image(systemName: "arrow.left.to.line.square")
+                                        .font(.system(size: 32.0))
+                                })
+                            }
+                        }
+                        
+                        optionsView(includeSettings: false)
+                            .clipped()
+                            .environment(\.horizontalSizeClass, isPhone && vertical ? .compact : .regular)
+                            .ignoresSafeArea()
+                            .frame(minWidth: isShowingLocationSelection ? 350.0 : nil)
+                    }
+                    
+                    plotView
+                        .layoutPriority(1.0)
+                }
+            }
         }
         .onAppear {
             timeSelectDebouncer.store = store
@@ -87,7 +118,8 @@ struct ContentView: View {
         }
     }
     
-    private var optionsView: some View {
+    @ViewBuilder
+    private func optionsView(includeSettings: Bool = true) -> some View {
         TabView(selection: Binding<DisplayState.DialogSelection>(
             get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
@@ -113,12 +145,23 @@ struct ContentView: View {
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.recent))
             
-            DisplayOptionsView()
-                .environmentObject(store)
-                .tabItem {
-                    Label("Options", systemImage: "slider.horizontal.3")
-                }
-                .tag(DisplayState.DialogSelection.displayOptions)
+            if includeSettings {
+                DisplayOptionsView()
+                    .environmentObject(store)
+                    .tabItem {
+                        Label("Options", systemImage: "slider.horizontal.3")
+                    }
+                    .tag(DisplayState.DialogSelection.displayOptions)
+            }
+        }
+    }
+    
+    private var isShowingLocationSelection: Bool {
+        switch store.state.displayState.dialogSelection {
+        case .locationSelection(_):
+            return true
+        case .displayOptions, .none:
+            return false
         }
     }
     
@@ -142,6 +185,11 @@ struct ContentView: View {
         }
         .font(.headline.weight(.semibold))
         .foregroundColor(.blue)
+        .onTapGesture {
+            withAnimation {
+                store.dispatch(DisplayState.Action.showDialog(.locationSelection(store.state.displayState.lastLocationDialogSelection)))
+            }
+        }
     }
     
     private var footer: some View {
