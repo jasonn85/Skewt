@@ -52,12 +52,22 @@ struct ContentView: View {
         let vertical = verticalSizeClass != .compact
         
         Group {
-            if isPhone && vertical {
-                VStack {
-                    plotView
-                        .layoutPriority(store.state.displayState.dialogSelection != nil ? 1.0 : 0.0)
-                    
-                    optionsView(includeSettings: true)
+            if isPhone {
+                if vertical {
+                    VStack {
+                        plotView
+                            .layoutPriority(1.0)
+                        
+                        optionsView(includeSettings: true)
+                            .frame(minHeight: 300.0)
+                    }
+                } else {
+                    HStack {
+                        optionsView(includeSettings: true)
+                            .environment(\.horizontalSizeClass, .regular)
+
+                        plotView
+                    }
                 }
             } else {
                 NavigationSplitView {
@@ -65,6 +75,7 @@ struct ContentView: View {
                 } detail: {
                     plotView
                 }
+                .navigationSplitViewStyle(.balanced)
             }
         }
         .onAppear {
