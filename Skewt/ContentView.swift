@@ -60,32 +60,10 @@ struct ContentView: View {
                     optionsView(includeSettings: true)
                 }
             } else {
-                HStack {
-                    VStack {
-                        if isShowingLocationSelection {
-                            HStack {
-                                Spacer()
-                                
-                                Button(action: {
-                                    withAnimation {
-                                        store.dispatch(DisplayState.Action.hideDialog)
-                                    }
-                                }, label: {
-                                    Image(systemName: "arrow.left.to.line.square")
-                                        .font(.system(size: 32.0))
-                                })
-                            }
-                        }
-                        
-                        optionsView(includeSettings: false)
-                            .clipped()
-                            .environment(\.horizontalSizeClass, isPhone && vertical ? .compact : .regular)
-                            .ignoresSafeArea()
-                            .frame(minWidth: isShowingLocationSelection ? 350.0 : nil)
-                    }
-                    
+                NavigationSplitView {
+                    optionsView(includeSettings: true)
+                } detail: {
                     plotView
-                        .layoutPriority(1.0)
                 }
             }
         }
