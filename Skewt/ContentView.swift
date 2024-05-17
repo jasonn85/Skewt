@@ -70,7 +70,7 @@ struct ContentView: View {
                     }
                 }
             } else {
-                NavigationSplitView {
+                NavigationSplitView(columnVisibility: splitViewVisibility) {
                     optionsView(includeSettings: true)
                 } detail: {
                     plotView
@@ -84,6 +84,21 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 store.dispatch(SoundingState.Action.doRefresh)
+            }
+        }
+    }
+    
+    private var splitViewVisibility: Binding<NavigationSplitViewVisibility> {
+        Binding {
+            switch store.state.displayState.dialogSelection {
+            case .displayOptions, .locationSelection(_):
+                return .doubleColumn
+            default:
+                return .detailOnly
+            }
+        } set: {
+            if $0 == .detailOnly {
+                store.dispatch(DisplayState.Action.hideDialog)
             }
         }
     }
