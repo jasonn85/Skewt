@@ -63,15 +63,16 @@ struct ContentView: View {
                     }
                 } else {
                     HStack {
-                        optionsView(includeSettings: true)
-                            .environment(\.horizontalSizeClass, .regular)
+                        LocationSelectionView()
+                            .environmentObject(store)
 
                         plotView
                     }
                 }
             } else {
                 NavigationSplitView(columnVisibility: splitViewVisibility) {
-                    optionsView(includeSettings: true)
+                    LocationSelectionView()
+                        .environmentObject(store)
                 } detail: {
                     plotView
                 }
