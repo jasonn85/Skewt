@@ -16,6 +16,7 @@ struct LocationSelectionView: View {
 
     @State private var modelType: SoundingSelection.ModelType = .op40
     @State private var searchText: String = ""
+    @FocusState private var isSearching: Bool
         
     var body: some View {
         VStack {
@@ -56,6 +57,8 @@ struct LocationSelectionView: View {
                     }
                     .pickerStyle(.segmented)
                     
+                    searchLine
+                    
                     switch modelType {
                     case .op40:
                         op40List
@@ -82,6 +85,31 @@ struct LocationSelectionView: View {
             return true
         case .text(_):
             return false
+        }
+    }
+    
+    @ViewBuilder
+    private var searchLine: some View {
+        HStack {
+            HStack {
+                if !isSearching {
+                    Image(systemName: "magnifyingglass")
+                        .opacity(0.5)
+                }
+                
+                TextField("Search \(modelType == .op40 ? "airports" : "sounding locations")", text: $searchText)
+                    .focused($isSearching)
+            }
+            .padding(6)
+            .background(.gray.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 8.0))
+            
+            if isSearching {
+                Button("Cancel") {
+                    isSearching.toggle()
+                }
+                .foregroundColor(.blue)
+            }
         }
     }
     
