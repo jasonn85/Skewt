@@ -71,6 +71,8 @@ struct LocationSelectionView: View {
             if soundingsDataAge == nil || soundingsDataAge! > soundingDataMaxAge {
                 store.dispatch(RecentSoundingsState.Action.refresh)
             }
+            
+            store.dispatch(ForecastSelectionState.Action.load)
         }
     }
     
