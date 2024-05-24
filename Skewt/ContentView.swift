@@ -31,7 +31,6 @@ struct ContentView: View {
     @Environment(\.scenePhase) var scenePhase
     
     @State private var selectingTime = false
-    @State private var showingOptionsInSplitView = false
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -77,12 +76,12 @@ struct ContentView: View {
                             .environmentObject(store)
                             .toolbar {
                                 Button("Options", systemImage: "slider.horizontal.3") {
-                                    showingOptionsInSplitView = true
-                                    
                                     store.dispatch(DisplayState.Action.showDialog(.displayOptions))
                                 }
                             }
-                            .navigationDestination(isPresented: showingOptionsInSplitView) {
+                            .navigationDestination(isPresented: Binding<Bool>(get: {
+                                store.state.displayState.dialogSelection == .displayOptions
+                            }, set: { _ in })) {
                                 DisplayOptionsView()
                                     .environmentObject(store)
                             }
