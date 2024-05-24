@@ -31,6 +31,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) var scenePhase
     
     @State private var selectingTime = false
+    @State private var showingOptionsInSplitView = false
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -71,8 +72,21 @@ struct ContentView: View {
                 }
             } else {
                 NavigationSplitView(columnVisibility: splitViewVisibility) {
-                    LocationSelectionView()
-                        .environmentObject(store)
+                    NavigationStack {
+                        LocationSelectionView()
+                            .environmentObject(store)
+                            .toolbar {
+                                Button("Options", systemImage: "slider.horizontal.3") {
+                                    showingOptionsInSplitView = true
+                                    
+                                    store.dispatch(DisplayState.Action.showDialog(.displayOptions))
+                                }
+                            }
+                            .navigationDestination(isPresented: showingOptionsInSplitView) {
+                                DisplayOptionsView()
+                                    .environmentObject(store)
+                            }
+                    }
                 } detail: {
                     plotView
                 }
@@ -270,6 +284,12 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environmentObject(Store<SkewtState>.previewStore)
+    }
+}
+
+extension Store<SkewtState> {
+    func showLastLocationDialog() {
+        dispatch(DisplayState.Action.showDialog(.locationSelection(state.displayState.lastLocationDialogSelection)))
     }
 }
 
