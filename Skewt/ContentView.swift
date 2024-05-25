@@ -113,6 +113,8 @@ struct ContentView: View {
         } set: {
             if $0 == .detailOnly {
                 store.dispatch(DisplayState.Action.hideDialog)
+            } else {
+                store.showLastLocationDialog()
             }
         }
     }
@@ -268,6 +270,12 @@ struct ContentView: View {
                 return "Data was not parseable"
             }
         }
+    }
+}
+
+extension Store<SkewtState> {
+    func showLastLocationDialog() {
+        dispatch(DisplayState.Action.showDialog(.locationSelection(state.displayState.lastLocationDialogSelection)))
     }
 }
 
