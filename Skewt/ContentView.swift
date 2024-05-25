@@ -174,15 +174,6 @@ struct ContentView: View {
         }
     }
     
-    private var isShowingLocationSelection: Bool {
-        switch store.state.displayState.dialogSelection {
-        case .locationSelection(_):
-            return true
-        case .displayOptions, .none:
-            return false
-        }
-    }
-    
     private var header: some View {
         HStack {
             if store.state.currentSoundingState.selection.requiresLocation {
@@ -283,12 +274,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environmentObject(Store<SkewtState>.previewStore)
-    }
-}
-
-extension Store<SkewtState> {
-    func showLastLocationDialog() {
-        dispatch(DisplayState.Action.showDialog(.locationSelection(state.displayState.lastLocationDialogSelection)))
     }
 }
 
