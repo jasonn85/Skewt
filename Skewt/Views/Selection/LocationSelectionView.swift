@@ -98,7 +98,11 @@ struct LocationSelectionView: View {
                 }
                 
                 TextField("Search \(modelType == .op40 ? "airports" : "sounding locations")", text: $searchText)
+                    .autocorrectionDisabled()
                     .focused($isSearching)
+                    .onChange(of: searchText) {
+                        store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
+                    }
             }
             .padding(6)
             .background(.gray.opacity(0.2))
