@@ -156,9 +156,15 @@ struct LocationSelectionView: View {
         case .loading:
             if showNearestForecastRow {
                 nearestForecastRow
-            } else {
-                EmptyView()
             }
+            
+            HStack {
+                Spacer()
+                ProgressView()
+                    .progressViewStyle(.circular)
+                Spacer()
+            }
+            .id(UUID())
         case .done(let locations):
             nearestForecastRow
             
