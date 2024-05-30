@@ -111,6 +111,7 @@ struct LocationSelectionView: View {
             if isSearching {
                 Button("Cancel") {
                     isSearching.toggle()
+                    searchText = ""
                 }
                 .foregroundColor(.blue)
             }
