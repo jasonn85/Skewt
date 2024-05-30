@@ -194,7 +194,9 @@ struct LocationSelectionView: View {
         case .loading:
             loadingView
         case .done(_, _), .refreshing(_, _):
-            ForEach(raobLocations, id: \.name) {
+            let locations = raobLocations
+            
+            ForEach(locations, id: \.name) {
                 SoundingSelectionRow(
                     selection: SoundingSelection(
                         type: .raob,
@@ -204,6 +206,10 @@ struct LocationSelectionView: View {
                     titleComponents: [.text($0.name), .text($0.description)],
                     subtitleComponents: subtitleComponents(forStationNamed: $0.name)
                 )
+            }
+            
+            if locations.isEmpty {
+                Text("No results")
             }
         case .failed(_), .idle:
             Text("Failed to load soundings")
