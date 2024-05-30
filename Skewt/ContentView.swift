@@ -84,8 +84,10 @@ struct ContentView: View {
                             }, set: { _ in })) {
                                 DisplayOptionsView()
                                     .environmentObject(store)
+                                    .navigationTitle("Options")
                             }
                     }
+                    .navigationTitle("Locations")
                 } detail: {
                     plotView
                 }
