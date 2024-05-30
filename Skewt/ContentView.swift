@@ -90,6 +90,7 @@ struct ContentView: View {
                     .navigationTitle("Locations")
                 } detail: {
                     plotView
+                        .navigationBarTitleDisplayMode(.inline)
                 }
                 .navigationSplitViewStyle(.balanced)
             }
