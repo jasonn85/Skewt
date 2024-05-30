@@ -99,6 +99,20 @@ struct LocationSelectionView: View {
                 
                 TextField("Search \(modelType == .op40 ? "airports" : "sounding locations")", text: $searchText)
                     .autocorrectionDisabled()
+                    .overlay {
+                        if !searchText.isEmpty {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    searchText = ""
+                                } label: {
+                                    Image(systemName: "multiply.circle.fill")
+                                }
+                                .foregroundColor(.secondary)
+                                .padding(.trailing, 4.0)
+                            }
+                        }
+                    }
                     .focused($isSearching)
                     .onChange(of: searchText) {
                         store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
