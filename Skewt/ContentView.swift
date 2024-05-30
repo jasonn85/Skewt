@@ -59,7 +59,7 @@ struct ContentView: View {
                             .layoutPriority(1.0)
                         
                         optionsView(includeSettings: true)
-                            .frame(minHeight: 300.0)
+                            .frame(minHeight: 350.0)
                     }
                 } else {
                     HStack {
