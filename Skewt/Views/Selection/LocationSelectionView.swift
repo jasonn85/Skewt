@@ -53,7 +53,7 @@ struct LocationSelectionView: View {
                             .tag(SoundingSelection.ModelType.op40)
                         
                         Text("Sounding")
-                        .tag(SoundingSelection.ModelType.raob)
+                            .tag(SoundingSelection.ModelType.raob)
                     }
                     .pickerStyle(.segmented)
                     
@@ -194,7 +194,7 @@ struct LocationSelectionView: View {
         case .loading:
             loadingView
         case .done(_, _), .refreshing(_, _):
-            ForEach(closestSoundingLocations, id: \.name) {
+            ForEach(raobLocations, id: \.name) {
                 SoundingSelectionRow(
                     selection: SoundingSelection(
                         type: .raob,
@@ -207,6 +207,19 @@ struct LocationSelectionView: View {
             }
         case .failed(_), .idle:
             Text("Failed to load soundings")
+        }
+    }
+    
+    private var raobLocations: [LocationList.Location] {
+        switch store.state.displayState.forecastSelectionState.searchType {
+        case .nearest:
+            return closestSoundingLocations
+        case .text(let searchText):
+            guard let allSoundings = try? LocationList.forType(.raob) else {
+                return []
+            }
+            
+            return allSoundings.locationsForSearch(searchText)
         }
     }
     
