@@ -63,31 +63,14 @@ struct ContentView: View {
                     }
                 } else {
                     HStack {
-                        LocationSelectionView()
-                            .environmentObject(store)
+                        locationNavigationStack
 
                         plotView
                     }
                 }
             } else {
                 NavigationSplitView(columnVisibility: splitViewVisibility) {
-                    NavigationStack {
-                        LocationSelectionView()
-                            .environmentObject(store)
-                            .toolbar {
-                                Button("Options", systemImage: "slider.horizontal.3") {
-                                    store.dispatch(DisplayState.Action.showDialog(.displayOptions))
-                                }
-                            }
-                            .navigationDestination(isPresented: Binding<Bool>(get: {
-                                store.state.displayState.dialogSelection == .displayOptions
-                            }, set: { _ in })) {
-                                DisplayOptionsView()
-                                    .environmentObject(store)
-                                    .navigationTitle("Options")
-                            }
-                    }
-                    .navigationTitle("Locations")
+                    locationNavigationStack
                 } detail: {
                     plotView
                         .navigationBarTitleDisplayMode(.inline)
@@ -103,6 +86,27 @@ struct ContentView: View {
                 store.dispatch(SoundingState.Action.doRefresh)
             }
         }
+    }
+    
+    @ViewBuilder
+    private var locationNavigationStack: some View {
+        NavigationStack {
+            LocationSelectionView()
+                .environmentObject(store)
+                .toolbar {
+                    Button("Options", systemImage: "slider.horizontal.3") {
+                        store.dispatch(DisplayState.Action.showDialog(.displayOptions))
+                    }
+                }
+                .navigationDestination(isPresented: Binding<Bool>(get: {
+                    store.state.displayState.dialogSelection == .displayOptions
+                }, set: { _ in })) {
+                    DisplayOptionsView()
+                        .environmentObject(store)
+                        .navigationTitle("Options")
+                }
+        }
+        .navigationTitle("Locations")
     }
     
     private var splitViewVisibility: Binding<NavigationSplitViewVisibility> {
