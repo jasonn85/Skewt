@@ -58,8 +58,10 @@ struct ContentView: View {
                         plotView
                             .layoutPriority(1.0)
                         
-                        optionsView(includeSettings: true)
-                            .frame(minHeight: 350.0)
+                        NavigationStack {
+                            optionsView
+                                .frame(minHeight: 350.0)
+                        }
                     }
                 } else {
                     HStack {
@@ -146,40 +148,38 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func optionsView(includeSettings: Bool = true) -> some View {
+    private var optionsView: some View {
         TabView(selection: Binding<DisplayState.DialogSelection>(
             get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
-            ForecastSelectionView()
+            LocationSelectionView(listType: .modelType(.op40))
                 .environmentObject(store)
                 .tabItem {
                     Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.forecast))
             
-            SoundingSelectionView()
+            LocationSelectionView(listType: .modelType(.raob))
                 .environmentObject(store)
                 .tabItem {
                     Label("Soundings", systemImage: "balloon")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
-            RecentSelectionsView()
+            LocationSelectionView(listType: .favoritesAndRecents)
                 .environmentObject(store)
                 .tabItem {
                     Label("Recents", systemImage: "list.bullet")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.recent))
             
-            if includeSettings {
-                DisplayOptionsView()
-                    .environmentObject(store)
-                    .tabItem {
-                        Label("Options", systemImage: "slider.horizontal.3")
-                    }
-                    .tag(DisplayState.DialogSelection.displayOptions)
-            }
+            DisplayOptionsView()
+                .environmentObject(store)
+                .tabItem {
+                    Label("Options", systemImage: "slider.horizontal.3")
+                }
+                .tag(DisplayState.DialogSelection.displayOptions)
         }
     }
     

@@ -10,64 +10,70 @@ import CoreLocation
 
 struct LocationSelectionView: View {    
     @EnvironmentObject var store: Store<SkewtState>
+    var listType: ListType = .all
+    
+    enum ListType {
+        case all
+        case modelType(SoundingSelection.ModelType)
+        case favoritesAndRecents
+    }
+    
     private var searchCount = 20
     private var locationListLength = 5
     private var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
-
-    @State private var modelType: SoundingSelection.ModelType = .op40
+    
+    @State private var selectedModelType: SoundingSelection.ModelType = .op40
     @State private var searchText: String = ""
     @FocusState private var isSearching: Bool
-        
+    
+    init(listType: ListType = .all) {
+        self.listType = listType
+    }
+    
     var body: some View {
-        VStack {
-            List {
-                if searchText.isEmpty {
-                    if !store.state.pinnedSelections.isEmpty {
-                        Section("Favorites") {
-                            ForEach(store.state.pinnedSelections, id: \.id) {
-                                SoundingSelectionRow(
-                                    selection: $0,
-                                    titleComponents: pinnedTitleComponents(forSelection: $0),
-                                    subtitleComponents: [.type]
-                                )
-                                .environmentObject(store)
-                            }
-                        }
-                    }
-                    
-                    if !store.state.recentSelections.isEmpty {
-                        Section("Recents") {
-                            ForEach(store.state.recentSelections, id: \.id) {
-                                SoundingSelectionRow(
-                                    selection: $0,
-                                    titleComponents: pinnedTitleComponents(forSelection: $0),
-                                    subtitleComponents: [.type]
-                                )
-                                .environmentObject(store)
-                            }
+        List {
+            if showFavoritesAndRecents {
+                if !store.state.pinnedSelections.isEmpty {
+                    Section("Favorites") {
+                        ForEach(store.state.pinnedSelections, id: \.id) {
+                            SoundingSelectionRow(
+                                selection: $0,
+                                titleComponents: pinnedTitleComponents(forSelection: $0),
+                                subtitleComponents: [.type]
+                            )
+                            .environmentObject(store)
                         }
                     }
                 }
                 
-                Section("Location") {
-                    Picker("Type", selection: $modelType) {
-                        Text("Forecast")  
-                            .tag(SoundingSelection.ModelType.op40)
-                        
-                        Text("Sounding")
-                            .tag(SoundingSelection.ModelType.raob)
+                if !store.state.recentSelections.isEmpty {
+                    Section("Recents") {
+                        ForEach(store.state.recentSelections, id: \.id) {
+                            SoundingSelectionRow(
+                                selection: $0,
+                                titleComponents: pinnedTitleComponents(forSelection: $0),
+                                subtitleComponents: [.type]
+                            )
+                            .environmentObject(store)
+                        }
                     }
-                    .pickerStyle(.segmented)
-                                        
-                    switch modelType {
-                    case .op40:
-                        op40List
-                    case .raob:
-                        raobList
+                }
+            }
+            
+            if showList {
+                // We want `Section {}` for a nonexistent section header in some cases. Section(nil) or Section("") do not achieve that.
+                if let listTitle = listTitle {
+                    Section(listTitle) {
+                        listContents
+                    }
+                } else {
+                    Section {
+                        listContents
                     }
                 }
             }
         }
+        .listStyle(.plain)
         .searchable(text: $searchText)
         .onChange(of: searchText) {
             store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
@@ -80,6 +86,68 @@ struct LocationSelectionView: View {
             }
             
             store.dispatch(ForecastSelectionState.Action.load)
+        }
+    }
+    
+    private var showFavoritesAndRecents: Bool {
+        guard searchText.isEmpty else {
+            return false
+        }
+        
+        switch listType {
+        case .all, .favoritesAndRecents:
+            return true
+        case .modelType(_):
+            return false
+        }
+    }
+    
+    private var showList: Bool {
+        switch listType {
+        case .favoritesAndRecents:
+            return false
+        case .all, .modelType(_):
+            return true
+        }
+    }
+    
+    private var listTitle: String? {
+        switch listType {
+        case .all:
+            return "Locations"
+        case .modelType(_), .favoritesAndRecents:
+            return nil
+        }
+    }
+    
+    @ViewBuilder
+    private var listContents: some View {
+        switch listType {
+        case .all:
+            Picker("Type", selection: $selectedModelType) {
+                Text("Forecast")
+                    .tag(SoundingSelection.ModelType.op40)
+                
+                Text("Sounding")
+                    .tag(SoundingSelection.ModelType.raob)
+            }
+            .pickerStyle(.segmented)
+            
+            switch selectedModelType {
+            case .op40:
+                op40List
+            case .raob:
+                raobList
+            }
+        case .modelType(let modelType):
+            switch modelType {
+            case .op40:
+                op40List
+            case .raob:
+                raobList
+            }
+        case .favoritesAndRecents:
+            EmptyView()
         }
     }
     
