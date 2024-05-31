@@ -74,7 +74,7 @@ struct LocationSelectionView: View {
             }
         }
         .listStyle(.plain)
-        .searchable(text: $searchText)
+        .searchable(isSearchable: showSearch, text: $searchText)
         .onChange(of: searchText) {
             store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
         }
@@ -86,6 +86,15 @@ struct LocationSelectionView: View {
             }
             
             store.dispatch(ForecastSelectionState.Action.load)
+        }
+    }
+    
+    private var showSearch: Bool {
+        switch listType {
+        case .all, .modelType(_):
+            true
+        case .favoritesAndRecents:
+            false
         }
     }
     
@@ -359,6 +368,26 @@ struct LocationSelectionView: View {
         }
         
         return "Near \(closest.description)"
+    }
+}
+
+struct OptionallySearchable: ViewModifier {
+    let isSearchable: Bool
+    @Binding var searchText: String
+    
+    func body(content: Content) -> some View {
+        switch isSearchable {
+        case true:
+            content.searchable(text: $searchText)
+        case false:
+            content
+        }
+    }
+}
+
+extension View {
+    func searchable(isSearchable searchable: Bool, text: Binding<String>) -> some View {
+        modifier(OptionallySearchable(isSearchable: searchable, searchText: text))
     }
 }
 
