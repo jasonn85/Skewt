@@ -21,28 +21,30 @@ struct LocationSelectionView: View {
     var body: some View {
         VStack {
             List {
-                if !store.state.pinnedSelections.isEmpty {
-                    Section("Favorites") {
-                        ForEach(store.state.pinnedSelections, id: \.id) {
-                            SoundingSelectionRow(
-                                selection: $0,
-                                titleComponents: pinnedTitleComponents(forSelection: $0),
-                                subtitleComponents: [.type]
-                            )
+                if searchText.isEmpty {
+                    if !store.state.pinnedSelections.isEmpty {
+                        Section("Favorites") {
+                            ForEach(store.state.pinnedSelections, id: \.id) {
+                                SoundingSelectionRow(
+                                    selection: $0,
+                                    titleComponents: pinnedTitleComponents(forSelection: $0),
+                                    subtitleComponents: [.type]
+                                )
                                 .environmentObject(store)
+                            }
                         }
                     }
-                }
-                
-                if !store.state.recentSelections.isEmpty {
-                    Section("Recents") {
-                        ForEach(store.state.recentSelections, id: \.id) {
-                            SoundingSelectionRow(
-                                selection: $0,
-                                titleComponents: pinnedTitleComponents(forSelection: $0),
-                                subtitleComponents: [.type]
-                            )
+                    
+                    if !store.state.recentSelections.isEmpty {
+                        Section("Recents") {
+                            ForEach(store.state.recentSelections, id: \.id) {
+                                SoundingSelectionRow(
+                                    selection: $0,
+                                    titleComponents: pinnedTitleComponents(forSelection: $0),
+                                    subtitleComponents: [.type]
+                                )
                                 .environmentObject(store)
+                            }
                         }
                     }
                 }
@@ -56,9 +58,7 @@ struct LocationSelectionView: View {
                             .tag(SoundingSelection.ModelType.raob)
                     }
                     .pickerStyle(.segmented)
-                    
-                    searchLine
-                    
+                                        
                     switch modelType {
                     case .op40:
                         op40List
@@ -67,6 +67,10 @@ struct LocationSelectionView: View {
                     }
                 }
             }
+        }
+        .searchable(text: $searchText)
+        .onChange(of: searchText) {
+            store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
         }
         .onAppear {
             let soundingsDataAge = store.state.recentSoundingsState.dataAge
@@ -85,36 +89,6 @@ struct LocationSelectionView: View {
             return true
         case .text(_):
             return false
-        }
-    }
-    
-    @ViewBuilder
-    private var searchLine: some View {
-        HStack {
-            HStack {
-                if !isSearching {
-                    Image(systemName: "magnifyingglass")
-                        .opacity(0.5)
-                }
-                
-                TextField("Search \(modelType == .op40 ? "airports" : "sounding locations")", text: $searchText)
-                    .autocorrectionDisabled()
-                    .focused($isSearching)
-                    .onChange(of: searchText) {
-                        store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
-                    }
-            }
-            .padding(6)
-            .background(.gray.opacity(0.2))
-            .clipShape(RoundedRectangle(cornerRadius: 8.0))
-            
-            if isSearching {
-                Button("Cancel") {
-                    isSearching.toggle()
-                    searchText = ""
-                }
-                .foregroundColor(.blue)
-            }
         }
     }
     
