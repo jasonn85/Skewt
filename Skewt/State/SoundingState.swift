@@ -97,6 +97,19 @@ extension SoundingSelection: CustomStringConvertible {
     }
 }
 
+extension SoundingSelection.Location {
+    var briefDescription: String {
+        switch self {
+        case .closest:
+            return "Current location"
+        case .named(let name):
+            return name
+        case .point(latitude: let latitude, longitude: let longitude):
+            return String(format: "%.0f, %.0f", latitude, longitude)
+        }
+    }
+}
+
 extension SoundingSelection.ModelType {
     var hourInterval: Int {
         switch self {
