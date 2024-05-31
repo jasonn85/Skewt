@@ -19,7 +19,6 @@ struct LocationSelectionView: View {
     }
     
     private var searchCount = 20
-    private var locationListLength = 5
     private var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
     @State private var selectedModelType: SoundingSelection.ModelType = .op40
@@ -247,7 +246,7 @@ struct LocationSelectionView: View {
         case .done(_, _), .refreshing(_, _):
             let locations = raobLocations
             
-            ForEach(locations, id: \.name) {
+            ForEach(locations.prefix(searchCount), id: \.name) {
                 SoundingSelectionRow(
                     selection: SoundingSelection(
                         type: .raob,
@@ -288,7 +287,7 @@ struct LocationSelectionView: View {
                 return []
             }
             
-            return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
+            return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<searchCount])
         case .text(let searchText):
             guard let allSoundings = try? LocationList.forType(.raob) else {
                 return []
