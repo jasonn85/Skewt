@@ -61,7 +61,7 @@ struct LocationSelectionView: View {
             }
             
             if showList {
-                // We want `Section {}` for a nonexistent section header in some cases. Section(nil) or Section("") do not achieve that.
+                // We want `Section {}` for a nonexistent section header in some cases. Section(nil) or Section("") does not achieve that.
                 if let listTitle = listTitle {
                     Section(listTitle) {
                         listContents
@@ -259,31 +259,12 @@ struct LocationSelectionView: View {
     }
     
     private var raobLocations: [LocationList.Location] {
-        switch store.state.displayState.forecastSelectionState.searchType {
-        case .nearest:
-            return closestSoundingLocations
-        case .text(let searchText):
-            guard let allSoundings = try? LocationList.forType(.raob) else {
-                return []
-            }
-            
-            return allSoundings.locationsForSearch(searchText)
-        }
-    }
-    
-    private var centerLocation: CLLocation {
-        store.state.locationState.locationIfKnown ?? CLLocation(latitude: 39.83, longitude: -104.66)
-    }
-    
-    private var closestSoundingLocations: [LocationList.Location] {
-        var wmoIds: [Int]? = nil
-        
         guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings(),
               recentSoundings.count > 0 else {
             return []
         }
         
-        wmoIds = recentSoundings.compactMap {
+        let wmoIds = recentSoundings.compactMap {
             switch $0.stationId {
             case .wmoId(let wmoId) :
                 return wmoId
@@ -291,12 +272,31 @@ struct LocationSelectionView: View {
                 return nil
             }
         }
-        
-        guard let locations = try? LocationList.forType(.op40) else {
-            return []
+                
+        switch store.state.displayState.forecastSelectionState.searchType {
+        case .nearest:
+            guard let locations = try? LocationList.forType(.op40) else {
+                return []
+            }
+            
+            return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
+        case .text(let searchText):
+            guard let allSoundings = try? LocationList.forType(.raob) else {
+                return []
+            }
+            
+            return allSoundings.locationsForSearch(searchText).filter {
+                guard let wmoId = $0.wmoId else {
+                    return false
+                }
+                
+                return wmoIds.contains(wmoId)
+            }
         }
-
-        return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<locationListLength])
+    }
+    
+    private var centerLocation: CLLocation {
+        store.state.locationState.locationIfKnown ?? CLLocation(latitude: 39.83, longitude: -104.66)
     }
     
     private func pinnedTitleComponents(
