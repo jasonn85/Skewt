@@ -74,6 +74,7 @@ struct LocationSelectionView: View {
         }
         .listStyle(.plain)
         .searchable(isSearchable: showSearch, text: $searchText)
+        .autocorrectionDisabled()
         .onChange(of: searchText) {
             store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
         }
