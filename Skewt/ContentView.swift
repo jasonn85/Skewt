@@ -58,10 +58,8 @@ struct ContentView: View {
                         plotView
                             .layoutPriority(1.0)
                         
-                        NavigationStack {
-                            optionsView
-                                .frame(minHeight: 350.0)
-                        }
+                        optionsView
+                            .frame(minHeight: 350.0)
                     }
                 } else {
                     HStack {
@@ -153,29 +151,37 @@ struct ContentView: View {
             get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
-            LocationSelectionView(listType: .modelType(.op40))
-                .environmentObject(store)
+            NavigationStack {
+                LocationSelectionView(listType: .modelType(.op40))
+                    .environmentObject(store)
+            }
                 .tabItem {
                     Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.forecast))
             
-            LocationSelectionView(listType: .modelType(.raob))
-                .environmentObject(store)
+            NavigationStack {
+                LocationSelectionView(listType: .modelType(.raob))
+                    .environmentObject(store)
+            }
                 .tabItem {
                     Label("Soundings", systemImage: "balloon")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
-            LocationSelectionView(listType: .favoritesAndRecents)
-                .environmentObject(store)
+            NavigationStack {
+                LocationSelectionView(listType: .favoritesAndRecents)
+                    .environmentObject(store)
+            }
                 .tabItem {
                     Label("Recents", systemImage: "list.bullet")
                 }
                 .tag(DisplayState.DialogSelection.locationSelection(.recent))
             
-            DisplayOptionsView()
-                .environmentObject(store)
+            NavigationStack {
+                DisplayOptionsView()
+                    .environmentObject(store)
+            }
                 .tabItem {
                     Label("Options", systemImage: "slider.horizontal.3")
                 }
