@@ -155,37 +155,37 @@ struct ContentView: View {
                 LocationSelectionView(listType: .modelType(.op40))
                     .environmentObject(store)
             }
-                .tabItem {
-                    Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
-                }
-                .tag(DisplayState.DialogSelection.locationSelection(.forecast))
+            .tabItem {
+                Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
+            }
+            .tag(DisplayState.DialogSelection.locationSelection(.forecast))
             
             NavigationStack {
                 LocationSelectionView(listType: .modelType(.raob))
                     .environmentObject(store)
             }
-                .tabItem {
-                    Label("Soundings", systemImage: "balloon")
-                }
-                .tag(DisplayState.DialogSelection.locationSelection(.sounding))
+            .tabItem {
+                Label("Soundings", systemImage: "balloon")
+            }
+            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
                     .environmentObject(store)
             }
-                .tabItem {
-                    Label("Recents", systemImage: "list.bullet")
-                }
-                .tag(DisplayState.DialogSelection.locationSelection(.recent))
+            .tabItem {
+                Label("Recents", systemImage: "list.bullet")
+            }
+            .tag(DisplayState.DialogSelection.locationSelection(.recent))
             
             NavigationStack {
                 DisplayOptionsView()
                     .environmentObject(store)
             }
-                .tabItem {
-                    Label("Options", systemImage: "slider.horizontal.3")
-                }
-                .tag(DisplayState.DialogSelection.displayOptions)
+            .tabItem {
+                Label("Options", systemImage: "slider.horizontal.3")
+            }
+            .tag(DisplayState.DialogSelection.displayOptions)
         }
     }
     
