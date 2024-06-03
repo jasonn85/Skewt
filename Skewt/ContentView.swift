@@ -211,7 +211,7 @@ struct ContentView: View {
         .foregroundColor(.blue)
         .onTapGesture {
             withAnimation {
-                store.dispatch(DisplayState.Action.showDialog(.locationSelection(store.state.displayState.lastLocationDialogSelection)))
+                store.showLastLocationDialog()
             }
         }
     }
