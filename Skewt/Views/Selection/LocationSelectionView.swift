@@ -259,7 +259,7 @@ struct LocationSelectionView: View {
             }
             
             if locations.isEmpty {
-                Text("No results")
+                noResultsRow
             }
         case .failed(_), .idle:
             Text("Failed to load soundings")
