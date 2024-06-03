@@ -58,7 +58,7 @@ struct ContentView: View {
                         plotView
                             .layoutPriority(1.0)
                         
-                        optionsView
+                        tabView
                             .frame(minHeight: 350.0)
                     }
                 } else {
@@ -146,7 +146,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private var optionsView: some View {
+    private var tabView: some View {
         TabView(selection: Binding<DisplayState.DialogSelection>(
             get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
