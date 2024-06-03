@@ -23,7 +23,6 @@ struct LocationSelectionView: View {
     
     @State private var selectedModelType: SoundingSelection.ModelType = .op40
     @State private var searchText: String = ""
-    @FocusState private var isSearching: Bool
     
     init(listType: ListType = .all) {
         self.listType = listType
