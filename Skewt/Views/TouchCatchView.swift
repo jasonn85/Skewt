@@ -32,6 +32,12 @@ struct TouchCatchView: UIViewRepresentable {
         view.addGestureRecognizer(tapper)
         context.coordinator.tapper = tapper
         
+        let doubleTapper = UITapGestureRecognizer(target: context.coordinator,
+                                                  action: #selector(Coordinator.doubleTapperUpdated(_:)))
+        doubleTapper.numberOfTapsRequired = 2
+        view.addGestureRecognizer(doubleTapper)
+        context.coordinator.doubleTapper = doubleTapper
+        
         let panner = UIPanGestureRecognizer(target: context.coordinator, 
                                             action: #selector(Coordinator.panUpdated(_:)))
         view.addGestureRecognizer(panner)
@@ -55,9 +61,12 @@ extension TouchCatchView {
         
         var pincher: UIPinchGestureRecognizer?
         var tapper: UITapGestureRecognizer?
+        var doubleTapper: UITapGestureRecognizer?
         var panner: UIPanGestureRecognizer?
         
         var startingZoom: CGFloat = 1.0
+        
+        private let doubleTapZoom: CGFloat = 2.0
         
         var panStart: CGPoint = .zero
         var panStartSquare: ZoomedSquare? = nil
@@ -142,7 +151,7 @@ extension TouchCatchView {
             }
         }
         
-        @objc func tapperUpdated(_ gesture: UIPinchGestureRecognizer) {
+        @objc func tapperUpdated(_ gesture: UITapGestureRecognizer) {
             switch gesture.state {
             case .ended:
                 guard let bounds = gesture.view?.bounds else {
@@ -158,6 +167,14 @@ extension TouchCatchView {
             
             default:
                 return
+            }
+        }
+        
+        @objc func doubleTapperUpdated(_ gesture: UITapGestureRecognizer) {
+            let transaction = Transaction(animation: parent.bounceBackAnimation)
+
+            withTransaction(transaction) {
+                parent.zoom = parent.zoom > 1.0 ? 1.0 : doubleTapZoom
             }
         }
     }
