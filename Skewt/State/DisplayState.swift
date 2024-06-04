@@ -9,18 +9,25 @@ import Foundation
 import Combine
 
 struct DisplayState: Codable {
-    enum TabSelection: Hashable, Codable {
+    enum DialogSelection: Hashable, Codable {
         case displayOptions
-        case recentSelections
-        case forecastSelection
-        case soundingSelection
+        case locationSelection(LocationDialogSelection)
+    }
+    
+    enum LocationDialogSelection: Codable {
+        case recent
+        case forecast
+        case sounding
     }
     
     enum Action: Skewt.Action {
-        case selectTab(TabSelection)
+        case showDialog(DialogSelection)
+        case hideDialog
     }
     
-    var tabSelection: TabSelection
+    var dialogSelection: DialogSelection?
+    var lastLocationDialogSelection: LocationDialogSelection
+    
     var forecastSelectionState: ForecastSelectionState
 }
 
@@ -48,7 +55,9 @@ struct ForecastSelectionState: Hashable {
 
 extension DisplayState {
     init() {
-        tabSelection = .soundingSelection
+        dialogSelection = nil
+        lastLocationDialogSelection = .forecast
+        
         forecastSelectionState = ForecastSelectionState()
     }
 }
@@ -88,9 +97,26 @@ extension DisplayState {
     static let reducer: Reducer<Self> = { state, action in
         if let action = action as? DisplayState.Action {
             switch action {
-            case .selectTab(let tabSelection):
+            case .showDialog(let dialogSelection):
+                var lastLocationSelection: LocationDialogSelection
+                
+                switch dialogSelection {
+                case .locationSelection(let locationSelection):
+                    lastLocationSelection = locationSelection
+                default:
+                    lastLocationSelection = state.lastLocationDialogSelection
+                }
+                
                 return DisplayState(
-                    tabSelection: tabSelection,
+                    dialogSelection: dialogSelection,
+                    lastLocationDialogSelection: lastLocationSelection,
+                    forecastSelectionState: state.forecastSelectionState
+                )
+                
+            case .hideDialog:
+                return DisplayState(
+                    dialogSelection: nil,
+                    lastLocationDialogSelection: state.lastLocationDialogSelection,
                     forecastSelectionState: state.forecastSelectionState
                 )
             }
@@ -98,7 +124,8 @@ extension DisplayState {
         
         if let action = action as? ForecastSelectionState.Action {
             return DisplayState(
-                tabSelection: state.tabSelection,
+                dialogSelection: state.dialogSelection,
+                lastLocationDialogSelection: state.lastLocationDialogSelection,
                 forecastSelectionState: ForecastSelectionState.reducer(state.forecastSelectionState, action)
             )
         }

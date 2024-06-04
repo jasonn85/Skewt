@@ -80,7 +80,15 @@ extension PlotOptions {
 
 extension DisplayState {
     static var saved: DisplayState? {
-        UserDefaults.standard.loadValue(forKey: .displayState) as Self?
+        guard let savedDisplayState = UserDefaults.standard.loadValue(forKey: .displayState) as DisplayState? else {
+            return nil
+        }
+        
+        return DisplayState(
+            dialogSelection: nil,
+            lastLocationDialogSelection: savedDisplayState.lastLocationDialogSelection,
+            forecastSelectionState: savedDisplayState.forecastSelectionState
+        )
     }
 }
 
