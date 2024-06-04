@@ -439,4 +439,43 @@ class SkewtTests: XCTestCase {
         XCTAssertTrue(hopefullyNegativeFifteen! > temperaturesAndPressures[0].0)
         XCTAssertTrue(hopefullyNegativeFifteen! < temperaturesAndPressures[1].0)
     }
+    
+    func testSurfaceData() throws {
+        let surfacePoint = LevelDataPoint(
+            type: .surfaceLevel,
+            pressure: 1000.0,
+            height: nil,
+            temperature: 15.0,
+            dewPoint: 10.0,
+            windDirection: nil,
+            windSpeed: nil
+        )
+        
+        let significantLevelJustAboveSurface = LevelDataPoint(
+            type: .significantLevel,
+            pressure: 900.0,
+            height: nil,
+            temperature: 14.0,
+            dewPoint: 10.0,
+            windDirection: nil,
+            windSpeed: nil
+        )
+        
+        let significantLevelUpHigh = LevelDataPoint(
+            type: .significantLevel,
+            pressure: 500.0,
+            height: nil,
+            temperature: -10.0,
+            dewPoint: -20.0,
+            windDirection: nil,
+            windSpeed: nil
+        )
+        
+        let withSurface = try Sounding(withJustData: [surfacePoint, significantLevelJustAboveSurface, significantLevelUpHigh])
+        let noSurface = try Sounding(withJustData: [significantLevelJustAboveSurface, significantLevelUpHigh])
+        
+        XCTAssertEqual(withSurface.surfaceData, surfacePoint, ".surfaceData returns surface data point")
+        XCTAssertEqual(noSurface.surfaceData, significantLevelJustAboveSurface,
+                       ".surfaceData returns lowest available data if no surface data point exists")
+    }
 }

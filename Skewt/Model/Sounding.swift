@@ -414,4 +414,14 @@ extension Sounding {
         
         return points.reduce(points[0]) { abs($1.pressure - pressure) < abs($0.pressure - pressure) ? $1 : $0 }
     }
+    
+    var surfaceData: LevelDataPoint? {
+        if let surfacePoint = data.filter({ $0.type == .surfaceLevel }).first,
+           surfacePoint.temperature != nil,
+           surfacePoint.dewPoint != nil {
+            return surfacePoint
+        }
+        
+        return data.filter({ $0.temperature != nil && $0.dewPoint != nil }).first
+    }
 }
