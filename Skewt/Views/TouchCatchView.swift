@@ -27,16 +27,17 @@ struct TouchCatchView: UIViewRepresentable {
         view.addGestureRecognizer(pincher)
         context.coordinator.pincher = pincher
         
-        let tapper = UITapGestureRecognizer(target: context.coordinator, 
-                                            action: #selector(Coordinator.tapperUpdated(_:)))
-        view.addGestureRecognizer(tapper)
-        context.coordinator.tapper = tapper
-        
         let doubleTapper = UITapGestureRecognizer(target: context.coordinator,
                                                   action: #selector(Coordinator.doubleTapperUpdated(_:)))
         doubleTapper.numberOfTapsRequired = 2
         view.addGestureRecognizer(doubleTapper)
         context.coordinator.doubleTapper = doubleTapper
+        
+        let tapper = UITapGestureRecognizer(target: context.coordinator,
+                                            action: #selector(Coordinator.tapperUpdated(_:)))
+        tapper.require(toFail: doubleTapper)
+        view.addGestureRecognizer(tapper)
+        context.coordinator.tapper = tapper
         
         let panner = UIPanGestureRecognizer(target: context.coordinator, 
                                             action: #selector(Coordinator.panUpdated(_:)))
