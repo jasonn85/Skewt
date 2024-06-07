@@ -100,6 +100,14 @@ struct SkewtPlot {
         
         return path
     }
+    
+    var surfaceParcelPath: CGPath? {
+        guard let surface = sounding?.surfaceData else {
+            return nil
+        }
+        
+        return parcelPath(forTemperature: surface.temperature!, pressure: surface.pressure)
+    }
 }
 
 // MARK: - Coordinate calculations (skew and log magic)
@@ -355,6 +363,52 @@ extension SkewtPlot {
         }
         
         return path
+    }
+    
+    private func parcelPath(forTemperature startingTemperature: Double, pressure startingPressure: Double) -> CGPath? {
+        let dy = 1.0 / 500.0
+        
+        guard let sounding = sounding,
+              let dewPoint = sounding.interpolatedValue(for: \.dewPoint, atPressure: startingPressure) else {
+            return nil
+        }
+        
+        let bounds = CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0)
+        let firstPoint = point(pressure: startingPressure, temperature: startingTemperature)
+
+        guard bounds.contains(firstPoint) else {
+            return nil
+        }
+        
+        let path = CGMutablePath()
+        path.move(to: firstPoint)
+        
+        let mixingRatio = saturatedMixingRatio(withTemperature: Temperature(dewPoint), pressure: startingPressure)
+        var temperature = Temperature(startingTemperature)
+        var isSaturated = temperature <= .temperature(forMixingRatio: mixingRatio, pressure: startingPressure)
+        var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: firstPoint.y))
+        
+        for y in stride(from: firstPoint.y - dy, through: 0.0, by: -dy) {
+            let pressure = pressure(atY: y)
+            let altitude = Altitude.standardAltitude(forPressure: pressure)
+            
+            if isSaturated {
+                temperature = temperature.temperatureOfSaturatedParcelRaised(from: lastAltitude, to: altitude, pressure: pressure)
+            } else {
+                temperature = temperature.temperatureOfDryParcelRaised(from: lastAltitude, to: altitude)
+            }
+            
+            let point = point(pressure: pressure, temperature: temperature.value(inUnit: .celsius))
+            
+            if bounds.contains(point) {
+                path.addLine(to: point)
+            }
+            
+            isSaturated = isSaturated || temperature <= .temperature(forMixingRatio: mixingRatio, pressure: pressure)
+            lastAltitude = altitude
+        }
+        
+        return !path.isEmpty ? path : nil
     }
     
     private func isohume(forMixingRatio mixingRatio: Double, dy: CGFloat) -> CGPath {

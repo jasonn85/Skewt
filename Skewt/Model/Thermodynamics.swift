@@ -145,10 +145,6 @@ extension Temperature {
     }
 }
 
-public func vaporPressure(withPressure pressure: Pressure, mixingRatio: Double) -> Double {
-    return mixingRatio * pressure.inPascals / (.gasConstantRatioDryAirToWaterVapor * mixingRatio)
-}
-
 public func saturatedMixingRatio(withTemperature temperature: Temperature, pressure: Pressure) -> Double {
     let vaporPressure = temperature.saturatedVaporPressure
     return (.gasConstantRatioDryAirToWaterVapor * vaporPressure
