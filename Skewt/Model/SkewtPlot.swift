@@ -383,7 +383,7 @@ extension SkewtPlot {
         let path = CGMutablePath()
         path.move(to: firstPoint)
         
-        let mixingRatio = saturatedMixingRatio(withTemperature: Temperature(dewPoint), pressure: startingPressure)
+        let mixingRatio = saturatedMixingRatio(withTemperature: Temperature(dewPoint), pressure: startingPressure) * 1000.0
         var temperature = Temperature(startingTemperature)
         var isSaturated = temperature <= .temperature(forMixingRatio: mixingRatio, pressure: startingPressure)
         var lastAltitude = Altitude.standardAltitude(forPressure: pressure(atY: firstPoint.y))
