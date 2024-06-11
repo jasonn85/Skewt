@@ -11,6 +11,8 @@ struct PlotOptions: Codable {
     enum Action: Skewt.Action, Codable {
         case changeAltitudeRange(ClosedRange<Double>)
         case changeSkew(Double)
+        case setShowSurfaceParcelByDefault(Bool)
+        case setShowMovableParcel(Bool)
         case changeIsothermTypes(IsothermTypes)
         case changeIsobarTypes(IsobarTypes)
         case changeAdiabatTypes(AdiabatTypes)
@@ -78,6 +80,8 @@ struct PlotOptions: Codable {
         
     var altitudeRange: ClosedRange<Double>?
     var skew: Double
+    var showSurfaceParcelByDefault: Bool
+    var showMovableParcel: Bool
     var isothermTypes: IsothermTypes
     var isobarTypes: IsobarTypes
     var adiabatTypes: AdiabatTypes
@@ -93,6 +97,8 @@ extension PlotOptions {
     init() {
         altitudeRange = nil
         skew = 1.0
+        showSurfaceParcelByDefault = true
+        showMovableParcel = true
         isothermTypes = .tens
         isobarTypes = .altitude
         adiabatTypes = .tens
@@ -122,6 +128,10 @@ extension PlotOptions {
                 options.altitudeRange = range
             case .changeSkew(let skew):
                 options.skew = skew
+            case .setShowSurfaceParcelByDefault(let showSurfaceParcel):
+                options.showSurfaceParcelByDefault = showSurfaceParcel
+            case .setShowMovableParcel(let showParcel):
+                options.showMovableParcel = showParcel
             case .changeIsothermTypes(let types):
                 options.isothermTypes = types
             case .changeIsobarTypes(let types):

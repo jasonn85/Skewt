@@ -365,7 +365,7 @@ extension SkewtPlot {
         return path
     }
     
-    private func parcelPath(forTemperature startingTemperature: Double, pressure startingPressure: Double) -> CGPath? {
+    func parcelPath(forTemperature startingTemperature: Double, pressure startingPressure: Double) -> CGPath? {
         let dy = 1.0 / 500.0
         
         guard let sounding = sounding,

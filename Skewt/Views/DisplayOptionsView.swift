@@ -27,6 +27,25 @@ struct DisplayOptionsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    windBarbs
+                    animatedWind
+                    parcels
+                }
+                
+                Section("Isopleths") {
+                    isotherms
+                    isobars
+                    adiabats
+                    mixingLines
+                    isobarLabels
+                    isothermLabels
+                }
+                
+                Section {
+                    lineStyles
+                }
+                
                 Section() {
                     VStack {
                         HStack {
@@ -48,24 +67,6 @@ struct DisplayOptionsView: View {
                             step: 1_000.0
                         )
                     }
-                }
-                
-                Section {
-                    windBarbs
-                    animatedWind
-                }
-                
-                Section("Isopleths") {
-                    isotherms
-                    isobars
-                    adiabats
-                    mixingLines
-                    isobarLabels
-                    isothermLabels
-                }
-                
-                Section {
-                    lineStyles
                 }
                 
                 Section("About") {
@@ -141,6 +142,31 @@ struct DisplayOptionsView: View {
                 }
             })) {
                 Text("Animated wind")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var parcels: some View {
+        HStack {
+            Image("logoParcel")
+            
+            Toggle(isOn: Binding<Bool>(
+                get: { store.state.plotOptions.showSurfaceParcelByDefault },
+                set: { store.dispatch(PlotOptions.Action.setShowSurfaceParcelByDefault($0)) }
+            )) {
+                Text("Surface parcel")
+            }
+        }
+        
+        HStack {
+            Image("logoParcel")
+            
+            Toggle(isOn: Binding<Bool>(
+                get: { store.state.plotOptions.showMovableParcel },
+                set: { store.dispatch(PlotOptions.Action.setShowMovableParcel($0)) }
+            )) {
+                Text("Parcel from selection")
             }
         }
     }

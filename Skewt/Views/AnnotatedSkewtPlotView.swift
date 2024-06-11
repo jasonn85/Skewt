@@ -156,7 +156,7 @@ struct AnnotatedSkewtPlotView: View {
                         .gridCellUnsizedAxes(.vertical)
                     
                     ZStack {
-                        SkewtPlotView(plotOptions: plotOptions, plot: plot)
+                        SkewtPlotView(plotOptions: plotOptions, plot: plot, parcelPoint: annotationPointAsCGPoint)
                             .aspectRatio(1.0, contentMode: .fit)
                             .scaleEffect(zoom, anchor: zoomAnchor)
                             .border(.black)
@@ -508,6 +508,14 @@ struct AnnotatedSkewtPlotView: View {
         }
         
         return plot
+    }
+    
+    private var annotationPointAsCGPoint: CGPoint? {
+        if let annotationPoint = annotationPoint {
+            return CGPoint(x: annotationPoint.x, y: annotationPoint.y)
+        }
+        
+        return nil
     }
 }
 
