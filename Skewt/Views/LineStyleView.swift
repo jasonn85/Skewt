@@ -14,6 +14,8 @@ extension PlotOptions.PlotStyling.PlotType: CustomStringConvertible {
             return "Temperature"
         case .dewPoint:
             return "Dew point"
+        case .parcel:
+            return "Parcel"
         case .isotherms:
             return "Isotherms"
         case .zeroIsotherm:

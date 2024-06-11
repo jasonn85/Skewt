@@ -10,6 +10,7 @@ import SwiftUI
 struct SkewtPlotView: View {
     let plotOptions: PlotOptions
     let plot: SkewtPlot
+    let parcelPoint: CGPoint?
     
     var body: some View {
         let plotStyling = plotOptions.plotStyling
@@ -25,6 +26,12 @@ struct SkewtPlotView: View {
                 PlottedPath(path: dewPointPath)
                     .applyLineStyle(plotStyling.lineStyle(forType: .dewPoint))
                     .zIndex(99)
+            }
+            
+            if let parcelPath = parcelPath {
+                PlottedPath(path: parcelPath)
+                    .applyLineStyle(plotStyling.lineStyle(forType: .parcel))
+                    .zIndex(98)
             }
             
             ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
@@ -96,6 +103,18 @@ struct SkewtPlotView: View {
         }
     }
     
+    private var parcelPath: CGPath? {
+        if plotOptions.showMovableParcel, let parcelPoint = parcelPoint {
+            let (pressure, temperature) = plot.pressureAndTemperature(atPoint: parcelPoint)
+            
+            return plot.parcelPath(forTemperature: temperature, pressure: pressure)
+        } else if plotOptions.showSurfaceParcelByDefault {
+            return plot.surfaceParcelPath
+        }
+        
+        return nil
+    }
+    
     private var isobarStyle: PlotOptions.PlotStyling.LineStyle {
         let type: PlotOptions.PlotStyling.PlotType = (
             plotOptions.isobarTypes == .altitude ? .altitudeIsobars : .pressureIsobars
@@ -131,7 +150,7 @@ struct SkewtPlotView_Previews: PreviewProvider {
             let store = Store<SkewtState>.previewStore
             let plot = SkewtPlot(sounding: Store<SkewtState>.previewSounding)
             
-            SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot)
+            SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot, parcelPoint: nil)
         }
     }
 }
