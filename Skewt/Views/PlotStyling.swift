@@ -41,6 +41,9 @@ extension PlotOptions.PlotStyling {
         case .dewPoint:
             width = 3.0
             color = UIColor(named: "DewPointPlot")!
+        case .parcel:
+            width = 2.0
+            color = UIColor(named: "ParcelPlot")!
         case .isotherms:
             color = UIColor(named: "IsothermPlot")!
         case .zeroIsotherm:

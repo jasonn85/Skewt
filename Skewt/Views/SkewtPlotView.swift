@@ -27,6 +27,12 @@ struct SkewtPlotView: View {
                     .zIndex(99)
             }
             
+            if let parcelPlot = plot.surfaceParcelPath {
+                PlottedPath(path: parcelPlot)
+                    .applyLineStyle(plotStyling.lineStyle(forType: .parcel))
+                    .zIndex(98)
+            }
+            
             ForEach(isobarPaths.keys.sorted(), id: \.self) { a in
                 PlottedPath(path: isobarPaths[a]!)
                     .applyLineStyle(isobarStyle)

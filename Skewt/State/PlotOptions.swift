@@ -31,6 +31,7 @@ struct PlotOptions: Codable {
         enum PlotType: Codable, Equatable, CaseIterable, Identifiable {
             case temperature
             case dewPoint
+            case parcel
             case isotherms
             case zeroIsotherm
             case altitudeIsobars
