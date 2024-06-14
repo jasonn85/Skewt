@@ -64,10 +64,10 @@ The sole data source is the US's NOAA. Forecast data is only available for the U
 - Debounced UI is handled via bindings and Combine
 
 # What's in the works?
-- [Parcel analysis/CAPE](https://github.com/jasonn85/Skewt/issues/44)
-- [Lots](https://github.com/jasonn85/Skewt/issues/33) of [background](https://github.com/jasonn85/Skewt/issues/34) [animations](https://github.com/jasonn85/Skewt/issues/35) for predicted weather
-- [Pinch zooming](https://github.com/jasonn85/Skewt/issues/7)
+- [Background](https://github.com/jasonn85/Skewt/issues/34) [animations](https://github.com/jasonn85/Skewt/issues/35) for predicted weather
 - [Tutorials](https://github.com/jasonn85/Skewt/issues/37)
+- [Better support for viewing charts over time](https://github.com/jasonn85/Skewt/issues/39)
+- [Maps for selecting location](https://github.com/jasonn85/Skewt/issues/41)
 
 # Privacy
 - No user data is collected, period. This may be revisted later for anonymous analytics.
