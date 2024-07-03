@@ -1,5 +1,5 @@
 //
-//  BackgroundView.swift
+//  AnimatedWindView.swift
 //  Skewt
 //
 //  Created by Jason Neel on 11/23/23.
@@ -31,20 +31,15 @@ fileprivate extension UIView {
     }
 }
 
-struct BackgroundView: UIViewRepresentable {
+struct AnimatedWindView: UIViewRepresentable {
     typealias UIViewType = UIView
     
     let frame: CGRect
-    let skyGradientStart: CGPoint = CGPoint(x: 0.5, y: 0.0)
-    let skyGradientEnd: CGPoint = CGPoint(x: 0.5, y: 1.0)
-    let skyColors: [Color]
     
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
     let minimumWindToAnimate = 10.0
     
-    private let gradientName = "backgroundGradient"
-
     private let windParticleColor = CGColor(gray: 0.33, alpha: 0.2)
     private let windParticleScale = 1.0
     private let velocityScale = 0.33
@@ -54,30 +49,18 @@ struct BackgroundView: UIViewRepresentable {
     
     @Environment(\.self) var environment
     
-    init(frame: CGRect, winds: [Double : Double]?, skyColors: [Color] = [Color("HighSkyBlue"), Color("LowSkyBlue")]) {
+    init(frame: CGRect, winds: [Double : Double]?) {
         self.frame = frame
         self.winds = winds
-        self.skyColors = skyColors
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {
-        let gradient: CAGradientLayer? = uiView.layer.sublayers?.first(where: { $0.name == gradientName }) as? CAGradientLayer
-        
-        gradient!.frame = frame
-        gradient!.colors = skyColors.compactMap { $0.resolve(in: environment).cgColor }
-        gradient!.startPoint = skyGradientStart
-        gradient!.endPoint = skyGradientEnd
-        
         rebuildWindEmittersIfNeeded(inView: uiView)
         uiView.windEmitters.forEach { updateWindEmitterPosition($0) }
     }
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: frame)
-
-        let gradient = CAGradientLayer()
-        gradient.name = gradientName
-        view.layer.addSublayer(gradient)
         
         rebuildWindEmittersIfNeeded(inView: view)
                 
@@ -186,7 +169,7 @@ struct BackgroundView: UIViewRepresentable {
 
 #Preview {
     GeometryReader { geometry in
-        BackgroundView(
+        AnimatedWindView(
             frame: CGRect(origin: .zero, size: geometry.size),
             winds: [
                 0.0: -25.0,

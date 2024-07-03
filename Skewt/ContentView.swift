@@ -130,7 +130,12 @@ struct ContentView: View {
         VStack (alignment: .center) {
             header
             
-            AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
+            AnnotatedSkewtPlotView(
+                soundingState: store.state.currentSoundingState,
+                plotOptions: store.state.plotOptions,
+                location: store.state.locationState.locationIfKnown,
+                time: store.state.currentSoundingState.selection.timeAsConcreteDate
+            )
                 .onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
                     store.dispatch(RecentSoundingsState.Action.refresh)

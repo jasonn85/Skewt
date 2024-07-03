@@ -110,6 +110,24 @@ extension SoundingSelection.Location {
     }
 }
 
+extension SoundingSelection {
+    /// A wall clock time for the current selection, resolving any relative time
+    var timeAsConcreteDate: Date {
+        switch time {
+        case .now:
+            return Date.now
+        case .relative(let interval):
+            return Date.now.addingTimeInterval(interval)
+        case .specific(let date):
+            return date
+        case .numberOfSoundingsAgo(let soundingsAgo):
+            let interval = TimeInterval(soundingsAgo * type.hourInterval)
+            
+            return Date.now.addingTimeInterval(-interval)
+        }
+    }
+}
+
 extension SoundingSelection.ModelType {
     var hourInterval: Int {
         switch self {
