@@ -18,6 +18,7 @@
 		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */; };
+		96337ACD2C37263100787E2D /* SkyColor.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96337ACC2C37263100787E2D /* SkyColor.metal */; };
 		963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */; };
 		964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964998652B6A20A700899BC7 /* TouchCatchView.swift */; };
 		964A81A52ADDDD2300E3E1EC /* SunTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964A81A42ADDDD2300E3E1EC /* SunTimes.swift */; };
@@ -105,6 +106,7 @@
 		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunlightGradientView.swift; sourceTree = "<group>"; };
+		96337ACC2C37263100787E2D /* SkyColor.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SkyColor.metal; sourceTree = "<group>"; };
 		963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewStore.swift; sourceTree = "<group>"; };
 		964998652B6A20A700899BC7 /* TouchCatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchCatchView.swift; sourceTree = "<group>"; };
 		964A81A42ADDDD2300E3E1EC /* SunTimes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunTimes.swift; sourceTree = "<group>"; };
@@ -204,6 +206,14 @@
 				96FE7E512A3A89ED0069AD3A /* RecentSoundingsState.swift */,
 			);
 			path = State;
+			sourceTree = "<group>";
+		};
+		96337ACE2C3766D600787E2D /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				96337ACC2C37263100787E2D /* SkyColor.metal */,
+			);
+			path = Shaders;
 			sourceTree = "<group>";
 		};
 		965D66572A5293A90015FB4B /* Selection */ = {
@@ -307,9 +317,9 @@
 			isa = PBXGroup;
 			children = (
 				965D66572A5293A90015FB4B /* Selection */,
+				96337ACE2C3766D600787E2D /* Shaders */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				969B8BC92B0FB6D8002D0F20 /* AnimatedWindView.swift */,
-				96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */,
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
 				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
@@ -317,6 +327,7 @@
 				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
 				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
+				96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */,
 				964998652B6A20A700899BC7 /* TouchCatchView.swift */,
 				96D30F2F2A83581200986E7E /* WindBarb.swift */,
 				96693FB12B746C5900697291 /* ZoomedSquare.swift */,
@@ -526,6 +537,7 @@
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
+				96337ACD2C37263100787E2D /* SkyColor.metal in Sources */,
 				96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */,
 				9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */,
 			);

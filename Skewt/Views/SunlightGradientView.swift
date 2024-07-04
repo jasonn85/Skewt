@@ -18,7 +18,8 @@ struct SunlightGradientView: View {
     }
     
     var body: some View {
-        LinearGradient(colors: [Color("HighSkyBlue"), Color("LowSkyBlue")], startPoint: UnitPoint(x: 0.5, y: 0.0), endPoint: UnitPoint(x: 0.5, y: 1.0))
+        Rectangle()
+            .foregroundStyle(ShaderLibrary.skyColor(.boundingRect))
     }
 }
 
