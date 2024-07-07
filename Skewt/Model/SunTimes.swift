@@ -106,12 +106,8 @@ extension Date {
         )
     }
     
-    func solarZenithAngle(at location: CLLocation) -> Double {
-        let latitude = location.coordinate.latitude * .pi / 180.0
-        let solarDeclination = solarDeclination
-        let equationOfTime = equationOfTime
+    func hourAngle(at location: CLLocation) -> Double {
         let timeOffset: TimeInterval = equationOfTime + 4.0 * location.coordinate.longitude * 60.0
-        
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents(in: .gmt, from: self)
         let solarTime: TimeInterval = (
@@ -121,8 +117,13 @@ extension Date {
             + timeOffset
         )
         
-        let hourAngle = 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
-            
+        return 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
+    }
+    
+    func solarZenithAngle(at location: CLLocation) -> Double {
+        let latitude = location.coordinate.latitude * .pi / 180.0
+        let hourAngle = hourAngle(at: location)
+        
         return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
     }
     
