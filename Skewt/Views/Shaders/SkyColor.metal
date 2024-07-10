@@ -109,11 +109,11 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
 }
 
 [[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float viewBearing, float horizontalFov, float verticalFov, float2 elevationRange, float hourAngle, float sunDeclination) {
-    float height = elevationRange[0] + (1.0 - position.y / bounds.w) * (elevationRange[1] - elevationRange[0]);
+    float height = elevationRange[0] + (1.0 - (position.y - bounds.y) / bounds.w) * (elevationRange[1] - elevationRange[0]);
     float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + height, 0.0);
 
     float phi = 0.0;
-    float theta = -(0.5 - (position.x / bounds.z)) * horizontalFov - viewBearing;
+    float theta = -(0.5 - (position.x - bounds.x) / bounds.z) * horizontalFov - viewBearing;
     float3 viewDirection = float3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
     
     float sunPhi = M_PI_F / 2.0 - sunDeclination;
