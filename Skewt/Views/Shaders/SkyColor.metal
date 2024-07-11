@@ -22,30 +22,23 @@ using namespace metal;
 #define NUM_SAMPLES_RAY 16
 #define NUM_SAMPLES_SUBRAYS 8
 
-float2 solveQuadratic(float a, float b, float c) {
-    float discr = b * b - 4 * a * c;
+float2 solveQuadratic(float a, float b, float c);
+float2 sphereIntersectionPoints(float3 start, float3 direction, float radius);
+half4 incidentLight(float3 start, float3 direction, float3 sunDirection);
 
-    if (discr < 0) {
-        return float2(NAN, NAN);
-    }
-    
-    float q = (b < 0.0) ? -0.5 * (b - sqrt(discr)) : -0.5 * (b + sqrt(discr));
-    
-    return float2(q / a, c / q);
-}
+[[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float viewBearing, float horizontalFov, float verticalFov, float2 elevationRange, float hourAngle, float sunDeclination) {
+    float height = elevationRange[0] + (1.0 - (position.y - bounds.y) / bounds.w) * (elevationRange[1] - elevationRange[0]);
+    float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + height, 0.0);
 
-float2 sphereIntersectionPoints(float3 start, float3 direction, float radius) {
-    float a = direction.x * direction.x + direction.y * direction.y * direction.z * direction.z;
-    float b = 2.0 * (direction.x * start.x + direction.y * start.y + direction.z + start.z);
-    float c = start.x * start.x + start.y * start.y + start.z * start.z - radius * radius;
+    float phi = 0.0;
+    float theta = -(0.5 - (position.x - bounds.x) / bounds.z) * horizontalFov - viewBearing;
+    float3 viewDirection = float3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
     
-    float2 r = solveQuadratic(a, b, c);
+    float sunPhi = M_PI_F / 2.0 - sunDeclination;
+    float sunTheta = -hourAngle - viewBearing;
+    float3 sunDirection = float3(sin(sunTheta) * cos(sunPhi), cos(sunTheta), sin(sunTheta) * sin(sunPhi));
     
-    if (r[0] > r[1]) {
-        return float2(r[1], r[0]);
-    }
-    
-    return r;
+    return incidentLight(viewPoint, viewDirection, sunDirection);
 }
 
 half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
@@ -108,17 +101,28 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
     return half4(colorsWithAlpha);
 }
 
-[[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float viewBearing, float horizontalFov, float verticalFov, float2 elevationRange, float hourAngle, float sunDeclination) {
-    float height = elevationRange[0] + (1.0 - (position.y - bounds.y) / bounds.w) * (elevationRange[1] - elevationRange[0]);
-    float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + height, 0.0);
+float2 sphereIntersectionPoints(float3 start, float3 direction, float radius) {
+    float a = direction.x * direction.x + direction.y * direction.y * direction.z * direction.z;
+    float b = 2.0 * (direction.x * start.x + direction.y * start.y + direction.z + start.z);
+    float c = start.x * start.x + start.y * start.y + start.z * start.z - radius * radius;
+    
+    float2 r = solveQuadratic(a, b, c);
+    
+    if (r[0] > r[1]) {
+        return float2(r[1], r[0]);
+    }
+    
+    return r;
+}
 
-    float phi = 0.0;
-    float theta = -(0.5 - (position.x - bounds.x) / bounds.z) * horizontalFov - viewBearing;
-    float3 viewDirection = float3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
+float2 solveQuadratic(float a, float b, float c) {
+    float discr = b * b - 4 * a * c;
+
+    if (discr < 0) {
+        return float2(NAN, NAN);
+    }
     
-    float sunPhi = M_PI_F / 2.0 - sunDeclination;
-    float sunTheta = -hourAngle - viewBearing;
-    float3 sunDirection = float3(sin(sunTheta) * cos(sunPhi), cos(sunTheta), sin(sunTheta) * sin(sunPhi));
+    float q = (b < 0.0) ? -0.5 * (b - sqrt(discr)) : -0.5 * (b + sqrt(discr));
     
-    return incidentLight(viewPoint, viewDirection, sunDirection);
+    return float2(q / a, c / q);
 }
