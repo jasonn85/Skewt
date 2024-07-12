@@ -73,12 +73,14 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
         float currentLight = 0.0;
         float subrayOpticalDepthRayleigh = 0.0;
         float subrayOpticalDepthMie = 0.0;
+        bool underground = false;
         
         for (uint j = 0; j < NUM_SAMPLES_SUBRAYS; j++) {
             float3 subraySamplePosition = samplePosition + (currentLight + subraySegmentLength * 0.5) * sunDirection;
             float subrayHeight = sqrt(subraySamplePosition.x * subraySamplePosition.x + subraySamplePosition.y * subraySamplePosition.y + subraySamplePosition.z + subraySamplePosition.z) - RADIUS_EARTH_SURFACE;
             
             if (subrayHeight < 0.0) {
+                underground = true;
                 break;
             }
             
@@ -87,10 +89,12 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
             currentLight += subraySegmentLength;
         }
         
-        float3 tau = betaRayleigh * (opticalDepthRayleigh + subrayOpticalDepthRayleigh) + betaMie * 1.1 * (opticalDepthMie + subrayOpticalDepthMie);
-        float3 attenuation = float3(exp(-tau.x), exp(-tau.y), exp(-tau.z));
-        sumRayleigh += attenuation * opticalDepthRayleigh;
-        sumMie += attenuation * opticalDepthMie;
+        if (!underground) {
+            float3 tau = betaRayleigh * (opticalDepthRayleigh + subrayOpticalDepthRayleigh) + betaMie * 1.1 * (opticalDepthMie + subrayOpticalDepthMie);
+            float3 attenuation = float3(exp(-tau.x), exp(-tau.y), exp(-tau.z));
+            sumRayleigh += attenuation * opticalDepthRayleigh;
+            sumMie += attenuation * opticalDepthMie;
+        }
         
         current += segmentLength;
     }
