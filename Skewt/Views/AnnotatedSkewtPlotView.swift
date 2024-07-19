@@ -25,7 +25,7 @@ struct AnnotatedSkewtPlotView: View {
     let plotOptions: PlotOptions
     
     let location: CLLocation?
-    @State var time: Date? = nil
+    var time: Date? = nil
     
     @State var annotationPoint: UnitPoint? = nil
     
