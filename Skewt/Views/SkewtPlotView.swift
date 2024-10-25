@@ -133,7 +133,7 @@ struct SkewtPlotView: View {
     }
 }
 
-extension CGPath: @unchecked Sendable { }
+extension CGPath: @unchecked @retroactive Sendable { }
 
 struct PlottedPath: Shape {
     let path: CGPath
