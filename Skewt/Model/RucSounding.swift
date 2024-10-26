@@ -1,5 +1,5 @@
 //
-//  Sounding.swift
+//  RucSounding.swift
 //  Skewt
 //
 //  Created by Jason Neel on 2/15/23.
@@ -13,85 +13,90 @@ fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB for
 fileprivate let temperatureRange = -270.0...100.0
 
 /// A rawindsonde sounding
-struct Sounding: Codable {
+struct RucSounding: Codable {
     let stationInfo: StationInfo
     let type: SoundingType
-    let timestamp: Date
     let description: String
     
     let stationId: String
     let windSpeedUnit: WindSpeedUnit
     let radiosondeCode: RadiosondeCode?
     
-    let cape: Int?  // Convective Available Potential Energy in J/Kg
-    let cin: Int?  // Convective Inhibition in J/Kg
-    let helicity: Int?  // Storm-relative helicity in m^2/s^2
-    let precipitableWater: Int?  // Precipitable water in model column in Kg/m^2
+    let data: SoundingData
+}
+
+extension RucSounding {
+    enum SoundingType: String, Codable, CaseIterable {
+        case op40 = "Op40"
+        case bak40 = "Bak40"
+        case nam = "NAM"
+        case gfs = "GFS"
+        case raob = "RAOB"
+    }
     
-    let data: [LevelDataPoint]
+    struct StationInfo: Codable {
+        let wbanId: Int?
+        let wmoId: Int?
+        let latitude: Double
+        let longitude: Double
+        let altitude: Int?
+    }
+    
+    struct LevelDataPoint: Codable, Hashable {
+        enum DataPointType: Int, Codable {
+            case stationId = 1
+            case soundingChecks = 2
+            case stationIdAndOther = 3
+            case mandatoryLevel = 4
+            case significantLevel = 5
+            case windLevel = 6
+            case tropopauseLevel = 7
+            case maximumWindLevel = 8
+            case surfaceLevel = 9
+        }
+        
+        let type: DataPointType
+        let pressure: Double
+        let height: Int?  // height in m
+        let temperature: Double?
+        let dewPoint: Double?
+        let windDirection: Int?
+        let windSpeed: Int?
+    }
+    
+    enum ParseError: Error, Codable {
+        case empty
+        case missingHeaders
+        case unparseableLine(String)
+        case lineTypeMismatch(String)
+        case duplicateStationInfo
+    }
+    
+    enum WindSpeedUnit: String, Codable {
+        case ms = "ms"
+        case kt = "kt"
+    }
+
+    struct StationInfoAndOther: Codable {
+        let stationId: String
+        let radiosondeType: RadiosondeCode?
+        let windSpeedUnit: WindSpeedUnit
+    }
+
+    enum RadiosondeCode: Int, Codable {
+        case vizA = 10
+        case vizB = 11
+        case sdc = 12
+    }
 }
 
-struct StationInfo: Codable {
-    let wbanId: Int?
-    let wmoId: Int?
-    let latitude: Double
-    let longitude: Double
-    let altitude: Int?
-}
-
-enum SoundingType: String, Codable, CaseIterable {
-    case op40 = "Op40"
-    case bak40 = "Bak40"
-    case nam = "NAM"
-    case gfs = "GFS"
-    case raob = "RAOB"
-}
-
-struct LevelDataPoint: Codable, Hashable {
-    let type: DataPointType
-    let pressure: Double
-    let height: Int?  // height in m
-    let temperature: Double?
-    let dewPoint: Double?
-    let windDirection: Int?
-    let windSpeed: Int?
-}
-
-enum SoundingParseError: Error, Codable {
-    case empty
-    case missingHeaders
-    case unparseableLine(String)
-    case lineTypeMismatch(String)
-    case duplicateStationInfo
-}
-
-enum WindSpeedUnit: String, Codable {
-    case ms = "ms"
-    case kt = "kt"
-}
-
-enum DataPointType: Int, Codable {
-    case stationId = 1
-    case soundingChecks = 2
-    case stationIdAndOther = 3
-    case mandatoryLevel = 4
-    case significantLevel = 5
-    case windLevel = 6
-    case tropopauseLevel = 7
-    case maximumWindLevel = 8
-    case surfaceLevel = 9
-}
-
-struct StationInfoAndOther: Codable {
-    let stationId: String
-    let radiosondeType: RadiosondeCode?
-    let windSpeedUnit: WindSpeedUnit
-}
-
-enum RadiosondeCode: Int, Codable {
-    case vizA = 10
-    case vizB = 11
-    case sdc = 12
+extension SoundingData.Point {
+    init(fromRucDataPoint point: RucSounding.LevelDataPoint) {
+        temperature = point.temperature
+        dewPoint = point.dewPoint
+        windSpeed = point.windSpeed != nil ? Double(point.windSpeed!) : nil
+        windDirection = point.windDirection
+    }
 }
 
 // Adding an init? that treats "99999" sentinel as nil when parsing values from String
@@ -141,10 +146,10 @@ internal extension String {
         return slices(ofLength: columnWidth).map { String($0) }
     }
     
-    func soundingDataType() -> DataPointType? {
+    func soundingDataType() -> RucSounding.LevelDataPoint.DataPointType? {
         guard let firstColumn = soundingColumns().first,
               let typeInt = Int(fromSoundingString: firstColumn),
-              let type = DataPointType(rawValue: typeInt) else {
+              let type = RucSounding.LevelDataPoint.DataPointType(rawValue: typeInt) else {
             return nil
         }
         
@@ -153,12 +158,12 @@ internal extension String {
     
     /// Returns a tuple of the data point type and all following columns of [String] data.
     /// Throws SoundingParseError.unparseableLine if unparseable or containing an unrecognized type.
-    func soundingTypeAndColumns() throws -> (DataPointType, [String])  {
+    func soundingTypeAndColumns() throws -> (RucSounding.LevelDataPoint.DataPointType, [String])  {
         let columns = soundingColumns()
         
         guard let typeInt = Int(fromSoundingString: columns[0]),
-              let type = DataPointType(rawValue: typeInt) else {
-            throw SoundingParseError.unparseableLine(self)
+              let type = RucSounding.LevelDataPoint.DataPointType(rawValue: typeInt) else {
+            throw RucSounding.ParseError.unparseableLine(self)
         }
         
         return (type, Array(columns[1...]))
@@ -180,7 +185,7 @@ internal extension String {
         dateFormatter.dateFormat = "HH dd MMM yyyy"
 
         guard let date = dateFormatter.date(from: dateString) else {
-            throw SoundingParseError.unparseableLine(self)
+            throw RucSounding.ParseError.unparseableLine(self)
         }
 
         return date
@@ -210,7 +215,7 @@ internal extension String {
 
 internal extension Collection where Element == String {
     /// Filters an Array of Strings based on a parseable sounding data type in the first column
-    func filter(byDataTypes types: [DataPointType]) -> [Element] {
+    func filter(byDataTypes types: [RucSounding.LevelDataPoint.DataPointType]) -> [Element] {
         filter {
             guard let type = $0.soundingDataType() else {
                 return false
@@ -226,12 +231,12 @@ internal extension Collection where Element == String {
 }
 
 /// Initializing a Sounding from multiline text
-extension Sounding {
+extension RucSounding {
     init(fromText text: String) throws {
         let lines = text.split(whereSeparator: \.isNewline).filter { !$0.isEmpty }.map { String($0) }
         
         guard let firstDataIndex = lines.firstIndexContainingData() else {
-            throw SoundingParseError.empty
+            throw ParseError.empty
         }
         
         description = lines[0]
@@ -239,20 +244,24 @@ extension Sounding {
         let dataLines = lines[firstDataIndex...]
         let stationIdLines = dataLines.filter(byDataTypes:[.stationId])
         let stationIdAndOtherLines = dataLines.filter(byDataTypes:[.stationIdAndOther])
-        let soundingDataLines = dataLines.filter(byDataTypes:LevelDataPoint.types)
+        let soundingDataLines = dataLines.filter(byDataTypes:RucSounding.LevelDataPoint.types)
         
         guard let typeString = headerLine.trimmingCharacters(in: .whitespaces)
             .components(separatedBy: .whitespaces).first,
               let type = SoundingType(rawValue: typeString) else {
-            throw SoundingParseError.missingHeaders
+            throw ParseError.missingHeaders
         }
         
         guard stationIdLines.count == 1, stationIdAndOtherLines.count == 1 else {
-            throw SoundingParseError.duplicateStationInfo
+            throw ParseError.duplicateStationInfo
         }
         
         self.type = type
-        try timestamp = headerLine.dateFromHeaderLine()
+        
+        var cape: Int?
+        var cin: Int?
+        var helicity: Int?
+        var precipitableWater: Int?
         
         if firstDataIndex > 2 {
             let globals = lines[2].globals()
@@ -260,11 +269,6 @@ extension Sounding {
             cin = globals["CIN"]
             helicity = globals["Helic"]
             precipitableWater = globals["PW"]
-        } else {
-            cape = nil
-            cin = nil
-            helicity = nil
-            precipitableWater = nil
         }
         
         stationInfo = try StationInfo(fromText: stationIdLines[0])
@@ -274,12 +278,21 @@ extension Sounding {
         radiosondeCode = stationInfoAndOther.radiosondeType
         windSpeedUnit = stationInfoAndOther.windSpeedUnit
         
-        data = try soundingDataLines.map { try LevelDataPoint(fromText: $0) }
+        let rucData = try soundingDataLines.map { try LevelDataPoint(fromText: $0) }
+        
+        try data = SoundingData(
+            time: headerLine.dateFromHeaderLine(),
+            dataPoints: rucData.map { SoundingData.Point(fromRucDataPoint: $0) },
+            cape: cape,
+            cin: cin,
+            helicity: helicity,
+            precipitableWater: precipitableWater
+        )
     }
 }
 
 // Initializing StationInfo from a line of text
-extension StationInfo {
+extension RucSounding.StationInfo {
     init(fromText text: String) throws {
         // Use regex for StationInfo parsing because the station info line breaks the format of fixed
         // width columns for N/S/E/W suffixes on latitude/longitude; that suffix spills into the next
@@ -290,10 +303,10 @@ extension StationInfo {
               var latitude = Double(fromSoundingString: result.3),
               var longitude = Double(fromSoundingString: result.5) else {
             if let lineType = text.soundingDataType(), lineType != .stationId {
-                throw SoundingParseError.lineTypeMismatch(text)
+                throw RucSounding.ParseError.lineTypeMismatch(text)
             }
             
-            throw SoundingParseError.unparseableLine(text)
+            throw RucSounding.ParseError.unparseableLine(text)
         }
         
         let wbanId = Int(fromSoundingString: result.1)
@@ -319,19 +332,19 @@ extension StationInfo {
 }
 
 // Initializing StationInfoAndOther from a line of text
-extension StationInfoAndOther {
+extension RucSounding.StationInfoAndOther {
     init(fromText text: String) throws {
         let (type, columns) = try text.soundingTypeAndColumns()
 
         guard type == .stationIdAndOther else {
-            throw SoundingParseError.lineTypeMismatch(text)
+            throw RucSounding.ParseError.lineTypeMismatch(text)
         }
         
         stationId = columns[1].trimmingCharacters(in: .whitespaces)
-        radiosondeType = RadiosondeCode(rawValue: Int(columns[4]) ?? 0)
+        radiosondeType = RucSounding.RadiosondeCode(rawValue: Int(columns[4]) ?? 0)
         
-        guard let windSpeedUnit = WindSpeedUnit(rawValue: columns[5].trimmingCharacters(in: .whitespaces)) else {
-            throw SoundingParseError.unparseableLine(text)
+        guard let windSpeedUnit = RucSounding.WindSpeedUnit(rawValue: columns[5].trimmingCharacters(in: .whitespaces)) else {
+            throw RucSounding.ParseError.unparseableLine(text)
         }
         
         self.windSpeedUnit = windSpeedUnit
@@ -339,7 +352,7 @@ extension StationInfoAndOther {
 }
 
 // Initializing a data point from a line of text
-extension LevelDataPoint {
+extension RucSounding.LevelDataPoint {
     // Row types that contain sounding data that can be parsed as a LevelDataPoint
     static let types: [DataPointType] = [.surfaceLevel, .significantLevel,
                                          .mandatoryLevel, .windLevel,
@@ -348,12 +361,12 @@ extension LevelDataPoint {
     init(fromText text: String) throws {
         let (type, columns) = try text.soundingTypeAndColumns()
         
-        guard LevelDataPoint.types.contains(type) else {
-            throw SoundingParseError.lineTypeMismatch(text)
+        guard RucSounding.LevelDataPoint.types.contains(type) else {
+            throw RucSounding.ParseError.lineTypeMismatch(text)
         }
         
         guard let pressure = Int(fromSoundingString: columns[0]) else {
-            throw SoundingParseError.unparseableLine(text)
+            throw RucSounding.ParseError.unparseableLine(text)
         }
     
         self.type = type
@@ -366,7 +379,7 @@ extension LevelDataPoint {
     }
 }
 
-extension LevelDataPoint {
+extension RucSounding.LevelDataPoint {
     var altitudeInFeet: Int {
         let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
         
@@ -375,7 +388,7 @@ extension LevelDataPoint {
 }
 
 // Value interpolation
-extension Sounding {
+extension RucSounding {
     /// Find the nearest double value to a key value via linear interpolation
     func interpolatedValue(
         for valuePath: KeyPath<LevelDataPoint, Double?>,
