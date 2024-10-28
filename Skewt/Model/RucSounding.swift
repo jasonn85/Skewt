@@ -92,6 +92,8 @@ extension RucSounding {
 
 extension SoundingData.Point {
     init(fromRucDataPoint point: RucSounding.LevelDataPoint) {
+        pressure = point.pressure
+        height = point.height
         temperature = point.temperature
         dewPoint = point.dewPoint
         windSpeed = point.windSpeed != nil ? Double(point.windSpeed!) : nil
@@ -282,6 +284,7 @@ extension RucSounding {
         
         try data = SoundingData(
             time: headerLine.dateFromHeaderLine(),
+            elevation: rucData.surfaceData?.height ?? 0,
             dataPoints: rucData.map { SoundingData.Point(fromRucDataPoint: $0) },
             cape: cape,
             cin: cin,
@@ -387,54 +390,14 @@ extension RucSounding.LevelDataPoint {
     }
 }
 
-// Value interpolation
-extension RucSounding {
-    /// Find the nearest double value to a key value via linear interpolation
-    func interpolatedValue(
-        for valuePath: KeyPath<LevelDataPoint, Double?>,
-        atPressure pressure: Double
-    ) -> Double? {
-        let points = data.filter { $0[keyPath: valuePath] != nil }
-        
-        guard points.count > 0 else {
-            return nil
-        }
-        
-        if let exactMatch = points.first(where: { $0.pressure == pressure }) {
-            return exactMatch[keyPath: valuePath]
-        }
-        
-        let below = points.filter { $0.pressure > pressure }
-        let above = points.filter { $0.pressure < pressure }
-        
-        guard below.count > 0 else {
-            return above.first![keyPath: valuePath]
-        }
-        
-        guard above.count > 0 else {
-            return below.last![keyPath: valuePath]
-        }
-        
-        return (below.last![keyPath: valuePath]! + above.first![keyPath: valuePath]!) / 2.0
-    }
-    
-    func closestValue(toPressure pressure: Double, withValueFor valuePath: KeyPath<LevelDataPoint, Double?>) -> LevelDataPoint? {
-        let points = data.filter { $0[keyPath: valuePath] != nil }
-        
-        guard points.count > 0 else {
-            return nil
-        }
-        
-        return points.reduce(points[0]) { abs($1.pressure - pressure) < abs($0.pressure - pressure) ? $1 : $0 }
-    }
-    
-    var surfaceData: LevelDataPoint? {
-        if let surfacePoint = data.filter({ $0.type == .surfaceLevel }).first,
+extension Array where Element == RucSounding.LevelDataPoint {
+    var surfaceData: RucSounding.LevelDataPoint? {
+        if let surfacePoint = filter({ $0.type == .surfaceLevel }).first,
            surfacePoint.temperature != nil,
            surfacePoint.dewPoint != nil {
             return surfacePoint
         }
         
-        return data.filter({ $0.temperature != nil && $0.dewPoint != nil }).first
+        return filter({ $0.temperature != nil && $0.dewPoint != nil }).first
     }
 }
