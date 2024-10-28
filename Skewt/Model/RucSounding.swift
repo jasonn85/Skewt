@@ -13,7 +13,7 @@ fileprivate let emptyValue = "99999"  // Unavailable value sentinel per RAOB for
 fileprivate let temperatureRange = -270.0...100.0
 
 /// A rawindsonde sounding
-struct RucSounding: Codable {
+struct RucSounding: Codable, Sounding {
     let stationInfo: StationInfo
     let type: SoundingType
     let description: String

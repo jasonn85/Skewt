@@ -63,6 +63,7 @@
 		96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F02A26757200B90043 /* LocationStateTests.swift */; };
 		96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F22A2707E700B90043 /* DisplayOptionsView.swift */; };
 		96EF85AF2CCD83A200414011 /* SoundingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85AE2CCD83A200414011 /* SoundingData.swift */; };
+		96EF85B12CD0268600414011 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B02CD0268600414011 /* Sounding.swift */; };
 		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
@@ -154,6 +155,7 @@
 		96E334F02A26757200B90043 /* LocationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStateTests.swift; sourceTree = "<group>"; };
 		96E334F22A2707E700B90043 /* DisplayOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayOptionsView.swift; sourceTree = "<group>"; };
 		96EF85AE2CCD83A200414011 /* SoundingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingData.swift; sourceTree = "<group>"; };
+		96EF85B02CD0268600414011 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
@@ -329,6 +331,7 @@
 				96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */,
 				965D66582A52A09A0015FB4B /* RelativeLocations.swift */,
 				96A8F60C299DAC680021A170 /* RucSounding.swift */,
+				96EF85B02CD0268600414011 /* Sounding.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96EF85AE2CCD83A200414011 /* SoundingData.swift */,
 				969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */,
@@ -504,6 +507,7 @@
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				969B8BCA2B0FB6D8002D0F20 /* BackgroundView.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
+				96EF85B12CD0268600414011 /* Sounding.swift in Sources */,
 				96EF85AF2CCD83A200414011 /* SoundingData.swift in Sources */,
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
 				960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */,
