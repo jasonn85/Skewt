@@ -162,7 +162,7 @@ struct SoundingState: Codable {
         case doRefresh
         case changeAndLoadSelection(SoundingSelection.Action)
         case didReceiveFailure(SoundingError)
-        case didReceiveResponse(Sounding)
+        case didReceiveResponse(RucSounding)
         case awaitSoundingLocation
     }
     
@@ -170,8 +170,8 @@ struct SoundingState: Codable {
         case idle
         case awaitingSoundingLocationData
         case loading
-        case done(Sounding, Date)
-        case refreshing(Sounding)
+        case done(RucSounding, Date)
+        case refreshing(RucSounding)
         case failed(SoundingError)
     }
     
@@ -225,7 +225,7 @@ extension SoundingState.Action: CustomStringConvertible {
         case .didReceiveFailure(let error):
             return "Failed to load sounding: \(error)"
         case .didReceiveResponse(let sounding):
-            return "Received sounding with \(sounding.data.count) data points"
+            return "Received sounding with \(sounding.data.dataPoints.count) data points"
         case .awaitSoundingLocation:
             return "Waiting for sounding location data"
         }

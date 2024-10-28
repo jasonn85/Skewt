@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension Store {
-    static var previewSounding: Sounding {
+    static var previewSounding: RucSounding {
         let previewData = NSDataAsset(name: "op40-sample")!.data
         let previewDataString = String(decoding: previewData, as: UTF8.self)
         return try! RucSounding(fromText: previewDataString)

@@ -16,13 +16,13 @@ struct SoundingRequest {
     private static let modelsUrl = "https://rucsoundings.noaa.gov/get_soundings.cgi"
     private static let soundingsUrl = "https://rucsoundings.noaa.gov/get_pbraobs.cgi"
     let location: Location
-    let modelName: SoundingType?
+    let modelName: RucSounding.SoundingType?
     let startTime: Date?
     let endTime: Date?
     let numberOfHours: Int?
     
     init(location: Location,
-         modelName: SoundingType? = nil,
+         modelName: RucSounding.SoundingType? = nil,
          startTime: Date? = nil,
          endTime: Date? = nil,
          numberOfHours: Int? = nil) {
