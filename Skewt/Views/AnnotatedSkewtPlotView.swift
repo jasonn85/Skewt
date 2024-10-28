@@ -170,7 +170,7 @@ struct AnnotatedSkewtPlotView: View {
                                             zoomAnchor: $zoomAnchor,
                                             bounceBackAnimation: .easeOut(duration: 0.2)
                                         )
-                                        
+
                                         Rectangle()
                                             .foregroundColor(.clear)
                                             .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
@@ -187,7 +187,7 @@ struct AnnotatedSkewtPlotView: View {
                             .background {
                                 GeometryReader { geometry in
                                     let winds = plotOptions.showAnimatedWind ? 
-                                        sounding?.reducedWindData(sounding!.maximumWindReducer()).reduce(into: [Double:Double]()) {
+                                    sounding?.data.reducedWindData(sounding!.data.maximumWindReducer()).reduce(into: [Double:Double]()) {
                                             $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
                                         } 
                                     : nil
@@ -314,7 +314,7 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    private func altitudeDetailText(_ dataPoint: LevelDataPoint) -> String {
+    private func altitudeDetailText(_ dataPoint: SoundingData.Point) -> String {
         switch plotOptions.isobarTypes {
         case .altitude, .none:
             return fullAltitudeFormatter.string(from: dataPoint.altitudeInFeet as NSNumber)! + "'"
@@ -430,7 +430,7 @@ struct AnnotatedSkewtPlotView: View {
                     if let sounding = plot.sounding {
                         GeometryReader { geometry in
                             let x = geometry.size.width / 2.0
-                            let windData = sounding.data.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            let windData = sounding.data.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
                                 let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)

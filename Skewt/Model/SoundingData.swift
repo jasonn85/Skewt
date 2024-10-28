@@ -8,7 +8,7 @@
 import Foundation
 
 struct SoundingData: Codable {
-    struct Point: Codable {
+    struct Point: Codable, Hashable {
         let pressure: Double
         let height: Int?
         let temperature: Double?
@@ -20,6 +20,7 @@ struct SoundingData: Codable {
     let time: Date
     let elevation: Int
     let dataPoints: [Point]
+    let surfaceDataPoint: Point?
     
     let cape: Int?  // Convective Available Potential Energy in J/Kg
     let cin: Int?  // Convective Inhibition in J/Kg
@@ -66,5 +67,13 @@ extension SoundingData {
         }
         
         return points.reduce(points[0]) { abs($1.pressure - pressure) < abs($0.pressure - pressure) ? $1 : $0 }
+    }
+}
+
+extension SoundingData.Point {
+    var altitudeInFeet: Int {
+        let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
+        
+        return Int(Double(altitudeInM) * 3.28084)
     }
 }

@@ -281,11 +281,13 @@ extension RucSounding {
         windSpeedUnit = stationInfoAndOther.windSpeedUnit
         
         let rucData = try soundingDataLines.map { try LevelDataPoint(fromText: $0) }
+        let surfacePoint = rucData.surfaceData
         
         try data = SoundingData(
             time: headerLine.dateFromHeaderLine(),
-            elevation: rucData.surfaceData?.height ?? 0,
+            elevation: surfacePoint?.height ?? 0,
             dataPoints: rucData.map { SoundingData.Point(fromRucDataPoint: $0) },
+            surfaceDataPoint: surfacePoint != nil ? SoundingData.Point(fromRucDataPoint: surfacePoint!) : nil,
             cape: cape,
             cin: cin,
             helicity: helicity,
@@ -379,14 +381,6 @@ extension RucSounding.LevelDataPoint {
         self.dewPoint = Int(fromSoundingString: columns[3])?.doubleFromTenths().safeTemperatureValue
         self.windDirection = Int(fromSoundingString: columns[4])
         self.windSpeed = Int(fromSoundingString: columns[5])
-    }
-}
-
-extension RucSounding.LevelDataPoint {
-    var altitudeInFeet: Int {
-        let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
-        
-        return Int(Double(altitudeInM) * 3.28084)
     }
 }
 
