@@ -55,7 +55,7 @@ final class SoundingRequestTests: XCTestCase {
     func testModelTypes() {
         let location = SoundingRequest.Location.name("NKX")
     
-        SoundingType.allCases.forEach {
+        RucSounding.SoundingType.allCases.forEach {
             let request = SoundingRequest(location: location, modelName: $0)
             let urlComponents = URLComponents(url: request.url, resolvingAgainstBaseURL: false)!
             let modelQueryItem = urlComponents.queryItems!.first { $0.name == "data_source" }!
