@@ -46,7 +46,7 @@
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
 		96A8F5EA299DAC3F0021A170 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */; };
-		96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */; };
+		96A8F5F4299DAC3F0021A170 /* RucSoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */; };
 		96A8F5FE299DAC3F0021A170 /* SkewtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */; };
 		96A8F600299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */; };
 		96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* RucSounding.swift */; };
@@ -64,6 +64,7 @@
 		96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F22A2707E700B90043 /* DisplayOptionsView.swift */; };
 		96EF85AF2CCD83A200414011 /* SoundingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85AE2CCD83A200414011 /* SoundingData.swift */; };
 		96EF85B12CD0268600414011 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B02CD0268600414011 /* Sounding.swift */; };
+		96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B22CD2C54500414011 /* SoundingTests.swift */; };
 		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
@@ -137,7 +138,7 @@
 		96A8F5E6299DAC3F0021A170 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		96A8F5EF299DAC3F0021A170 /* SkewtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtTests.swift; sourceTree = "<group>"; };
+		96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingTests.swift; sourceTree = "<group>"; };
 		96A8F5F9299DAC3F0021A170 /* SkewtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITests.swift; sourceTree = "<group>"; };
 		96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -156,6 +157,7 @@
 		96E334F22A2707E700B90043 /* DisplayOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayOptionsView.swift; sourceTree = "<group>"; };
 		96EF85AE2CCD83A200414011 /* SoundingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingData.swift; sourceTree = "<group>"; };
 		96EF85B02CD0268600414011 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
+		96EF85B22CD2C54500414011 /* SoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTests.swift; sourceTree = "<group>"; };
 		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
@@ -262,10 +264,11 @@
 				965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */,
 				96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
-				96A8F5F3299DAC3F0021A170 /* SkewtTests.swift */,
+				96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */,
 				967E24282A366110009262D9 /* SoundingLocationListTests.swift */,
 				9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */,
 				969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */,
+				96EF85B22CD2C54500414011 /* SoundingTests.swift */,
 				964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */,
 				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */,
@@ -541,6 +544,7 @@
 			files = (
 				9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */,
 				969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */,
+				96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */,
 				965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */,
 				9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */,
 				96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */,
@@ -548,7 +552,7 @@
 				96B436E32B6AF73700C8A01A /* ZoomedSquareTests.swift in Sources */,
 				969B8BC62AFEEB94002D0F20 /* SoundingWindDataTests.swift in Sources */,
 				967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */,
-				96A8F5F4299DAC3F0021A170 /* SkewtTests.swift in Sources */,
+				96A8F5F4299DAC3F0021A170 /* RucSoundingTests.swift in Sources */,
 				96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */,
 				967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */,
 				96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */,
