@@ -83,7 +83,7 @@ final class SkewTPlotTests: XCTestCase {
         let fileUrl = bundle.url(forResource: "ord-gfs-1", withExtension: "txt")!
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
-        sounding = try Sounding(fromText: s)
+        sounding = try RucSounding(fromText: s)
     }
     
     func testNilSoundingMakesNilPaths() {
@@ -104,7 +104,7 @@ final class SkewTPlotTests: XCTestCase {
     }
     
     func testConstantTemperatureSlopesRight() throws {
-        let constantTempSounding = try Sounding(fromText: """
+        let constantTempSounding = try RucSounding(fromText: """
 RAOB sounding valid at:
    RAOB     12     22      FEB    2023
       1   3190  72293  32.87N117.15W   134   1103
@@ -126,7 +126,7 @@ RAOB sounding valid at:
         let fileUrl = bundle.url(forResource: "out-of-bounds-op40", withExtension: "txt")!
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
         let plot = SkewtPlot(sounding: sounding)
         
         // Allow off-screen left, right, and up by a factor of 1. Down should always be in bounds.
@@ -242,14 +242,14 @@ RAOB sounding valid at:
     func testDataToCoordinateAndBack() {
         let plot = SkewtPlot(sounding: sounding)
 
-        let data = sounding.data.filter({ $0.temperature != nil }).first!
+        let data = sounding.data.dataPoints.filter({ $0.temperature != nil }).first!
         let expected = (pressure: data.pressure, temperature: data.temperature!)
         let pointFromPlot = plot.point(pressure: expected.pressure, temperature: expected.temperature)
         let recalculatedData = plot.pressureAndTemperature(atPoint: pointFromPlot)
         XCTAssertEqual(recalculatedData.pressure, expected.pressure, accuracy: 0.001)
         XCTAssertEqual(recalculatedData.temperature, expected.temperature, accuracy: 0.001)
         
-        let data2 = sounding.data.filter({ $0.temperature != nil }).last!
+        let data2 = sounding.data.dataPoints.filter({ $0.temperature != nil }).last!
         let expected2 = (pressure: data2.pressure, temperature: data2.temperature!)
         let pointFromPlot2 = plot.point(pressure: expected2.pressure, temperature: expected2.temperature)
         let recalculatedData2 = plot.pressureAndTemperature(atPoint: pointFromPlot2)
@@ -260,7 +260,7 @@ RAOB sounding valid at:
     func testCoordinateToPointAndBack() {
         let plot = SkewtPlot(sounding: sounding)
 
-        let data = sounding.data.filter({ $0.temperature != nil })[15]
+        let data = sounding.data.dataPoints.filter({ $0.temperature != nil })[15]
         let point = plot.point(pressure: data.pressure, temperature: data.temperature!)
         let dataFromPoint = plot.pressureAndTemperature(atPoint: point)
         let recalculatedPoint = plot.point(pressure: dataFromPoint.pressure, temperature: dataFromPoint.temperature)

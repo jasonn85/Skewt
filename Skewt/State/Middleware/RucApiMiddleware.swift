@@ -57,7 +57,7 @@ extension Middlewares {
                             return SoundingState.Action.didReceiveFailure(.emptyResponse)
                         }
                         
-                        guard let sounding = try? Sounding(fromText: text) else {
+                        guard let sounding = try? RucSounding(fromText: text) else {
                             return SoundingState.Action.didReceiveFailure(.unparseableResponse)
                         }
                         
@@ -130,7 +130,7 @@ extension SoundingRequest {
          currentLocation: CLLocation? = nil,
          recentSoundings: LatestSoundingList? = nil) throws {
         var location: SoundingRequest.Location
-        var modelType: SoundingType
+        var modelType: RucSounding.SoundingType
         var startTime: Date?
         var endTime: Date?
         

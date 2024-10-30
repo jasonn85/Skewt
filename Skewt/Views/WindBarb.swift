@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WindBarb: Shape {
     let bearingInDegrees: Int
-    let speed: Int
+    let speed: Double
     
     var length: CGFloat = 50.0
     
@@ -125,9 +125,9 @@ struct WindBarb: Shape {
     private var barbs: [Barb] {
         var result: [Barb] = []
 
-        result.append(contentsOf: repeatElement(.flag, count: speed / 50))
-        result.append(contentsOf: repeatElement(.full, count: (speed % 50) / 10))
-        result.append(contentsOf: repeatElement(.half, count: (speed % 10) / 5))
+        result.append(contentsOf: repeatElement(.flag, count: Int(speed) / 50))
+        result.append(contentsOf: repeatElement(.full, count: (Int(speed) % 50) / 10))
+        result.append(contentsOf: repeatElement(.half, count: (Int(speed) % 10) / 5))
         
         switch result.first {
         case .flag, .half:
@@ -149,7 +149,7 @@ struct WindBarb_Previews: PreviewProvider {
             ForEach(Array(stride(from: 0, to: 360 - dDegrees, by: dDegrees)), id: \.self) { bearing in
                 VStack {
                     ForEach(speeds, id: \.self) { speed in
-                        WindBarb(bearingInDegrees: bearing, speed: speed)
+                        WindBarb(bearingInDegrees: bearing, speed: Double(speed))
                             .stroke(.black, lineWidth: 2.0)
                             .fill(speed >= 5 ? .black : .clear)
                             .border(.black)
