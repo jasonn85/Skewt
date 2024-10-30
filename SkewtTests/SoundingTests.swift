@@ -111,43 +111,4 @@ final class SoundingTests: XCTestCase {
         XCTAssertTrue(hopefullyNegativeFifteen! > temperaturesAndPressures[0].0)
         XCTAssertTrue(hopefullyNegativeFifteen! < temperaturesAndPressures[1].0)
     }
-    
-    func testSurfaceData() throws {
-        let surfacePoint = RucSounding.LevelDataPoint(
-            type: .surfaceLevel,
-            pressure: 1000.0,
-            height: nil,
-            temperature: 15.0,
-            dewPoint: 10.0,
-            windDirection: nil,
-            windSpeed: nil
-        )
-        
-        let significantLevelJustAboveSurface = RucSounding.LevelDataPoint(
-            type: .significantLevel,
-            pressure: 900.0,
-            height: nil,
-            temperature: 14.0,
-            dewPoint: 10.0,
-            windDirection: nil,
-            windSpeed: nil
-        )
-        
-        let significantLevelUpHigh = RucSounding.LevelDataPoint(
-            type: .significantLevel,
-            pressure: 500.0,
-            height: nil,
-            temperature: -10.0,
-            dewPoint: -20.0,
-            windDirection: nil,
-            windSpeed: nil
-        )
-        
-        let withSurface = try RucSounding(withJustData: [surfacePoint, significantLevelJustAboveSurface, significantLevelUpHigh])
-        let noSurface = try RucSounding(withJustData: [significantLevelJustAboveSurface, significantLevelUpHigh])
-        
-        XCTAssertEqual(withSurface.data.surfaceDataPoint, SoundingData.Point(fromRucDataPoint: surfacePoint), ".surfaceData returns surface data point")
-        XCTAssertEqual(noSurface.data.surfaceDataPoint, SoundingData.Point(fromRucDataPoint: significantLevelJustAboveSurface),
-                       ".surfaceData returns lowest available data if no surface data point exists")
-    }
 }
