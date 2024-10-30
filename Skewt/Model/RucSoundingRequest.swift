@@ -1,5 +1,5 @@
 //
-//  SoundingRequest.swift
+//  RucSoundingRequest.swift
 //  Skewt
 //
 //  Created by Jason Neel on 2/23/23.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SoundingRequest {
+struct RucSoundingRequest {
     enum Location {
         case name(String)
         case geolocation(latitude: Double, longitude: Double)
@@ -34,8 +34,8 @@ struct SoundingRequest {
     }
 }
 
-class SoundingRequestLocationFormatter {
-    static let shared = SoundingRequestLocationFormatter()
+class RucSoundingRequestLocationFormatter {
+    static let shared = RucSoundingRequestLocationFormatter()
     
     private var formatter: NumberFormatter
     
@@ -46,7 +46,7 @@ class SoundingRequestLocationFormatter {
         formatter.maximumFractionDigits = numberOfDecimals
     }
     
-    func string(forLocation location: SoundingRequest.Location) -> String {
+    func string(forLocation location: RucSoundingRequest.Location) -> String {
         switch location {
         case .name(let name):
             return name
@@ -58,19 +58,19 @@ class SoundingRequestLocationFormatter {
     }
 }
 
-extension SoundingRequest {
+extension RucSoundingRequest {
     private var basePath: String {
         switch modelName {
         case .raob:
-            return SoundingRequest.soundingsUrl
+            return RucSoundingRequest.soundingsUrl
         default:
-            return SoundingRequest.modelsUrl
+            return RucSoundingRequest.modelsUrl
         }
     }
     
     var url: URL {
         var components = URLComponents(string: basePath)!
-        let locationFormatter = SoundingRequestLocationFormatter.shared
+        let locationFormatter = RucSoundingRequestLocationFormatter.shared
         components.queryItems = [URLQueryItem(name: "airport",
                                                value: locationFormatter.string(forLocation: location))]
                                   

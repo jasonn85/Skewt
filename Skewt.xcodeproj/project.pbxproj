@@ -34,7 +34,7 @@
 		967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */; };
 		967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2B2A4299A600034A78 /* DisplayState.swift */; };
 		967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */; };
-		9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */; };
+		9689981E2A16B5E7005457D6 /* RucSoundingRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981D2A16B5E7005457D6 /* RucSoundingRequestTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
 		969117902A29165000A5C72D /* PlotStyling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9691178F2A29165000A5C72D /* PlotStyling.swift */; };
@@ -70,7 +70,7 @@
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
 		96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05929A72D61006D23BE /* ord-gfs-1.txt */; };
 		96F4B05E29A80396006D23BE /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05D29A80396006D23BE /* Store.swift */; };
-		96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05F29A804E1006D23BE /* SoundingRequest.swift */; };
+		96F4B06029A804E1006D23BE /* RucSoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */; };
 		96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */; };
 		96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06529B165D0006D23BE /* SkewtPlot.swift */; };
 		96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */; };
@@ -123,7 +123,7 @@
 		967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMiddleware.swift; sourceTree = "<group>"; };
 		967FAF2B2A4299A600034A78 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayState.swift; sourceTree = "<group>"; };
 		967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtStateTests.swift; sourceTree = "<group>"; };
-		9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequestTests.swift; sourceTree = "<group>"; };
+		9689981D2A16B5E7005457D6 /* RucSoundingRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingRequestTests.swift; sourceTree = "<group>"; };
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
 		968998232A17F8E2005457D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -163,7 +163,7 @@
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
 		96F4B05929A72D61006D23BE /* ord-gfs-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ord-gfs-1.txt"; sourceTree = "<group>"; };
 		96F4B05D29A80396006D23BE /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
-		96F4B05F29A804E1006D23BE /* SoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingRequest.swift; sourceTree = "<group>"; };
+		96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingRequest.swift; sourceTree = "<group>"; };
 		96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlotView.swift; sourceTree = "<group>"; };
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
 		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
@@ -264,9 +264,9 @@
 				965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */,
 				96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
+				9689981D2A16B5E7005457D6 /* RucSoundingRequestTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */,
 				967E24282A366110009262D9 /* SoundingLocationListTests.swift */,
-				9689981D2A16B5E7005457D6 /* SoundingRequestTests.swift */,
 				969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */,
 				96EF85B22CD2C54500414011 /* SoundingTests.swift */,
 				964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */,
@@ -339,7 +339,7 @@
 				96EF85AE2CCD83A200414011 /* SoundingData.swift */,
 				969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */,
 				967E24242A366064009262D9 /* SoundingLocationList.swift */,
-				96F4B05F29A804E1006D23BE /* SoundingRequest.swift */,
+				96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */,
 				964A81A42ADDDD2300E3E1EC /* SunTimes.swift */,
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
 			);
@@ -522,7 +522,7 @@
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96E0A95F2B2901680076B87A /* UpdateRAOBTimeMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
-				96F4B06029A804E1006D23BE /* SoundingRequest.swift in Sources */,
+				96F4B06029A804E1006D23BE /* RucSoundingRequest.swift in Sources */,
 				96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */,
 				961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */,
 				963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */,
@@ -542,7 +542,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9689981E2A16B5E7005457D6 /* SoundingRequestTests.swift in Sources */,
+				9689981E2A16B5E7005457D6 /* RucSoundingRequestTests.swift in Sources */,
 				969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */,
 				96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */,
 				965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */,
