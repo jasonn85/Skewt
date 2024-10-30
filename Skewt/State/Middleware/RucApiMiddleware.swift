@@ -42,9 +42,9 @@ extension Middlewares {
             }
             
             do {
-                let soundingRequest = try SoundingRequest(fromSoundingSelection: selection,
-                                                          currentLocation: location,
-                                                          recentSoundings: state.recentSoundingsState.recentSoundings)
+                let soundingRequest = try RucSoundingRequest(fromSoundingSelection: selection,
+                                                             currentLocation: location,
+                                                             recentSoundings: state.recentSoundingsState.recentSoundings)
                 let url = soundingRequest.url
                 
                 logger.info("Requesting a sounding via \(url.absoluteString)")
@@ -80,7 +80,7 @@ extension Middlewares {
 
 extension LatestSoundingList {
     func soundingRequestLocation(forSelectionLocation selectionLocation: SoundingSelection.Location,
-                                 currentLocation: CLLocation?) throws -> SoundingRequest.Location {
+                                 currentLocation: CLLocation?) throws -> RucSoundingRequest.Location {
         var searchLocation: CLLocation
         let recentSoundingIds = recentSoundings().compactMap { $0.wmoIdOrNil }
         
@@ -125,11 +125,11 @@ extension LatestSoundingList {
     }
 }
 
-extension SoundingRequest {
+extension RucSoundingRequest {
     init(fromSoundingSelection selection: SoundingSelection,
          currentLocation: CLLocation? = nil,
          recentSoundings: LatestSoundingList? = nil) throws {
-        var location: SoundingRequest.Location
+        var location: RucSoundingRequest.Location
         var modelType: RucSounding.SoundingType
         var startTime: Date?
         var endTime: Date?
