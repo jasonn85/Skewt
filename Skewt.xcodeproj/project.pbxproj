@@ -18,6 +18,7 @@
 		962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */; };
 		962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */; };
 		963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */; };
+		9648C2B32CDBEE7F002AF5AF /* OpenMeteoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9648C2B22CDBEE7F002AF5AF /* OpenMeteoTests.swift */; };
 		964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964998652B6A20A700899BC7 /* TouchCatchView.swift */; };
 		964A81A52ADDDD2300E3E1EC /* SunTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964A81A42ADDDD2300E3E1EC /* SunTimes.swift */; };
 		964A81A72ADDE28100E3E1EC /* SunTimesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */; };
@@ -65,6 +66,12 @@
 		96EF85AF2CCD83A200414011 /* SoundingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85AE2CCD83A200414011 /* SoundingData.swift */; };
 		96EF85B12CD0268600414011 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B02CD0268600414011 /* Sounding.swift */; };
 		96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B22CD2C54500414011 /* SoundingTests.swift */; };
+		96EF85B92CD97EBB00414011 /* open-meteo-timestamps.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */; };
+		96EF85BA2CD97EBB00414011 /* open-meteo-F.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B52CD97EBB00414011 /* open-meteo-F.json */; };
+		96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B42CD97EBB00414011 /* open-meteo.json */; };
+		96EF85BC2CD97EBB00414011 /* open-meteo-half-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */; };
+		96EF85BD2CD97EBB00414011 /* open-meteo-mph.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B72CD97EBB00414011 /* open-meteo-mph.json */; };
+		96EF85BF2CD97EFE00414011 /* OpenMeteoSoundingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */; };
 		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
@@ -107,6 +114,7 @@
 		962B3C5E29A43ECE000FDC8D /* san-op40-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-1.txt"; sourceTree = "<group>"; };
 		962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "san-op40-4.txt"; sourceTree = "<group>"; };
 		963CF0EF2A1C5B87002116A0 /* PreviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewStore.swift; sourceTree = "<group>"; };
+		9648C2B22CDBEE7F002AF5AF /* OpenMeteoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoTests.swift; sourceTree = "<group>"; };
 		964998652B6A20A700899BC7 /* TouchCatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchCatchView.swift; sourceTree = "<group>"; };
 		964A81A42ADDDD2300E3E1EC /* SunTimes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunTimes.swift; sourceTree = "<group>"; };
 		964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunTimesTests.swift; sourceTree = "<group>"; };
@@ -158,6 +166,12 @@
 		96EF85AE2CCD83A200414011 /* SoundingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingData.swift; sourceTree = "<group>"; };
 		96EF85B02CD0268600414011 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96EF85B22CD2C54500414011 /* SoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTests.swift; sourceTree = "<group>"; };
+		96EF85B42CD97EBB00414011 /* open-meteo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo.json"; sourceTree = "<group>"; };
+		96EF85B52CD97EBB00414011 /* open-meteo-F.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-F.json"; sourceTree = "<group>"; };
+		96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-half-data.json"; sourceTree = "<group>"; };
+		96EF85B72CD97EBB00414011 /* open-meteo-mph.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-mph.json"; sourceTree = "<group>"; };
+		96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-timestamps.json"; sourceTree = "<group>"; };
+		96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoSoundingList.swift; sourceTree = "<group>"; };
 		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
@@ -259,13 +273,14 @@
 			children = (
 				96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */,
 				96E334F02A26757200B90043 /* LocationStateTests.swift */,
-				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
+				9648C2B22CDBEE7F002AF5AF /* OpenMeteoTests.swift */,
 				969117912A29178900A5C72D /* PlotStylingTests.swift */,
 				965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */,
 				96ABF2002A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift */,
 				96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */,
 				9689981D2A16B5E7005457D6 /* RucSoundingRequestTests.swift */,
 				96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */,
+				967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */,
 				967E24282A366110009262D9 /* SoundingLocationListTests.swift */,
 				969B8BC52AFEEB94002D0F20 /* SoundingWindDataTests.swift */,
 				96EF85B22CD2C54500414011 /* SoundingTests.swift */,
@@ -276,6 +291,11 @@
 				967E242A2A3670F6009262D9 /* latest_pbraob.txt */,
 				96F081892A4B67C100D8289A /* metar.short */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
+				96EF85B42CD97EBB00414011 /* open-meteo.json */,
+				96EF85B52CD97EBB00414011 /* open-meteo-F.json */,
+				96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */,
+				96EF85B72CD97EBB00414011 /* open-meteo-mph.json */,
+				96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */,
 				967E24262A3660F2009262D9 /* raob.short */,
@@ -332,14 +352,15 @@
 			isa = PBXGroup;
 			children = (
 				96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */,
+				96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */,
 				965D66582A52A09A0015FB4B /* RelativeLocations.swift */,
 				96A8F60C299DAC680021A170 /* RucSounding.swift */,
+				96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */,
 				96EF85B02CD0268600414011 /* Sounding.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96EF85AE2CCD83A200414011 /* SoundingData.swift */,
 				969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */,
 				967E24242A366064009262D9 /* SoundingLocationList.swift */,
-				96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */,
 				964A81A42ADDDD2300E3E1EC /* SunTimes.swift */,
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
 			);
@@ -471,6 +492,11 @@
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
 				967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */,
 				96F0818A2A4B67C100D8289A /* metar.short in Resources */,
+				96EF85B92CD97EBB00414011 /* open-meteo-timestamps.json in Resources */,
+				96EF85BA2CD97EBB00414011 /* open-meteo-F.json in Resources */,
+				96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */,
+				96EF85BC2CD97EBB00414011 /* open-meteo-half-data.json in Resources */,
+				96EF85BD2CD97EBB00414011 /* open-meteo-mph.json in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				967E24272A3660F2009262D9 /* raob.short in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,
@@ -523,6 +549,7 @@
 				96E0A95F2B2901680076B87A /* UpdateRAOBTimeMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
 				96F4B06029A804E1006D23BE /* RucSoundingRequest.swift in Sources */,
+				96EF85BF2CD97EFE00414011 /* OpenMeteoSoundingList.swift in Sources */,
 				96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */,
 				961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */,
 				963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */,
@@ -556,6 +583,7 @@
 				96ABF2012A4F741B00CEA4A7 /* RucApiMiddlewareTests.swift in Sources */,
 				967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */,
 				96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */,
+				9648C2B32CDBEE7F002AF5AF /* OpenMeteoTests.swift in Sources */,
 				96B46FEF2AB4EA01008AA3A1 /* ClosestTimeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
