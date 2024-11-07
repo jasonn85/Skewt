@@ -41,14 +41,6 @@ extension OpenMeteoSoundingList {
         let hourlyUnits: HourlyUnits?
         let hourly: HourlyData?
         
-        enum CodingKeys: CodingKey {
-            case latitude
-            case longitude
-            case elevation
-            case hourlyUnits
-            case hourly
-        }
-        
         struct HourlyUnits: Decodable {
             let time: TimeUnit
             
@@ -132,15 +124,136 @@ extension OpenMeteoSoundingList {
             }
         }
         
-        struct HourlyData: Decodable {
+        struct HourlyData: DecodableWithConfiguration {
+            init(from decoder: any Decoder, configuration: HourlyUnits?) throws {
+                let container = try decoder.container(keyedBy: HourlyDataKey.self)
+                
+                var times: [Date]
+                var temperature: [Date: [Int: Double]] = [:]
+                var relativeHumidity: [Date: [Int: Int]] = [:]
+                var windSpeed: [Date: [Int: Double]] = [:]
+                var windDirection: [Date: [Int: Int]] = [:]
+                
+                let timeKey = HourlyDataKey(stringValue: "time")
+                
+                switch configuration?.time {
+                case .iso8601:
+                    let dateStrings = try container.decode([String].self, forKey: timeKey)
+                    let formatter = ISO8601DateFormatter()
+                    times = try dateStrings.map {
+                        guard let date = formatter.date(from: $0) else {
+                            throw ParseError.unparseableDate($0)
+                        }
+                        
+                        return date
+                    }
+                case .unixTime:
+                    fallthrough
+                default:
+                    let dateInts = try container.decode([Int].self, forKey: timeKey)
+                    times = dateInts.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+                }
+                
+                try container.allKeys.forEach { key in
+                    let r = /([A-Za-z]+)(\d+0)Hpa/
+                    
+                    guard let match = key.stringValue.firstMatch(of: r), let pressure = Int(match.output.2) else {
+                        return
+                    }
+                    
+                    let keyName = String(match.output.1)
+                    
+                    switch keyName {
+                    case "temperature":
+                        for (dateIndex, temperatureThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                            if temperature[times[dateIndex]] == nil {
+                                temperature[times[dateIndex]] = [:]
+                            }
+
+                            temperature[times[dateIndex]]![pressure] = temperatureThisPressure
+                        }
+                    case "relativeHumidity":
+                        for (dateIndex, humidityThisPressure) in try container.decode([Int].self, forKey: key).enumerated() {
+                            if relativeHumidity[times[dateIndex]] == nil {
+                                relativeHumidity[times[dateIndex]] = [:]
+                            }
+                                
+                            relativeHumidity[times[dateIndex]]![pressure] = humidityThisPressure
+                        }
+                    case "windSpeed":
+                        for (dateIndex, windSpeedThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                            if windSpeed[times[dateIndex]] == nil {
+                                    
+                                windSpeed[times[dateIndex]] = [:]
+                            }
+                                
+                            windSpeed[times[dateIndex]]![pressure] = windSpeedThisPressure
+                        }
+                    case "windDirection":
+                        for (dateIndex, windDirectionThisPressure) in try container.decode([Int].self, forKey: key).enumerated() {
+                            if windDirection[times[dateIndex]] == nil {
+                                windDirection[times[dateIndex]] = [:]
+                            }
+                            
+                            windDirection[times[dateIndex]]![pressure] = windDirectionThisPressure
+                        }
+                    default:
+                        // Happily gnore a key that does not match our expected name/pressure format
+                        return
+                    }
+                }
+                
+                self.times = times
+                self.temperature = temperature
+                self.relativeHumidity = relativeHumidity
+                self.windSpeed = windSpeed
+                self.windDirection = windDirection
+            }
             
+            typealias DecodingConfiguration = HourlyUnits?
+            
+            let times: [Date]
+            
+            // Values keyed by pressure keyed by timestamp
+            let temperature: [Date: [Int: Double]]
+            let relativeHumidity: [Date: [Int: Int]]
+            let windSpeed: [Date: [Int: Double]]
+            let windDirection: [Date: [Int: Int]]
+            
+            struct HourlyDataKey: CodingKey {
+                var stringValue: String
+                var intValue: Int? { nil }
+                init?(intValue: Int) { nil }
+                
+                init(stringValue: String) {
+                    self.stringValue = stringValue
+                }
+            }
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case latitude = "latitude"
+            case longitude = "longitude"
+            case elevation = "elevation"
+            case hourlyUnits = "hourlyUnits"
+            case hourly = "hourly"
+        }
+        
+        init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            latitude = try container.decode(Double.self, forKey: .latitude)
+            longitude = try container.decode(Double.self, forKey: .longitude)
+            elevation = try container.decode(Int.self, forKey: .elevation)
+            hourlyUnits = try container.decode(HourlyUnits.self, forKey: .hourlyUnits)
+            hourly = try container.decode(HourlyData.self, forKey: .hourly, configuration: hourlyUnits)
         }
     }
-    
     
     enum ParseError: Error {
         case empty
         case unparseable
+        case unparseableDate(String?)
         case missingLocation
     }
 }
