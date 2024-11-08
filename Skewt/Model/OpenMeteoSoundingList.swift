@@ -41,7 +41,8 @@ extension OpenMeteoSoundingList {
                     SoundingData.Point(
                         pressure: Double(pressure),
                         height: nil,
-                        temperature: response.hourly?.temperature[date]?[pressure],
+                        temperature: response.hourly?.temperature[date]?[pressure]
+                            .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure]),
                         // TODO: Calculate dew point
                         dewPoint: response.hourly?.relativeHumidity[date]?[pressure] != nil ? Double(response.hourly!.relativeHumidity[date]![pressure]!) : nil,
                         windDirection: response.hourly?.windDirection[date]?[pressure],
@@ -306,11 +307,34 @@ extension OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.WindSpeedUnit {
 }
 
 extension Double? {
-    func convertToKnots(from value: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.WindSpeedUnit?) -> Double? {
+    func convertToKnots(from originalType: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.WindSpeedUnit?) -> Double? {
         guard let v = self else {
             return nil
         }
         
-        return v * (value?.multiplierToKnots ?? 1.0)
+        return v * (originalType?.multiplierToKnots ?? 1.0)
+    }
+}
+
+extension OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.TemperatureUnit? {
+    var unit: Skewt.TemperatureUnit {
+        switch self {
+        case .fahrenheit:
+            return .fahrenheit
+        case .celsius:
+            return .celsius
+        case .none:
+            return .celsius
+        }
+    }
+}
+
+extension Double? {
+    func convertToCelsius(from originalType: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.TemperatureUnit?) -> Double? {
+        guard let v = self else {
+            return nil
+        }
+        
+        return Temperature(v, unit: originalType.unit).value(inUnit: .celsius)
     }
 }
