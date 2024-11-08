@@ -115,4 +115,43 @@ class OpenMeteoTests {
             #expect($0.windSpeed == 100.0)
         }
     }
+    
+    @Test("Relative humidity is converted to dew point temperature",
+          arguments: [
+            (temperature: 20.0, humidity: 50, dewPoint: 9.0),
+            (20.0, 100, 20.0),
+            (20.0, 25, -1.0),
+            (0.0, 100, 0.0),
+            (0.0, 50, -9.0),
+            (0.0, 25, -18.0),
+            (35.0, 50, 24.0),
+            (35.0, 100, 35.0),
+            (35.0, 25, 12.0)
+          ]
+    )
+    func relativeHumidity(d: (Double, Int, Double)) throws {
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "temperature_1000hPa":"°C",
+        "relative_humidity_1000hPa":"%"
+    },
+    "hourly":{
+        "time":[1731089721],
+        "temperature_1000hPa":[
+            \(d.0)
+        ],
+        "relative_humidity_1000hPa":[
+            \(d.1)
+        ],
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+        
+        #expect(result.data.values.first?.dataPoints.first?.dewPoint == d.2)
+    }
 }
