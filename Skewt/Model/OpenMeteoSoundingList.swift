@@ -23,10 +23,7 @@ extension OpenMeteoSoundingList {
         
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        
-        guard let response = try? decoder.decode(OpenMeteoData.self, from: jsonData) else {
-            throw ParseError.unparseable
-        }
+        let response = try decoder.decode(OpenMeteoData.self, from: jsonData)
         
         fetchTime = Date()
         location = CLLocation(latitude: response.latitude, longitude: response.longitude)
@@ -73,16 +70,14 @@ extension OpenMeteoSoundingList {
         struct HourlyUnits: Decodable {
             let time: TimeUnit
             
-            let temperature: [Int: TemperatureUnit]
-            let relativeHumidity: [Int: RelativeHumidityUnit]
-            let windSpeed: [Int: WindSpeedUnit]
-            let windDirection: [Int: WindDirectionUnit]
+            let temperature: [Int: TemperatureUnit]?
+            let relativeHumidity: [Int: RelativeHumidityUnit]?
+            let windSpeed: [Int: WindSpeedUnit]?
+            let windDirection: [Int: WindDirectionUnit]?
             
-            var allPressures: Set<Int> {
-                Set(temperature.keys).union(Set(relativeHumidity.keys).union(Set(windSpeed.keys).union(Set(windDirection.keys))))
-            }
+            let allPressures: Set<Int>
             
-            enum TimeUnit: String, Decodable {
+            enum TimeUnit: String, Decodable, CaseIterable {
                 case iso8601 = "iso8601"
                 case unixTime = "unixtime"
             }
@@ -126,6 +121,7 @@ extension OpenMeteoSoundingList {
                 var relativeHumidity: [Int: RelativeHumidityUnit] = [:]
                 var windSpeed: [Int: WindSpeedUnit] = [:]
                 var windDirection: [Int: WindDirectionUnit] = [:]
+                var allPressures = Set<Int>()
                 
                 try container.allKeys.forEach { key in
                     let r = /([A-Za-z]+)(\d+0)Hpa/
@@ -134,6 +130,7 @@ extension OpenMeteoSoundingList {
                         return
                     }
                     
+                    allPressures.insert(pressure)
                     let keyName = String(match.output.1)
                     
                     switch keyName {
@@ -154,6 +151,7 @@ extension OpenMeteoSoundingList {
                 self.relativeHumidity = relativeHumidity
                 self.windSpeed = windSpeed
                 self.windDirection = windDirection
+                self.allPressures = allPressures
             }
         }
         
