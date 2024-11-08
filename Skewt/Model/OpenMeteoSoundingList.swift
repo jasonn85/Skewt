@@ -46,6 +46,7 @@ extension OpenMeteoSoundingList {
                         dewPoint: response.hourly?.relativeHumidity[date]?[pressure] != nil ? Double(response.hourly!.relativeHumidity[date]![pressure]!) : nil,
                         windDirection: response.hourly?.windDirection[date]?[pressure],
                         windSpeed: response.hourly?.windSpeed[date]?[pressure]
+                            .convertToKnots(from: response.hourlyUnits?.windSpeed?[pressure])
                     )
                 },
                 surfaceDataPoint: nil,
@@ -286,5 +287,30 @@ extension OpenMeteoSoundingList {
         case unparseable
         case unparseableDate(String?)
         case missingLocation
+    }
+}
+
+extension OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.WindSpeedUnit {
+    var multiplierToKnots: Double {
+        switch self {
+        case .kph:
+            return 0.539957
+        case .kn:
+            return 1.0
+        case .mph:
+            return 0.868976
+        case .ms:
+            return 1.94384
+        }
+    }
+}
+
+extension Double? {
+    func convertToKnots(from value: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.WindSpeedUnit?) -> Double? {
+        guard let v = self else {
+            return nil
+        }
+        
+        return v * (value?.multiplierToKnots ?? 1.0)
     }
 }

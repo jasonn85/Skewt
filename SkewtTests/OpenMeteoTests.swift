@@ -112,7 +112,7 @@ class OpenMeteoTests {
         let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
 
         result.data.values.first?.dataPoints.forEach {
-            #expect($0.windSpeed == 100.0)
+            #expect(abs($0.windSpeed! - 100.0) < 0.01)
         }
     }
     
