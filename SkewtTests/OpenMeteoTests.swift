@@ -17,7 +17,7 @@ class OpenMeteoTests {
         let data = try Data(contentsOf: fileUrl)
         
         let result = try OpenMeteoSoundingList(fromData: data)
-        #expect(result.data.count == 10)
+        #expect(result.data.count == 24)
     }
     
     @Test("ISO 8601 timestamp in Open Meteo soundings list is parsed")

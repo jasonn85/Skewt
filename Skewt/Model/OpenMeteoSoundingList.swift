@@ -30,7 +30,36 @@ extension OpenMeteoSoundingList {
         
         fetchTime = Date()
         location = CLLocation(latitude: response.latitude, longitude: response.longitude)
-        data = [:]
+        
+        var data = [Date: SoundingData]()
+        
+        let dates = response.hourly?.times ?? []
+        let pressures = response.hourlyUnits?.allPressures.sorted() ?? []
+        
+        dates.forEach { date in
+            data[date] = SoundingData(
+                time: date,
+                elevation: response.elevation,
+                dataPoints: pressures.map { pressure in
+                    SoundingData.Point(
+                        pressure: Double(pressure),
+                        height: nil,
+                        temperature: response.hourly?.temperature[date]?[pressure],
+                        // TODO: Calculate dew point
+                        dewPoint: response.hourly?.relativeHumidity[date]?[pressure] != nil ? Double(response.hourly!.relativeHumidity[date]![pressure]!) : nil,
+                        windDirection: response.hourly?.windDirection[date]?[pressure],
+                        windSpeed: response.hourly?.windSpeed[date]?[pressure]
+                    )
+                },
+                surfaceDataPoint: nil,
+                cape: nil,
+                cin: nil,
+                helicity: nil,
+                precipitableWater: nil
+            )
+        }
+        
+        self.data = data
     }
     
     struct OpenMeteoData: Decodable {
@@ -48,6 +77,10 @@ extension OpenMeteoSoundingList {
             let relativeHumidity: [Int: RelativeHumidityUnit]
             let windSpeed: [Int: WindSpeedUnit]
             let windDirection: [Int: WindDirectionUnit]
+            
+            var allPressures: Set<Int> {
+                Set(temperature.keys).union(Set(relativeHumidity.keys).union(Set(windSpeed.keys).union(Set(windDirection.keys))))
+            }
             
             enum TimeUnit: String, Decodable {
                 case iso8601 = "iso8601"
@@ -257,5 +290,3 @@ extension OpenMeteoSoundingList {
         case missingLocation
     }
 }
-
-
