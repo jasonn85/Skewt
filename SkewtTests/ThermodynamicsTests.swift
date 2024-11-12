@@ -157,4 +157,26 @@ final class ThermodynamicsTests: XCTestCase {
         }
         
     }
+    
+    func testRelativeHumidityToDewPoint() {
+        let tolerance = 1.0
+        
+        let values: [(temperature: Double, humidity: Double, dewPoint: Double)] = [
+            (20.0, 50.0, 9.0),
+            (20.0, 100.0, 20.0),
+            (20.0, 25.0, -1.0),
+            (0.0, 100.0, 0.0),
+            (0.0, 50.0, -9.0),
+            (0.0, 25.0, -18.0),
+            (35.0, 50.0, 24.0),
+            (35.0, 100.0, 35.0),
+            (35.0, 25.0, 12.0)
+        ]
+        
+        for (temperature, humidity, expectedDewPoint) in values {
+            let dewPoint = Temperature(temperature, unit: .celsius).dewPoint(withRelativeHumidity: humidity)
+            XCTAssertEqual(dewPoint, expectedDewPoint, accuracy: tolerance)
+        }
+        
+    }
 }

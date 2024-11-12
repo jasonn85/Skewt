@@ -86,6 +86,23 @@ public struct Temperature: Comparable {
     }
 }
 
+// Relative humidity
+extension Temperature {
+    /// Dew point calculated from humidity via Magnus Formula
+    func dewPoint(withRelativeHumidity humidity: Double) -> Double {
+        let t = self.value(inUnit: .celsius)
+        
+        // Magnus Formula coefficients
+        let a1 = 17.625
+        let b1 = 243.04 // °C
+        
+        let numerator = b1 * (log(humidity / 100.0) + (a1 * t) / (b1 + t))
+        let denominator = a1 - log(humidity / 100.0) - (a1 * t / (b1 + t))
+        
+        return numerator / denominator
+    }
+}
+
 // Lapsing
 extension Temperature {
     private static let lapseRatePerFoot = 0.00298704
