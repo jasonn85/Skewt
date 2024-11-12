@@ -129,7 +129,9 @@ class OpenMeteoTests {
             (35.0, 25, 12.0)
           ]
     )
-    func relativeHumidity(d: (Double, Int, Double)) throws {
+    func relativeHumidity(d: (temperature: Double, humidity: Int, dewPoint: Double)) throws {
+        let accuracy = 1.0
+        
         let json = """
 {
     "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
@@ -141,17 +143,18 @@ class OpenMeteoTests {
     "hourly":{
         "time":[1731089721],
         "temperature_1000hPa":[
-            \(d.0)
+            \(d.temperature)
         ],
         "relative_humidity_1000hPa":[
-            \(d.1)
+            \(d.humidity)
         ],
     }
 }
 """
         
         let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+        let e = abs(result.data.values.first!.dataPoints.first!.dewPoint! - d.dewPoint)
         
-        #expect(result.data.values.first?.dataPoints.first?.dewPoint == d.2)
+        #expect(e < accuracy)
     }
 }

@@ -38,13 +38,21 @@ extension OpenMeteoSoundingList {
                 time: date,
                 elevation: response.elevation,
                 dataPoints: pressures.map { pressure in
-                    SoundingData.Point(
+                    let temperature = response.hourly?.temperature[date]?[pressure]
+                        .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure])
+                    let dewPoint: Double?
+                    
+                    if let temperature = temperature, let humidity = response.hourly?.relativeHumidity[date]?[pressure] {
+                        dewPoint = Temperature(temperature, unit: .celsius).dewPoint(withRelativeHumidity: Double(humidity))
+                    } else {
+                        dewPoint = nil
+                    }
+                    
+                    return SoundingData.Point(
                         pressure: Double(pressure),
                         height: nil,
-                        temperature: response.hourly?.temperature[date]?[pressure]
-                            .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure]),
-                        // TODO: Calculate dew point
-                        dewPoint: response.hourly?.relativeHumidity[date]?[pressure] != nil ? Double(response.hourly!.relativeHumidity[date]![pressure]!) : nil,
+                        temperature: temperature,
+                        dewPoint: dewPoint,
                         windDirection: response.hourly?.windDirection[date]?[pressure],
                         windSpeed: response.hourly?.windSpeed[date]?[pressure]
                             .convertToKnots(from: response.hourlyUnits?.windSpeed?[pressure])
