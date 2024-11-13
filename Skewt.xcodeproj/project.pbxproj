@@ -66,11 +66,7 @@
 		96EF85AF2CCD83A200414011 /* SoundingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85AE2CCD83A200414011 /* SoundingData.swift */; };
 		96EF85B12CD0268600414011 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B02CD0268600414011 /* Sounding.swift */; };
 		96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B22CD2C54500414011 /* SoundingTests.swift */; };
-		96EF85B92CD97EBB00414011 /* open-meteo-timestamps.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */; };
-		96EF85BA2CD97EBB00414011 /* open-meteo-F.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B52CD97EBB00414011 /* open-meteo-F.json */; };
 		96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B42CD97EBB00414011 /* open-meteo.json */; };
-		96EF85BC2CD97EBB00414011 /* open-meteo-half-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */; };
-		96EF85BD2CD97EBB00414011 /* open-meteo-mph.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B72CD97EBB00414011 /* open-meteo-mph.json */; };
 		96EF85BF2CD97EFE00414011 /* OpenMeteoSoundingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */; };
 		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
@@ -167,10 +163,6 @@
 		96EF85B02CD0268600414011 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96EF85B22CD2C54500414011 /* SoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTests.swift; sourceTree = "<group>"; };
 		96EF85B42CD97EBB00414011 /* open-meteo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo.json"; sourceTree = "<group>"; };
-		96EF85B52CD97EBB00414011 /* open-meteo-F.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-F.json"; sourceTree = "<group>"; };
-		96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-half-data.json"; sourceTree = "<group>"; };
-		96EF85B72CD97EBB00414011 /* open-meteo-mph.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-mph.json"; sourceTree = "<group>"; };
-		96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-timestamps.json"; sourceTree = "<group>"; };
 		96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoSoundingList.swift; sourceTree = "<group>"; };
 		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
@@ -292,10 +284,6 @@
 				96F081892A4B67C100D8289A /* metar.short */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
 				96EF85B42CD97EBB00414011 /* open-meteo.json */,
-				96EF85B52CD97EBB00414011 /* open-meteo-F.json */,
-				96EF85B62CD97EBB00414011 /* open-meteo-half-data.json */,
-				96EF85B72CD97EBB00414011 /* open-meteo-mph.json */,
-				96EF85B82CD97EBB00414011 /* open-meteo-timestamps.json */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */,
 				967E24262A3660F2009262D9 /* raob.short */,
@@ -492,11 +480,7 @@
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
 				967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */,
 				96F0818A2A4B67C100D8289A /* metar.short in Resources */,
-				96EF85B92CD97EBB00414011 /* open-meteo-timestamps.json in Resources */,
-				96EF85BA2CD97EBB00414011 /* open-meteo-F.json in Resources */,
 				96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */,
-				96EF85BC2CD97EBB00414011 /* open-meteo-half-data.json in Resources */,
-				96EF85BD2CD97EBB00414011 /* open-meteo-mph.json in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				967E24272A3660F2009262D9 /* raob.short in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,

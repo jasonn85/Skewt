@@ -157,4 +157,51 @@ class OpenMeteoTests {
         
         #expect(e < accuracy)
     }
+    
+    @Test("Surface pressure is parsed")
+    func surfacePressure() throws {
+        let count = 10
+        
+        // Hour by hour
+        let dates = stride(from: 0, to: count, by: 1).map {
+            Date(timeIntervalSince1970: 1731455336.0 + (Double($0) * 60.0 * 60.0))
+        }
+        
+        // 1000, 950, 900, etc. for pressures
+        let pressures = stride(from: 0, to: count, by: 1).map {
+            1000.0 - (Double($0) * 50.0)
+        }
+        
+        let temperatures = stride(from: 0, to: count, by: 1).map {
+            15.0 - Double($0)
+        }
+        
+        let jsonArrayOfTemperatures = "[\(temperatures.map { String($0) }.joined(separator: ","))]"
+        
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "surface_pressure":"hPa",
+        \(pressures.map({"\"temperature_\(String(Int($0)))hPa\":\"°C\""}).joined(separator: ",\n"))
+    },
+    "hourly":{
+        "time":[
+            \(dates.map({ String(Int($0.timeIntervalSince1970)) }).joined(separator: ","))
+        ],
+        "surface_pressure":[
+            \(pressures.map({ String($0) }).joined(separator: ","))
+        ],
+        \(pressures.map({"\"temperature_\(String(Int($0)))hPa\": \(jsonArrayOfTemperatures)"}).joined(separator: ",\n"))
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+        
+        for i in 0..<count {
+            #expect(result.data[dates[i]]?.surfaceDataPoint?.pressure == pressures[i])
+        }
+    }
 }

@@ -34,31 +34,44 @@ extension OpenMeteoSoundingList {
         let pressures = response.hourlyUnits?.allPressures.sorted() ?? []
         
         dates.forEach { date in
+            let dataPoints = pressures.map { pressure in
+                let temperature = response.hourly?.temperature[date]?[pressure]
+                    .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure])
+                let dewPoint: Double?
+                
+                if let temperature = temperature, let humidity = response.hourly?.relativeHumidity[date]?[pressure] {
+                    dewPoint = Temperature(temperature, unit: .celsius).dewPoint(withRelativeHumidity: Double(humidity))
+                } else {
+                    dewPoint = nil
+                }
+                
+                return SoundingData.Point(
+                    pressure: Double(pressure),
+                    height: nil,
+                    temperature: temperature,
+                    dewPoint: dewPoint,
+                    windDirection: response.hourly?.windDirection[date]?[pressure],
+                    windSpeed: response.hourly?.windSpeed[date]?[pressure]
+                        .convertToKnots(from: response.hourlyUnits?.windSpeed?[pressure])
+                )
+            }
+            
+            let surfaceDataPoint: SoundingData.Point?
+            
+            if let surfacePressure = response.hourly?.surfacePressure[date], dataPoints.count > 0 {
+                surfaceDataPoint = dataPoints
+                    .reduce(dataPoints.first!) {
+                        abs($1.pressure - surfacePressure) < abs($0.pressure - surfacePressure) ? $1 : $0
+                    }
+            } else {
+                surfaceDataPoint = nil
+            }
+
             data[date] = SoundingData(
                 time: date,
                 elevation: response.elevation,
-                dataPoints: pressures.map { pressure in
-                    let temperature = response.hourly?.temperature[date]?[pressure]
-                        .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure])
-                    let dewPoint: Double?
-                    
-                    if let temperature = temperature, let humidity = response.hourly?.relativeHumidity[date]?[pressure] {
-                        dewPoint = Temperature(temperature, unit: .celsius).dewPoint(withRelativeHumidity: Double(humidity))
-                    } else {
-                        dewPoint = nil
-                    }
-                    
-                    return SoundingData.Point(
-                        pressure: Double(pressure),
-                        height: nil,
-                        temperature: temperature,
-                        dewPoint: dewPoint,
-                        windDirection: response.hourly?.windDirection[date]?[pressure],
-                        windSpeed: response.hourly?.windSpeed[date]?[pressure]
-                            .convertToKnots(from: response.hourlyUnits?.windSpeed?[pressure])
-                    )
-                },
-                surfaceDataPoint: nil,
+                dataPoints: dataPoints,
+                surfaceDataPoint: surfaceDataPoint,
                 cape: nil,
                 cin: nil,
                 helicity: nil,
@@ -79,6 +92,7 @@ extension OpenMeteoSoundingList {
         
         struct HourlyUnits: Decodable {
             let time: TimeUnit
+            let surfacePressure: SurfacePressureUnit?
             
             let temperature: [Int: TemperatureUnit]?
             let relativeHumidity: [Int: RelativeHumidityUnit]?
@@ -112,6 +126,10 @@ extension OpenMeteoSoundingList {
                 case degrees = "°"
             }
             
+            enum SurfacePressureUnit: String, Decodable {
+                case hpa = "hPa"
+            }
+            
             struct HourlyUnitKey: CodingKey {
                 var stringValue: String
                 var intValue: Int? { nil }
@@ -126,6 +144,7 @@ extension OpenMeteoSoundingList {
                 let container = try decoder.container(keyedBy: HourlyUnitKey.self)
                 
                 time = try container.decode(TimeUnit.self, forKey: HourlyUnitKey(stringValue: "time"))
+                surfacePressure = try? container.decode(SurfacePressureUnit.self, forKey: HourlyUnitKey(stringValue: "surfacePressure"))
                 
                 var temperature: [Int: TemperatureUnit] = [:]
                 var relativeHumidity: [Int: RelativeHumidityUnit] = [:]
@@ -170,6 +189,7 @@ extension OpenMeteoSoundingList {
                 let container = try decoder.container(keyedBy: HourlyDataKey.self)
                 
                 var times: [Date]
+                var surfacePressure: [Date: Double] = [:]
                 var temperature: [Date: [Int: Double]] = [:]
                 var relativeHumidity: [Date: [Int: Int]] = [:]
                 var windSpeed: [Date: [Int: Double]] = [:]
@@ -193,6 +213,12 @@ extension OpenMeteoSoundingList {
                 default:
                     let dateInts = try container.decode([Int].self, forKey: timeKey)
                     times = dateInts.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+                }
+                
+                if let pressures = try? container.decode([Double].self, forKey: HourlyDataKey(stringValue: "surfacePressure")) {
+                    for (i, pressure) in pressures.enumerated() {
+                        surfacePressure[times[i]] = pressure
+                    }
                 }
                 
                 try container.allKeys.forEach { key in
@@ -245,6 +271,7 @@ extension OpenMeteoSoundingList {
                 }
                 
                 self.times = times
+                self.surfacePressure = surfacePressure
                 self.temperature = temperature
                 self.relativeHumidity = relativeHumidity
                 self.windSpeed = windSpeed
@@ -254,6 +281,7 @@ extension OpenMeteoSoundingList {
             typealias DecodingConfiguration = HourlyUnits?
             
             let times: [Date]
+            let surfacePressure: [Date: Double]
             
             // Values keyed by pressure keyed by timestamp
             let temperature: [Date: [Int: Double]]
