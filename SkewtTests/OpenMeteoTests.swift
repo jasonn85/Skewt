@@ -204,4 +204,82 @@ class OpenMeteoTests {
             #expect(result.data[dates[i]]?.surfaceDataPoint?.pressure == pressures[i])
         }
     }
+    
+    @Test("CAPE is processed",
+          arguments: [
+            [0],
+            [0, 1000, 2000, 3000],
+            [25, 7555, 9999, 0]
+          ]
+    )
+    func cape(values: [Int]) throws {
+        let dates = values.indices.map { Date(timeIntervalSince1970: 1731528361).addingTimeInterval(Double($0) * 60.0 * 60.0) }
+        
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "temperature_1000hPa":"°C",
+        "cape":"J/kg"
+    },
+    "hourly":{
+        "time":[
+            \(dates.map({ String(Int($0.timeIntervalSince1970)) }).joined(separator:","))
+        ],
+        "cape":[
+            \(values.map({ String($0) }).joined(separator:","))
+        ],
+        "temperature_1000hPa":[
+            \(values.map({ _ in return "15.0" }).joined(separator:","))
+        ]   
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+
+        for i in 0..<values.count {
+            #expect(result.data[dates[i]]?.cape == values[i])
+        }
+    }
+    
+    @Test("CIN is processed",
+          arguments: [
+            [0],
+            [0, 10, 77, 155],
+            [25, 225]
+          ]
+    )
+    func cin(values: [Int]) throws {
+        let dates = values.indices.map { Date(timeIntervalSince1970: 1731528361).addingTimeInterval(Double($0) * 60.0 * 60.0) }
+        
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "temperature_1000hPa":"°C",
+        "cin":"J/kg"
+    },
+    "hourly":{
+        "time":[
+            \(dates.map({ String(Int($0.timeIntervalSince1970)) }).joined(separator:","))
+        ],
+        "cin":[
+            \(values.map({ String($0) }).joined(separator:","))
+        ],
+        "temperature_1000hPa":[
+            \(values.map({ _ in return "15.0" }).joined(separator:","))
+        ]   
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+
+        for i in 0..<values.count {
+            #expect(result.data[dates[i]]?.cin == values[i])
+        }
+    }
 }
