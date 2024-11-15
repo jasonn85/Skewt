@@ -78,12 +78,6 @@ struct LocationSelectionView: View {
             store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
         }
         .onAppear {
-            let soundingsDataAge = store.state.recentSoundingsState.dataAge
-            
-            if soundingsDataAge == nil || soundingsDataAge! > soundingDataMaxAge {
-                store.dispatch(RecentSoundingsState.Action.refresh)
-            }
-            
             store.dispatch(ForecastSelectionState.Action.load)
         }
     }
@@ -142,14 +136,14 @@ struct LocationSelectionView: View {
             .pickerStyle(.segmented)
             
             switch selectedModelType {
-            case .op40:
+            case .op40, .automatic:
                 op40List
             case .raob:
                 raobList
             }
         case .modelType(let modelType):
             switch modelType {
-            case .op40:
+            case .op40, .automatic:
                 op40List
             case .raob:
                 raobList
@@ -175,7 +169,8 @@ struct LocationSelectionView: View {
                 selection: SoundingSelection(
                     type: .op40,
                     location: .closest,
-                    time: .now
+                    time: .now,
+                    dataAgeBeforeRefresh: 15.0 * 60.0
                 ),
                 subtitleComponents: nearestSubtitleComponents
             )
@@ -226,7 +221,8 @@ struct LocationSelectionView: View {
                         selection: SoundingSelection(
                             type: .op40,
                             location: .named($0.name),
-                            time: .now
+                            time: .now,
+                            dataAgeBeforeRefresh: 15.0 * 60.0
                         ),
                         titleComponents: [.text($0.description)],
                         subtitleComponents: [.text($0.name)]
@@ -240,67 +236,73 @@ struct LocationSelectionView: View {
     
     @ViewBuilder
     private var raobList: some View {
-        switch store.state.recentSoundingsState.status {
-        case .loading:
-            loadingView
-        case .done(_, _), .refreshing(_, _):
-            let locations = raobLocations
-            
-            ForEach(locations.prefix(searchCount), id: \.name) {
-                SoundingSelectionRow(
-                    selection: SoundingSelection(
-                        type: .raob,
-                        location: .named($0.name),
-                        time: .now
-                    ),
-                    titleComponents: [.text($0.name), .text($0.description)],
-                    subtitleComponents: subtitleComponents(forStationNamed: $0.name)
-                )
-            }
-            
-            if locations.isEmpty {
-                noResultsRow
-            }
-        case .failed(_), .idle:
-            Text("Failed to load soundings")
-        }
+        Text("Failed to load soundings")
+        
+        // TODO: Remove
+//        switch store.state.recentSoundingsState.status {
+//        case .loading:
+//            loadingView
+//        case .done(_, _), .refreshing(_, _):
+//            let locations = raobLocations
+//            
+//            ForEach(locations.prefix(searchCount), id: \.name) {
+//                SoundingSelectionRow(
+//                    selection: SoundingSelection(
+//                        type: .raob,
+//                        location: .named($0.name),
+//                        time: .now
+//                    ),
+//                    titleComponents: [.text($0.name), .text($0.description)],
+//                    subtitleComponents: subtitleComponents(forStationNamed: $0.name)
+//                )
+//            }
+//            
+//            if locations.isEmpty {
+//                noResultsRow
+//            }
+//        case .failed(_), .idle:
+//            Text("Failed to load soundings")
+//        }
     }
     
     private var raobLocations: [LocationList.Location] {
-        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings(),
-              recentSoundings.count > 0 else {
-            return []
-        }
+        // TODO: Remove
+        return []
         
-        let wmoIds = recentSoundings.compactMap {
-            switch $0.stationId {
-            case .wmoId(let wmoId) :
-                return wmoId
-            case .bufr(_):
-                return nil
-            }
-        }
-                
-        switch store.state.displayState.forecastSelectionState.searchType {
-        case .nearest:
-            guard let locations = try? LocationList.forType(.op40) else {
-                return []
-            }
-            
-            return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<searchCount])
-        case .text(let searchText):
-            guard let allSoundings = try? LocationList.forType(.raob) else {
-                return []
-            }
-            
-            return allSoundings.locationsForSearch(searchText).filter {
-                guard let wmoId = $0.wmoId else {
-                    return false
-                }
-                
-                return wmoIds.contains(wmoId)
-            }
-        }
+//        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings?.recentSoundings(),
+//              recentSoundings.count > 0 else {
+//            return []
+//        }
+//        
+//        let wmoIds = recentSoundings.compactMap {
+//            switch $0.stationId {
+//            case .wmoId(let wmoId) :
+//                return wmoId
+//            case .bufr(_):
+//                return nil
+//            }
+//        }
+//                
+//        switch store.state.displayState.forecastSelectionState.searchType {
+//        case .nearest:
+//            guard let locations = try? LocationList.forType(.op40) else {
+//                return []
+//            }
+//            
+//            return Array(locations.locationsSortedByProximity(to: centerLocation, onlyWmoIds: wmoIds)[..<searchCount])
+//        case .text(let searchText):
+//            guard let allSoundings = try? LocationList.forType(.raob) else {
+//                return []
+//            }
+//            
+//            return allSoundings.locationsForSearch(searchText).filter {
+//                guard let wmoId = $0.wmoId else {
+//                    return false
+//                }
+//                
+//                return wmoIds.contains(wmoId)
+//            }
+//        }
     }
     
     private var centerLocation: CLLocation {
@@ -340,12 +342,8 @@ struct LocationSelectionView: View {
     }
     
     private func lastSoundingComponent(forWmoId wmoId: Int) -> SoundingSelectionRow.DescriptionComponent? {
-        guard let recentSoundings = store.state.recentSoundingsState.recentSoundings,
-              let soundingTime = recentSoundings.lastSoundingTime(forWmoId: wmoId) else {
-            return nil
-        }
-        
-        return .age(soundingTime)
+        // TODO: Remove
+        return nil
     }
     
     private var nearestSubtitleComponents: [SoundingSelectionRow.DescriptionComponent]? {

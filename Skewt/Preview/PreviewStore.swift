@@ -19,17 +19,20 @@ extension Store {
             SoundingSelection(
                 type: .op40,
                 location: .closest,
-                time: .now
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
                 type: .raob,
                 location: .closest,
-                time: .now
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
                 type: .op40,
                 location: .named("SAN"),
-                time: .now
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
         ]
     }
@@ -37,9 +40,10 @@ extension Store {
     static var previewStore: Store<SkewtState> {
         let selection = SoundingSelection()
         
+        // TODO: Place Open-Meteo placeholder data
         let soundingState = SoundingState(
             selection: selection,
-            status: .done(previewSounding, .now)
+            status: .idle
         )
         
         return Store<SkewtState>(
@@ -49,8 +53,7 @@ extension Store {
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState(),
-                recentSoundingsState: RecentSoundingsState()
+                locationState: LocationState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

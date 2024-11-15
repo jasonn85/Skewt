@@ -16,66 +16,66 @@ enum RucRequestError: Error {
 }
 
 extension Middlewares {
-    static let rucApi: Middleware<SkewtState> = { state, action in
-        let logger = Logger()
-        
-        switch action as? RecentSoundingsState.Action {
-        case .didReceiveList(_):
-            switch state.currentSoundingState.status {
-            case .awaitingSoundingLocationData:
-                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
-            default:
-                break
-            }
-        default:
-            break
-        }
-        
-        switch action as? SoundingState.Action {
-        case .doRefresh, .changeAndLoadSelection(_):
-            let selection = state.currentSoundingState.selection
-            let location = state.locationState.locationIfKnown
-            
-            guard !selection.requiresLocation || location != nil else {
-                return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
-                    .eraseToAnyPublisher()
-            }
-            
-            do {
-                let soundingRequest = try RucSoundingRequest(fromSoundingSelection: selection,
-                                                             currentLocation: location,
-                                                             recentSoundings: state.recentSoundingsState.recentSoundings)
-                let url = soundingRequest.url
-                
-                logger.info("Requesting a sounding via \(url.absoluteString)")
-                
-                return URLSession.shared.dataTaskPublisher(for: url)
-                    .map { data, response in
-                        guard !data.isEmpty,
-                                let text = String(data: data, encoding: .utf8),
-                                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                            return SoundingState.Action.didReceiveFailure(.emptyResponse)
-                        }
-                        
-                        guard let sounding = try? RucSounding(fromText: text) else {
-                            return SoundingState.Action.didReceiveFailure(.unparseableResponse)
-                        }
-                        
-                        return SoundingState.Action.didReceiveResponse(sounding)
-                    }
-                    .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
-                    .eraseToAnyPublisher()
-            } catch RucRequestError.unableToFindClosestSounding {
-                return Just(SoundingState.Action.awaitSoundingLocation).eraseToAnyPublisher()
-            } catch {
-                return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
-                    .eraseToAnyPublisher()
-            }
-            
-        default:
-            return Empty().eraseToAnyPublisher()
-        }
-    }
+//    static let rucApi: Middleware<SkewtState> = { state, action in
+//        let logger = Logger()
+//        
+//        switch action as? RecentSoundingsState.Action {
+//        case .didReceiveList(_):
+//            switch state.currentSoundingState.status {
+//            case .awaitingSoundingLocationData:
+//                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
+//            default:
+//                break
+//            }
+//        default:
+//            break
+//        }
+//        
+//        switch action as? SoundingState.Action {
+//        case .doRefresh, .changeAndLoadSelection(_):
+//            let selection = state.currentSoundingState.selection
+//            let location = state.locationState.locationIfKnown
+//            
+//            guard !selection.requiresLocation || location != nil else {
+//                return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
+//                    .eraseToAnyPublisher()
+//            }
+//            
+//            do {
+//                let soundingRequest = try RucSoundingRequest(fromSoundingSelection: selection,
+//                                                             currentLocation: location,
+//                                                             recentSoundings: state.recentSoundingsState.recentSoundings)
+//                let url = soundingRequest.url
+//                
+//                logger.info("Requesting a sounding via \(url.absoluteString)")
+//                
+//                return URLSession.shared.dataTaskPublisher(for: url)
+//                    .map { data, response in
+//                        guard !data.isEmpty,
+//                                let text = String(data: data, encoding: .utf8),
+//                                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+//                            return SoundingState.Action.didReceiveFailure(.emptyResponse)
+//                        }
+//                        
+//                        guard let sounding = try? RucSounding(fromText: text) else {
+//                            return SoundingState.Action.didReceiveFailure(.unparseableResponse)
+//                        }
+//                        
+//                        return SoundingState.Action.didReceiveResponse(sounding)
+//                    }
+//                    .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
+//                    .eraseToAnyPublisher()
+//            } catch RucRequestError.unableToFindClosestSounding {
+//                return Just(SoundingState.Action.awaitSoundingLocation).eraseToAnyPublisher()
+//            } catch {
+//                return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
+//                    .eraseToAnyPublisher()
+//            }
+//            
+//        default:
+//            return Empty().eraseToAnyPublisher()
+//        }
+//    }
 }
 
 extension LatestSoundingList {
@@ -145,7 +145,7 @@ extension RucSoundingRequest {
                 forSelectionLocation: selection.location,
                 currentLocation: currentLocation
             )
-        case .op40:
+        case .op40, .automatic:
             modelType = .op40
             
             switch selection.location {
@@ -169,7 +169,7 @@ extension RucSoundingRequest {
             endTime = startTime!.addingTimeInterval(.hours(selection.type.hourInterval))
         case .relative(let timeInterval):
             switch selection.type {
-            case .op40:
+            case .op40, .automatic:
                 startTime = Date.nearestHour(withIntervalFromNow: timeInterval, hoursPerInterval: selection.type.hourInterval)
                 endTime = startTime!.addingTimeInterval(.hours(selection.type.hourInterval))
             case .raob:

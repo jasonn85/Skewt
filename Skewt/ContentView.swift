@@ -133,7 +133,6 @@ struct ContentView: View {
             AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
                 .onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
-                    store.dispatch(RecentSoundingsState.Action.refresh)
                     store.dispatch(SoundingState.Action.doRefresh)
                 }
             
@@ -244,7 +243,7 @@ struct ContentView: View {
     @ViewBuilder
     private var timeSelection: some View {
         switch store.state.currentSoundingState.selection.type {
-        case .op40:
+        case .op40, .automatic:
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
@@ -261,13 +260,13 @@ struct ContentView: View {
     
     private var statusText: String? {
         switch store.state.currentSoundingState.status {
-        case .done(let sounding, _), .refreshing(let sounding):
-            let timeAgo = timeAgoFormatter.string(for: sounding.data.time)!
-            let dateString = dateFormatter.string(for: sounding.data.time)!
+        case .done(_), .refreshing(_):
+            let timeAgo = timeAgoFormatter.string(for: store.state.currentSoundingState.sounding?.data.time)!
+            let dateString = dateFormatter.string(for: store.state.currentSoundingState.sounding?.data.time)!
             return "\(timeAgo) (\(dateString))"
         case .idle:
             return nil
-        case .loading, .awaitingSoundingLocationData:
+        case .loading:
             return "Loading..."
         case .failed(let error):
             switch error {
@@ -301,8 +300,8 @@ struct ContentView_Previews: PreviewProvider {
 extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
-        case .op40:
-            return "Op40 forecast"
+        case .op40, .automatic:
+            return "Forecast"
         case .raob:
             return "Sounding"
         }

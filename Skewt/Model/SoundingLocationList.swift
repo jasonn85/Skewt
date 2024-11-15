@@ -73,7 +73,7 @@ extension LatestSoundingList.Entry {
 extension SoundingSelection.ModelType {
     var assetName: String {
         switch self {
-        case .op40:
+        case .op40, .automatic:
             return "Metar Locations"
         case .raob:
             return "Sounding Locations"
@@ -104,7 +104,7 @@ extension LocationList {
     
     static func forType(_ type: SoundingSelection.ModelType) throws -> Self {
         switch type {
-        case .op40:
+        case .op40, .automatic:
             return op40Locations
         case .raob:
             return raobLocations

@@ -75,7 +75,6 @@ struct SkewtState: Codable {
     
     var plotOptions: PlotOptions
     var locationState: LocationState
-    var recentSoundingsState: RecentSoundingsState
 }
 
 // Default initializer
@@ -89,7 +88,6 @@ extension SkewtState {
         pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
-        recentSoundingsState = RecentSoundingsState()
     }
 }
 
@@ -102,7 +100,6 @@ extension SkewtState {
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
-        state.recentSoundingsState = RecentSoundingsState.reducer(state.recentSoundingsState, action)
         
         switch action as? SkewtState.Action {
         case .pinSelection(let selection):

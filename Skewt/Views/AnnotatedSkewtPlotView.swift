@@ -71,16 +71,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var sounding: Sounding? {
-        switch soundingState.status {
-        case .done(let sounding, _), .refreshing(let sounding):
-            if !soundingState.status.isStale {
-                return sounding
-            }
-            
-            fallthrough
-        case .failed(_), .idle, .loading, .awaitingSoundingLocationData:
-            return nil
-        }
+        soundingState.sounding
     }
     
     private var axisLabelFont: UIFont {
