@@ -197,7 +197,7 @@ struct SoundingState: Codable {
             case .specific(let date):
                 return soundingList.closestSounding(toDate: date)
             case.numberOfSoundingsAgo(let agoCount):
-                let secondsAgo = TimeInterval(selection.type.hourInterval) * 60.0 * 60.0
+                let secondsAgo = Double(agoCount) * Double(selection.type.hourInterval) * 60.0 * 60.0
                 return soundingList.closestSounding(toDate: .now.addingTimeInterval(-secondsAgo))
             }
         }
@@ -267,6 +267,50 @@ extension SoundingState {
             
             return state
         case .changeAndLoadSelection(let action):
+            // Is our data stale?
+            if let openMeteoSounding = state.sounding as? OpenMeteoSounding,
+               Date.now.timeIntervalSince(openMeteoSounding.fetchTime) < state.selection.dataAgeBeforeRefresh {
+                // Our data is not stale. Now is the selection just a time change or no change at all?
+                switch state.status {
+                case .done(let soundingList):
+                    switch action {
+                    case .selectLocation(state.selection.location, state.selection.time),
+                            .selectModelType(state.selection.type, state.selection.time):
+                        return SoundingState(selection: state.selection, status: .done(soundingList))
+                        
+                    case .selectTime(let time),
+                            .selectModelTypeAndLocation(nil, nil, let time),
+                            .selectModelTypeAndLocation(state.selection.type, nil, let time),
+                            .selectModelTypeAndLocation(nil, state.selection.location, let time),
+                            .selectModelTypeAndLocation(state.selection.type, state.selection.location, let time):
+                        // It is just a time change. Do we have data for that time already?
+                        let date: Date
+                        
+                        switch time {
+                        case .now:
+                            date = .now
+                        case .numberOfSoundingsAgo(let countAgo):
+                            let intervalAgo = Double(countAgo) * Double(state.selection.type.hourInterval) * 60.0 * 60.0
+                            date = .now.addingTimeInterval(-intervalAgo)
+                        case .relative(let interval):
+                            date = .now.addingTimeInterval(interval)
+                        case .specific(let specificDate):
+                            date = specificDate
+                        }
+                        
+                        if let closestTime = soundingList.closestSounding(toDate: date)?.date,
+                           abs(closestTime.timeIntervalSince(date)) <= Double(state.selection.type.hourInterval) * 60.0 * 60.0 {
+                            // No loading needed! Hooray!
+                            return SoundingState(selection: state.selection, status: .done(soundingList))
+                        }
+                    default:
+                        break
+                    }
+                default:
+                    break
+                }
+            }
+            
             return SoundingState(
                 selection: SoundingSelection.reducer(state.selection, action),
                 status: .loading
