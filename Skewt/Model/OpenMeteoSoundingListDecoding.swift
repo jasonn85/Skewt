@@ -30,13 +30,8 @@ extension OpenMeteoSoundingList {
             let dataPoints = pressures.map { pressure in
                 let temperature = response.hourly?.temperature[date]?[pressure]
                     .convertToCelsius(from: response.hourlyUnits?.temperature?[pressure])
-                let dewPoint: Double?
-                
-                if let temperature = temperature, let humidity = response.hourly?.relativeHumidity[date]?[pressure] {
-                    dewPoint = Temperature(temperature, unit: .celsius).dewPoint(withRelativeHumidity: Double(humidity))
-                } else {
-                    dewPoint = nil
-                }
+                let dewPoint = response.hourly?.dewPoint[date]?[pressure]
+                    .convertToCelsius(from: response.hourlyUnits?.dewPoint?[pressure])
                 
                 return SoundingData.Point(
                     pressure: Double(pressure),
@@ -88,7 +83,7 @@ extension OpenMeteoSoundingList {
             let surfacePressure: SurfacePressureUnit?
             
             let temperature: [Int: TemperatureUnit]?
-            let relativeHumidity: [Int: RelativeHumidityUnit]?
+            let dewPoint: [Int: TemperatureUnit]?
             let windSpeed: [Int: WindSpeedUnit]?
             let windDirection: [Int: WindDirectionUnit]?
             
@@ -105,10 +100,6 @@ extension OpenMeteoSoundingList {
             enum TemperatureUnit: String, Decodable {
                 case celsius = "°C"
                 case fahrenheit = "°F"
-            }
-            
-            enum RelativeHumidityUnit: String, Decodable {
-                case percent = "%"
             }
             
             enum WindSpeedUnit: String, Decodable {
@@ -153,7 +144,7 @@ extension OpenMeteoSoundingList {
                 cin = try? container.decode(CinUnit.self, forKey: HourlyUnitKey(stringValue: "cin"))
                 
                 var temperature: [Int: TemperatureUnit] = [:]
-                var relativeHumidity: [Int: RelativeHumidityUnit] = [:]
+                var dewPoint: [Int: TemperatureUnit] = [:]
                 var windSpeed: [Int: WindSpeedUnit] = [:]
                 var windDirection: [Int: WindDirectionUnit] = [:]
                 var allPressures = Set<Int>()
@@ -171,8 +162,8 @@ extension OpenMeteoSoundingList {
                     switch keyName {
                     case "temperature":
                         temperature[pressure] = try container.decode(TemperatureUnit.self, forKey: key)
-                    case "relativeHumidity":
-                        relativeHumidity[pressure] = try container.decode(RelativeHumidityUnit.self, forKey: key)
+                    case "dewPoint":
+                        dewPoint[pressure] = try container.decode(TemperatureUnit.self, forKey: key)
                     case "windSpeed":
                         windSpeed[pressure] = try container.decode(WindSpeedUnit.self, forKey: key)
                     case "windDirection":
@@ -183,7 +174,7 @@ extension OpenMeteoSoundingList {
                 }
                 
                 self.temperature = temperature
-                self.relativeHumidity = relativeHumidity
+                self.dewPoint = dewPoint
                 self.windSpeed = windSpeed
                 self.windDirection = windDirection
                 self.allPressures = allPressures
@@ -197,7 +188,7 @@ extension OpenMeteoSoundingList {
                 var times: [Date]
                 var surfacePressure: [Date: Double] = [:]
                 var temperature: [Date: [Int: Double]] = [:]
-                var relativeHumidity: [Date: [Int: Int]] = [:]
+                var dewPoint: [Date: [Int: Double]] = [:]
                 var windSpeed: [Date: [Int: Double]] = [:]
                 var windDirection: [Date: [Int: Int]] = [:]
                 var cape: [Date: Int] = [:]
@@ -259,13 +250,13 @@ extension OpenMeteoSoundingList {
 
                             temperature[times[dateIndex]]![pressure] = temperatureThisPressure
                         }
-                    case "relativeHumidity":
-                        for (dateIndex, humidityThisPressure) in try container.decode([Int].self, forKey: key).enumerated() {
-                            if relativeHumidity[times[dateIndex]] == nil {
-                                relativeHumidity[times[dateIndex]] = [:]
+                    case "dewPoint":
+                        for (dateIndex, dewPointThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                            if dewPoint[times[dateIndex]] == nil {
+                                dewPoint[times[dateIndex]] = [:]
                             }
-                                
-                            relativeHumidity[times[dateIndex]]![pressure] = humidityThisPressure
+
+                            dewPoint[times[dateIndex]]![pressure] = dewPointThisPressure
                         }
                     case "windSpeed":
                         for (dateIndex, windSpeedThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
@@ -293,7 +284,7 @@ extension OpenMeteoSoundingList {
                 self.times = times
                 self.surfacePressure = surfacePressure
                 self.temperature = temperature
-                self.relativeHumidity = relativeHumidity
+                self.dewPoint = dewPoint
                 self.windSpeed = windSpeed
                 self.windDirection = windDirection
                 self.cape = cape
@@ -307,7 +298,7 @@ extension OpenMeteoSoundingList {
             
             // Values keyed by pressure keyed by timestamp
             let temperature: [Date: [Int: Double]]
-            let relativeHumidity: [Date: [Int: Int]]
+            let dewPoint: [Date: [Int: Double]]
             let windSpeed: [Date: [Int: Double]]
             let windDirection: [Date: [Int: Int]]
             

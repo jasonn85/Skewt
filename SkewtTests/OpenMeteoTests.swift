@@ -86,6 +86,35 @@ class OpenMeteoTests {
         }
     }
     
+    @Test("Parses dew point units correctly, resulting in celsius")
+    func dewPointUnits() throws {
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "dew_point_1000hPa":"°C",
+        "dew_point_900hPa": "°F",
+        "dew_point_800hPa":"°C",
+        "dew_point_700hPa": "°F"
+    },
+    "hourly":{
+        "time":[1731089721],
+        "dew_point_1000hPa":[0.0],
+        "dew_point_900hPa":[32.0],
+        "dew_point_800hPa":[0.0],
+        "dew_point_700hPa":[32.0]
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+
+        result.data.values.first?.dataPoints.forEach {
+            #expect($0.dewPoint == 0.0)
+        }
+    }
+    
     @Test("Parses wind units correctly, resulting in knots")
     func windUnits() throws {
         let json = """
@@ -114,48 +143,6 @@ class OpenMeteoTests {
         result.data.values.first?.dataPoints.forEach {
             #expect(abs($0.windSpeed! - 100.0) < 0.01)
         }
-    }
-    
-    @Test("Relative humidity is converted to dew point temperature",
-          arguments: [
-            (temperature: 20.0, humidity: 50, dewPoint: 9.0),
-            (20.0, 100, 20.0),
-            (20.0, 25, -1.0),
-            (0.0, 100, 0.0),
-            (0.0, 50, -9.0),
-            (0.0, 25, -18.0),
-            (35.0, 50, 24.0),
-            (35.0, 100, 35.0),
-            (35.0, 25, 12.0)
-          ]
-    )
-    func relativeHumidity(d: (temperature: Double, humidity: Int, dewPoint: Double)) throws {
-        let accuracy = 1.0
-        
-        let json = """
-{
-    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
-    "hourly_units":{
-        "time":"unixtime",
-        "temperature_1000hPa":"°C",
-        "relative_humidity_1000hPa":"%"
-    },
-    "hourly":{
-        "time":[1731089721],
-        "temperature_1000hPa":[
-            \(d.temperature)
-        ],
-        "relative_humidity_1000hPa":[
-            \(d.humidity)
-        ],
-    }
-}
-"""
-        
-        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
-        let e = abs(result.data.values.first!.dataPoints.first!.dewPoint! - d.dewPoint)
-        
-        #expect(e < accuracy)
     }
     
     @Test("Surface pressure is parsed")
