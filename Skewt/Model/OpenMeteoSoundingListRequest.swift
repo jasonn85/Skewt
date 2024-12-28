@@ -329,6 +329,25 @@ struct OpenMeteoSoundingListRequest: Codable {
     }
 }
 
+extension OpenMeteoSoundingListRequest {
+    var queryItems: [URLQueryItem]? {
+        guard let data = try? JSONEncoder().encode(self),
+              let dictionary = (try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed))
+                .flatMap({ $0 as? [String: Any] })
+        else {
+            return nil
+        }
+        
+        return dictionary.map {
+            if let arrayValue = $0.value as? [String] {
+                return URLQueryItem(name: $0.key, value: arrayValue.joined(separator: ","))
+            }
+            
+            return URLQueryItem(name: $0.key, value: String(describing: $0.value))
+        }
+    }
+}
+
 extension OpenMeteoSoundingListRequest.HourlyValue {
     static var allTemperatures: [OpenMeteoSoundingListRequest.HourlyValue] {
         [
