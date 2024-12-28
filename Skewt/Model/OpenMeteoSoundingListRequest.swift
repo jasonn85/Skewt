@@ -40,7 +40,7 @@ struct OpenMeteoSoundingListRequest: Codable {
     
     let apikey: String?
     
-    enum HourlyValue: Codable {
+    enum HourlyValue: String, Codable {
         case temperature_2m
         case relative_humidity_2m
         case dew_point_2m
@@ -274,6 +274,58 @@ struct OpenMeteoSoundingListRequest: Codable {
     
     enum Model: String, Codable {
         case auto
+    }
+    
+    init(
+        latitude: Double,
+        longitude: Double,
+        hourly: [HourlyValue]? = nil,
+        daily: [DailyValue]? = nil,
+        current: [HourlyValue]? = nil,
+        temperature_unit: TemperatureUnit? = .celsius,
+        wind_speed_unit: WindSpeedUnit? = .kn,
+        precipitation_unit: PrecipitationUnit? = nil,
+        timeformat: TimeFormat? = .unixtime,
+        timezone: String? = nil,
+        past_days: Int? = nil,
+        forecast_days: Int? = nil,
+        forecast_hours: Int? = nil,
+        forecast_minutely_15: Int? = nil,
+        past_hours: Int? = nil,
+        past_minutely_15: Int? = nil,
+        start_date: Date? = nil,
+        end_date: Date? = nil,
+        start_hour: Date? = nil,
+        end_hour: Date? = nil,
+        start_minutely_15: Date? = nil,
+        end_minutely_15: Date? = nil,
+        models: [Model]? = nil,
+        apikey: String? = nil
+    ) {
+        self.latitude = latitude
+        self.longitude = longitude
+        self.hourly = hourly
+        self.daily = daily
+        self.current = current
+        self.temperature_unit = temperature_unit
+        self.wind_speed_unit = wind_speed_unit
+        self.precipitation_unit = precipitation_unit
+        self.timeformat = timeformat
+        self.timezone = timezone
+        self.past_days = past_days
+        self.forecast_days = forecast_days
+        self.forecast_hours = forecast_hours
+        self.forecast_minutely_15 = forecast_minutely_15
+        self.past_hours = past_hours
+        self.past_minutely_15 = past_minutely_15
+        self.start_date = start_date
+        self.end_date = end_date
+        self.start_hour = start_hour
+        self.end_hour = end_hour
+        self.start_minutely_15 = start_minutely_15
+        self.end_minutely_15 = end_minutely_15
+        self.models = models
+        self.apikey = apikey
     }
 }
 
