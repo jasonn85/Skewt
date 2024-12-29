@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -56,11 +56,9 @@
 		96B436E32B6AF73700C8A01A /* ZoomedSquareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */; };
 		96B46FEF2AB4EA01008AA3A1 /* ClosestTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */; };
 		96B46FF12AB4F8AE008AA3A1 /* ClosestTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */; };
-		96B97AF12CE9567000C201B4 /* OpenMeteoSoundingListRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B97AF02CE9567000C201B4 /* OpenMeteoSoundingListRequest.swift */; };
 		96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CE4AE22BF7EAF0008D1DE9 /* LocationSelectionView.swift */; };
 		96CF5E782CEAFECF004A139A /* OpenMeteoRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CF5E772CEAFECF004A139A /* OpenMeteoRequestTests.swift */; };
 		96D30F302A83581200986E7E /* WindBarb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D30F2F2A83581200986E7E /* WindBarb.swift */; };
-		96D88A942CE68C710063B952 /* OpenMeteoSoundingListDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D88A932CE68C710063B952 /* OpenMeteoSoundingListDecoding.swift */; };
 		96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */; };
 		96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */; };
 		96E334F12A26757200B90043 /* LocationStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E334F02A26757200B90043 /* LocationStateTests.swift */; };
@@ -69,7 +67,6 @@
 		96EF85B12CD0268600414011 /* Sounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B02CD0268600414011 /* Sounding.swift */; };
 		96EF85B32CD2C54500414011 /* SoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85B22CD2C54500414011 /* SoundingTests.swift */; };
 		96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */ = {isa = PBXBuildFile; fileRef = 96EF85B42CD97EBB00414011 /* open-meteo.json */; };
-		96EF85BF2CD97EFE00414011 /* OpenMeteoSoundingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */; };
 		96F0818A2A4B67C100D8289A /* metar.short in Resources */ = {isa = PBXBuildFile; fileRef = 96F081892A4B67C100D8289A /* metar.short */; };
 		96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */; };
 		96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96F4B05729A72C73006D23BE /* iad-nam-1.txt */; };
@@ -152,11 +149,9 @@
 		96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquareTests.swift; sourceTree = "<group>"; };
 		96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTimeTests.swift; sourceTree = "<group>"; };
 		96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTime.swift; sourceTree = "<group>"; };
-		96B97AF02CE9567000C201B4 /* OpenMeteoSoundingListRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoSoundingListRequest.swift; sourceTree = "<group>"; };
 		96CE4AE22BF7EAF0008D1DE9 /* LocationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelectionView.swift; sourceTree = "<group>"; };
 		96CF5E772CEAFECF004A139A /* OpenMeteoRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoRequestTests.swift; sourceTree = "<group>"; };
 		96D30F2F2A83581200986E7E /* WindBarb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindBarb.swift; sourceTree = "<group>"; };
-		96D88A932CE68C710063B952 /* OpenMeteoSoundingListDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoSoundingListDecoding.swift; sourceTree = "<group>"; };
 		96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotatedSkewtPlotView.swift; sourceTree = "<group>"; };
 		96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLogMiddleware.swift; sourceTree = "<group>"; };
 		96E334F02A26757200B90043 /* LocationStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationStateTests.swift; sourceTree = "<group>"; };
@@ -165,7 +160,6 @@
 		96EF85B02CD0268600414011 /* Sounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sounding.swift; sourceTree = "<group>"; };
 		96EF85B22CD2C54500414011 /* SoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTests.swift; sourceTree = "<group>"; };
 		96EF85B42CD97EBB00414011 /* open-meteo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo.json"; sourceTree = "<group>"; };
-		96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoSoundingList.swift; sourceTree = "<group>"; };
 		96F081892A4B67C100D8289A /* metar.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = metar.short; sourceTree = "<group>"; };
 		96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "nkx-raob-1.txt"; sourceTree = "<group>"; };
 		96F4B05729A72C73006D23BE /* iad-nam-1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "iad-nam-1.txt"; sourceTree = "<group>"; };
@@ -176,6 +170,10 @@
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
 		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9623DCAF2D21C0CD000A4887 /* OpenMeteo */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = OpenMeteo; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		96A8F5DC299DAC3E0021A170 /* Frameworks */ = {
@@ -337,10 +335,8 @@
 		96AA78DC2A2E763A003338D8 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				9623DCAF2D21C0CD000A4887 /* OpenMeteo */,
 				96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */,
-				96EF85BE2CD97EFE00414011 /* OpenMeteoSoundingList.swift */,
-				96D88A932CE68C710063B952 /* OpenMeteoSoundingListDecoding.swift */,
-				96B97AF02CE9567000C201B4 /* OpenMeteoSoundingListRequest.swift */,
 				965D66582A52A09A0015FB4B /* RelativeLocations.swift */,
 				96A8F60C299DAC680021A170 /* RucSounding.swift */,
 				96F4B05F29A804E1006D23BE /* RucSoundingRequest.swift */,
@@ -378,6 +374,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9623DCAF2D21C0CD000A4887 /* OpenMeteo */,
 			);
 			name = Skewt;
 			productName = Skewt;
@@ -504,7 +503,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96B97AF12CE9567000C201B4 /* OpenMeteoSoundingListRequest.swift in Sources */,
 				964A81A52ADDDD2300E3E1EC /* SunTimes.swift in Sources */,
 				968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */,
 				965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */,
@@ -531,8 +529,6 @@
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
 				96F4B05E29A80396006D23BE /* Store.swift in Sources */,
 				96F4B06029A804E1006D23BE /* RucSoundingRequest.swift in Sources */,
-				96D88A942CE68C710063B952 /* OpenMeteoSoundingListDecoding.swift in Sources */,
-				96EF85BF2CD97EFE00414011 /* OpenMeteoSoundingList.swift in Sources */,
 				96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */,
 				961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */,
 				963CF0F02A1C5B87002116A0 /* PreviewStore.swift in Sources */,
