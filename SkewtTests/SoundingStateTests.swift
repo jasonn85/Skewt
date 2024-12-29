@@ -252,6 +252,6 @@ struct SoundingStateTests {
 extension TimeInterval {
     static let fifteenMinutes = TimeInterval(15.0 * 60.0)
     static let oneHour = TimeInterval(60.0 * 60.0)
-    static let twelveHours = .oneHour * 12.0
+    static let twelveHours = oneHour * 12.0
     static let oneDay = twelveHours * 2.0
 }

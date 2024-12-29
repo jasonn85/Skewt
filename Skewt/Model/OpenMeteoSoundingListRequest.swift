@@ -250,29 +250,29 @@ struct OpenMeteoSoundingListRequest: Codable {
         case uv_index_clear_sky_max
     }
     
-    enum TemperatureUnit: String, Codable {
+    enum TemperatureUnit: String, Codable, CaseIterable {
         case celsius
         case fahrenheit
     }
     
-    enum WindSpeedUnit: String, Codable {
+    enum WindSpeedUnit: String, Codable, CaseIterable {
         case kmh
         case ms
         case mph
         case kn
     }
     
-    enum PrecipitationUnit: String, Codable {
+    enum PrecipitationUnit: String, Codable, CaseIterable {
         case mm
         case inch
     }
     
-    enum TimeFormat: String, Codable {
+    enum TimeFormat: String, Codable, CaseIterable {
         case iso8601
         case unixtime
     }
     
-    enum Model: String, Codable {
+    enum Model: String, Codable, CaseIterable {
         case auto
     }
     
