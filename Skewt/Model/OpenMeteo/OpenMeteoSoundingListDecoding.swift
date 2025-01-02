@@ -276,7 +276,7 @@ extension OpenMeteoSoundingList {
                             windDirection[times[dateIndex]]![pressure] = windDirectionThisPressure
                         }
                     default:
-                        // Happily gnore a key that does not match our expected name/pressure format
+                        // Happily ignore a key that does not match our expected name/pressure format
                         return
                     }
                 }
