@@ -8,6 +8,8 @@
 import Foundation
 
 struct OpenMeteoSoundingListRequest: Codable {
+    static let apiUrl = URL(string: "https://api.open-meteo.com/v1/forecast")!
+    
     let latitude: Double
     let longitude: Double
     
@@ -345,6 +347,13 @@ extension OpenMeteoSoundingListRequest {
             
             return URLQueryItem(name: $0.key, value: String(describing: $0.value))
         }
+    }
+    
+    var url: URL {
+        var components = URLComponents(url: OpenMeteoSoundingListRequest.apiUrl, resolvingAgainstBaseURL: false)!
+        components.queryItems = queryItems
+        
+        return components.url!
     }
 }
 

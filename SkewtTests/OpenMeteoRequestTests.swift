@@ -10,6 +10,11 @@ import Foundation
 @testable import Skewt
 
 struct OpenMeteoRequestTests {
+    @Test("URL resolves")
+    func someUrl() {
+        #expect(OpenMeteoSoundingListRequest.apiUrl.absoluteString.count > 0)
+    }
+    
     @Test("All temperatures/dew points/wind speeds/wind directions show up in query parameters")
     func requestAllHourly() {
         let allSkewt = OpenMeteoSoundingListRequest.HourlyValue.allTemperatures
