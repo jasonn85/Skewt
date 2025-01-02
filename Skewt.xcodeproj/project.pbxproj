@@ -13,6 +13,7 @@
 		961202632A156B03009423D5 /* SoundingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202622A156B03009423D5 /* SoundingState.swift */; };
 		961202652A156B39009423D5 /* PlotOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202642A156B39009423D5 /* PlotOptions.swift */; };
 		961202672A157A52009423D5 /* RucApiMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202662A157A52009423D5 /* RucApiMiddleware.swift */; };
+		961CA9A92D2758BA00426A80 /* open-meteo-with-nulls.json in Resources */ = {isa = PBXBuildFile; fileRef = 961CA9A82D2758BA00426A80 /* open-meteo-with-nulls.json */; };
 		9623DCB12D21C4C7000A4887 /* OpenMeteoMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9623DCB02D21C4C7000A4887 /* OpenMeteoMiddleware.swift */; };
 		9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629E30429BBB07100C2904E /* Thermodynamics.swift */; };
 		9629E30929BBC3A300C2904E /* ThermodynamicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */; };
@@ -103,6 +104,7 @@
 		961202622A156B03009423D5 /* SoundingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingState.swift; sourceTree = "<group>"; };
 		961202642A156B39009423D5 /* PlotOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotOptions.swift; sourceTree = "<group>"; };
 		961202662A157A52009423D5 /* RucApiMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucApiMiddleware.swift; sourceTree = "<group>"; };
+		961CA9A82D2758BA00426A80 /* open-meteo-with-nulls.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-with-nulls.json"; sourceTree = "<group>"; };
 		9623DCB02D21C4C7000A4887 /* OpenMeteoMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoMiddleware.swift; sourceTree = "<group>"; };
 		9629E30429BBB07100C2904E /* Thermodynamics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thermodynamics.swift; sourceTree = "<group>"; };
 		9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermodynamicsTests.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				96F081892A4B67C100D8289A /* metar.short */,
 				96F3B4AE29A6D7C300DF4A58 /* nkx-raob-1.txt */,
 				96EF85B42CD97EBB00414011 /* open-meteo.json */,
+				961CA9A82D2758BA00426A80 /* open-meteo-with-nulls.json */,
 				96F4B05929A72D61006D23BE /* ord-gfs-1.txt */,
 				96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */,
 				967E24262A3660F2009262D9 /* raob.short */,
@@ -484,6 +487,7 @@
 				96F0818A2A4B67C100D8289A /* metar.short in Resources */,
 				96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
+				961CA9A92D2758BA00426A80 /* open-meteo-with-nulls.json in Resources */,
 				967E24272A3660F2009262D9 /* raob.short in Resources */,
 				962B3C6029A43ECE000FDC8D /* san-op40-1.txt in Resources */,
 				96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */,

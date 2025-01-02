@@ -243,7 +243,7 @@ extension OpenMeteoSoundingList {
                     
                     switch keyName {
                     case "temperature":
-                        for (dateIndex, temperatureThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                        for (dateIndex, temperatureThisPressure) in try container.decode([Double?].self, forKey: key).enumerated() {
                             if temperature[times[dateIndex]] == nil {
                                 temperature[times[dateIndex]] = [:]
                             }
@@ -251,7 +251,7 @@ extension OpenMeteoSoundingList {
                             temperature[times[dateIndex]]![pressure] = temperatureThisPressure
                         }
                     case "dewPoint":
-                        for (dateIndex, dewPointThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                        for (dateIndex, dewPointThisPressure) in try container.decode([Double?].self, forKey: key).enumerated() {
                             if dewPoint[times[dateIndex]] == nil {
                                 dewPoint[times[dateIndex]] = [:]
                             }
@@ -259,7 +259,7 @@ extension OpenMeteoSoundingList {
                             dewPoint[times[dateIndex]]![pressure] = dewPointThisPressure
                         }
                     case "windSpeed":
-                        for (dateIndex, windSpeedThisPressure) in try container.decode([Double].self, forKey: key).enumerated() {
+                        for (dateIndex, windSpeedThisPressure) in try container.decode([Double?].self, forKey: key).enumerated() {
                             if windSpeed[times[dateIndex]] == nil {
                                     
                                 windSpeed[times[dateIndex]] = [:]
@@ -268,7 +268,7 @@ extension OpenMeteoSoundingList {
                             windSpeed[times[dateIndex]]![pressure] = windSpeedThisPressure
                         }
                     case "windDirection":
-                        for (dateIndex, windDirectionThisPressure) in try container.decode([Int].self, forKey: key).enumerated() {
+                        for (dateIndex, windDirectionThisPressure) in try container.decode([Int?].self, forKey: key).enumerated() {
                             if windDirection[times[dateIndex]] == nil {
                                 windDirection[times[dateIndex]] = [:]
                             }

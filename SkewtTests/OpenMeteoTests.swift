@@ -20,6 +20,16 @@ class OpenMeteoTests {
         #expect(result.data.count == 24)
     }
     
+    @Test("24 results with some null values parse into 24 soundings")
+    func parseWithNulls() throws {
+        let bundle = Bundle(for: OpenMeteoTests.self)
+        let fileUrl = bundle.url(forResource: "open-meteo-with-nulls", withExtension: "json")!
+        let data = try Data(contentsOf: fileUrl)
+        
+        let result = try OpenMeteoSoundingList(fromData: data)
+        #expect(result.data.count == 24)
+    }
+    
     @Test("Parses all Open-Meteo date formats",
           arguments: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.TimeUnit.allCases)
     func dateFormats(timeUnit: OpenMeteoSoundingList.OpenMeteoData.HourlyUnits.TimeUnit) throws {
