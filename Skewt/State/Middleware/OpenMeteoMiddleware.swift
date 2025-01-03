@@ -21,7 +21,7 @@ extension Middlewares {
         let logger = Logger()
         
         switch state.currentSoundingState.status {
-        case .loading:
+        case .loading, .refreshing(_):
             guard !state.currentSoundingState.selection.requiresLocation || state.locationState.locationIfKnown != nil else {
                 return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
                                 .eraseToAnyPublisher()

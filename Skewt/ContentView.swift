@@ -261,8 +261,9 @@ struct ContentView: View {
     private var statusText: String? {
         switch store.state.currentSoundingState.status {
         case .done(_), .refreshing(_):
-            let timeAgo = timeAgoFormatter.string(for: store.state.currentSoundingState.sounding?.data.time)!
-            let dateString = dateFormatter.string(for: store.state.currentSoundingState.sounding?.data.time)!
+            let time = store.state.currentSoundingState.sounding?.data.time
+            let timeAgo = timeAgoFormatter.string(for: time)!
+            let dateString = dateFormatter.string(for: time)!
             return "\(timeAgo) (\(dateString))"
         case .idle:
             return nil
