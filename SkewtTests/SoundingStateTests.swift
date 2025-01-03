@@ -199,6 +199,49 @@ struct SoundingStateTests {
         }
     }
     
+    @Test("Change time to a time we have in existing, recent data results in change of time selection")
+    func changeTimeWorksWithExistingData() {
+        let soundingData = SoundingData(
+            time: .now,
+            elevation: 0,
+            dataPoints: [],
+            surfaceDataPoint: nil,
+            cape: nil,
+            cin: nil,
+            helicity: nil,
+            precipitableWater: nil
+        )
+        
+        let startingState = SoundingState(
+            selection: SoundingSelection(
+                type: .automatic,
+                location: .closest,
+                time: .now,
+                dataAgeBeforeRefresh: .fifteenMinutes
+            ),
+            status: .done(OpenMeteoSoundingList(
+                fetchTime: .now,
+                latitude: 39.8563,
+                longitude: -104.6764,
+                data: [
+                    .now: soundingData,
+                    .now.addingTimeInterval(.oneHour): soundingData
+                ]
+            )))
+        
+        let timeSelection = SoundingSelection.Action.selectTime(.relative(.oneHour))
+        let endState = SoundingState.reducer(startingState, SoundingState.Action.changeAndLoadSelection(timeSelection))
+        
+        switch endState.selection.time {
+        case .relative(.oneHour):
+            return
+        case .relative(let interval):
+            Issue.record("Relative time selection was \(interval) instead of one hour. That's odd.")
+        default:
+            Issue.record("Changing time selection with existing data erased the selection of a new time.")
+        }
+    }
+    
     @Test("Changing time to now with hour old data effects a load")
     func reloadWithOldData() {
         let soundingData = SoundingData(
