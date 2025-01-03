@@ -301,7 +301,15 @@ extension SoundingState {
                         if let closestTime = soundingList.closestSounding(toDate: date)?.date,
                            abs(closestTime.timeIntervalSince(date)) <= Double(state.selection.type.hourInterval) * 60.0 * 60.0 {
                             // No loading needed! Hooray!
-                            return SoundingState(selection: state.selection, status: .done(soundingList))
+                            return SoundingState(selection:
+                                                    SoundingSelection(
+                                                        type: state.selection.type,
+                                                        location: state.selection.location,
+                                                        time: time,
+                                                        dataAgeBeforeRefresh: state.selection.dataAgeBeforeRefresh
+                                                    ),
+                                                 status: .done(soundingList)
+                            )
                         }
                     default:
                         break
