@@ -10,6 +10,87 @@ import Foundation
 @testable import Skewt
 
 struct SoundingStateTests {
+    @Test("Current sounding reflects time selection")
+    func soundingForTimes() {
+        let epoch = Date.now
+        
+        let intervals: [TimeInterval] = [-.twelveHours, .zero, .twelveHours]
+        let soundings = intervals.map {
+            SoundingData(
+                time: epoch.addingTimeInterval($0),
+                elevation: 0,
+                dataPoints: [],
+                surfaceDataPoint: nil,
+                cape: nil,
+                cin: nil,
+                helicity: nil,
+                precipitableWater: nil
+            )
+        }
+        
+        let soundingList = OpenMeteoSoundingList(
+            fetchTime: .now,
+            latitude: 0.0,
+            longitude: 0.0,
+            data: soundings.reduce(into: [Date: SoundingData]()) { $0[$1.time] = $1 }
+        )
+        
+        intervals.forEach { interval in
+            let time = epoch.addingTimeInterval(interval)
+            
+            let relativeSelection = SoundingSelection(
+                type: .automatic,
+                location: .closest,
+                time: .relative(interval),
+                dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
+            )
+            
+            let specificSelection = SoundingSelection(
+                type: .automatic,
+                location: .closest,
+                time: .specific(time),
+                dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
+            )
+            
+            let relativeState = SoundingState(selection: relativeSelection, status: .done(soundingList))
+            let specificState = SoundingState(selection: specificSelection, status: .done(soundingList))
+            
+            #expect(relativeState.sounding!.data.time == time)
+            #expect(specificState.sounding!.data.time == time)
+        }
+    }
+    
+    @Test("Changing time selection works",
+          arguments: [
+            SoundingSelection.Time.now,
+            .numberOfSoundingsAgo(-10),
+            .numberOfSoundingsAgo(0),
+            .numberOfSoundingsAgo(1),
+            .relative(-.twentyFourHours),
+            .relative(.zero),
+            .relative(.twelveHours),
+            .specific(Date(timeIntervalSince1970: 1735936978.0))
+          ]
+    )
+    func changeTime(timeSelection: SoundingSelection.Time) {
+        let originalState = SoundingState(
+            selection: SoundingSelection(
+                type: .automatic,
+                location: .closest,
+                time: .now,
+                dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
+            ),
+            status: .idle
+        )
+        
+        let state = SoundingState.reducer(
+            originalState,
+            SoundingState.Action.changeAndLoadSelection(.selectTime(timeSelection))
+        )
+        
+        #expect(state.selection.time == timeSelection)
+    }
+    
     @Test("Change/load selection from idle state causes loading state",
           arguments: [
             SoundingSelection.Action.selectTime(.now),
