@@ -316,18 +316,33 @@ struct OpenMeteoSoundingListRequest: Encodable {
         self.timezone = timezone
         self.past_days = past_days
         self.forecast_days = forecast_days
-        self.forecast_hours = forecast_hours
         self.forecast_minutely_15 = forecast_minutely_15
-        self.past_hours = past_hours
         self.past_minutely_15 = past_minutely_15
         self.start_date = start_date
         self.end_date = end_date
-        self.start_hour = start_hour
-        self.end_hour = end_hour
         self.start_minutely_15 = start_minutely_15
         self.end_minutely_15 = end_minutely_15
         self.models = models
         self.apikey = apikey
+        
+        if let end_hour = end_hour {
+            self.start_hour = start_hour
+            self.end_hour = end_hour
+            self.forecast_hours = nil
+            self.past_hours = nil
+        } else if let start_hour = start_hour, let forecast_hours = forecast_hours {
+            let past_hours = past_hours ?? 0
+            
+            self.start_hour = start_hour.addingTimeInterval(-Double(past_hours) * 60.0 * 60.0)
+            self.end_hour = start_hour.addingTimeInterval(Double(forecast_hours) * 60.0 * 60.0)
+            self.forecast_hours = nil
+            self.past_hours = nil
+        } else {
+            self.start_hour = start_hour
+            self.end_hour = nil
+            self.forecast_hours = forecast_hours
+            self.past_hours = past_hours
+        }
     }
 }
 
