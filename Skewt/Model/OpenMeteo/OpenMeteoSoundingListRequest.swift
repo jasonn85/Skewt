@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct OpenMeteoSoundingListRequest: Codable {
+struct OpenMeteoSoundingListRequest: Encodable {
     static let apiUrl = URL(string: "https://api.open-meteo.com/v1/forecast")!
     
     let latitude: Double
@@ -333,7 +333,10 @@ struct OpenMeteoSoundingListRequest: Codable {
 
 extension OpenMeteoSoundingListRequest {
     var queryItems: [URLQueryItem]? {
-        guard let data = try? JSONEncoder().encode(self),
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = .iso8601
+        
+        guard let data = try? jsonEncoder.encode(self),
               let dictionary = (try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed))
                 .flatMap({ $0 as? [String: Any] })
         else {
