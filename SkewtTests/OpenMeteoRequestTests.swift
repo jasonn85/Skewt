@@ -103,6 +103,7 @@ struct OpenMeteoRequestTests {
     @Test("Start hour/end hour are encoded as yyyy-mm-ddThh:mm")
     func startHourEndHour() {
         let date = Date(timeIntervalSince1970: 1735956408)
+        let dateString = "2025-01-04T02:06"
         
         let request = OpenMeteoSoundingListRequest(
             latitude: 39.7392,
@@ -114,7 +115,7 @@ struct OpenMeteoRequestTests {
         let encodedStart = request.queryItems!.filter({ $0.name == "start_hour" }).first!.value!
         let encodedEnd = request.queryItems!.filter({ $0.name == "end_hour" }).first!.value!
 
-        #expect(encodedStart == ISO8601DateFormatter().string(from: date))
-        #expect(encodedEnd == ISO8601DateFormatter().string(from: date))
+        #expect(encodedStart == dateString)
+        #expect(encodedEnd == dateString)
     }
 }

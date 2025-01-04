@@ -334,7 +334,10 @@ struct OpenMeteoSoundingListRequest: Encodable {
 extension OpenMeteoSoundingListRequest {
     var queryItems: [URLQueryItem]? {
         let jsonEncoder = JSONEncoder()
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = .gmt
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        jsonEncoder.dateEncodingStrategy = .formatted(dateFormatter)
         
         guard let data = try? jsonEncoder.encode(self),
               let dictionary = (try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed))
