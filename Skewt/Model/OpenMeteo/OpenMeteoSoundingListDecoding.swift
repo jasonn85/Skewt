@@ -35,7 +35,7 @@ extension OpenMeteoSoundingList {
                 
                 return SoundingData.Point(
                     pressure: Double(pressure),
-                    height: nil,
+                    height: response.hourly?.geopotentialHeight[date]?[pressure],
                     temperature: temperature,
                     dewPoint: dewPoint,
                     windDirection: response.hourly?.windDirection[date]?[pressure],
@@ -86,6 +86,7 @@ extension OpenMeteoSoundingList {
             let dewPoint: [Int: TemperatureUnit]?
             let windSpeed: [Int: WindSpeedUnit]?
             let windDirection: [Int: WindDirectionUnit]?
+            let geopotentialHeight: [Int: HeightUnit]?
             
             let cape: CapeUnit?
             let cin: CinUnit?
@@ -107,6 +108,10 @@ extension OpenMeteoSoundingList {
                 case ms = "m/s"
                 case mph = "mp/h"
                 case kn = "kn"
+            }
+            
+            enum HeightUnit: String, Decodable {
+                case m = "m"
             }
             
             enum WindDirectionUnit: String, Decodable {
@@ -147,6 +152,7 @@ extension OpenMeteoSoundingList {
                 var dewPoint: [Int: TemperatureUnit] = [:]
                 var windSpeed: [Int: WindSpeedUnit] = [:]
                 var windDirection: [Int: WindDirectionUnit] = [:]
+                var geopotentialHeight: [Int: HeightUnit] = [:]
                 var allPressures = Set<Int>()
                 
                 try container.allKeys.forEach { key in
@@ -168,6 +174,8 @@ extension OpenMeteoSoundingList {
                         windSpeed[pressure] = try container.decode(WindSpeedUnit.self, forKey: key)
                     case "windDirection":
                         windDirection[pressure] = try container.decode(WindDirectionUnit.self, forKey: key)
+                    case "geopotentialHeight":
+                        geopotentialHeight[pressure] = try container.decode(HeightUnit.self, forKey: key)
                     default:
                         return
                     }
@@ -177,6 +185,7 @@ extension OpenMeteoSoundingList {
                 self.dewPoint = dewPoint
                 self.windSpeed = windSpeed
                 self.windDirection = windDirection
+                self.geopotentialHeight = geopotentialHeight
                 self.allPressures = allPressures
             }
         }
@@ -191,6 +200,7 @@ extension OpenMeteoSoundingList {
                 var dewPoint: [Date: [Int: Double]] = [:]
                 var windSpeed: [Date: [Int: Double]] = [:]
                 var windDirection: [Date: [Int: Int]] = [:]
+                var geopotentialHeight: [Date: [Int: Double]] = [:]
                 var cape: [Date: Int] = [:]
                 var cin: [Date: Int] = [:]
                 
@@ -275,6 +285,14 @@ extension OpenMeteoSoundingList {
                             
                             windDirection[times[dateIndex]]![pressure] = windDirectionThisPressure
                         }
+                    case "geopotentialHeight":
+                        for (dateIndex, geopotentialHeightThisPressure) in try container.decode([Double?].self, forKey: key).enumerated() {
+                            if geopotentialHeight[times[dateIndex]] == nil {
+                                geopotentialHeight[times[dateIndex]] = [:]
+                            }
+                            
+                            geopotentialHeight[times[dateIndex]]![pressure] = geopotentialHeightThisPressure
+                        }
                     default:
                         // Happily ignore a key that does not match our expected name/pressure format
                         return
@@ -287,6 +305,7 @@ extension OpenMeteoSoundingList {
                 self.dewPoint = dewPoint
                 self.windSpeed = windSpeed
                 self.windDirection = windDirection
+                self.geopotentialHeight = geopotentialHeight
                 self.cape = cape
                 self.cin = cin
             }
@@ -301,6 +320,7 @@ extension OpenMeteoSoundingList {
             let dewPoint: [Date: [Int: Double]]
             let windSpeed: [Date: [Int: Double]]
             let windDirection: [Date: [Int: Int]]
+            let geopotentialHeight: [Date: [Int: Double]]
             
             let cape: [Date: Int]?
             let cin: [Date: Int]?

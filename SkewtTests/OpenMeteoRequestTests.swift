@@ -21,6 +21,7 @@ struct OpenMeteoRequestTests {
             + OpenMeteoSoundingListRequest.HourlyValue.allDewPoints
             + OpenMeteoSoundingListRequest.HourlyValue.allWindSpeeds
             + OpenMeteoSoundingListRequest.HourlyValue.allWindDirections
+            + OpenMeteoSoundingListRequest.HourlyValue.allGeopotentialHeights
         
         let request = OpenMeteoSoundingListRequest(
             latitude: 39.7392,

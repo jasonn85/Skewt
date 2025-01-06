@@ -202,6 +202,30 @@ class OpenMeteoTests {
         }
     }
     
+    @Test("Geopotential heights are processed",
+          arguments: [0.0, 250.0, 500.0, 1000.0])
+    func heights(height: Double) throws {
+        let json = """
+{
+    "latitude":52.52, "longitude":13.41, "utc_offset_seconds":0, "timezone":"GMT", "timezone_abbreviation":"GMT", "elevation":38.0,
+    "hourly_units":{
+        "time":"unixtime",
+        "geopotential_height_1000hPa":"m"
+    },
+    "hourly":{
+        "time":[1731089721],
+        "geopotential_height_1000hPa":[\(height)]
+    }
+}
+"""
+        
+        let result = try OpenMeteoSoundingList(fromData: json.data(using: .utf8)!)
+
+        result.data.values.first?.dataPoints.forEach {
+            #expect(abs($0.height! - height) < 0.01)
+        }
+    }
+    
     @Test("CAPE is processed",
           arguments: [
             [0],
