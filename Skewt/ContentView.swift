@@ -198,7 +198,7 @@ struct ContentView: View {
                 
             
             switch store.state.currentSoundingState.selection.location {
-            case .named(let locationName):
+            case .named(let locationName, _, _):
                 Text("(\(locationName))")
             case .point(_, _):
                 Text("(selected location)")

@@ -165,9 +165,10 @@ struct SoundingSelectionRow: View {
             switch location {
             case .closest, .point(_, _):
                 return .now
-            case .named(let name):
+            case .named(_, _, _):
                 return .now
                 
+//            case .named(let name, _, _):
 //                guard let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId,
 //                      let mostRecentSounding = store.state.recentSoundingsState.recentSoundings?.lastSoundingTime(forWmoId: wmoId) else {
 //                    return .now

@@ -26,7 +26,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Location: Codable, Hashable, Identifiable {
         case closest
         case point(latitude: Double, longitude: Double)
-        case named(String)
+        case named(name: String, latitude: Double, longitude: Double)
         
         var id: Self { self }
     }
@@ -107,7 +107,7 @@ extension SoundingSelection.Location {
         switch self {
         case .closest:
             return "Current location"
-        case .named(let name):
+        case .named(let name, _, _):
             return name
         case .point(latitude: let latitude, longitude: let longitude):
             return String(format: "%.0f, %.0f", latitude, longitude)

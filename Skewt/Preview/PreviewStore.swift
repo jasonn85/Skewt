@@ -30,7 +30,7 @@ extension Store {
             ),
             SoundingSelection(
                 type: .op40,
-                location: .named("SAN"),
+                location: .named(name: "SAN", latitude: 32.73, longitude: -117.18),
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0
             ),

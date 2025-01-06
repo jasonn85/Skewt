@@ -93,7 +93,7 @@ extension LatestSoundingList {
             searchLocation = currentLocation
         case .point(latitude: let latitude, longitude: let longitude):
             searchLocation = CLLocation(latitude: latitude, longitude: longitude)
-        case .named(let name):
+        case .named(let name, _, _):
             if let soundingLocation = try? LocationList.forType(.raob).locationNamed(name) {
                 if let wmoId = soundingLocation.wmoId,
                    recentSoundingIds.contains(wmoId) {
@@ -158,7 +158,7 @@ extension RucSoundingRequest {
                                         longitude: currentLocation.coordinate.longitude)
             case .point(latitude: let latitude, longitude: let longitude):
                 location = .geolocation(latitude: latitude, longitude: longitude)
-            case .named(let locationName):
+            case .named(let locationName, _, _):
                 location = .name(locationName)
             }
         }

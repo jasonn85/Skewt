@@ -68,8 +68,6 @@ extension OpenMeteoSoundingListRequest {
         let longitude: Double
         
         switch selection.location {
-        case .named(_):
-            throw OpenMeteoRequestError.unsupportedLocationType
         case .closest:
             guard let location = currentLocation else {
                 throw OpenMeteoRequestError.missingLocation
@@ -77,7 +75,8 @@ extension OpenMeteoSoundingListRequest {
             
             latitude = location.coordinate.latitude
             longitude = location.coordinate.longitude
-        case .point(let pointLatitude, let pointLongitude):
+        case .point(let pointLatitude, let pointLongitude),
+                .named(_, let pointLatitude, let pointLongitude):
             latitude = pointLatitude
             longitude = pointLongitude
         }

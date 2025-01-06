@@ -220,7 +220,7 @@ struct LocationSelectionView: View {
                     SoundingSelectionRow(
                         selection: SoundingSelection(
                             type: .op40,
-                            location: .named($0.name),
+                            location: .named(name: $0.name, latitude: $0.latitude, longitude: $0.longitude),
                             time: .now,
                             dataAgeBeforeRefresh: 15.0 * 60.0
                         ),
@@ -312,7 +312,7 @@ struct LocationSelectionView: View {
     private func pinnedTitleComponents(
         forSelection selection: SoundingSelection
     ) -> [SoundingSelectionRow.DescriptionComponent] {
-        guard case .named(let stationName) = selection.location,
+        guard case .named(let stationName, _, _) = selection.location,
               let location = LocationList.allLocations.locationNamed(stationName) else {
             return [.selectionDescription]
         }
