@@ -64,7 +64,9 @@ final class SkewtStateTests: XCTestCase {
             let name = "Location \(i)"
             let recentCount = state.recentSelections.count
             
-            state = SkewtState.reducer(state, SoundingState.Action.changeAndLoadSelection(.selectLocation(.named(name))))
+            state = SkewtState.reducer(state, SoundingState.Action.changeAndLoadSelection(
+                .selectLocation(.named(name: name, latitude: 0.0, longitude: 0.0))
+            ))
             
             if state.recentSelections.count == recentCount {
                 // Test complete
