@@ -55,7 +55,7 @@ struct PrivacyPolicyView: View {
     private var thirdParty = Section(
         heading: "Third Party Data Providers",
         paragraphs: [
-            "• United States National Oceanic and Atmospheric Association",
+            "• Open-Meteo",
             "Please refer to the privacy policies of these third-party data providers for information regarding their data practices."
         ]
     )
