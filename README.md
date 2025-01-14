@@ -31,10 +31,7 @@ All sorts of other weather characteristics are easily identifiable on a Skew-T L
 Weather balloons are released twice a day from dozens of locations around the US and hundreds around the world.
 
 ## 🧮 Forecasts
-NOAA forecasts provide predicted sounding data on a grid. The default model (Op40) is hourly on a 40km grid for up to 18 hours in the future.
-
-## 🇺🇸 US only?
-The sole data source is the US's NOAA. Forecast data is only available for the US, but 12 hour soundings _are_ available from US military bases all over the world.
+Forecasts provide predicted sounding data on a grid. The default model used for the US is hourly on a 3-25 km grid for up to 16 days in the future. Specifics for other locations vary.
 
 # Further Skew-T Log-P references
 - [NOAA's sounding web API](https://rucsoundings.noaa.gov/)
