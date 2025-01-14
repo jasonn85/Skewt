@@ -16,8 +16,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
-        case automatic  // Allow data provider to select the best forecast model
-        case op40
+        case automaticForecast  // Allow data provider to select the best forecast model
         case raob
         
         var id: Self { self }
@@ -51,7 +50,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
 // Default initializer
 extension SoundingSelection {
     init() {
-        type = .op40
+        type = .automaticForecast
         location = .closest
         time = .now
         
@@ -82,7 +81,7 @@ extension Date {
         let timeInterval = timeIntervalSince(referenceDate)
 
         switch modelType {
-        case .automatic, .op40:
+        case .automaticForecast:
             return timeInterval == 0.0 ? .now : .relative(timeInterval)
         case .raob:
             let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
@@ -118,14 +117,8 @@ extension SoundingSelection.Location {
 extension SoundingSelection.ModelType {
     var hourInterval: Int {
         switch self {
-        case .automatic:
+        case .automaticForecast:
             return 1
-        case .op40:
-            return 1
-//        case .nam:
-//            return 3
-//        case .gfs:
-//            return 3
         case .raob:
             return 12
         }

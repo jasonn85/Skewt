@@ -193,7 +193,7 @@ final class SoundingLocationListTests: XCTestCase {
     }
     
     func testInitialDataInAssets() throws {
-        let metarData = try LocationList.forType(.op40)
+        let metarData = try LocationList.forType(.automaticForecast)
         let soundingData = try LocationList.forType(.raob)
         
         XCTAssertTrue(metarData.locations.contains { $0.name == "MYF" })

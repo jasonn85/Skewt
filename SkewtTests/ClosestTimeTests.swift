@@ -178,10 +178,10 @@ final class ClosestTimeTests: XCTestCase {
         let referenceDate = Date(timeIntervalSince1970: 1702412771)  // December 12, 2023 20:26:11 UTC
         
         // op40 just spits back the time interval (or .now)
-        XCTAssertEqual(referenceDate.soundingSelectionTime(forModelType: .op40, referenceDate: referenceDate), .now)
+        XCTAssertEqual(referenceDate.soundingSelectionTime(forModelType: .automaticForecast, referenceDate: referenceDate), .now)
         let oneHour = TimeInterval(60.0 * 60.0)
         let oneHourAgo = referenceDate.addingTimeInterval(-oneHour)
-        XCTAssertEqual(oneHourAgo.soundingSelectionTime(forModelType: .op40, referenceDate: referenceDate), .relative(-oneHour))
+        XCTAssertEqual(oneHourAgo.soundingSelectionTime(forModelType: .automaticForecast, referenceDate: referenceDate), .relative(-oneHour))
         
         // RAOB now is most recent
         XCTAssertEqual(referenceDate.soundingSelectionTime(forModelType: .raob, referenceDate: referenceDate), .now)

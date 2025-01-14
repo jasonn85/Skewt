@@ -17,7 +17,7 @@ extension Store {
     private static var previewPinnedSelections: [SoundingSelection] {
         [
             SoundingSelection(
-                type: .op40,
+                type: .automaticForecast,
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0
@@ -29,7 +29,7 @@ extension Store {
                 dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
-                type: .op40,
+                type: .automaticForecast,
                 location: .named(name: "SAN", latitude: 32.73, longitude: -117.18),
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0

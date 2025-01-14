@@ -21,7 +21,7 @@ struct LocationSelectionView: View {
     private var searchCount = 20
     private var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
-    @State private var selectedModelType: SoundingSelection.ModelType = .op40
+    @State private var selectedModelType: SoundingSelection.ModelType = .automaticForecast
     @State private var searchText: String = ""
     
     init(listType: ListType = .all) {
@@ -128,7 +128,7 @@ struct LocationSelectionView: View {
         case .all:
             Picker("Type", selection: $selectedModelType) {
                 Text("Forecast")
-                    .tag(SoundingSelection.ModelType.op40)
+                    .tag(SoundingSelection.ModelType.automaticForecast)
                 
                 Text("Sounding")
                     .tag(SoundingSelection.ModelType.raob)
@@ -136,15 +136,15 @@ struct LocationSelectionView: View {
             .pickerStyle(.segmented)
             
             switch selectedModelType {
-            case .op40, .automatic:
-                op40List
+            case .automaticForecast:
+                forecastList
             case .raob:
                 raobList
             }
         case .modelType(let modelType):
             switch modelType {
-            case .op40, .automatic:
-                op40List
+            case .automaticForecast:
+                forecastList
             case .raob:
                 raobList
             }
@@ -167,7 +167,7 @@ struct LocationSelectionView: View {
         if showNearestForecastRow {
             SoundingSelectionRow(
                 selection: SoundingSelection(
-                    type: .op40,
+                    type: .automaticForecast,
                     location: .closest,
                     time: .now,
                     dataAgeBeforeRefresh: 15.0 * 60.0
@@ -196,7 +196,7 @@ struct LocationSelectionView: View {
     }
     
     @ViewBuilder
-    private var op40List: some View {
+    private var forecastList: some View {
         switch store.state.displayState.forecastSelectionState.searchStatus {
         case .loading:
             if showNearestForecastRow {
@@ -219,7 +219,7 @@ struct LocationSelectionView: View {
                 ForEach(locations.prefix(searchCount), id: \.id) {
                     SoundingSelectionRow(
                         selection: SoundingSelection(
-                            type: .op40,
+                            type: .automaticForecast,
                             location: .named(name: $0.name, latitude: $0.latitude, longitude: $0.longitude),
                             time: .now,
                             dataAgeBeforeRefresh: 15.0 * 60.0

@@ -73,7 +73,7 @@ extension LatestSoundingList.Entry {
 extension SoundingSelection.ModelType {
     var assetName: String {
         switch self {
-        case .op40, .automatic:
+        case .automaticForecast:
             return "Metar Locations"
         case .raob:
             return "Sounding Locations"
@@ -82,7 +82,7 @@ extension SoundingSelection.ModelType {
 }
 
 extension LocationList {
-    static private var op40Locations = try! LocationList.loadLocationForType(.op40)
+    static private var forecastLocations = try! LocationList.loadLocationForType(.automaticForecast)
     static private var raobLocations = try! LocationList.loadLocationForType(.raob)
     static var allLocations = try! LocationList.loadAllLocations()
     
@@ -104,8 +104,8 @@ extension LocationList {
     
     static func forType(_ type: SoundingSelection.ModelType) throws -> Self {
         switch type {
-        case .op40, .automatic:
-            return op40Locations
+        case .automaticForecast:
+            return forecastLocations
         case .raob:
             return raobLocations
         }

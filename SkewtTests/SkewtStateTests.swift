@@ -9,16 +9,16 @@ import XCTest
 @testable import Skewt
 
 final class SkewtStateTests: XCTestCase {
-    let closestLatestOp40 = SoundingSelection(type: .op40, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestLatestForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
     let closestLatestRaob = SoundingSelection(type: .raob, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
-    let closestSixHourOp40 = SoundingSelection(type: .op40, location: .closest, time: .relative(.hours(6)), dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestSixHourForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .relative(.hours(6)), dataAgeBeforeRefresh: 15.0 * 60.0)
 
     func testCurrentSoundingSavedInRecents() {
         let originalState = SkewtState(
             displayState: DisplayState(),
-            currentSoundingState: SoundingState(selection: closestLatestOp40),
+            currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
-            recentSelections: [closestLatestOp40],
+            recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
             locationState: LocationState()
         )
@@ -34,9 +34,9 @@ final class SkewtStateTests: XCTestCase {
     func testChangingTimeDoesNotSaveNewRecent() {
         let originalState = SkewtState(
             displayState: DisplayState(),
-            currentSoundingState: SoundingState(selection: closestLatestOp40),
+            currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
-            recentSelections: [closestLatestOp40],
+            recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
             locationState: LocationState()
         )
@@ -53,9 +53,9 @@ final class SkewtStateTests: XCTestCase {
         let failsafe = 1000
         var state = SkewtState(
             displayState: DisplayState(),
-            currentSoundingState: SoundingState(selection: closestLatestOp40),
+            currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
-            recentSelections: [closestLatestOp40],
+            recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
             locationState: LocationState()
         )
@@ -80,13 +80,13 @@ final class SkewtStateTests: XCTestCase {
     }
     
     func testPinningAndUnpinning() {
-        let selection = closestLatestOp40
+        let selection = closestLatestForecast
         
         let originalState = SkewtState(
             displayState: DisplayState(),
-            currentSoundingState: SoundingState(selection: closestLatestOp40),
+            currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
-            recentSelections: [closestLatestOp40],
+            recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
             locationState: LocationState()
         )
@@ -101,7 +101,7 @@ final class SkewtStateTests: XCTestCase {
     }
     
     func testDuplicatePinning() {
-        let selection = closestLatestOp40
+        let selection = closestLatestForecast
         
         let pinnedState = SkewtState(
             displayState: DisplayState(),

@@ -91,7 +91,7 @@ struct ContentView: View {
     @ViewBuilder
     private var locationNavigationStack: some View {
         NavigationStack {
-            LocationSelectionView(listType: .modelType(.op40))
+            LocationSelectionView(listType: .modelType(.automaticForecast))
                 .environmentObject(store)
                 .toolbar {
                     Button("Options", systemImage: "slider.horizontal.3") {
@@ -151,7 +151,7 @@ struct ContentView: View {
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
             NavigationStack {
-                LocationSelectionView(listType: .modelType(.op40))
+                LocationSelectionView(listType: .modelType(.automaticForecast))
                     .environmentObject(store)
             }
             .tabItem {
@@ -234,11 +234,11 @@ struct ContentView: View {
     @ViewBuilder
     private var timeSelection: some View {
         switch store.state.currentSoundingState.selection.type {
-        case .op40, .automatic:
+        case .automaticForecast:
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.op40.hourInterval),
+                stepSize: .hours(SoundingSelection.ModelType.automaticForecast.hourInterval),
                 location: store.state.locationState.locationIfKnown
             )
         case .raob:
@@ -292,7 +292,7 @@ struct ContentView_Previews: PreviewProvider {
 extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
-        case .op40, .automatic:
+        case .automaticForecast:
             return "Forecast"
         case .raob:
             return "Sounding"
