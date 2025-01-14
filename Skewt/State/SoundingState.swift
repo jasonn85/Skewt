@@ -260,6 +260,9 @@ extension SoundingState {
             
             return state
         case .changeAndLoadSelection(let action):
+            // Try to find data for the new selection already existing in our data. We'll return a .done state
+            //  if that succeeds. If not, we'll return a .loading at the bottom of this case.
+            
             // Is our data stale?
             if let openMeteoSounding = state.sounding as? OpenMeteoSounding,
                Date.now.timeIntervalSince(openMeteoSounding.fetchTime) < state.selection.dataAgeBeforeRefresh {
@@ -312,6 +315,7 @@ extension SoundingState {
                 }
             }
             
+            // Load data for the new selection or stale data.
             return SoundingState(
                 selection: SoundingSelection.reducer(state.selection, action),
                 status: .loading
