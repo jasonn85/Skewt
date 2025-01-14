@@ -91,7 +91,7 @@ struct ContentView: View {
     @ViewBuilder
     private var locationNavigationStack: some View {
         NavigationStack {
-            LocationSelectionView()
+            LocationSelectionView(listType: .modelType(.op40))
                 .environmentObject(store)
                 .toolbar {
                     Button("Options", systemImage: "slider.horizontal.3") {
@@ -158,15 +158,6 @@ struct ContentView: View {
                 Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
             }
             .tag(DisplayState.DialogSelection.locationSelection(.forecast))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.raob))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Soundings", systemImage: "balloon")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
