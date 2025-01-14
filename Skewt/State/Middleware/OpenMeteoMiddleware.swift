@@ -17,11 +17,15 @@ enum OpenMeteoRequestError: Error {
 }
 
 extension Middlewares {
-    static let openMeteoApi: Middleware<SkewtState> = { state, action in
+    static let openMeteoApi: Middleware<SkewtState> = { oldState, state, action in
         let logger = Logger()
         
         switch state.currentSoundingState.status {
         case .loading, .refreshing(_):
+            guard oldState.currentSoundingState != state.currentSoundingState else {
+                return Empty().eraseToAnyPublisher()
+            }
+            
             guard !state.currentSoundingState.selection.requiresLocation || state.locationState.locationIfKnown != nil else {
                 return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
                                 .eraseToAnyPublisher()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SoundingData: Codable {
+struct SoundingData: Codable, Equatable {
     struct Point: Codable, Hashable {
         let pressure: Double
         let height: Double?

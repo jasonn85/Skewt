@@ -17,7 +17,7 @@ struct OpenMeteoSounding: Sounding {
     let data: SoundingData
 }
 
-struct OpenMeteoSoundingList: Codable {
+struct OpenMeteoSoundingList: Codable, Equatable {
     let fetchTime: Date
     let latitude: Double
     let longitude: Double

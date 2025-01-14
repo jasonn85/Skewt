@@ -157,7 +157,7 @@ extension SoundingSelection {
     }
 }
 
-struct SoundingState: Codable {
+struct SoundingState: Codable, Equatable {
     enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
         case emptyResponse
@@ -173,7 +173,7 @@ struct SoundingState: Codable {
         case didReceiveResponse(OpenMeteoSoundingList)
     }
     
-    enum Status: Codable {
+    enum Status: Codable, Equatable {
         case idle
         case loading
         case done(OpenMeteoSoundingList)

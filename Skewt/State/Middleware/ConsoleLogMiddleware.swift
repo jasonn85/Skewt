@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 extension Middlewares {
-    static let consoleLogger: Middleware<SkewtState> = { state, action in
+    static let consoleLogger: Middleware<SkewtState> = { _, _, action in
         print("Action: \(action)")
         return Empty().eraseToAnyPublisher()
     }

@@ -17,7 +17,7 @@ extension CLLocation {
 extension Middlewares {
     static let locationSearchLogger = Logger()
     
-    static let locationSearchMiddleware: Middleware<SkewtState> = { state, action in
+    static let locationSearchMiddleware: Middleware<SkewtState> = { _, state, action in
         if case .didDetermineLocation(let location) = action as? LocationState.Action,
            case .loading = state.displayState.forecastSelectionState.searchStatus {
             // We were waiting on location and just got it
