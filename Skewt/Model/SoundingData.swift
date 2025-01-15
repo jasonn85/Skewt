@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct SoundingData: Codable {
+struct SoundingData: Codable, Equatable {
     struct Point: Codable, Hashable {
         let pressure: Double
-        let height: Int?
+        let height: Double?
         let temperature: Double?
         let dewPoint: Double?
         let windDirection: Int?
@@ -71,9 +71,9 @@ extension SoundingData {
 }
 
 extension SoundingData.Point {
-    var altitudeInFeet: Int {
-        let altitudeInM = height ?? Int(Pressure.standardAltitude(forPressure: pressure))
+    var altitudeInFeet: Double {
+        let altitudeInM = height ?? Pressure.standardAltitude(forPressure: pressure)
         
-        return Int(Double(altitudeInM) * 3.28084)
+        return Double(altitudeInM) * 3.28084
     }
 }

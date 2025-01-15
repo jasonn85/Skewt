@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol Sounding {
+protocol Sounding: Codable {
     var data: SoundingData { get }
 }

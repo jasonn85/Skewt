@@ -8,28 +8,30 @@
 import SwiftUI
 
 extension Store {
-    static var previewSounding: RucSounding {
-        let previewData = NSDataAsset(name: "op40-sample")!.data
-        let previewDataString = String(decoding: previewData, as: UTF8.self)
-        return try! RucSounding(fromText: previewDataString)
+    static var previewSoundingList: OpenMeteoSoundingList {
+        let previewData = NSDataAsset(name: "open-meteo-sample")!.data
+        return try! OpenMeteoSoundingList(fromData: previewData)
     }
     
     private static var previewPinnedSelections: [SoundingSelection] {
         [
             SoundingSelection(
-                type: .op40,
+                type: .automaticForecast,
                 location: .closest,
-                time: .now
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
                 type: .raob,
                 location: .closest,
-                time: .now
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
-                type: .op40,
-                location: .named("SAN"),
-                time: .now
+                type: .automaticForecast,
+                location: .named(name: "SAN", latitude: 32.73, longitude: -117.18),
+                time: .now,
+                dataAgeBeforeRefresh: 15.0 * 60.0
             ),
         ]
     }
@@ -39,7 +41,7 @@ extension Store {
         
         let soundingState = SoundingState(
             selection: selection,
-            status: .done(previewSounding, .now)
+            status: .done(previewSoundingList)
         )
         
         return Store<SkewtState>(
@@ -49,8 +51,7 @@ extension Store {
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState(),
-                recentSoundingsState: RecentSoundingsState()
+                locationState: LocationState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

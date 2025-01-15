@@ -12,7 +12,7 @@ extension RucSounding {
     init(withJustData data: [RucSounding.LevelDataPoint]) throws {
         let points = data.map { SoundingData.Point(
             pressure: $0.pressure,
-            height: $0.height,
+            height: $0.height != nil ? Double($0.height!) : nil,
             temperature: $0.temperature,
             dewPoint: $0.dewPoint,
             windDirection: $0.windDirection,

@@ -71,16 +71,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var sounding: Sounding? {
-        switch soundingState.status {
-        case .done(let sounding, _), .refreshing(let sounding):
-            if !soundingState.status.isStale {
-                return sounding
-            }
-            
-            fallthrough
-        case .failed(_), .idle, .loading, .awaitingSoundingLocationData:
-            return nil
-        }
+        soundingState.sounding
     }
     
     private var axisLabelFont: UIFont {
@@ -317,7 +308,7 @@ struct AnnotatedSkewtPlotView: View {
     private func altitudeDetailText(_ dataPoint: SoundingData.Point) -> String {
         switch plotOptions.isobarTypes {
         case .altitude, .none:
-            return fullAltitudeFormatter.string(from: dataPoint.altitudeInFeet as NSNumber)! + "'"
+            return fullAltitudeFormatter.string(from: Int(dataPoint.altitudeInFeet.rounded()) as NSNumber)! + "'"
             
         case .pressure:
             return isobarAxisLabelFormatter.string(from: dataPoint.pressure as NSNumber)! + "mb"

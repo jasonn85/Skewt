@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol Action {}
 typealias Reducer<State> = (State, Action) -> State
-typealias Middleware<State> = (State, Action) -> AnyPublisher<Action, Never>
+typealias Middleware<State> = (State, State, Action) -> AnyPublisher<Action, Never>
 enum Middlewares {}
 
 fileprivate let dispatchQueueLabel = "com.jasonneel.skewt.store"
@@ -49,7 +49,7 @@ final class Store<State>: ObservableObject {
         middlewares.forEach {
             let key = UUID()
             
-            $0(newState, action)
+            $0(currentState, newState, action)
                 .receive(on: DispatchQueue.main)
                 .handleEvents(receiveCompletion: { [weak self] _ in
                     self?.subscriptions.removeValue(forKey: key)
@@ -75,7 +75,6 @@ struct SkewtState: Codable {
     
     var plotOptions: PlotOptions
     var locationState: LocationState
-    var recentSoundingsState: RecentSoundingsState
 }
 
 // Default initializer
@@ -89,7 +88,6 @@ extension SkewtState {
         pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
-        recentSoundingsState = RecentSoundingsState()
     }
 }
 
@@ -102,7 +100,6 @@ extension SkewtState {
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
-        state.recentSoundingsState = RecentSoundingsState.reducer(state.recentSoundingsState, action)
         
         switch action as? SkewtState.Action {
         case .pinSelection(let selection):
