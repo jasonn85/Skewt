@@ -111,6 +111,6 @@ extension OpenMeteoSoundingListRequest {
 
 extension OpenMeteoSoundingListRequest.HourlyValue {
     static var skewtHourlyValues: [OpenMeteoSoundingListRequest.HourlyValue] {
-        allTemperatures + allDewPoints + allWindSpeeds + allWindDirections + allGeopotentialHeights
+        allTemperatures + allDewPoints + allWindSpeeds + allWindDirections + allGeopotentialHeights + [.surface_pressure]
     }
 }
