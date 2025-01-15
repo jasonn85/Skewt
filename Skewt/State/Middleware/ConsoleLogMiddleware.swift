@@ -10,7 +10,7 @@ import Combine
 
 extension Middlewares {
     static let consoleLogger: Middleware<SkewtState> = { _, _, action in
-        print("Action: \(action)")
+        print("\(String(reflecting: type(of: action))): \(action)")
         return Empty().eraseToAnyPublisher()
     }
 }
