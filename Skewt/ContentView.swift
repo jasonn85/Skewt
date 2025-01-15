@@ -133,7 +133,6 @@ struct ContentView: View {
             AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
                 .onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
-                    store.dispatch(SoundingState.Action.doRefresh)
                 }
             
             footer

@@ -12,6 +12,8 @@ struct LocationSelectionView: View {
     @EnvironmentObject var store: Store<SkewtState>
     var listType: ListType = .all
     
+    @State var appeared = false
+    
     enum ListType {
         case all
         case modelType(SoundingSelection.ModelType)
@@ -78,7 +80,10 @@ struct LocationSelectionView: View {
             store.dispatch(ForecastSelectionState.Action.setSearchText(searchText))
         }
         .onAppear {
-            store.dispatch(ForecastSelectionState.Action.load)
+            if !appeared {
+                self.appeared = true
+                store.dispatch(ForecastSelectionState.Action.load)
+            }
         }
     }
     
