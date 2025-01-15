@@ -1,9 +1,9 @@
 {
   "data" : [
     {
-      "filename" : "san-op40-1.txt",
+      "filename" : "forecast.json",
       "idiom" : "universal",
-      "universal-type-identifier" : "public.plain-text"
+      "universal-type-identifier" : "public.json"
     }
   ],
   "info" : {
