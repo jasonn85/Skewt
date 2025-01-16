@@ -37,7 +37,7 @@ extension UserDefaults {
  }
 
 extension Middlewares {
-    static let userDefaultsSaving: Middleware<SkewtState> = { state, action in
+    static let userDefaultsSaving: Middleware<SkewtState> = { _, state, action in
         switch action as? SkewtState.Action {
         case .pinSelection(_), .unpinSelection(_):
             UserDefaults.standard.save(state.pinnedSelections, forKey: .pinnedSelections)

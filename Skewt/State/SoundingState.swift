@@ -16,7 +16,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     }
     
     enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
-        case op40
+        case automaticForecast  // Allow data provider to select the best forecast model
         case raob
         
         var id: Self { self }
@@ -25,7 +25,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Location: Codable, Hashable, Identifiable {
         case closest
         case point(latitude: Double, longitude: Double)
-        case named(String)
+        case named(name: String, latitude: Double, longitude: Double)
         
         var id: Self { self }
     }
@@ -42,6 +42,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     let type: ModelType
     let location: Location
     let time: Time
+    let dataAgeBeforeRefresh: TimeInterval
     
     var id: Self { self }
 }
@@ -49,9 +50,12 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
 // Default initializer
 extension SoundingSelection {
     init() {
-        type = .op40
+        type = .automaticForecast
         location = .closest
         time = .now
+        
+        let fiveMinutes = TimeInterval(5.0 * 60.0)
+        dataAgeBeforeRefresh = fiveMinutes
     }
 }
 
@@ -77,7 +81,7 @@ extension Date {
         let timeInterval = timeIntervalSince(referenceDate)
 
         switch modelType {
-        case .op40:
+        case .automaticForecast:
             return timeInterval == 0.0 ? .now : .relative(timeInterval)
         case .raob:
             let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
@@ -102,7 +106,7 @@ extension SoundingSelection.Location {
         switch self {
         case .closest:
             return "Current location"
-        case .named(let name):
+        case .named(let name, _, _):
             return name
         case .point(latitude: let latitude, longitude: let longitude):
             return String(format: "%.0f, %.0f", latitude, longitude)
@@ -131,12 +135,8 @@ extension SoundingSelection {
 extension SoundingSelection.ModelType {
     var hourInterval: Int {
         switch self {
-        case .op40:
+        case .automaticForecast:
             return 1
-//        case .nam:
-//            return 3
-//        case .gfs:
-//            return 3
         case .raob:
             return 12
         }
@@ -152,22 +152,23 @@ extension SoundingSelection {
         
         switch action {
         case .selectModelType(let type, let time):
-            return SoundingSelection(type: type, location: state.location, time: time)
+            return SoundingSelection(type: type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
         case .selectLocation(let location, let time):
-            return SoundingSelection(type: state.type, location: location, time: time)
+            return SoundingSelection(type: state.type, location: location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
         case .selectTime(let time):
-            return SoundingSelection(type: state.type, location: state.location, time: time)
+            return SoundingSelection(type: state.type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
         case .selectModelTypeAndLocation(let type, let location, let time):
             return SoundingSelection(
                 type: type ?? state.type,
                 location: location ?? state.location,
-                time: time
+                time: time,
+                dataAgeBeforeRefresh: state.dataAgeBeforeRefresh
             )
         }
     }
 }
 
-struct SoundingState: Codable {
+struct SoundingState: Codable, Equatable {
     enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
         case emptyResponse
@@ -180,21 +181,38 @@ struct SoundingState: Codable {
         case doRefresh
         case changeAndLoadSelection(SoundingSelection.Action)
         case didReceiveFailure(SoundingError)
-        case didReceiveResponse(Sounding)
-        case awaitSoundingLocation
+        case didReceiveResponse(OpenMeteoSoundingList)
     }
     
-    enum Status: Codable {
+    enum Status: Codable, Equatable {
         case idle
-        case awaitingSoundingLocationData
         case loading
-        case done(Sounding, Date)
-        case refreshing(Sounding)
+        case done(OpenMeteoSoundingList)
+        case refreshing(OpenMeteoSoundingList)
         case failed(SoundingError)
     }
     
     var selection: SoundingSelection
     var status: Status
+    
+    var sounding: Sounding? {
+        switch status {
+        case .idle, .loading, .failed(_):
+            return nil
+        case .done(let soundingList), .refreshing(let soundingList):
+            switch selection.time {
+            case .now:
+                return soundingList.closestSounding()
+            case .relative(let interval):
+                return soundingList.closestSounding(toDate: .now.addingTimeInterval(interval))
+            case .specific(let date):
+                return soundingList.closestSounding(toDate: date)
+            case.numberOfSoundingsAgo(let agoCount):
+                let secondsAgo = Double(agoCount) * Double(selection.type.hourInterval) * 60.0 * 60.0
+                return soundingList.closestSounding(toDate: .now.addingTimeInterval(-secondsAgo))
+            }
+        }
+    }
 }
 
 // Default initializer
@@ -213,24 +231,12 @@ extension SoundingState {
 extension SoundingState.Status {
     var isLoading: Bool {
         switch self {
-        case .loading, .refreshing(_), .awaitingSoundingLocationData:
+        case .loading, .refreshing(_):
             return true
-        case .idle, .done(_, _), .failed(_):
+        case .idle, .done(_), .failed(_):
             return false
         }
 	}
-    
-    private var staleAge: TimeInterval { 60.0 * 60.0 }  // one hour
-    
-    /// Was this data fetched so long ago that it's likely out of date?
-    var isStale: Bool {
-        switch self {
-        case .done(_, let fetchDate):
-            return -fetchDate.timeIntervalSinceNow >= staleAge
-        case .idle, .awaitingSoundingLocationData, .loading, .refreshing(_), .failed(_):
-            return false
-        }
-    }
 }
 
 extension SoundingState.Action: CustomStringConvertible {
@@ -242,10 +248,8 @@ extension SoundingState.Action: CustomStringConvertible {
             return "Changing selection and reloading: \(selection)"
         case .didReceiveFailure(let error):
             return "Failed to load sounding: \(error)"
-        case .didReceiveResponse(let sounding):
-            return "Received sounding with \(sounding.data.count) data points"
-        case .awaitSoundingLocation:
-            return "Waiting for sounding location data"
+        case .didReceiveResponse(let soundingList):
+            return "Received list of \(soundingList.data.count) sounding\(soundingList.data.count != 1 ? "s" : "")"
         }
     }
 }
@@ -262,11 +266,11 @@ extension SoundingState {
             var state = state
             
             switch state.status {
-            case .done(let sounding, _):
-                if state.status.isStale {
+            case .done(let soundingList):
+                if Date.now.timeIntervalSince(soundingList.fetchTime) > state.selection.dataAgeBeforeRefresh {
                     state.status = .loading
                 } else {
-                    state.status = .refreshing(sounding)
+                    state.status = .refreshing(soundingList)
                 }
             default:
                 state.status = .loading
@@ -274,6 +278,62 @@ extension SoundingState {
             
             return state
         case .changeAndLoadSelection(let action):
+            // Try to find data for the new selection already existing in our data. We'll return a .done state
+            //  if that succeeds. If not, we'll return a .loading at the bottom of this case.
+            
+            // Is our data stale?
+            if let openMeteoSounding = state.sounding as? OpenMeteoSounding,
+               Date.now.timeIntervalSince(openMeteoSounding.fetchTime) < state.selection.dataAgeBeforeRefresh {
+                // Our data is not stale. Now is the selection just a time change or no change at all?
+                switch state.status {
+                case .done(let soundingList):
+                    switch action {
+                    case .selectLocation(state.selection.location, state.selection.time),
+                            .selectModelType(state.selection.type, state.selection.time):
+                        return SoundingState(selection: state.selection, status: .done(soundingList))
+                        
+                    case .selectTime(let time),
+                            .selectModelTypeAndLocation(nil, nil, let time),
+                            .selectModelTypeAndLocation(state.selection.type, nil, let time),
+                            .selectModelTypeAndLocation(nil, state.selection.location, let time),
+                            .selectModelTypeAndLocation(state.selection.type, state.selection.location, let time):
+                        // It is just a time change. Do we have data for that time already?
+                        let date: Date
+                        
+                        switch time {
+                        case .now:
+                            date = .now
+                        case .numberOfSoundingsAgo(let countAgo):
+                            let intervalAgo = Double(countAgo) * Double(state.selection.type.hourInterval) * 60.0 * 60.0
+                            date = .now.addingTimeInterval(-intervalAgo)
+                        case .relative(let interval):
+                            date = .now.addingTimeInterval(interval)
+                        case .specific(let specificDate):
+                            date = specificDate
+                        }
+                        
+                        if let closestTime = soundingList.closestSounding(toDate: date)?.date,
+                           abs(closestTime.timeIntervalSince(date)) <= Double(state.selection.type.hourInterval) * 60.0 * 60.0 {
+                            // No loading needed! Hooray!
+                            return SoundingState(selection:
+                                                    SoundingSelection(
+                                                        type: state.selection.type,
+                                                        location: state.selection.location,
+                                                        time: time,
+                                                        dataAgeBeforeRefresh: state.selection.dataAgeBeforeRefresh
+                                                    ),
+                                                 status: .done(soundingList)
+                            )
+                        }
+                    default:
+                        break
+                    }
+                default:
+                    break
+                }
+            }
+            
+            // Load data for the new selection or stale data.
             return SoundingState(
                 selection: SoundingSelection.reducer(state.selection, action),
                 status: .loading
@@ -283,14 +343,9 @@ extension SoundingState {
             state.status = .failed(error)
             
             return state
-        case .didReceiveResponse(let sounding):
+        case .didReceiveResponse(let soundingList):
             var state = state
-            state.status = .done(sounding, .now)
-            
-            return state
-        case .awaitSoundingLocation:
-            var state = state
-            state.status = .awaitingSoundingLocationData
+            state.status = .done(soundingList)
             
             return state
         }

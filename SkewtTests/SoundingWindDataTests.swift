@@ -10,10 +10,10 @@ import XCTest
 
 final class SoundingWindDataTests: XCTestCase {
     func testWindDataFiltering() throws {
-        let types: [DataPointType] = [.mandatoryLevel, .significantLevel, .windLevel]
+        let types: [RucSounding.LevelDataPoint.DataPointType] = [.mandatoryLevel, .significantLevel, .windLevel]
         
         var data = stride(from: 0, through: 49, by: 1).map {
-            LevelDataPoint(
+            RucSounding.LevelDataPoint(
                 type: types[$0 % types.count],
                 pressure: 1013.0 - Double($0),
                 height: nil,
@@ -24,15 +24,15 @@ final class SoundingWindDataTests: XCTestCase {
             )
         }
         
-        let noWindPoint = LevelDataPoint(type: .significantLevel, pressure: 1013, height: nil, temperature: 15, dewPoint: 0, windDirection: nil, windSpeed: nil)
+        let noWindPoint = RucSounding.LevelDataPoint(type: .significantLevel, pressure: 1013, height: nil, temperature: 15, dewPoint: 0, windDirection: nil, windSpeed: nil)
         
         data.insert(noWindPoint, at: 0)
         data.insert(noWindPoint, at: 25)
         data.append(noWindPoint)
         
-        let sounding = try Sounding(withJustData: data)
+        let sounding = try RucSounding(withJustData: data)
     
-        XCTAssertEqual(sounding.windData.count, 50)
+        XCTAssertEqual(sounding.data.windData.count, 50)
     }
     
     func testWindDataComponentization() {
@@ -42,7 +42,7 @@ final class SoundingWindDataTests: XCTestCase {
         
         magnitudes.forEach { magnitude in
             let data = directions.map { direction in
-                LevelDataPoint(
+                RucSounding.LevelDataPoint(
                     type: .windLevel,
                     pressure: 1013.0 - Double(direction),
                     height: nil,
@@ -53,18 +53,18 @@ final class SoundingWindDataTests: XCTestCase {
                 )
             }
             
-            let sounding = try! Sounding(withJustData: data)
+            let sounding = try! RucSounding(withJustData: data)
             
-            XCTAssertEqual(sounding.windData.count, data.count)
+            XCTAssertEqual(sounding.data.windData.count, data.count)
             
-            sounding.windDataDirectionalComponents.forEach {
+            sounding.data.windDataDirectionalComponents.forEach {
                 XCTAssertEqual(sqrt(pow($0.n, 2) + pow($0.e, 2)), Double(magnitude), accuracy: accuracy)
             }
         }
         
         directions.forEach { direction in
             let data = magnitudes.filter({$0 > 0}).map { magnitude in
-                LevelDataPoint(
+                RucSounding.LevelDataPoint(
                     type: .windLevel,
                     pressure: 1013.0 - Double(direction),
                     height: nil,
@@ -75,11 +75,11 @@ final class SoundingWindDataTests: XCTestCase {
                 )
             }
             
-            let sounding = try! Sounding(withJustData: data)
+            let sounding = try! RucSounding(withJustData: data)
             
-            XCTAssertEqual(sounding.windData.count, data.count)
+            XCTAssertEqual(sounding.data.windData.count, data.count)
             
-            sounding.windDataDirectionalComponents.forEach {
+            sounding.data.windDataDirectionalComponents.forEach {
                 
                 var computedDirection = atan2($0.e, $0.n) / .pi * 180.0
                 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension LevelDataPoint {
+extension SoundingData.Point {
     var windComponents: (n: Double, e: Double)? {
         guard let windSpeed = windSpeed, let windDirection = windDirection else {
             return nil
@@ -20,10 +20,10 @@ extension LevelDataPoint {
     }
 }
 
-extension Sounding {
+extension SoundingData {
     /// All data points in the sounding that contain wind data
-    var windData: [LevelDataPoint] {
-        data.filter { $0.windSpeed != nil && $0.windDirection != nil }
+    var windData: [Point] {
+        dataPoints.filter { $0.windSpeed != nil && $0.windDirection != nil }
     }
     
     /// Wind data as north/east components
@@ -37,8 +37,8 @@ struct ReducedWindDataPoint {
     let windMagnitude: Double
 }
 
-extension Sounding {
-    typealias WindReducer = (Int, Int) -> Double
+extension SoundingData {
+    typealias WindReducer = (Int, Double) -> Double
     
     static var magnitudeWindReducer: WindReducer = { _, speed in Double(speed) }
     
@@ -46,7 +46,7 @@ extension Sounding {
         let windData = windData
         
         guard windData.count > 0 else {
-            return Sounding.magnitudeWindReducer
+            return SoundingData.magnitudeWindReducer
         }
         
         let maximumWindPoint = windData.reduce(windData.first!) { $1.windSpeed! > $0.windSpeed! ? $1 : $0 }

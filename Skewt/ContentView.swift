@@ -91,7 +91,7 @@ struct ContentView: View {
     @ViewBuilder
     private var locationNavigationStack: some View {
         NavigationStack {
-            LocationSelectionView()
+            LocationSelectionView(listType: .modelType(.automaticForecast))
                 .environmentObject(store)
                 .toolbar {
                     Button("Options", systemImage: "slider.horizontal.3") {
@@ -138,8 +138,6 @@ struct ContentView: View {
             )
                 .onAppear() {
                     store.dispatch(LocationState.Action.requestLocation)
-                    store.dispatch(RecentSoundingsState.Action.refresh)
-                    store.dispatch(SoundingState.Action.doRefresh)
                 }
             
             footer
@@ -157,22 +155,13 @@ struct ContentView: View {
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
             NavigationStack {
-                LocationSelectionView(listType: .modelType(.op40))
+                LocationSelectionView(listType: .modelType(.automaticForecast))
                     .environmentObject(store)
             }
             .tabItem {
                 Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
             }
             .tag(DisplayState.DialogSelection.locationSelection(.forecast))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.raob))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Soundings", systemImage: "balloon")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
@@ -204,7 +193,7 @@ struct ContentView: View {
                 
             
             switch store.state.currentSoundingState.selection.location {
-            case .named(let locationName):
+            case .named(let locationName, _, _):
                 Text("(\(locationName))")
             case .point(_, _):
                 Text("(selected location)")
@@ -249,11 +238,11 @@ struct ContentView: View {
     @ViewBuilder
     private var timeSelection: some View {
         switch store.state.currentSoundingState.selection.type {
-        case .op40:
+        case .automaticForecast:
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.op40.hourInterval),
+                stepSize: .hours(SoundingSelection.ModelType.automaticForecast.hourInterval),
                 location: store.state.locationState.locationIfKnown
             )
         case .raob:
@@ -266,13 +255,14 @@ struct ContentView: View {
     
     private var statusText: String? {
         switch store.state.currentSoundingState.status {
-        case .done(let sounding, _), .refreshing(let sounding):
-            let timeAgo = timeAgoFormatter.string(for: sounding.timestamp)!
-            let dateString = dateFormatter.string(for: sounding.timestamp)!
+        case .done(_), .refreshing(_):
+            let time = store.state.currentSoundingState.sounding?.data.time
+            let timeAgo = timeAgoFormatter.string(for: time)!
+            let dateString = dateFormatter.string(for: time)!
             return "\(timeAgo) (\(dateString))"
         case .idle:
             return nil
-        case .loading, .awaitingSoundingLocationData:
+        case .loading:
             return "Loading..."
         case .failed(let error):
             switch error {
@@ -306,8 +296,8 @@ struct ContentView_Previews: PreviewProvider {
 extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
-        case .op40:
-            return "Op40 forecast"
+        case .automaticForecast:
+            return "Forecast"
         case .raob:
             return "Sounding"
         }

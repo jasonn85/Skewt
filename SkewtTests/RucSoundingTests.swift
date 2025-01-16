@@ -1,5 +1,5 @@
 //
-//  SkewtTests.swift
+//  RucSoundingTests.swift
 //  SkewtTests
 //
 //  Created by Jason Neel on 2/15/23.
@@ -8,26 +8,39 @@
 import XCTest
 @testable import Skewt
 
-extension Sounding {
-    init(withJustData data: [LevelDataPoint]) throws {
+extension RucSounding {
+    init(withJustData data: [RucSounding.LevelDataPoint]) throws {
+        let points = data.map { SoundingData.Point(
+            pressure: $0.pressure,
+            height: $0.height != nil ? Double($0.height!) : nil,
+            temperature: $0.temperature,
+            dewPoint: $0.dewPoint,
+            windDirection: $0.windDirection,
+            windSpeed: $0.windSpeed != nil ? Double($0.windSpeed!) : nil
+        ) }
+        
         self.init(
             stationInfo: try StationInfo(fromText: "      1  23062  72290  32.78 117.06      9  99999"),
             type: .op40,
-            timestamp: Date(timeIntervalSince1970: 1693945305),
             description: "Test data",
             stationId: "0",
             windSpeedUnit: .kt,
             radiosondeCode: nil,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil,
-            data: data
+            data: SoundingData(
+                time: Date(timeIntervalSince1970: 1693945305),
+                elevation: 0,
+                dataPoints: points,
+                surfaceDataPoint: points.first,
+                cape: nil,
+                cin: nil,
+                helicity: nil,
+                precipitableWater: nil
+            )
         )
     }
 }
 
-class SkewtTests: XCTestCase {
+class RucSoundingTests: XCTestCase {
     func testNilSentinel() {
         XCTAssertEqual(Int(fromSoundingString: "69"), 69)
         XCTAssertEqual(Int(fromSoundingString: "-5785"), -5785)
@@ -70,7 +83,7 @@ class SkewtTests: XCTestCase {
         do {
             let (_, _) = try unknownTypeLine.soundingTypeAndColumns()
             XCTFail("Unrecognized line type should throw an error")
-        } catch SoundingParseError.unparseableLine {
+        } catch RucSounding.ParseError.unparseableLine {
             return
         } catch {
             XCTFail("Unrecognized line type should throw a SoundingParseError.unparseableLine")
@@ -94,7 +107,7 @@ class SkewtTests: XCTestCase {
         do {
             let _ = try notADate.dateFromHeaderLine()
             XCTFail("A non-date should throw an error when parsed as a date")
-        } catch SoundingParseError.unparseableLine {
+        } catch RucSounding.ParseError.unparseableLine {
             return
         } catch {
             XCTFail("A non-date should throw a SoundingParseError.unparseableLine when parsed as a date")
@@ -120,7 +133,7 @@ class SkewtTests: XCTestCase {
     }
     
     func testStationInfoParsing() throws {
-        let stationInfo = try StationInfo(fromText: "      1  23062  72290  32.78 117.06      9  99999")
+        let stationInfo = try RucSounding.StationInfo(fromText: "      1  23062  72290  32.78 117.06      9  99999")
         XCTAssertEqual(stationInfo.wbanId, 23062)
         XCTAssertEqual(stationInfo.wmoId, 72290)
         XCTAssertEqual(stationInfo.latitude, 32.78)
@@ -128,7 +141,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(stationInfo.altitude, 9)
         
         // Lat/long mushed together like happens with ROAB data
-        let mushedInfo = try StationInfo(fromText: "      1   3190  72293  32.87N117.15W   134   1103")
+        let mushedInfo = try RucSounding.StationInfo(fromText: "      1   3190  72293  32.87N117.15W   134   1103")
         XCTAssertEqual(mushedInfo.wbanId, 3190)
         XCTAssertEqual(mushedInfo.wmoId, 72293)
         XCTAssertEqual(mushedInfo.latitude, 32.87)
@@ -136,7 +149,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(mushedInfo.altitude, 134)
         
         // Permit missing WMO ID and altitude
-        let stationInfoNoWmoIdOrAltitude = try StationInfo(fromText: "      1  23062  99999  32.87 117.15  99999  99999")
+        let stationInfoNoWmoIdOrAltitude = try RucSounding.StationInfo(fromText: "      1  23062  99999  32.87 117.15  99999  99999")
         XCTAssertEqual(stationInfoNoWmoIdOrAltitude.wbanId, 23062)
         XCTAssertNil(stationInfoNoWmoIdOrAltitude.wmoId)
         XCTAssertEqual(stationInfoNoWmoIdOrAltitude.latitude, 32.87)
@@ -144,9 +157,9 @@ class SkewtTests: XCTestCase {
         XCTAssertNil(stationInfoNoWmoIdOrAltitude.altitude)
         
         do {
-            let _ = try StationInfo(fromText: "      4   2500  10313   -525   -574    256     36")
+            let _ = try RucSounding.StationInfo(fromText: "      4   2500  10313   -525   -574    256     36")
             XCTFail("Parsing a data point line as a station ID line should throw an error")
-        } catch SoundingParseError.lineTypeMismatch {
+        } catch RucSounding.ParseError.lineTypeMismatch {
             return
         } catch {
             XCTFail("Parsing a data point line as a station ID line should throw a "
@@ -154,15 +167,15 @@ class SkewtTests: XCTestCase {
         }
         
         let line = "      3           SAN                   12     kt"
-        let stationInfoAndOther = try StationInfoAndOther(fromText: line)
+        let stationInfoAndOther = try RucSounding.StationInfoAndOther(fromText: line)
         XCTAssertEqual(stationInfoAndOther.stationId, "SAN")
         XCTAssertEqual(stationInfoAndOther.radiosondeType, .sdc)
         XCTAssertEqual(stationInfoAndOther.windSpeedUnit, .kt)
         
         do {
-            let _ = try StationInfoAndOther(fromText: "      4   2500  10313   -525   -574    256     36")
+            let _ = try RucSounding.StationInfoAndOther(fromText: "      4   2500  10313   -525   -574    256     36")
             XCTFail("Parsing a data point line as a station ID and others line should throw an error")
-        } catch SoundingParseError.lineTypeMismatch {
+        } catch RucSounding.ParseError.lineTypeMismatch {
             return
         } catch {
             XCTFail("Parsing a data point line as a station ID and others line should throw a "
@@ -172,7 +185,7 @@ class SkewtTests: XCTestCase {
     
     func testDataPointParsing() throws {
         let mandatoryLine = "      4   2500  10313   -525   -574    256     36"
-        let mandatory = try LevelDataPoint(fromText: mandatoryLine)
+        let mandatory = try RucSounding.LevelDataPoint(fromText: mandatoryLine)
         XCTAssertEqual(mandatory.type, .mandatoryLevel)
         XCTAssertEqual(mandatory.pressure, 250.0)
         XCTAssertEqual(mandatory.height, 10313)
@@ -182,7 +195,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(mandatory.windSpeed, 36)
         
         let significantLine = "      5   2331  10762   -553   -602    235     36"
-        let significant = try LevelDataPoint(fromText: significantLine)
+        let significant = try RucSounding.LevelDataPoint(fromText: significantLine)
         XCTAssertEqual(significant.type, .significantLevel)
         XCTAssertEqual(significant.pressure, 233.1)
         XCTAssertEqual(significant.height, 10762)
@@ -192,7 +205,7 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(significant.windSpeed, 36)
         
         let mandatoryLineWithBlanks = "      4   8500  99999  99999  99999  99999  99999"
-        let blanks = try LevelDataPoint(fromText: mandatoryLineWithBlanks)
+        let blanks = try RucSounding.LevelDataPoint(fromText: mandatoryLineWithBlanks)
         XCTAssertEqual(blanks.type, .mandatoryLevel)
         XCTAssertEqual(blanks.pressure, 850.0)
         XCTAssertNil(blanks.temperature)
@@ -201,7 +214,7 @@ class SkewtTests: XCTestCase {
         XCTAssertNil(blanks.windSpeed)
         
         let windLine = "      6    262  24384  99999  99999     40     10   1235     88     90"
-        let wind = try LevelDataPoint(fromText: windLine)
+        let wind = try RucSounding.LevelDataPoint(fromText: windLine)
         XCTAssertEqual(wind.type, .windLevel)
         XCTAssertNil(wind.temperature)
         XCTAssertNil(wind.dewPoint)
@@ -210,9 +223,9 @@ class SkewtTests: XCTestCase {
         
         let stationIdLine = "      1  23062  72290  32.78 117.06      9  99999"
         do {
-            let _ = try LevelDataPoint(fromText: stationIdLine)
+            let _ = try RucSounding.LevelDataPoint(fromText: stationIdLine)
             XCTFail("Parsing a station ID line as a data point should throw an error")
-        } catch SoundingParseError.lineTypeMismatch {
+        } catch RucSounding.ParseError.lineTypeMismatch {
             return
         } catch {
             XCTFail("Parsing a station ID line as a data point should throw a SoundingParseError.lineTypeMismatch")
@@ -226,27 +239,27 @@ class SkewtTests: XCTestCase {
         let s = String(data: d, encoding: .utf8)!
         let lines = s.components(separatedBy: .newlines)
         
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
         XCTAssertEqual(sounding.type, .op40)
         XCTAssertEqual(sounding.description, "Op40 analysis valid for grid point 6.9 nm / 66 deg from SAN:")
-        XCTAssertEqual(sounding.data.count, 62)
-        XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 62)
-        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 62)
+        XCTAssertEqual(sounding.data.dataPoints.count, 62)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 62)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 62)
         XCTAssertEqual(sounding.stationId, "SAN")
-        XCTAssertEqual(sounding.cape, 0)
-        XCTAssertEqual(sounding.cin, 0)
+        XCTAssertEqual(sounding.data.cape, 0)
+        XCTAssertEqual(sounding.data.cin, 0)
         
         let linesMinusGlobals = lines[0...1] + lines[3...]
         let minusGlobals = linesMinusGlobals.joined(separator: "\n")
-        let _ = try Sounding(fromText: minusGlobals)
+        let _ = try RucSounding(fromText: minusGlobals)
         
         let linesMinusHeader = [lines[0]] + lines[2...]
         let missingHeader = linesMinusHeader.joined(separator: "\n")
         
         do {
-            let _ = try Sounding(fromText: missingHeader)
+            let _ = try RucSounding(fromText: missingHeader)
             XCTFail("Parsing a sounding with no header should throw an error")
-        } catch SoundingParseError.missingHeaders {
+        } catch RucSounding.ParseError.missingHeaders {
             return
         } catch {
             XCTFail("Parsing a sounding with no header should throw a SoundingParseError.missingHeaders, "
@@ -259,16 +272,16 @@ class SkewtTests: XCTestCase {
         let fileUrl = bundle.url(forResource: "out-of-bounds-op40", withExtension: "txt")!
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
 
-        sounding.data.filter({ $0.temperature != nil }).forEach {
+        sounding.data.dataPoints.filter({ $0.temperature != nil }).forEach {
             XCTAssertTrue(
                 $0.temperature! >= -270.0 && $0.temperature! <= 100.0,
                 "Temperature \($0.temperature!) is between absolute zero and boiling water temperature"
             )
         }
         
-        sounding.data.filter({ $0.dewPoint != nil }).forEach {
+        sounding.data.dataPoints.filter({ $0.dewPoint != nil }).forEach {
             XCTAssertTrue(
                 $0.dewPoint! >= -270.0 && $0.dewPoint! <= 100.0,
                 "Dew point of \($0.dewPoint!) is between absolute zero and boiling water temperature"
@@ -282,12 +295,12 @@ class SkewtTests: XCTestCase {
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
 
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
         XCTAssertEqual(sounding.type, .raob)
         XCTAssertEqual(sounding.description, "RAOB sounding valid at:")
-        XCTAssertEqual(sounding.data.count, 231)
-        XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 89)
-        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 162)
+        XCTAssertEqual(sounding.data.dataPoints.count, 231)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 89)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 162)
         XCTAssertEqual(sounding.stationId, "NKX")
     }
     
@@ -297,15 +310,15 @@ class SkewtTests: XCTestCase {
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
         
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
         XCTAssertEqual(sounding.type, .nam)
         XCTAssertEqual(sounding.description, "NAM analysis valid for grid point 8.8 nm / 330 deg from IAD:")
         XCTAssertEqual(sounding.stationId, "IAD")
-        XCTAssertEqual(sounding.cape, 0)
-        XCTAssertEqual(sounding.cin, 0)
-        XCTAssertEqual(sounding.data.count, 39)
-        XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 39)
-        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 39)
+        XCTAssertEqual(sounding.data.cape, 0)
+        XCTAssertEqual(sounding.data.cin, 0)
+        XCTAssertEqual(sounding.data.dataPoints.count, 39)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 39)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 39)
     }
     
     func testGfsParsing() throws {
@@ -314,15 +327,15 @@ class SkewtTests: XCTestCase {
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
         
-        let sounding = try Sounding(fromText: s)
+        let sounding = try RucSounding(fromText: s)
         XCTAssertEqual(sounding.type, .gfs)
         XCTAssertEqual(sounding.description, "GFS analysis valid for grid point 4.6 nm / 285 deg from ORD:")
         XCTAssertEqual(sounding.stationId, "ORD")
-        XCTAssertEqual(sounding.cape, 0)
-        XCTAssertEqual(sounding.cin, 0)
-        XCTAssertEqual(sounding.data.count, 31)
-        XCTAssertEqual(sounding.data.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 26)
-        XCTAssertEqual(sounding.data.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 31)
+        XCTAssertEqual(sounding.data.cape, 0)
+        XCTAssertEqual(sounding.data.cin, 0)
+        XCTAssertEqual(sounding.data.dataPoints.count, 31)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.temperature != nil && $0.dewPoint != nil }).count, 26)
+        XCTAssertEqual(sounding.data.dataPoints.filter({ $0.windDirection != nil && $0.windSpeed != nil}).count, 31)
     }
     
     func testGlobalsParsing() {
@@ -336,112 +349,9 @@ class SkewtTests: XCTestCase {
         XCTAssertEqual(b["CAPE"], 170)
         XCTAssertEqual(b["CIN"], 1)
     }
-
-    func testNearestValue() throws {
-        let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0), (0.0, 800.0), (10.0, 700.0), (20.0, 600.0)]
-        let dewPointSpread = 10.0
-        
-        let points = temperaturesAndPressures.map {
-            LevelDataPoint(
-                type: .significantLevel,
-                pressure: $0.1,
-                height: nil,
-                temperature: $0.0,
-                dewPoint: $0.0 - dewPointSpread,
-                windDirection: nil,
-                windSpeed: nil
-            )
-        }
-        
-        let sounding = try Sounding(withJustData: Array(points))
-
-        XCTAssertEqual(
-            sounding.closestValue(toPressure: temperaturesAndPressures[0].1, withValueFor: \.temperature)!.temperature,
-            temperaturesAndPressures[0].0,
-            "Closest value to first value is first value"
-        )
-        
-        XCTAssertEqual(
-            sounding.closestValue(toPressure: 1500.0, withValueFor: \.temperature)!.temperature,
-            temperaturesAndPressures[0].0,
-            "Closest value to underground is first value"
-        )
-        
-        XCTAssertEqual(
-            sounding.closestValue(toPressure: temperaturesAndPressures.last!.1, withValueFor: \.temperature)!.temperature,
-            temperaturesAndPressures.last!.0,
-            "Closest value to last value is last value"
-        )
-        
-        XCTAssertEqual(
-            sounding.closestValue(toPressure: 0.0, withValueFor: \.temperature)!.temperature,
-            temperaturesAndPressures.last!.0,
-            "Closest value to space is last value"
-        )
-        
-        let closerToTwoThanThreePressure = (temperaturesAndPressures[2].1 
-                                            + temperaturesAndPressures[2].1
-                                            + temperaturesAndPressures[3].1) / 3.0
-        XCTAssertEqual(
-            sounding.closestValue(toPressure: closerToTwoThanThreePressure, withValueFor: \.temperature)!.temperature,
-            temperaturesAndPressures[2].0,
-            "A pressure closer to entry #2 than #3 results in #2"
-        )
-    }
-    
-    func testInterpolation() throws {
-        let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0), (0.0, 800.0), (10.0, 700.0), (20.0, 600.0)]
-        let dewPointSpread = 10.0
-        
-        let points = temperaturesAndPressures.map {
-            LevelDataPoint(
-                type: .significantLevel,
-                pressure: $0.1,
-                height: nil,
-                temperature: $0.0,
-                dewPoint: $0.0 - dewPointSpread,
-                windDirection: nil,
-                windSpeed: nil
-            )
-        }
-    
-        let sounding = try Sounding(withJustData: Array(points))
-        
-        XCTAssertEqual(
-            sounding.interpolatedValue(for: \.temperature, atPressure: temperaturesAndPressures[0].1),
-            points[0].temperature,
-            "Interpolation returns exact match if one exists"
-        )
-        XCTAssertEqual(
-            sounding.interpolatedValue(for: \.temperature, atPressure: temperaturesAndPressures[4].1),
-            points[4].temperature,
-            "Interpolation returns exact match if one exists"
-        )
-        XCTAssertEqual(
-            sounding.interpolatedValue(for: \.dewPoint, atPressure: temperaturesAndPressures[0].1),
-            points[0].dewPoint,
-            "Interpolation returns exact match if one exists"
-        )
-        
-        let hopefullyFive = sounding.interpolatedValue(
-            for: \.temperature,
-            atPressure: (temperaturesAndPressures[2].1 + temperaturesAndPressures[3].1) / 2.0
-        )
-        XCTAssertNotNil(hopefullyFive)
-        XCTAssertTrue(hopefullyFive! > temperaturesAndPressures[2].0)
-        XCTAssertTrue(hopefullyFive! < temperaturesAndPressures[3].0)
-        
-        let hopefullyNegativeFifteen = sounding.interpolatedValue(
-            for: \.temperature,
-            atPressure: (temperaturesAndPressures[0].1 + temperaturesAndPressures[1].1) / 2.0
-        )
-        XCTAssertNotNil(hopefullyNegativeFifteen)
-        XCTAssertTrue(hopefullyNegativeFifteen! > temperaturesAndPressures[0].0)
-        XCTAssertTrue(hopefullyNegativeFifteen! < temperaturesAndPressures[1].0)
-    }
     
     func testSurfaceData() throws {
-        let surfacePoint = LevelDataPoint(
+        let surfacePoint = RucSounding.LevelDataPoint(
             type: .surfaceLevel,
             pressure: 1000.0,
             height: nil,
@@ -451,7 +361,7 @@ class SkewtTests: XCTestCase {
             windSpeed: nil
         )
         
-        let significantLevelJustAboveSurface = LevelDataPoint(
+        let significantLevelJustAboveSurface = RucSounding.LevelDataPoint(
             type: .significantLevel,
             pressure: 900.0,
             height: nil,
@@ -461,7 +371,7 @@ class SkewtTests: XCTestCase {
             windSpeed: nil
         )
         
-        let significantLevelUpHigh = LevelDataPoint(
+        let significantLevelUpHigh = RucSounding.LevelDataPoint(
             type: .significantLevel,
             pressure: 500.0,
             height: nil,
@@ -471,11 +381,11 @@ class SkewtTests: XCTestCase {
             windSpeed: nil
         )
         
-        let withSurface = try Sounding(withJustData: [surfacePoint, significantLevelJustAboveSurface, significantLevelUpHigh])
-        let noSurface = try Sounding(withJustData: [significantLevelJustAboveSurface, significantLevelUpHigh])
+        let withSurface = try RucSounding(withJustData: [surfacePoint, significantLevelJustAboveSurface, significantLevelUpHigh])
+        let noSurface = try RucSounding(withJustData: [significantLevelJustAboveSurface, significantLevelUpHigh])
         
-        XCTAssertEqual(withSurface.surfaceData, surfacePoint, ".surfaceData returns surface data point")
-        XCTAssertEqual(noSurface.surfaceData, significantLevelJustAboveSurface,
+        XCTAssertEqual(withSurface.data.surfaceDataPoint, SoundingData.Point(fromRucDataPoint: surfacePoint), ".surfaceData returns surface data point")
+        XCTAssertEqual(noSurface.data.surfaceDataPoint, SoundingData.Point(fromRucDataPoint: significantLevelJustAboveSurface),
                        ".surfaceData returns lowest available data if no surface data point exists")
     }
 }

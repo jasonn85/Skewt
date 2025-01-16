@@ -93,7 +93,7 @@ struct SoundingSelectionRow: View {
         var description: String
         
         switch selection.type {
-        case .op40:
+        case .automaticForecast:
             iconName = "chart.line.uptrend.xyaxis"
             description = "Forecast"
         case .raob:
@@ -159,19 +159,22 @@ struct SoundingSelectionRow: View {
         location: SoundingSelection.Location
     ) -> SoundingSelection.Time {
         switch type {
-        case .op40:
+        case .automaticForecast:
             return .now
         case .raob:
             switch location {
             case .closest, .point(_, _):
                 return .now
-            case .named(let name):
-                guard let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId,
-                      let mostRecentSounding = store.state.recentSoundingsState.recentSoundings?.lastSoundingTime(forWmoId: wmoId) else {
-                    return .now
-                }
+            case .named(_, _, _):
+                return .now
                 
-                return mostRecentSounding.soundingSelectionTime(forModelType: type)
+//            case .named(let name, _, _):
+//                guard let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId,
+//                      let mostRecentSounding = store.state.recentSoundingsState.recentSoundings?.lastSoundingTime(forWmoId: wmoId) else {
+//                    return .now
+//                }
+//                
+//                return mostRecentSounding.soundingSelectionTime(forModelType: type)
             }
         }
     }
@@ -192,7 +195,7 @@ struct SoundingSelectionRow: View {
     
     private var redAge: TimeInterval {
         switch selection.type {
-        case .op40:
+        case .automaticForecast:
             let twoHours = 2.0 * 60.0 * 60.0
             return twoHours
         case .raob:
@@ -205,8 +208,8 @@ struct SoundingSelectionRow: View {
 struct SoundingSelectionRow_Previews: PreviewProvider {
     static var previews: some View {
         let store = Store<SkewtState>.previewStore
-        let currentForecast = SoundingSelection(type: .op40, location: .closest, time: .now)
-        let mostRecentSounding = SoundingSelection(type: .raob, location: .closest, time: .now)
+        let currentForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+        let mostRecentSounding = SoundingSelection(type: .raob, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
         let anHourAgo = Date(timeIntervalSinceNow: -1.0 * 60.0 * 60.0)
         let sixteenHoursAgo = Date(timeIntervalSinceNow: -16.0 * 60.0 * 60.0)
         
