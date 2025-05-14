@@ -30,24 +30,33 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection);
     float height = elevationRange[0] + (1.0 - (position.y - bounds.y) / bounds.w) * (elevationRange[1] - elevationRange[0]);
     float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + height, 0.0);
 
-    float phi = 0.0;
+    float phi = (1.0 - (position.y - bounds.y) / bounds.w) * verticalFov;
     float theta = -(0.5 - (position.x - bounds.x) / bounds.z) * horizontalFov - viewBearing;
     float3 viewDirection = float3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
-    
+        
     float sunPhi = M_PI_F / 2.0 - sunDeclination;
     float sunTheta = -hourAngle - viewBearing;
     float3 sunDirection = float3(sin(sunTheta) * cos(sunPhi), cos(sunTheta), sin(sunTheta) * sin(sunPhi));
     
-    return incidentLight(viewPoint, viewDirection, sunDirection);
+    half4 r = incidentLight(viewPoint, viewDirection, sunDirection);
+    
+    if (isnan(r.r) || isnan(r.g) || isnan(r.b)) {
+        // TODO: Remove pink NaN sentinel after development
+        r = half4(1.0, 0.0, 1.0, 1.0);
+    }
+    
+    return r;
 }
 
 half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
-    float rayLength = sphereIntersectionPoints(start, direction, RADIUS_EARTH_ATMOSPHERE)[1];
-    
-    if (isnan(rayLength) || rayLength < 0.0) {
-        return half4(0.0);
+    float2 points = sphereIntersectionPoints(start, direction, RADIUS_EARTH_ATMOSPHERE);
+
+    if (isnan(points[0]) || isnan(points[1])) {
+        // TODO: Remove red NaN sentinel after development
+        return half4(1.0, 0.0, 0.0, 1.0);
     }
     
+    float rayLength = points[1] - max(0.0, points[0]);
     float segmentLength = rayLength / NUM_SAMPLES_RAY;
     float current = 0.0;
     float3 betaRayleigh = float3(3.8e-6, 13.5e-6, 33.1e-6);
