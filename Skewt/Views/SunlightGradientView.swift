@@ -43,7 +43,7 @@ struct SunlightGradientView: View {
     struct SunlightGradientPreview: View {
         static var noonEpochTime = 1720548000.0
         @State var timeInterval: TimeInterval = noonEpochTime
-        @State var viewBearing: Double = 180.0
+        @State var viewBearing: Double = 0.0
         @State var horizontalFovDegrees: Double = 90.0
         
         var body: some View {

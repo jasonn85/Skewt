@@ -13,7 +13,6 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#define PI 3.1415926535
 #define RADIUS_EARTH_SURFACE 6360e3
 #define RADIUS_EARTH_ATMOSPHERE 6420e3
 #define THICKNESS_RAYLEIGH_ATMOSPHERE 7994
@@ -28,7 +27,7 @@ bool solveQuadratic(float a, float b, float c, thread float2 & x);
 bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t);
 
 [[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float sunAzimuth, float sunElevation, float horizontalFov) {
-    float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE, 0.0);
+    float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + 1.0, 0.0);
     
     float aspectRatio = bounds.z / bounds.w;
     float verticalFov = 2.0 * atan((1.0 / aspectRatio) * tan(horizontalFov / 2.0));
@@ -41,8 +40,12 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
     
     float2 surfaceIntersection;
     float tMaximum = INFINITY;
-    if (raySphereIntersect(viewPoint, viewDirection, RADIUS_EARTH_SURFACE, surfaceIntersection) && surfaceIntersection[1] > 0.0) {
-        tMaximum = max(0.0, surfaceIntersection[0]);
+    if (raySphereIntersect(viewPoint, viewDirection, RADIUS_EARTH_SURFACE, surfaceIntersection)) {
+        if (surfaceIntersection[0] > 0.0) {
+            tMaximum = surfaceIntersection[0];
+        } else if (surfaceIntersection[1] > 0.0) {
+            tMaximum = surfaceIntersection[1];
+        }
     }
     
     half4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
@@ -78,15 +81,23 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float t
     float g = 0.76;
     float phaseMie =  3.0 / (8.0 * M_PI_F) * ((1.0 - g * g) * (1.0 + mu * mu)) / ((2.0 + g * g) * pow(1.0 + g * g - 2.0 * g * mu, 1.5));
     
-    for (uint i = 0; i < NUM_SAMPLES_SUBRAYS; i++) {
+    for (uint i = 0; i < NUM_SAMPLES_RAY; i++) {
         float3 samplePosition = start + (current + segmentLength * 0.5) * direction;
         float height = length(samplePosition) - RADIUS_EARTH_SURFACE;
+        
+        float2 tEarthShadow;
+        if (raySphereIntersect(samplePosition, sunDirection, RADIUS_EARTH_SURFACE, tEarthShadow) && tEarthShadow[1] > 0.0) {
+            continue;
+        }
         
         opticalDepthRayleigh += exp(-height / THICKNESS_RAYLEIGH_ATMOSPHERE) * segmentLength;
         opticalDepthMie += exp(-height / THICKNESS_MIE_ATMOSPHERE) * segmentLength;
         
         float2 tLight;
-        raySphereIntersect(samplePosition, sunDirection, RADIUS_EARTH_ATMOSPHERE, tLight);
+        if (!raySphereIntersect(samplePosition, sunDirection, RADIUS_EARTH_ATMOSPHERE, tLight) || (tLight[1] <= 0.0)) {
+            continue;
+        }
+        
         float subraySegmentLength = tLight[1] / NUM_SAMPLES_SUBRAYS;
         float currentLight = 0.0;
         float subrayOpticalDepthRayleigh = 0.0;
@@ -110,8 +121,10 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float t
         if (!underground) {
             float3 tau = betaRayleigh * (opticalDepthRayleigh + subrayOpticalDepthRayleigh) + betaMie * 1.1 * (opticalDepthMie + subrayOpticalDepthMie);
             float3 attenuation = float3(exp(-tau.x), exp(-tau.y), exp(-tau.z));
-            sumRayleigh += attenuation * opticalDepthRayleigh;
-            sumMie += attenuation * opticalDepthMie;
+            float localRayleigh = exp(-height / THICKNESS_RAYLEIGH_ATMOSPHERE);
+            float localMie = exp(-height / THICKNESS_MIE_ATMOSPHERE);
+            sumRayleigh += attenuation * localRayleigh * segmentLength;
+            sumMie += attenuation * localMie * segmentLength;
         }
         
         current += segmentLength;
@@ -124,15 +137,6 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float t
 }
 
 bool solveQuadratic(float a, float b, float c, thread float2 & x) {
-    if (b == 0.0) {
-        if (a == 0.0) {
-            return false;
-        }
-        
-        x = float2(0.0, sqrt(-c / a));
-        return true;
-    }
-    
     float discriminant = b * b - 4.0 * a * c;
     
     if (discriminant < 0.0) {
@@ -146,7 +150,7 @@ bool solveQuadratic(float a, float b, float c, thread float2 & x) {
 }
 
 bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t) {
-    float a = direction.x * direction.x + direction.y * direction.y + direction.z + direction.z;
+    float a = dot(direction, direction);
     float b = 2.0 * (direction.x * start.x + direction.y * start.y + direction.z * start.z);
     float c = start.x * start.x + start.y * start.y + start.z * start.z - radius * radius;
     
