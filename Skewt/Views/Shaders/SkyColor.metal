@@ -150,8 +150,8 @@ float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float 
     float viewUp = saturate(direction.y);
     float horizon = 1.0 - viewUp;
 
-    float3 zenithNight = float3(0.01, 0.02, 0.06);
-    float3 horizonNight = float3(0.04, 0.06, 0.12);
+    float3 zenithNight = float3(0.04, 0.06, 0.12);
+    float3 horizonNight = float3(0.067, 0.125, 0.302);
 
     float3 nightColor = mix(zenithNight, horizonNight, pow(horizon, 1.5));
     colors = max(colors, nightColor * nightFactor);
