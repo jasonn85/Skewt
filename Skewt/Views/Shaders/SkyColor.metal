@@ -33,9 +33,12 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
     float verticalFov = 2.0 * atan((1.0 / aspectRatio) * tan(horizontalFov / 2.0));
     
     float x = 2.0 * (position.x + bounds.x + 0.5) / bounds.z - 1.0;
-    float y = 1.0 - (position.y + bounds.y + 0.5) / bounds.w;
+    float y = 1.0 - 2.0 * (position.y + bounds.y + 0.5) / bounds.w;
     
-    float3 viewDirection = normalize(float3(x * tan(horizontalFov / 2.0), y * tan(verticalFov / 2.0), -1.0));
+    float vx = x * tan(horizontalFov * 0.5);
+    float vy = (y + 1.0) * 0.5 * tan(verticalFov * 0.5);
+    
+    float3 viewDirection = normalize(float3(vx, vy, -1.0));
     float3 sunDirection = normalize(float3(sin(sunAzimuth) * cos(sunElevation), sin(sunElevation), -cos(sunAzimuth) * cos(sunElevation)));
     
     float2 surfaceIntersection;
