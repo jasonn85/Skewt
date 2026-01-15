@@ -32,8 +32,8 @@ struct SunlightGradientView: View {
         Rectangle()
             .foregroundStyle(ShaderLibrary.skyColor(
                 .boundingRect,
-                .float(time.hourAngle(at: location) + viewBearing * .pi / 180.0),
-                .float(time.solarZenithAngle(at: location)),
+                .float(.pi + time.hourAngle(at: location) + viewBearing * .pi / 180.0),
+                .float(.pi / 2.0 - time.solarZenithAngle(at: location)),
                 .float(horizontalFovDegrees * .pi / 180.0)
             ))
     }
@@ -43,7 +43,7 @@ struct SunlightGradientView: View {
     struct SunlightGradientPreview: View {
         static var noonEpochTime = 1720548000.0
         @State var timeInterval: TimeInterval = noonEpochTime
-        @State var viewBearing: Double = 0.0
+        @State var viewBearing: Double = 180.0
         @State var horizontalFovDegrees: Double = 90.0
         
         var body: some View {
