@@ -22,7 +22,7 @@ using namespace metal;
 #define NUM_SAMPLES_RAY 16
 #define NUM_SAMPLES_SUBRAYS 8
 
-half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float minimum, float maximum);
+float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float minimum, float maximum);
 bool solveQuadratic(float a, float b, float c, thread float2 & x);
 bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t);
 
@@ -59,16 +59,16 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
         }
     }
     
-    half4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
+    float4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
     
-    return r;
+    return half4(r);
 }
 
-half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float tMinimum, float tMaximum) {
+float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float tMinimum, float tMaximum) {
     float2 t;
     
     if (!raySphereIntersect(start, direction, RADIUS_EARTH_ATMOSPHERE, t) || t[1] < 0.0) {
-        return half4(0.0, 0.0, 0.0, 1.0);
+        return float4(0.0, 0.0, 0.0, 1.0);
     }
     
     if (t[0] > tMinimum && t[0] > 0.0) {
@@ -142,9 +142,9 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float t
     }
     
     float3 colors = (sumRayleigh * betaRayleigh * phaseRayleigh + sumMie * betaMie * phaseMie) * SUN_INTENSITY;
-    float4 colorsWithAlpha = float4(colors, 1.0);
+    colors = 1.0 - exp(-colors);
     
-    return half4(colorsWithAlpha);
+    return float4(colors, 1.0);
 }
 
 bool solveQuadratic(float a, float b, float c, thread float2 & x) {
