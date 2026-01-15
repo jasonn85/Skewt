@@ -23,8 +23,9 @@ using namespace metal;
 #define NUM_SAMPLES_RAY 16
 #define NUM_SAMPLES_SUBRAYS 8
 
-float rayLengthInsideSphere(float3 start, float3 direction, float radius);
-half4 incidentLight(float3 start, float3 direction, float3 sunDirection);
+half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float minimum, float maximum);
+bool solveQuadratic(float a, float b, float c, thread float2 & x);
+bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t);
 
 [[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float sunAzimuth, float sunElevation, float horizontalFov) {
     float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE, 0.0);
@@ -38,15 +39,34 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection);
     float3 viewDirection = normalize(float3(x * tan(horizontalFov / 2.0), y * tan(verticalFov / 2.0), -1.0));
     float3 sunDirection = normalize(float3(sin(sunAzimuth) * cos(sunElevation), sin(sunElevation), -cos(sunAzimuth) * cos(sunElevation)));
     
-    half4 r = incidentLight(viewPoint, viewDirection, sunDirection);
+    float2 surfaceIntersection;
+    float tMaximum = INFINITY;
+    if (raySphereIntersect(viewPoint, viewDirection, RADIUS_EARTH_SURFACE, surfaceIntersection) && surfaceIntersection[1] > 0.0) {
+        tMaximum = max(0.0, surfaceIntersection[0]);
+    }
+    
+    half4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
     
     return r;
 }
 
-half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
-    float rayLength = rayLengthInsideSphere(start, direction, RADIUS_EARTH_ATMOSPHERE);
-    float segmentLength = rayLength / NUM_SAMPLES_RAY;
-    float current = 0.0;
+half4 incidentLight(float3 start, float3 direction, float3 sunDirection, float tMinimum, float tMaximum) {
+    float2 t;
+    
+    if (!raySphereIntersect(start, direction, RADIUS_EARTH_ATMOSPHERE, t) || t[1] < 0.0) {
+        return half4(0.0, 0.0, 0.0, 1.0);
+    }
+    
+    if (t[0] > tMinimum && t[0] > 0.0) {
+        tMinimum = t[0];
+    }
+    
+    if (t[1] < tMaximum) {
+        tMaximum = t[1];
+    }
+    
+    float segmentLength = (tMaximum - tMinimum) / NUM_SAMPLES_RAY;
+    float current = tMinimum;
     float3 betaRayleigh = float3(3.8e-6, 13.5e-6, 33.1e-6);
     float3 betaMie = float3(21e-6);
     float3 sumRayleigh = float3(0.0);
@@ -60,13 +80,14 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
     
     for (uint i = 0; i < NUM_SAMPLES_SUBRAYS; i++) {
         float3 samplePosition = start + (current + segmentLength * 0.5) * direction;
-        float height = sqrt(samplePosition.x * samplePosition.x + samplePosition.y * samplePosition.y + samplePosition.z * samplePosition.z) - RADIUS_EARTH_SURFACE;
+        float height = length(samplePosition) - RADIUS_EARTH_SURFACE;
         
         opticalDepthRayleigh += exp(-height / THICKNESS_RAYLEIGH_ATMOSPHERE) * segmentLength;
         opticalDepthMie += exp(-height / THICKNESS_MIE_ATMOSPHERE) * segmentLength;
         
-        float subrayLength = rayLengthInsideSphere(samplePosition, sunDirection, RADIUS_EARTH_ATMOSPHERE);
-        float subraySegmentLength = subrayLength / NUM_SAMPLES_SUBRAYS;
+        float2 tLight;
+        raySphereIntersect(samplePosition, sunDirection, RADIUS_EARTH_ATMOSPHERE, tLight);
+        float subraySegmentLength = tLight[1] / NUM_SAMPLES_SUBRAYS;
         float currentLight = 0.0;
         float subrayOpticalDepthRayleigh = 0.0;
         float subrayOpticalDepthMie = 0.0;
@@ -74,7 +95,7 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
         
         for (uint j = 0; j < NUM_SAMPLES_SUBRAYS; j++) {
             float3 subraySamplePosition = samplePosition + (currentLight + subraySegmentLength * 0.5) * sunDirection;
-            float subrayHeight = sqrt(subraySamplePosition.x * subraySamplePosition.x + subraySamplePosition.y * subraySamplePosition.y + subraySamplePosition.z + subraySamplePosition.z) - RADIUS_EARTH_SURFACE;
+            float subrayHeight = length(subraySamplePosition) - RADIUS_EARTH_SURFACE;
             
             if (subrayHeight < 0.0) {
                 underground = true;
@@ -102,25 +123,42 @@ half4 incidentLight(float3 start, float3 direction, float3 sunDirection) {
     return half4(colorsWithAlpha);
 }
 
-float rayLengthInsideSphere(float3 start, float3 direction, float radius) {
-    float b = dot(start, direction);
-    float c = dot(start, start) - radius * radius;
-    float h = b * b - c;
-    
-    if (h < 0.0) {
-        return 0.0;
+bool solveQuadratic(float a, float b, float c, thread float2 & x) {
+    if (b == 0.0) {
+        if (a == 0.0) {
+            return false;
+        }
+        
+        x = float2(0.0, sqrt(-c / a));
+        return true;
     }
     
-    float hRoot = sqrt(h);
+    float discriminant = b * b - 4.0 * a * c;
     
-    float enter = -b - hRoot;
-    float exit = -b + hRoot;
-    
-    if (exit < 0.0) {
-        return 0.0;
+    if (discriminant < 0.0) {
+        return false;
     }
     
-    enter = max(enter, 0.0);
+    float q = (b < 0.0) ? -0.5 * (b - sqrt(discriminant)) : -0.5 * (b + sqrt(discriminant));
     
-    return max(0.0, exit - enter);
+    x = float2(q / a, c / q);
+    return true;
+}
+
+bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t) {
+    float a = direction.x * direction.x + direction.y * direction.y + direction.z + direction.z;
+    float b = 2.0 * (direction.x * start.x + direction.y * start.y + direction.z * start.z);
+    float c = start.x * start.x + start.y * start.y + start.z * start.z - radius * radius;
+    
+    if (!solveQuadratic(a, b, c, t)) {
+        return false;
+    }
+    
+    if (t[0] > t[1]) {
+        float t1 = t[1];
+        t[1] = t[0];
+        t[0] = t1;
+    }
+    
+    return true;
 }
