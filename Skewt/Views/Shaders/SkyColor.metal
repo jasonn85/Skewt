@@ -142,11 +142,10 @@ float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float 
     }
     
     float3 colors = (sumRayleigh * betaRayleigh * phaseRayleigh + sumMie * betaMie * phaseMie) * SUN_INTENSITY;
-    colors = 1.0 - exp(-colors);
     
-    float sunHeight = dot(sunDirection, float3(0.0, 1.0, 0.0));
-    float nightFactor = smoothstep(0.0, -0.2, sunHeight);
-
+    float sunLuminance = dot(colors, float3(0.2126, 0.7152, 0.0722));
+    float sunWeight = smoothstep(0.01, 0.08, sunLuminance);
+        
     float viewUp = saturate(direction.y);
     float horizon = 1.0 - viewUp;
 
@@ -154,7 +153,12 @@ float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float 
     float3 horizonNight = float3(0.067, 0.125, 0.302);
 
     float3 nightColor = mix(zenithNight, horizonNight, pow(horizon, 1.5));
-    colors = max(colors, nightColor * nightFactor);
+    
+    // Tone mapping
+    colors = 1.0 - exp(-colors);
+
+    // Apply night coloring
+    colors = mix(nightColor, colors, sunWeight);
     
     return float4(colors, 1.0);
 }
