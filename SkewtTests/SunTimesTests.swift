@@ -166,6 +166,47 @@ final class SunTimesTests: XCTestCase {
         ]
     }
     
+    func testJulianDate() {
+        let tolerance = 1.0
+        
+        let j2000 = Date(timeIntervalSince1970: 946728000)  // 2000-01-01 12:00:00 UTC
+        XCTAssertEqual(j2000.julianDate, 2451545, accuracy: tolerance)
+        
+        let date = Date(timeIntervalSince1970: 1769150400)  // Friday, January 23, 2026 6:40:00 AM GMT
+        XCTAssertEqual(date.julianDate, 2461063, accuracy: tolerance)
+    }
+    
+    func testSiderealTime() {
+        let tolerance = 0.01
+        
+        let date = Date(timeIntervalSince1970: 946728000) // 2000-01-01 12:00:00 UTC
+        let expectedGreenwichSiderealTime = 160.46061837 * .pi / 180.0
+        XCTAssertEqual(date.localSiderealTime(at: greenwich.location), expectedGreenwichSiderealTime, accuracy: tolerance)
+        
+        let oppositeGreenwich = CLLocation(
+            latitude: -greenwich.location.coordinate.latitude,
+            longitude: greenwich.location.coordinate.longitude + 180.0
+        )
+        XCTAssertEqual(date.localSiderealTime(at: oppositeGreenwich), expectedGreenwichSiderealTime + .pi, accuracy: tolerance)
+    }
+    
+    func testSiderealDriftPerDay() {
+        let tolerance = 0.01
+        
+        let location = CLLocation(latitude: 0, longitude: 0)
+        
+        let t0 = Date(timeIntervalSince1970: 1_000_000)
+        let t1 = t0.addingTimeInterval(86400) // +1 solar day
+
+        let s0 = t0.localSiderealTime(at: location)
+        let s1 = t1.localSiderealTime(at: location)
+
+        let delta = (s1 - s0).truncatingRemainder(dividingBy: 2 * .pi)
+        let expected = 1.0 * .pi / 180.0
+
+        XCTAssertEqual(delta, expected, accuracy: tolerance)
+    }
+    
     func testFractionalYear() {
         let accuracy = 0.1
         
