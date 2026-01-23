@@ -25,8 +25,18 @@ using namespace metal;
 float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float minimum, float maximum);
 bool solveQuadratic(float a, float b, float c, thread float2 & x);
 bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t);
+float3 rotateY(float3 dir, float angle);
+float2 sampleFlattenedCube(float3 dir);
 
-[[ stitchable ]] half4 skyColor(float2 position, float4 bounds, float sunAzimuth, float sunElevation, float horizontalFov) {
+[[ stitchable ]] half4 skyColor(
+                                float2 position,
+                                float4 bounds,
+                                float sunAzimuth,
+                                float sunElevation,
+                                float siderealTime,
+                                float horizontalFov,
+                                texture2d<half> starsTexture
+                                ) {
     float3 viewPoint = float3(0.0, RADIUS_EARTH_SURFACE + 1.0, 0.0);
     
     float aspectRatio = bounds.z / bounds.w;
@@ -49,6 +59,8 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
                                            -cos(sunAzimuth) * cos(sunElevation)
                                            ));
     
+    float3 starDirection = rotateY(viewDirection, siderealTime);
+    
     float2 surfaceIntersection;
     float tMaximum = INFINITY;
     if (raySphereIntersect(viewPoint, viewDirection, RADIUS_EARTH_SURFACE, surfaceIntersection)) {
@@ -61,7 +73,14 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
     
     float4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
     
-    return half4(r);
+    float2 starUV = sampleFlattenedCube(starDirection);
+    uint2 textureSize = uint2(starsTexture.get_width(), starsTexture.get_height());
+    uint2 texel = uint2(clamp(starUV.x * float(textureSize.x), 0.0, float(textureSize.x - 1)),
+                        clamp(starUV.y * float(textureSize.y), 0.0, float(textureSize.y - 1)));
+
+    float4 texelColor = float4(starsTexture.read(texel));
+    
+    return half4(r + texelColor);
 }
 
 float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float tMinimum, float tMaximum) {
@@ -193,3 +212,65 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
     
     return true;
 }
+
+float3 rotateY(float3 dir, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    return float3(
+        dir.x * c + dir.z * s,
+        dir.y,
+        -dir.x * s + dir.z * c
+    );
+}
+
+float2 sampleFlattenedCube(float3 dir) {
+    float absX = fabs(dir.x);
+    float absY = fabs(dir.y);
+    float absZ = fabs(dir.z);
+    
+    float u;
+    float v;
+    int faceIndex;
+    
+    if (absX >= absY && absX >= absZ) {
+        if (dir.x > 0) {
+            u = -dir.z / absX;
+            v = dir.y / absX;
+            faceIndex = 0;
+        } else {
+            u = dir.z / absX;
+            v = dir.y / absX;
+            faceIndex = 1;
+        }
+    } else if (absY >= absX && absY >= absZ) {
+        if (dir.y > 0) {
+            u = dir.x / absY;
+            v = -dir.z / absY;
+            faceIndex = 2;
+        } else {
+            u = dir.x / absY;
+            v = dir.z / absY;
+            faceIndex = 3;
+        }
+    } else {
+        if (dir.z > 0) {
+            u = dir.x / absZ;
+            v = dir.y / absZ;
+            faceIndex = 4;
+        } else {
+            u = -dir.x / absZ;
+            v = dir.y / absZ;
+            faceIndex = 5;
+        }
+    }
+    
+    // Convert from [-1,1] to [0,1]
+    u = 0.5 * (u + 1.0);
+    v = 0.5 * (v + 1.0);
+
+    // Flatten horizontally: each face is 1/6 of width
+    u = (faceIndex + u) / 6.0;
+
+    return float2(u, v);
+}
+
