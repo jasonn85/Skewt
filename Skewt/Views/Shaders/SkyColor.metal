@@ -59,7 +59,16 @@ float2 sampleFlattenedCube(float3 dir);
                                            -cos(sunAzimuth) * cos(sunElevation)
                                            ));
     
-    float3 starDirection = rotateY(viewDirection, siderealTime);
+    // Since our sunlight casting using a non-pinhole camera (to allow the projection to be flat
+    //  across the bottom of the view), we need to use a different direction for the star skybox,
+    //  which uses a texture cube.
+    float3 starViewDirection = normalize(float3(
+                                                x * tan(horizontalFov * 0.5),
+                                                y * tan(verticalFov * 0.5),
+                                                -1.0
+                                                ));
+    
+    float3 starDirection = rotateY(starViewDirection, siderealTime);
     
     float2 surfaceIntersection;
     float tMaximum = INFINITY;
