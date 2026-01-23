@@ -81,6 +81,19 @@ float2 sampleFlattenedCube(float3 dir);
     }
     
     float4 r = incidentLight(viewPoint, viewDirection, sunDirection, 0.0, tMaximum);
+    float skyLuminance = dot(r.rgb, float3(0.2126, 0.7152, 0.0722));
+    float starsMask = 1.0 - smoothstep(
+                                       0.02,   // full night below this
+                                       0.15,   // fully day above this
+                                       skyLuminance
+    );
+    float horizonStarFade = smoothstep(
+                                       0.0,
+                                       8.0 * M_PI_F / 180.0,
+                                       elevation
+    );
+    starsMask *= horizonStarFade;
+
     
     float2 starUV = sampleFlattenedCube(starDirection);
     uint2 textureSize = uint2(starsTexture.get_width(), starsTexture.get_height());
@@ -89,7 +102,8 @@ float2 sampleFlattenedCube(float3 dir);
 
     float4 texelColor = float4(starsTexture.read(texel));
     
-    return half4(r + texelColor);
+    float3 color = r.rgb + texelColor.rgb * starsMask;
+    return half4(float4(color, 1.0));
 }
 
 float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float tMinimum, float tMaximum) {
