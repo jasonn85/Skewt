@@ -244,6 +244,7 @@ bool raySphereIntersect(float3 start, float3 direction, float radius, thread flo
 float3 rotateY(float3 dir, float angle) {
     float c = cos(angle);
     float s = sin(angle);
+    
     return float3(
         dir.x * c + dir.z * s,
         dir.y,
