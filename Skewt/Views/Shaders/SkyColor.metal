@@ -18,6 +18,7 @@ using namespace metal;
 #define THICKNESS_RAYLEIGH_ATMOSPHERE 9000
 #define THICKNESS_MIE_ATMOSPHERE 600
 #define SUN_INTENSITY 80.0
+#define EARTH_OBLIQUITY 0.409092804f  // 23.44 degrees
 
 #define NUM_SAMPLES_RAY 16
 #define NUM_SAMPLES_SUBRAYS 8
@@ -26,6 +27,7 @@ float4 incidentLight(float3 start, float3 direction, float3 sunDirection, float 
 bool solveQuadratic(float a, float b, float c, thread float2 & x);
 bool raySphereIntersect(float3 start, float3 direction, float radius, thread float2 & t);
 float3 rotateY(float3 dir, float angle);
+float3 rotateX(float3 dir, float angle);
 float2 sampleFlattenedCube(float3 dir);
 
 [[ stitchable ]] half4 skyColor(
@@ -34,6 +36,7 @@ float2 sampleFlattenedCube(float3 dir);
                                 float sunAzimuth,
                                 float sunElevation,
                                 float siderealTime,
+                                float latitude,
                                 float horizontalFov,
                                 texture2d<half> starsTexture
                                 ) {
@@ -68,7 +71,9 @@ float2 sampleFlattenedCube(float3 dir);
                                                 -1.0
                                                 ));
     
-    float3 starDirection = rotateY(starViewDirection, siderealTime);
+    starViewDirection = rotateX(starViewDirection, -EARTH_OBLIQUITY);
+    starViewDirection = rotateY(starViewDirection, siderealTime);
+    starViewDirection = rotateX(starViewDirection, latitude);
     
     float2 surfaceIntersection;
     float tMaximum = INFINITY;
@@ -95,7 +100,7 @@ float2 sampleFlattenedCube(float3 dir);
     starsMask *= horizonStarFade;
 
     
-    float2 starUV = sampleFlattenedCube(starDirection);
+    float2 starUV = sampleFlattenedCube(starViewDirection);
     uint2 textureSize = uint2(starsTexture.get_width(), starsTexture.get_height());
     uint2 texel = uint2(clamp(starUV.x * float(textureSize.x), 0.0, float(textureSize.x - 1)),
                         clamp(starUV.y * float(textureSize.y), 0.0, float(textureSize.y - 1)));
@@ -243,6 +248,18 @@ float3 rotateY(float3 dir, float angle) {
         dir.x * c + dir.z * s,
         dir.y,
         -dir.x * s + dir.z * c
+    );
+}
+
+float3 rotateX(float3 dir, float angle)
+{
+    float s = sin(angle);
+    float c = cos(angle);
+
+    return float3(
+        dir.x,
+        c * dir.y - s * dir.z,
+        s * dir.y + c * dir.z
     );
 }
 

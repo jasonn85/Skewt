@@ -35,6 +35,7 @@ struct SunlightGradientView: View {
                 .float(.pi + time.hourAngle(at: location) + viewBearing * .pi / 180.0),
                 .float(.pi / 2.0 - time.solarZenithAngle(at: location)),
                 .float(time.localSiderealTime(at: location) + viewBearing * .pi / 180.0),
+                .float(location.coordinate.latitude * .pi / 180.0),
                 .float(horizontalFovDegrees * .pi / 180.0),
                 .image(Image("StarBox"))
             ))
