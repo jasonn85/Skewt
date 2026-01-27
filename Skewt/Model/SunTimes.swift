@@ -74,7 +74,62 @@ extension SunState {
 }
 
 extension Date {
-    // The percent of the year [0,2π], accurate to 24 hours
+    var julianDate: Double {
+        let calendar = Calendar(identifier: .gregorian)
+        let year = calendar.component(.year, from: self)
+        let month = calendar.component(.month, from: self)
+        let day = calendar.component(.day, from: self)
+        
+        var Y = year
+        var M = month
+        if M <= 2 {
+            Y -= 1
+            M += 12
+        }
+        
+        let D = Double(day)
+        let A = floor(Double(Y) / 100.0)
+        let B = 2 - A + floor(A / 4.0)
+        
+        let JD = floor(365.25 * Double(Y + 4716)) +
+                 floor(30.6001 * Double(M + 1)) +
+                 D + B - 1524.5
+        
+        let hour = Double(calendar.component(.hour, from: self))
+        let minute = Double(calendar.component(.minute, from: self))
+        let second = Double(calendar.component(.second, from: self))
+        
+        let fraction = (hour + minute / 60 + second / 3600) / 24.0
+        
+        return JD + fraction
+    }
+    
+    func localSiderealTime(at location: CLLocation) -> Double {
+        let JD = julianDate
+        let JD0 = floor(JD - 0.5) + 0.5  // JD at previous midnight
+        let H = (JD - JD0) * 24.0  // Hours past UT midnight
+        let D = JD - 2451545.0  // Days since J2000.0
+        let D0 = JD0 - 2451545.0
+        
+        // GMST in hours
+        var GMST = 6.697374558 + 0.06570982441908 * D0 + 1.00273790935 * H
+        GMST = fmod(GMST, 24.0)
+        if GMST < 0 { GMST += 24 }
+        
+        // Convert to radians and apply longitude
+        let GMSTRad = GMST * .pi / 12.0   // 24 hours → 2π radians
+        let longitudeRad = location.coordinate.longitude * .pi / 180.0
+        var LST = GMSTRad + longitudeRad
+        LST = fmod(LST, 2 * .pi)
+        
+        if LST < 0 {
+            LST += 2 * .pi
+        }
+        
+        return LST
+    }
+    
+    /// The percent of the year [0,2π], accurate to 24 hours
     var fractionalYearInRadians: Double {
         let calendar = Calendar(identifier: .gregorian)
         let dayOfTheYear = calendar.ordinality(of: .day, in: .year, for: self)!
@@ -84,7 +139,7 @@ extension Date {
         return 2.0 * .pi / Double(daysThisYear) * Double(dayOfTheYear - 1)
     }
     
-    // Solar declination in radians 
+    /// Solar declination in radians
     var solarDeclination: Double {
         let fractionalYear = fractionalYearInRadians
         
@@ -106,12 +161,9 @@ extension Date {
         )
     }
     
-    func solarZenithAngle(at location: CLLocation) -> Double {
-        let latitude = location.coordinate.latitude * .pi / 180.0
-        let solarDeclination = solarDeclination
-        let equationOfTime = equationOfTime
+    /// Local hour angle in radians
+    func hourAngle(at location: CLLocation) -> Double {
         let timeOffset: TimeInterval = equationOfTime + 4.0 * location.coordinate.longitude * 60.0
-        
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents(in: .gmt, from: self)
         let solarTime: TimeInterval = (
@@ -121,8 +173,13 @@ extension Date {
             + timeOffset
         )
         
-        let hourAngle = 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
-            
+        return 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
+    }
+    
+    func solarZenithAngle(at location: CLLocation) -> Double {
+        let latitude = location.coordinate.latitude * .pi / 180.0
+        let hourAngle = hourAngle(at: location)
+        
         return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
     }
     
@@ -130,8 +187,8 @@ extension Date {
         solarZenithAngle(at: location) <= Double.sunriseZenith
     }
     
-    // Sunrise or sunset on the same calendar UTC day.
-    // Returns nil if the day occurs during polar night or polar day.
+    /// Sunrise or sunset on the same calendar UTC day.
+    /// - Returns: nil if the day occurs during polar night or polar day.
     private static func sunriseOrSunset(sunrise: Bool, at location: CLLocation, onDate date: Date = .now) -> Date? {
         let latitude = location.coordinate.latitude * .pi / 180.0
         let solarDeclination = date.solarDeclination
@@ -158,20 +215,20 @@ extension Date {
         return calendar.date(from: components)!
     }
     
-    // Sunrise on the same calendar UTC day.
-    // Returns nil if the day occurs during polar night or polar day.
+    /// Sunrise on the same calendar UTC day.
+    /// - Returns: nil if the day occurs during polar night or polar day.
     static func sunrise(at location: CLLocation, onDate date: Date = .now) -> Date? {
         sunriseOrSunset(sunrise: true, at: location, onDate: date)
     }
     
-    // Sunset on the same calendar UTC day.
-    // Returns nil if the day occurs during polar night or polar day.
+    /// Sunset on the same calendar UTC day.
+    /// - Returns: nil if the day occurs during polar night or polar day.
     static func sunset(at location: CLLocation, onDate date: Date = .now) -> Date? {
         sunriseOrSunset(sunrise: false, at: location, onDate: date)
     }
     
-    // Prior sunrise or sunset to a time at a specified location, including appropriate, estimated polar
-    //  sunrise/sunset if it is 24+ hours prior.
+    /// Prior sunrise or sunset to a time at a specified location, including appropriate, estimated polar
+    ///  sunrise/sunset if it is 24+ hours prior.
     static func priorSunriseOrSunset(sunrise: Bool, at location: CLLocation, toDate date: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
         let minimumDate = date.addingTimeInterval(-eightMonths)
@@ -190,8 +247,8 @@ extension Date {
         return result!
     }
     
-    // Next sunrise or sunset after a time at a specified location, including appropriate, estimated polar
-    //  sunrise/sunset if it is 24+ hours hence.
+    /// Next sunrise or sunset after a time at a specified location, including appropriate, estimated polar
+    ///  sunrise/sunset if it is 24+ hours hence.
     static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate initialDate: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
         let maximumDate = initialDate.addingTimeInterval(eightMonths)

@@ -124,10 +124,9 @@ struct DisplayOptionsView: View {
                             Rectangle()
                                 .foregroundColor(.white)
                             
-                            BackgroundView(
+                            AnimatedWindView(
                                 frame: CGRect(origin: .zero, size: geometry.size),
-                                winds: [0.5: -15.0],
-                                skyColors: []
+                                winds: [0.5: -15.0]
                             )
                         }
                     }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct PlotSizePreferenceKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
@@ -22,6 +23,9 @@ struct PlotSizePreferenceKey: PreferenceKey {
 struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
+    
+    let location: CLLocation?
+    var time: Date? = nil
     
     @State var annotationPoint: UnitPoint? = nil
     
@@ -133,6 +137,13 @@ struct AnnotatedSkewtPlotView: View {
         return text.size(withAttributes: attributes).height
     }
     
+    init(soundingState: SoundingState, plotOptions: PlotOptions, location: CLLocation? = nil, time: Date? = nil) {
+        self.soundingState = soundingState
+        self.plotOptions = plotOptions
+        self.location = location
+        self.time = time
+    }
+    
     var body: some View {
         let plot = plot
 
@@ -177,18 +188,23 @@ struct AnnotatedSkewtPlotView: View {
                             }
                             .background {
                                 GeometryReader { geometry in
-                                    let winds = plotOptions.showAnimatedWind ? 
-                                    sounding?.data.reducedWindData(sounding!.data.maximumWindReducer()).reduce(into: [Double:Double]()) {
+                                    ZStack {
+                                        let winds = plotOptions.showAnimatedWind ?
+                                        sounding?.data.reducedWindData(sounding!.data.maximumWindReducer()).reduce(into: [Double:Double]()) {
                                             $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
-                                        } 
-                                    : nil
-                                    
-                                    BackgroundView(
-                                        frame: CGRect(origin: .zero, size: geometry.size),
-                                        winds: winds
-                                    )
-                                    .scaleEffect(zoom, anchor: zoomAnchor)
-                                    .clipped()
+                                        }
+                                        : nil
+                                        
+                                        SunlightGradientView(location: location, time: time)
+                                        
+                                        AnimatedWindView(
+                                            frame: CGRect(origin: .zero, size: geometry.size),
+                                            winds: winds,
+                                            particleColor: CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+                                        )
+                                        .scaleEffect(zoom, anchor: zoomAnchor)
+                                        .clipped()
+                                    }
                                 }
                             }
                     }
