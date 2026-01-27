@@ -199,7 +199,8 @@ struct AnnotatedSkewtPlotView: View {
                                         
                                         AnimatedWindView(
                                             frame: CGRect(origin: .zero, size: geometry.size),
-                                            winds: winds
+                                            winds: winds,
+                                            particleColor: CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
                                         )
                                         .scaleEffect(zoom, anchor: zoomAnchor)
                                         .clipped()

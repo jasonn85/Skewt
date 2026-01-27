@@ -35,12 +35,12 @@ struct AnimatedWindView: UIViewRepresentable {
     typealias UIViewType = UIView
     
     let frame: CGRect
+    let particleColor: CGColor
     
     /// Dictionary of 1d wind data keyed by [0...1] height
     let winds: [Double: Double]?
     let minimumWindToAnimate = 10.0
     
-    private let windParticleColor = CGColor(gray: 0.33, alpha: 0.2)
     private let windParticleScale = 1.0
     private let velocityScale = 0.33
     private let velocityRangeMultiplier = 0.2
@@ -49,9 +49,10 @@ struct AnimatedWindView: UIViewRepresentable {
     
     @Environment(\.self) var environment
     
-    init(frame: CGRect, winds: [Double : Double]?) {
+    init(frame: CGRect, winds: [Double : Double]?, particleColor: CGColor = CGColor(gray: 0.33, alpha: 0.2)) {
         self.frame = frame
         self.winds = winds
+        self.particleColor = particleColor
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {
@@ -113,7 +114,7 @@ struct AnimatedWindView: UIViewRepresentable {
         let cell = CAEmitterCell()
         cell.contentsScale = UIScreen.main.scale
         cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
-        cell.color = windParticleColor
+        cell.color = particleColor
         cell.scale = windParticleScale
         cell.velocity = screenScale * velocity * velocityScale
         cell.velocityRange = velocityRangeMultiplier * positiveVelocity
