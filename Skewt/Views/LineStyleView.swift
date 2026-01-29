@@ -97,11 +97,13 @@ struct LineStyleView: View {
                         .labelsHidden()
                     }
                     
-                    GridRow {
-                        Image(systemName: "square.dashed")
-                        Toggle("Dashed", isOn: $lineStyle.dashed)
-                            .labelsHidden()
-                    }
+                    // This third row is removed to resolve the layout crash in
+                    //  https://github.com/jasonn85/Skewt/issues/91
+//                    GridRow {
+//                        Image(systemName: "square.dashed")
+//                        Toggle("Dashed", isOn: $lineStyle.dashed)
+//                            .labelsHidden()
+//                    }
                 }
                 
                 if isDefault {
