@@ -93,10 +93,10 @@ struct SoundingSelectionRow: View {
         var description: String
         
         switch selection.type {
-        case .automaticForecast:
+        case .forecast(_):
             iconName = "chart.line.uptrend.xyaxis"
             description = "Forecast"
-        case .raob:
+        case .sounding:
             iconName = "balloon"
             description = "Sounding"
         }
@@ -159,9 +159,9 @@ struct SoundingSelectionRow: View {
         location: SoundingSelection.Location
     ) -> SoundingSelection.Time {
         switch type {
-        case .automaticForecast:
+        case .forecast(_):
             return .now
-        case .raob:
+        case .sounding:
             switch location {
             case .closest, .point(_, _):
                 return .now
@@ -195,10 +195,10 @@ struct SoundingSelectionRow: View {
     
     private var redAge: TimeInterval {
         switch selection.type {
-        case .automaticForecast:
+        case .forecast(_):
             let twoHours = 2.0 * 60.0 * 60.0
             return twoHours
-        case .raob:
+        case .sounding:
             let tenHours = 10.0 * 60.0 * 60.0
             return tenHours
         }
@@ -208,8 +208,8 @@ struct SoundingSelectionRow: View {
 struct SoundingSelectionRow_Previews: PreviewProvider {
     static var previews: some View {
         let store = Store<SkewtState>.previewStore
-        let currentForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
-        let mostRecentSounding = SoundingSelection(type: .raob, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+        let currentForecast = SoundingSelection(type: .forecast(.automatic), location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+        let mostRecentSounding = SoundingSelection(type: .sounding, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
         let anHourAgo = Date(timeIntervalSinceNow: -1.0 * 60.0 * 60.0)
         let sixteenHoursAgo = Date(timeIntervalSinceNow: -16.0 * 60.0 * 60.0)
         

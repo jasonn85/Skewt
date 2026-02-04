@@ -16,19 +16,19 @@ extension Store {
     private static var previewPinnedSelections: [SoundingSelection] {
         [
             SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
-                type: .raob,
+                type: .sounding,
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0
             ),
             SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .named(name: "SAN", latitude: 32.73, longitude: -117.18),
                 time: .now,
                 dataAgeBeforeRefresh: 15.0 * 60.0

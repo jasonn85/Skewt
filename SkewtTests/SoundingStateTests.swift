@@ -39,14 +39,14 @@ struct SoundingStateTests {
             let time = epoch.addingTimeInterval(interval)
             
             let relativeSelection = SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .relative(interval),
                 dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
             )
             
             let specificSelection = SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .specific(time),
                 dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
@@ -75,7 +75,7 @@ struct SoundingStateTests {
     func changeTime(timeSelection: SoundingSelection.Time) {
         let originalState = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
@@ -98,15 +98,15 @@ struct SoundingStateTests {
             SoundingSelection.Action.selectTime(.relative(-60.0 * 60.0)),
             SoundingSelection.Action.selectTime(.relative(24.0 * 60.0 * 60.0)),
             SoundingSelection.Action.selectTime(.specific(Date(timeIntervalSince1970: 1731695293))),
-            SoundingSelection.Action.selectModelType(.automaticForecast, .now),
+            SoundingSelection.Action.selectModelType(.forecast(.automatic), .now),
             SoundingSelection.Action.selectLocation(.closest, .now),
             SoundingSelection.Action.selectLocation(.point(latitude: 39.8563, longitude: -104.6764), .now),
-            SoundingSelection.Action.selectModelTypeAndLocation(.automaticForecast, .closest, .now)
+            SoundingSelection.Action.selectModelTypeAndLocation(.forecast(.automatic), .closest, .now)
           ]
     )
     func changeAndLoadFromIdle(selectionAction: SoundingSelection.Action) {
         let state = SoundingState(
-            selection: SoundingSelection(type: .automaticForecast, location: .closest, time: .now, dataAgeBeforeRefresh: .fifteenMinutes),
+            selection: SoundingSelection(type: .forecast(.automatic), location: .closest, time: .now, dataAgeBeforeRefresh: .fifteenMinutes),
             status: .idle
         )
                 
@@ -121,9 +121,9 @@ struct SoundingStateTests {
     @Test("Change/load selection with recent data does not change state",
           arguments: [
             SoundingSelection.Action.selectTime(.now),
-            SoundingSelection.Action.selectModelType(.automaticForecast, .now),
+            SoundingSelection.Action.selectModelType(.forecast(.automatic), .now),
             SoundingSelection.Action.selectLocation(.closest, .now),
-            SoundingSelection.Action.selectModelTypeAndLocation(.automaticForecast, .closest, .now)
+            SoundingSelection.Action.selectModelTypeAndLocation(.forecast(.automatic), .closest, .now)
           ])
     func changeLoadWithAlreadyGoodData(selectionAction: SoundingSelection.Action) {
         let soundingData = SoundingData(
@@ -139,7 +139,7 @@ struct SoundingStateTests {
         
         let state = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: .fifteenMinutes
@@ -174,7 +174,7 @@ struct SoundingStateTests {
         
         let state = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: .fifteenMinutes
@@ -214,7 +214,7 @@ struct SoundingStateTests {
         
         let startingState = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: .fifteenMinutes
@@ -257,7 +257,7 @@ struct SoundingStateTests {
         
         let state = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: .fifteenMinutes
@@ -301,7 +301,7 @@ struct SoundingStateTests {
         
         let specificTimeState = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .specific(dates[timeIndex]),
                 dataAgeBeforeRefresh: .fifteenMinutes
@@ -347,7 +347,7 @@ struct SoundingStateTests {
         
         let state = SoundingState(
             selection: SoundingSelection(
-                type: .automaticForecast,
+                type: .forecast(.automatic),
                 location: .closest,
                 time: .now,
                 dataAgeBeforeRefresh: .fifteenMinutes

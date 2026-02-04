@@ -9,9 +9,9 @@ import XCTest
 @testable import Skewt
 
 final class SkewtStateTests: XCTestCase {
-    let closestLatestForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
-    let closestLatestRaob = SoundingSelection(type: .raob, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
-    let closestSixHourForecast = SoundingSelection(type: .automaticForecast, location: .closest, time: .relative(.hours(6)), dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestLatestForecast = SoundingSelection(type: .forecast(.automatic), location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestLatestRaob = SoundingSelection(type: .sounding, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestSixHourForecast = SoundingSelection(type: .forecast(.automatic), location: .closest, time: .relative(.hours(6)), dataAgeBeforeRefresh: 15.0 * 60.0)
 
     func testCurrentSoundingSavedInRecents() {
         let originalState = SkewtState(
@@ -25,7 +25,7 @@ final class SkewtStateTests: XCTestCase {
         
         let state = SkewtState.reducer(
             originalState,
-            SoundingState.Action.changeAndLoadSelection(.selectModelType(.raob))
+            SoundingState.Action.changeAndLoadSelection(.selectModelType(.sounding))
         )
         
         XCTAssertTrue(state.recentSelections.contains { $0 == closestLatestRaob })
