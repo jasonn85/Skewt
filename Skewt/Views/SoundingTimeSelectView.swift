@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SoundingTimeSelectView: View, Equatable {
     @Binding var value: SoundingSelection.Time
-    var hourInterval = SoundingSelection.ModelType.raob.hourInterval
+    var hourInterval = SoundingSelection.ModelType.sounding.hourInterval
     let daysRange = 7
     var date: Date = .now
     
@@ -22,7 +22,7 @@ struct SoundingTimeSelectView: View, Equatable {
         Date.mostRecentSoundingTime(toDate: lhs.date) == Date.mostRecentSoundingTime(toDate: rhs.date)
     }
     
-    init(value: Binding<SoundingSelection.Time>, hourInterval: Int = SoundingSelection.ModelType.raob.hourInterval, date: Date = .now) {
+    init(value: Binding<SoundingSelection.Time>, hourInterval: Int = SoundingSelection.ModelType.sounding.hourInterval, date: Date = .now) {
         _value = value
         self.hourInterval = hourInterval
         self.date = date

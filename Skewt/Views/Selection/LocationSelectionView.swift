@@ -23,7 +23,7 @@ struct LocationSelectionView: View {
     private var searchCount = 20
     private var soundingDataMaxAge: TimeInterval = 5.0 * 60.0  // five minutes
     
-    @State private var selectedModelType: SoundingSelection.ModelType = .automaticForecast
+    @State private var selectedModelType: SoundingSelection.ModelType = .forecast(.automatic)
     @State private var searchText: String = ""
     
     init(listType: ListType = .all) {
@@ -133,24 +133,24 @@ struct LocationSelectionView: View {
         case .all:
             Picker("Type", selection: $selectedModelType) {
                 Text("Forecast")
-                    .tag(SoundingSelection.ModelType.automaticForecast)
+                    .tag(SoundingSelection.ModelType.forecast(.automatic))
                 
                 Text("Sounding")
-                    .tag(SoundingSelection.ModelType.raob)
+                    .tag(SoundingSelection.ModelType.sounding)
             }
             .pickerStyle(.segmented)
             
             switch selectedModelType {
-            case .automaticForecast:
+            case .forecast(_):
                 forecastList
-            case .raob:
+            case .sounding:
                 raobList
             }
         case .modelType(let modelType):
             switch modelType {
-            case .automaticForecast:
+            case .forecast(_):
                 forecastList
-            case .raob:
+            case .sounding:
                 raobList
             }
         case .favoritesAndRecents:
@@ -172,7 +172,7 @@ struct LocationSelectionView: View {
         if showNearestForecastRow {
             SoundingSelectionRow(
                 selection: SoundingSelection(
-                    type: .automaticForecast,
+                    type: .forecast(.automatic),
                     location: .closest,
                     time: .now,
                     dataAgeBeforeRefresh: 15.0 * 60.0
@@ -224,7 +224,7 @@ struct LocationSelectionView: View {
                 ForEach(locations.prefix(searchCount), id: \.id) {
                     SoundingSelectionRow(
                         selection: SoundingSelection(
-                            type: .automaticForecast,
+                            type: .forecast(.automatic),
                             location: .named(name: $0.name, latitude: $0.latitude, longitude: $0.longitude),
                             time: .now,
                             dataAgeBeforeRefresh: 15.0 * 60.0
@@ -326,7 +326,7 @@ struct LocationSelectionView: View {
     }
     
     private func subtitleComponents(forStationNamed stationName: String) -> [SoundingSelectionRow.DescriptionComponent]? {
-        guard let locationList = try? LocationList.forType(.raob),
+        guard let locationList = try? LocationList.forType(.sounding),
               let currentLocation = store.state.locationState.locationIfKnown,
               let station = locationList.locationNamed(stationName) else {
             return nil

@@ -38,7 +38,7 @@ struct OpenMeteoSoundingListRequest: Encodable {
     let start_minutely_15: Date?
     let end_minutely_15: Date?
     
-    let models: [Model]?
+    let model: SoundingSelection.ForecastModel?
     
     let apikey: String?
     
@@ -274,10 +274,6 @@ struct OpenMeteoSoundingListRequest: Encodable {
         case unixtime
     }
     
-    enum Model: String, Codable, CaseIterable {
-        case auto
-    }
-    
     init(
         latitude: Double,
         longitude: Double,
@@ -301,7 +297,7 @@ struct OpenMeteoSoundingListRequest: Encodable {
         end_hour: Date? = nil,
         start_minutely_15: Date? = nil,
         end_minutely_15: Date? = nil,
-        models: [Model]? = nil,
+        model: SoundingSelection.ForecastModel? = nil,
         apikey: String? = nil
     ) {
         self.latitude = latitude
@@ -322,7 +318,7 @@ struct OpenMeteoSoundingListRequest: Encodable {
         self.end_date = end_date
         self.start_minutely_15 = start_minutely_15
         self.end_minutely_15 = end_minutely_15
-        self.models = models
+        self.model = model
         self.apikey = apikey
         
         if let end_hour = end_hour {
@@ -355,10 +351,14 @@ extension OpenMeteoSoundingListRequest {
         jsonEncoder.dateEncodingStrategy = .formatted(dateFormatter)
         
         guard let data = try? jsonEncoder.encode(self),
-              let dictionary = (try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed))
+              var dictionary = (try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed))
                 .flatMap({ $0 as? [String: Any] })
         else {
             return nil
+        }
+        
+        if model == .automatic {
+            dictionary.removeValue(forKey: "model")
         }
         
         return dictionary.map {

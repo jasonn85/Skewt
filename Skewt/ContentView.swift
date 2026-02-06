@@ -91,7 +91,7 @@ struct ContentView: View {
     @ViewBuilder
     private var locationNavigationStack: some View {
         NavigationStack {
-            LocationSelectionView(listType: .modelType(.automaticForecast))
+            LocationSelectionView(listType: .modelType(.forecast(.automatic)))
                 .environmentObject(store)
                 .toolbar {
                     Button("Options", systemImage: "slider.horizontal.3") {
@@ -155,7 +155,7 @@ struct ContentView: View {
             set: { store.dispatch(DisplayState.Action.showDialog($0)) }
         )) {
             NavigationStack {
-                LocationSelectionView(listType: .modelType(.automaticForecast))
+                LocationSelectionView(listType: .modelType(.forecast(.automatic)))
                     .environmentObject(store)
             }
             .tabItem {
@@ -238,17 +238,17 @@ struct ContentView: View {
     @ViewBuilder
     private var timeSelection: some View {
         switch store.state.currentSoundingState.selection.type {
-        case .automaticForecast:
+        case .forecast(_):
             HourlyTimeSelectView(
                 value: $timeSelectDebouncer.time,
                 range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.automaticForecast.hourInterval),
+                stepSize: .hours(SoundingSelection.ModelType.forecast(.automatic).hourInterval),
                 location: store.state.locationState.locationIfKnown
             )
-        case .raob:
+        case .sounding:
             SoundingTimeSelectView(
                 value: $timeSelectDebouncer.time,
-                hourInterval: SoundingSelection.ModelType.raob.hourInterval
+                hourInterval: SoundingSelection.ModelType.sounding.hourInterval
             )
         }
     }
@@ -296,9 +296,9 @@ struct ContentView_Previews: PreviewProvider {
 extension SoundingSelection.ModelType: CustomStringConvertible {
     var description: String {
         switch self {
-        case .automaticForecast:
+        case .forecast(_):
             return "Forecast"
-        case .raob:
+        case .sounding:
             return "Sounding"
         }
     }

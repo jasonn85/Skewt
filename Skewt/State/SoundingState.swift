@@ -15,10 +15,76 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
         case selectModelTypeAndLocation(ModelType?, Location?, Time = .now)
     }
     
-    enum ModelType: Codable, CaseIterable, Identifiable, Equatable {
-        case automaticForecast  // Allow data provider to select the best forecast model
-        case raob
+    enum ModelType: Codable, Hashable, CaseIterable, Identifiable, Equatable {
+        case forecast(ForecastModel)
+        case sounding
         
+        static var allCases: [ModelType] {
+            [.sounding] + ForecastModel.allCases.map { .forecast($0) }
+        }
+        
+        var id: String {
+            switch self {
+            case .sounding:
+                return "sounding"
+            case .forecast(let model):
+                return "forecast-\(model.rawValue)"
+            }
+        }
+    }
+    
+    enum ForecastModel: String, Codable, CaseIterable, Identifiable, Equatable {
+        case automatic = "auto"
+
+        // ICON (DWD)
+        case iconSeamlessEps = "icon_seamless_eps"
+        case iconGlobalEps = "icon_global_eps"
+        case iconEuEps = "icon_eu_eps"
+        case iconD2Eps = "icon_d2_eps"
+
+        case iconSeamless = "icon_seamless"
+        case iconGlobal = "icon_global"
+        case iconEu = "icon_eu"
+        case iconD2 = "icon_d2"
+
+        // UKMO
+        case ukmoGlobalEnsemble20km = "ukmo_global_ensemble_20km"
+        case ukmoUkEnsemble2km = "ukmo_uk_ensemble_2km"
+
+        case ukmoGlobal = "ukmo_global"
+        case ukmoUk = "ukmo_uk"
+
+        // NCEP
+        case ncepGefsSeamless = "ncep_gefs_seamless"
+        case ncepGefs025 = "ncep_gefs025"
+        case ncepGefs05 = "ncep_gefs05"
+        case ncepAigefs025 = "ncep_aigefs025"
+
+        case gfsSeamless = "gfs_seamless"
+        case gfs025 = "gfs025"
+        case gfs05 = "gfs05"
+
+        // MeteoSwiss
+        case meteoswissIconCh1Ensemble = "meteoswiss_icon_ch1_ensemble"
+        case meteoswissIconCh2Ensemble = "meteoswiss_icon_ch2_ensemble"
+
+        case meteoswissIconCh1 = "meteoswiss_icon_ch1"
+        case meteoswissIconCh2 = "meteoswiss_icon_ch2"
+
+        // ECMWF
+        case ecmwfIfs025Ensemble = "ecmwf_ifs025_ensemble"
+        case ecmwfAifs025Ensemble = "ecmwf_aifs025_ensemble"
+
+        case ecmwfIfs025 = "ecmwf_ifs025"
+        case ecmwfAifs025 = "ecmwf_aifs025"
+
+        // Others
+        case gemGlobalEnsemble = "gem_global_ensemble"
+        case gemGlobal = "gem_global"
+
+        case bomAccessGlobalEnsemble = "bom_access_global_ensemble"
+        case bomAccessGlobal = "bom_access_global"
+
         var id: Self { self }
     }
     
@@ -50,7 +116,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
 // Default initializer
 extension SoundingSelection {
     init() {
-        type = .automaticForecast
+        type = .forecast(.automatic)
         location = .closest
         time = .now
         
@@ -81,9 +147,9 @@ extension Date {
         let timeInterval = timeIntervalSince(referenceDate)
 
         switch modelType {
-        case .automaticForecast:
+        case .forecast(_):
             return timeInterval == 0.0 ? .now : .relative(timeInterval)
-        case .raob:
+        case .sounding:
             let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
             
             if abs(intervalCount) <= 1 {
@@ -135,9 +201,9 @@ extension SoundingSelection {
 extension SoundingSelection.ModelType {
     var hourInterval: Int {
         switch self {
-        case .automaticForecast:
+        case .forecast(_):
             return 1
-        case .raob:
+        case .sounding:
             return 12
         }
     }

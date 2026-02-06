@@ -15,6 +15,26 @@ struct OpenMeteoRequestTests {
         #expect(OpenMeteoSoundingListRequest.apiUrl.absoluteString.count > 0)
     }
     
+    @Test("Auto model selection does not send model parameter")
+    func autoModel() {
+        let request = OpenMeteoSoundingListRequest(latitude: 39.7392, longitude: -104.9903, model: .automatic)
+        
+        #expect(request.queryItems!.filter({ $0.name == "model" }).count == 0)
+    }
+    
+    @Test("Model names are sent")
+    func modelNames() {
+        SoundingSelection.ForecastModel.allCases.forEach { model in
+            guard model != .automatic else {
+                return
+            }
+            
+            let request = OpenMeteoSoundingListRequest(latitude: 39.7392, longitude: -104.9903, model: model)
+            
+            #expect(request.queryItems!.filter({ $0.name == "model" }).first!.value == model.rawValue)
+        }
+    }
+    
     @Test("All temperatures/dew points/wind speeds/wind directions show up in query parameters")
     func requestAllHourly() {
         let allSkewt = OpenMeteoSoundingListRequest.HourlyValue.allTemperatures
