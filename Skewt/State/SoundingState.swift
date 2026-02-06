@@ -35,6 +35,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     
     enum ForecastModel: String, Codable, CaseIterable, Identifiable, Equatable {
         case automatic = "auto"
+        
         case iconSeamlessEps = "icon_seamless_eps"
         case iconGlobalEps = "icon_global_eps"
         case iconEuEps = "icon_eu_eps"
