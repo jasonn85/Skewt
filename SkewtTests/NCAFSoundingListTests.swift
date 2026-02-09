@@ -78,6 +78,16 @@ struct NCAFSoundingListTests {
         #expect(abs(at925.windSpeed! - 10.0) <= tolerance)
     }
     
+    @Test("Parses data despite trailing = terminator")
+    func toleratesTerminator() throws {
+        let s = "72518  TTAA 69121 72518 99008 18407 35004="
+        let list = try NCAFSoundingList(fromString: s)
+        let point = list.dataByStationId[72518]!.data.surfaceDataPoint!
+        
+        #expect(point.windDirection == 350)
+        #expect(point.windSpeed == 4.0)
+    }
+    
     @Test("Significant level data is parsed")
     func parseSignificantLevel() throws {
         let tolerance = 0.0001

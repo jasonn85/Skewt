@@ -36,8 +36,9 @@ extension NCAFSoundingList {
     }
     
     init(fromString s: String) throws {
+        let separators = CharacterSet.whitespacesAndNewlines.union(.init(charactersIn: "="))
         let tokens = s
-            .components(separatedBy: .whitespacesAndNewlines)
+            .components(separatedBy: separators)
             .filter { !$0.isEmpty && $0 != "=" }
 
         var index = 0
