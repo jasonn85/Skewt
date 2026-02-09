@@ -14,6 +14,7 @@ final class NCAFSoundingListTestClass {}
 struct NCAFSoundingListTests {
     @Test("Temperature block parsing")
     func parseTemperatureBlocks() throws {
+        #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "/////") == (nil, nil))
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "00000").0 == 0.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "20000").0 == 20.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "20100").0 == -20.1)
@@ -31,18 +32,14 @@ struct NCAFSoundingListTests {
     @Test("Wind block parsing")
     func parseWind() throws {
         // Normal values
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09010").0 == 90)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09010").1 == 10.0)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22532").0 == 225)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22532").1 == 32.0)
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "/////") == (nil, nil))
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09010") == (90, 10.0))
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22532") == (225, 32.0))
         
         // Other-than-0/5 wind directions meaning 100+ wind speed
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22632").0 == 225)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22632").1 == 132.0)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22732").0 == 225)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22732").1 == 232.0)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09112").0 == 90)
-        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09112").1 == 112.0)
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22632") == (225, 132.0))
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22732") == (225, 232.0))
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09112") == (90, 112.0))
     }
     
     @Test("Mandatory level data is parsed")
@@ -86,6 +83,15 @@ struct NCAFSoundingListTests {
         
         #expect(point.windDirection == 350)
         #expect(point.windSpeed == 4.0)
+    }
+    
+    @Test("Tolerates missing data blocks")
+    func missingData() throws {
+        let ttaaString = "72518  TTAA 69121 72518 99008 ///// /////="
+        let ttbbString = "72518  TTBB 69120 72518 00008 ///// 11980 /////="
+        
+        let _ = try NCAFSoundingList(fromString: ttaaString)
+        let _ = try NCAFSoundingList(fromString: ttbbString)
     }
     
     @Test("Significant level data is parsed")

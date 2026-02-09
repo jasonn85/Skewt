@@ -137,7 +137,11 @@ extension NCAFSoundingList {
         return calendar.date(from: components) ?? now
     }
     
-    static func temperatureAndDewPoint(fromString s: String) throws -> (Double, Double) {
+    static func temperatureAndDewPoint(fromString s: String) throws -> (Double?, Double?) {
+        guard s != "/////" else {
+            return (nil, nil)
+        }
+        
         guard s.count == 5,
               let rawTemperature = Int(s.prefix(3)),
               let rawDewPointDepression = Int(s.suffix(2)) else {
@@ -319,7 +323,11 @@ extension NCAFSoundingList {
         }
     }
     
-    static func windSpeedAndDirection(fromString s: String) throws -> (Int, Double) {
+    static func windSpeedAndDirection(fromString s: String) throws -> (Int?, Double?) {
+        guard s != "/////" else {
+            return (nil, nil)
+        }
+        
         guard s.count == 5, let rawDirection = Int(s.prefix(3)), let rawSpeed = Int(s.suffix(2)) else {
             throw NCAFSoundingList.ParsingError.unrecognizedFormat
         }
