@@ -50,7 +50,7 @@ extension NCAFSoundingList {
         while index < tokens.count {
             let token = tokens[index]
 
-            guard token == "TTAA" || token == "TTBB" || token == "PPBB" else {
+            guard token == "TTAA" || token == "TTBB" else {
                 index += 1
                 continue
             }
@@ -82,8 +82,6 @@ extension NCAFSoundingList {
                 try NCAFSoundingList.parseTTAA(tokens, &index, &soundings[k]!)
             case "TTBB":
                 try NCAFSoundingList.parseTTBB(tokens, &index, &soundings[k]!)
-            case "PPBB":
-                try NCAFSoundingList.parsePPBB(tokens, &index, &soundings[k]!)
             default:
                 break
             }
@@ -274,34 +272,6 @@ extension NCAFSoundingList {
             return Double(1_000 + value)
         } else {
             return Double(value)
-        }
-    }
-    
-    private static func parsePPBB(
-        _ tokens: [String],
-        _ index: inout Int,
-        _ ps: inout PartialSounding
-    ) throws {
-        while index + 1 < tokens.count {
-            let pGroup = tokens[index]
-            if pGroup == "TTAA" || pGroup == "TTBB" || pGroup == "PPBB" { break }
-
-            let wGroup = tokens[index + 1]
-            index += 2
-
-            let pressure = try decodeTTBBPressure(pGroup)
-            let (wd, ws) = try NCAFSoundingList.windSpeedAndDirection(fromString: wGroup)
-
-            let point = SoundingData.Point(
-                pressure: pressure,
-                height: nil,
-                temperature: nil,
-                dewPoint: nil,
-                windDirection: wd,
-                windSpeed: ws
-            )
-
-            ps.significantWind.append(point)
         }
     }
     
