@@ -15,6 +15,7 @@ struct NCAFSoundingListTests {
     @Test("Temperature block parsing")
     func parseTemperatureBlocks() throws {
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "/////") == (nil, nil))
+        #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "200//") == (20.0, nil))
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "00000").0 == 0.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "20000").0 == 20.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "20100").0 == -20.1)
@@ -27,6 +28,8 @@ struct NCAFSoundingListTests {
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "30062").1 == 18.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "30075").1 == 5.0)
         #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "30080").1 == 0.0)
+        
+        #expect(try NCAFSoundingList.temperatureAndDewPoint(fromString: "30050=") == (30.0, 25.0))
     }
     
     @Test("Wind block parsing")
@@ -40,6 +43,9 @@ struct NCAFSoundingListTests {
         #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22632") == (225, 132.0))
         #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "22732") == (225, 232.0))
         #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09112") == (90, 112.0))
+        
+        // With terminator
+        #expect(try NCAFSoundingList.windSpeedAndDirection(fromString: "09010=") == (90, 10.0))
     }
     
     @Test("Mandatory level data is parsed")
@@ -125,6 +131,17 @@ struct NCAFSoundingListTests {
         let at951 = data.dataPoints.filter({ $0.pressure == 951.0 }).first!
         #expect(abs(at951.temperature! - 17.0) <= tolerance)
         #expect(abs(at951.dewPoint! - 16.0) <= tolerance)
+    }
+    
+    @Test("Entire Current.rawins file parses without failure")
+    func parseCurrentRawins() throws {
+        let bundle = Bundle(for: NCAFSoundingListTestClass.self)
+        let fileUrl = bundle.url(forResource: "Current", withExtension: "rawins")!
+        let data = try Data(contentsOf: fileUrl)
+        let string = String(data: data, encoding: .utf8)!
+        
+        let list = try NCAFSoundingList(fromString: string)
+        print("woo")
     }
     
     // TODO: Test negative geopotential height

@@ -36,10 +36,11 @@ extension NCAFSoundingList {
     }
     
     init(fromString s: String) throws {
-        let separators = CharacterSet.whitespacesAndNewlines.union(.init(charactersIn: "="))
         let tokens = s
-            .components(separatedBy: separators)
-            .filter { !$0.isEmpty && $0 != "=" }
+            .replacingOccurrences(of: "\u{01}", with: "")
+            .replacingOccurrences(of: "\u{03}", with: "")
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
 
         var index = 0
         var soundings: [SoundingKey: PartialSounding] = [:]
@@ -110,6 +111,7 @@ extension NCAFSoundingList {
     }
     
     private static func parseTTAATime(_ s: String) -> Date {
+        let s = s.trimmingCharacters(in: CharacterSet(charactersIn: "="))
         let rawDay = Int(s.prefix(2)) ?? 1
         let hour = Int(s.dropFirst(2).prefix(2)) ?? 0
 
@@ -138,27 +140,46 @@ extension NCAFSoundingList {
     }
     
     static func temperatureAndDewPoint(fromString s: String) throws -> (Double?, Double?) {
+        let s = s.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
         guard s != "/////" else {
             return (nil, nil)
         }
         
         guard s.count == 5,
-              let rawTemperature = Int(s.prefix(3)),
-              let rawDewPointDepression = Int(s.suffix(2)) else {
+              let rawTemperature = Int(s.prefix(3)) else {
             throw ParsingError.unrecognizedFormat
         }
         
         let sign = (rawTemperature % 2) == 0 ? 1 : -1
         let temperature = Double(rawTemperature * sign) * 0.1
-        let dewPointDepression: Double
+        let dewPoint: Double?
         
-        if rawDewPointDepression <= 50 {
-            dewPointDepression = Double(rawDewPointDepression) * 0.1
+        if let dpd = try NCAFSoundingList.dewPointDepression(fromString: String(s.suffix(2))) {
+            dewPoint = temperature - dpd
         } else {
-            dewPointDepression = Double(rawDewPointDepression - 50)
+            dewPoint = nil
         }
         
-        return (temperature, temperature - dewPointDepression)
+        return (temperature, dewPoint)
+    }
+    
+    private static func dewPointDepression(fromString s: String) throws -> Double? {
+        let dd = s.suffix(2)
+        
+        guard dd != "//" else {
+            return nil
+        }
+        
+        guard let intValue = Int(dd) else {
+            throw ParsingError.unrecognizedFormat
+        }
+        
+        if intValue <= 50 {
+            return Double(intValue) * 0.1
+        } else {
+            return Double(intValue - 50)
+        }
     }
     
     private static func parseTTAA(
@@ -168,6 +189,7 @@ extension NCAFSoundingList {
     ) throws {
         while index < tokens.count {
             let g = tokens[index]
+            let triplet = "\(index)-\(index+2): \(tokens[index]) \(index + 1 < tokens.count ? tokens[index+1] : "") \(index + 2 < tokens.count ? tokens[index+2] : "")"
 
             if g == "TTAA" || g == "TTBB" || g == "PPBB" {
                 break
@@ -185,17 +207,38 @@ extension NCAFSoundingList {
             }
 
             let pGroup = g
-            let tGroup = tokens[index + 1]
-            index += 2
+            let tGroup: String?
+            var isTerminating = g.suffix(1) == "="
+            index += 1
+            
+            if !isTerminating {
+                tGroup = tokens[index]
+                
+                if tGroup!.rangeOfCharacter(from: .uppercaseLetters) != nil {
+                    break
+                }
+                
+                isTerminating = tGroup!.suffix(1) == "="
+                index += 1
+            } else {
+                tGroup = nil
+            }
 
             var wGroup: String?
-            if index < tokens.count, isWindGroup(tokens[index]) {
+            if !isTerminating, index < tokens.count, isWindGroup(tokens[index]) {
                 wGroup = tokens[index]
                 index += 1
             }
 
             let (p, h) = decodePressureHeight(pGroup)
-            let (t, d) = try NCAFSoundingList.temperatureAndDewPoint(fromString: tGroup)
+            let (t, d): (Double?, Double?)
+            
+            if let tGroup = tGroup {
+                (t, d) = try NCAFSoundingList.temperatureAndDewPoint(fromString: tGroup)
+            } else {
+                (t, d) = (nil, nil)
+            }
+            
             let (wd, ws): (Int?, Double?)
             
             if let wGroup = wGroup {
@@ -229,7 +272,7 @@ extension NCAFSoundingList {
         while index + 1 < tokens.count {
             let pGroup = tokens[index]
             
-            if !isTTBBPressureGroup(pGroup) {
+            if pGroup.suffix(1) == "=" || !isTTBBPressureGroup(pGroup) {
                 break
             }
             
@@ -257,6 +300,8 @@ extension NCAFSoundingList {
     }
     
     private static func isTTBBPressureGroup(_ g: String) -> Bool {
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
         guard g.count == 5 else {
             return false
         }
@@ -267,6 +312,8 @@ extension NCAFSoundingList {
     }
     
     private static func decodeTTBBPressure(_ g: String) throws -> Double {
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+        
         guard g.count == 5, let value = Int(g.suffix(3)) else {
             throw ParsingError.unrecognizedFormat
         }
@@ -281,18 +328,26 @@ extension NCAFSoundingList {
     }
     
     private static func isWindGroup(_ g: String) -> Bool {
-        g.count == 5
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
+        return g.count == 5
     }
     
     private static func isTTAASurfacePressureGroup(_ g: String) -> Bool {
-        g.count == 5 && g.prefix(2) == "99"
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
+        return g.count == 5 && g.prefix(2) == "99"
     }
     
     private static func isTTBBSurfacePressureGroup(_ g: String) -> Bool {
-        g.count == 5 && g.prefix(2) == "00"
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
+        return g.count == 5 && g.prefix(2) == "00"
     }
     
     private static func isPressureGroup(_ g: String) -> Bool {
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
         guard g.count == 5 else {
             return false
         }
@@ -302,6 +357,7 @@ extension NCAFSoundingList {
     }
     
     private static func decodePressureHeight(_ g: String) -> (Double, Double?) {
+        let g = g.trimmingCharacters(in: CharacterSet(charactersIn: "="))
         let prefix = g.prefix(2)
         let rest = Int(g.suffix(3)) ?? 0
 
@@ -324,12 +380,14 @@ extension NCAFSoundingList {
     }
     
     static func windSpeedAndDirection(fromString s: String) throws -> (Int?, Double?) {
+        let s = s.trimmingCharacters(in: CharacterSet(charactersIn: "="))
+
         guard s != "/////" else {
             return (nil, nil)
         }
         
         guard s.count == 5, let rawDirection = Int(s.prefix(3)), let rawSpeed = Int(s.suffix(2)) else {
-            throw NCAFSoundingList.ParsingError.unrecognizedFormat
+            throw ParsingError.unrecognizedFormat
         }
         
         let extraHundreds = rawDirection % 5

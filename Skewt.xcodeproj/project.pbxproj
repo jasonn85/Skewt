@@ -40,6 +40,7 @@
 		967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */; };
 		967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2B2A4299A600034A78 /* DisplayState.swift */; };
 		967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */; };
+		968180892F3898440027FD17 /* Current.rawins in Resources */ = {isa = PBXBuildFile; fileRef = 968180882F3898440027FD17 /* Current.rawins */; };
 		9681808B2F3898920027FD17 /* NCAFSoundingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9681808A2F3898920027FD17 /* NCAFSoundingList.swift */; };
 		9681808D2F3899C00027FD17 /* NCAFSoundingListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9681808C2F3899C00027FD17 /* NCAFSoundingListTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
@@ -133,6 +134,7 @@
 		967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMiddleware.swift; sourceTree = "<group>"; };
 		967FAF2B2A4299A600034A78 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayState.swift; sourceTree = "<group>"; };
 		967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtStateTests.swift; sourceTree = "<group>"; };
+		968180882F3898440027FD17 /* Current.rawins */ = {isa = PBXFileReference; lastKnownFileType = text; path = Current.rawins; sourceTree = "<group>"; };
 		9681808A2F3898920027FD17 /* NCAFSoundingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCAFSoundingList.swift; sourceTree = "<group>"; };
 		9681808C2F3899C00027FD17 /* NCAFSoundingListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCAFSoundingListTests.swift; sourceTree = "<group>"; };
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
@@ -302,6 +304,7 @@
 				964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */,
 				9629E30829BBC3A300C2904E /* ThermodynamicsTests.swift */,
 				96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */,
+				968180882F3898440027FD17 /* Current.rawins */,
 				96F4B05729A72C73006D23BE /* iad-nam-1.txt */,
 				967E242A2A3670F6009262D9 /* latest_pbraob.txt */,
 				96F081892A4B67C100D8289A /* metar.short */,
@@ -507,6 +510,7 @@
 				96F4B05829A72C73006D23BE /* iad-nam-1.txt in Resources */,
 				967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */,
 				96F0818A2A4B67C100D8289A /* metar.short in Resources */,
+				968180892F3898440027FD17 /* Current.rawins in Resources */,
 				96EF85BB2CD97EBB00414011 /* open-meteo.json in Resources */,
 				96F3B4AF29A6D7C300DF4A58 /* nkx-raob-1.txt in Resources */,
 				961CA9A92D2758BA00426A80 /* open-meteo-with-nulls.json in Resources */,
