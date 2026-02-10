@@ -52,8 +52,6 @@
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
 		96A8F5EA299DAC3F0021A170 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */; };
 		96A8F5F4299DAC3F0021A170 /* RucSoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */; };
-		96A8F5FE299DAC3F0021A170 /* SkewtUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */; };
-		96A8F600299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */; };
 		96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* RucSounding.swift */; };
 		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
 		96B436E32B6AF73700C8A01A /* ZoomedSquareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */; };
@@ -147,8 +145,6 @@
 		96A8F5EF299DAC3F0021A170 /* SkewtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingTests.swift; sourceTree = "<group>"; };
 		96A8F5F9299DAC3F0021A170 /* SkewtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITests.swift; sourceTree = "<group>"; };
-		96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		96A8F60C299DAC680021A170 /* RucSounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
 		96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquareTests.swift; sourceTree = "<group>"; };
@@ -240,7 +236,6 @@
 			children = (
 				96A8F5E1299DAC3E0021A170 /* Skewt */,
 				96A8F5F2299DAC3F0021A170 /* SkewtTests */,
-				96A8F5FC299DAC3F0021A170 /* SkewtUITests */,
 				96A8F5E0299DAC3E0021A170 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -302,15 +297,6 @@
 				962B3C5F29A43ECE000FDC8D /* san-op40-4.txt */,
 			);
 			path = SkewtTests;
-			sourceTree = "<group>";
-		};
-		96A8F5FC299DAC3F0021A170 /* SkewtUITests */ = {
-			isa = PBXGroup;
-			children = (
-				96A8F5FD299DAC3F0021A170 /* SkewtUITests.swift */,
-				96A8F5FF299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift */,
-			);
-			path = SkewtUITests;
 			sourceTree = "<group>";
 		};
 		96AA78DA2A2E759D003338D8 /* Middleware */ = {
@@ -588,8 +574,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96A8F5FE299DAC3F0021A170 /* SkewtUITests.swift in Sources */,
-				96A8F600299DAC3F0021A170 /* SkewtUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,7 +780,6 @@
 		96A8F607299DAC3F0021A170 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -816,7 +799,6 @@
 		96A8F608299DAC3F0021A170 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -836,7 +818,6 @@
 		96A8F60A299DAC3F0021A170 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HNS87AD5L9;
@@ -855,7 +836,6 @@
 		96A8F60B299DAC3F0021A170 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HNS87AD5L9;
