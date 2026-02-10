@@ -9,12 +9,12 @@ import Foundation
 
 struct SoundingData: Codable, Equatable {
     struct Point: Codable, Hashable {
-        let pressure: Double
-        let height: Double?
-        let temperature: Double?
-        let dewPoint: Double?
-        let windDirection: Int?
-        let windSpeed: Double?
+        let pressure: Double  // Pressure in millibars
+        let height: Double?  // Geopotential height in meters
+        let temperature: Double?  // Temperature in C
+        let dewPoint: Double?  // Dew point in C
+        let windDirection: Int?  // Wind direction in true heading
+        let windSpeed: Double?  // Wind speed in knots
     }
     
     let time: Date
