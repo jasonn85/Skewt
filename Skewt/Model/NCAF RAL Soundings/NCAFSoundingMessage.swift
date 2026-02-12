@@ -28,6 +28,7 @@ struct NCAFSoundingMessage {
     
     enum LevelType {
         case surface
+        case tropopause(Double)
         case pressure(Double)
         case altitude(Int)
     }
@@ -142,10 +143,47 @@ extension NCAFSoundingMessage {
                 levels.append(level)
             }
         }
+        
+        // MARK: - Section 3
+        if groups[i...].first?.prefix(2) == "88" {
+            let section3Terminators = ["88", "77", "31313", "51515"]
+            let endOfSection3 = groups[i...].firstIndex { group in
+                section3Terminators.contains { group.hasPrefix($0) }
+            } ?? groups[i...].endIndex
+            
+            let section3 = groups[i..<endOfSection3]
+            i = endOfSection3
+            
+            guard section3.count >= 3,
+                  let tropopauseGroup = PressureGroup(fromTropopauseString: section3.first!),
+                  let temperatureGroup = TemperatureGroup(fromString: section3.dropFirst().first!),
+                  let windGroup = WindGroup(fromString: section3.last!) else {
+                return nil
+            }
+            
+            let tropopauseLevel = Level(
+                type: .tropopause(tropopauseGroup.pressure),
+                pressureGroup: tropopauseGroup,
+                temperatureGroup: temperatureGroup,
+                windGroup: windGroup
+            )
+            
+            levels.append(tropopauseLevel)
+        }
     }
 }
 
 extension NCAFSoundingMessage.PressureGroup {
+    init?(fromTropopauseString s: String) {
+        guard s.prefix(2) == "88", let ppp = Int(s.suffix(3)) else {
+            return nil
+        }
+        
+        self.isSurface = false
+        self.pressure = Double(ppp)
+        self.height = nil
+    }
+    
     init?(fromString s: String) {
         guard let pp = Int(s.prefix(2)) else {
             return nil
