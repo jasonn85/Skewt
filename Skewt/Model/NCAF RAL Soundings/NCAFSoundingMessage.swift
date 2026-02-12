@@ -58,13 +58,7 @@ struct NCAFSoundingMessage {
 }
 
 extension NCAFSoundingMessage {
-    enum MessageError: Error {
-        case unsupportedType
-        case badOrMissingSection(Int)
-        case unparseableGroupData(String)
-    }
-    
-    init?(fromString s: String) throws {
+    init?(fromString s: String) {
         let groups = s
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { !$0.isEmpty }
@@ -83,7 +77,7 @@ extension NCAFSoundingMessage {
         let timestampGroup = section1.dropFirst().first!
         let stationIdGroup = section1.last!
         
-        if stationIdGroup == "NIL" {
+        if stationIdGroup == "NIL" || timestampGroup == "/////" {
             return nil
         }
         
@@ -91,7 +85,7 @@ extension NCAFSoundingMessage {
               let rawDay = Int(timestampGroup.prefix(2)),
               let hour = Int(timestampGroup.dropFirst(2).prefix(2)),
               let stationId = Int(stationIdGroup) else {
-            throw MessageError.badOrMissingSection(1)
+            return nil
         }
         
         if let lowestPressure = Int(timestampGroup.suffix(1)) {
@@ -130,10 +124,13 @@ extension NCAFSoundingMessage {
             let section2 = groups[i..<endOfSection2]
             i = endOfSection2
             
-            try stride(from: section2.startIndex, to: section2.endIndex - 2, by: 3).forEach {
-                let pressureGroup = try PressureGroup(fromString: section2[$0])
-                let temperatureGroup = try TemperatureGroup(fromString: section2[$0 + 1])
-                let windGroup = try WindGroup(fromString: section2[$0 + 2])
+            stride(from: section2.startIndex, to: section2.endIndex - 2, by: 3).forEach {
+                guard let pressureGroup = PressureGroup(fromString: section2[$0]) else {
+                    return
+                }
+                
+                let temperatureGroup = TemperatureGroup(fromString: section2[$0 + 1])
+                let windGroup = WindGroup(fromString: section2[$0 + 2])
                                 
                 let level = Level(
                     type: pressureGroup.isSurface ? .surface : .pressure(pressureGroup.pressure),
@@ -149,9 +146,9 @@ extension NCAFSoundingMessage {
 }
 
 extension NCAFSoundingMessage.PressureGroup {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         guard let pp = Int(s.prefix(2)) else {
-            throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+            return nil
         }
         
         let hhhString = s.suffix(3)
@@ -159,7 +156,7 @@ extension NCAFSoundingMessage.PressureGroup {
                 
         if pp == 99 {
             guard let hhh = hhh else {
-                throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+                return nil
             }
             
             self.isSurface = true
@@ -181,7 +178,7 @@ extension NCAFSoundingMessage.PressureGroup {
                 self.height = nil
             } else {
                 guard let hhh = hhh else {
-                    throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+                    return nil
                 }
                 
                 // Some ugly height-guessing. It's up to us to divine these adjustments.
@@ -212,7 +209,7 @@ extension NCAFSoundingMessage.PressureGroup {
 }
 
 extension NCAFSoundingMessage.TemperatureGroup {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         if s == "/////" {
             self.temperature = nil
             self.dewPoint = nil
@@ -220,7 +217,7 @@ extension NCAFSoundingMessage.TemperatureGroup {
         }
         
         guard let ttt = Int(s.prefix(3)) else {
-            throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+            return nil
         }
         
         let sign = (ttt % 2) == 0 ? 1 : -1
@@ -232,7 +229,7 @@ extension NCAFSoundingMessage.TemperatureGroup {
             self.dewPoint = nil
         } else {
             guard let rawDpd = Int(dpdString) else {
-                throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+                return nil
             }
             
             let dewPointDepression = rawDpd <= 50 ? Double(rawDpd) * 0.1 : Double(rawDpd - 50)
@@ -242,7 +239,7 @@ extension NCAFSoundingMessage.TemperatureGroup {
 }
 
 extension NCAFSoundingMessage.WindGroup {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         if s == "/////" {
             self.direction = nil
             self.speed = nil
@@ -251,7 +248,7 @@ extension NCAFSoundingMessage.WindGroup {
         
         guard let rawDirection = Int(s.prefix(3)),
               let rawSpeed = Int(s.suffix(2)) else {
-            throw NCAFSoundingMessage.MessageError.unparseableGroupData(s)
+            return nil
         }
         
         let extraHundreds = rawDirection % 5
