@@ -177,18 +177,74 @@ final class SunTimesTests: XCTestCase {
     }
     
     func testSiderealTime() {
-        let tolerance = 0.01
-        
+        let tolerance = 1e-4
+
+        func normalizeRadians(_ x: Double) -> Double {
+            var r = x.truncatingRemainder(dividingBy: 2.0 * .pi)
+            
+            if r < 0 {
+                r += 2.0 * .pi
+            }
+            
+            return r
+        }
+
+        // --- Absolute reference at J2000.0 ---
         let date = Date(timeIntervalSince1970: 946728000) // 2000-01-01 12:00:00 UTC
-        let expectedGreenwichSiderealTime = 160.46061837 * .pi / 180.0
-        XCTAssertEqual(date.localSiderealTime(at: greenwich.location), expectedGreenwichSiderealTime, accuracy: tolerance)
-        
+        let expectedGreenwichSiderealTime = 280.46061837 * .pi / 180.0
+
+        XCTAssertEqual(
+            date.localSiderealTime(at: greenwich.location),
+            expectedGreenwichSiderealTime,
+            accuracy: tolerance
+        )
+
+        // Opposite meridian (+180° longitude) should be +π, wrapped
         let oppositeGreenwich = CLLocation(
-            latitude: -greenwich.location.coordinate.latitude,
+            latitude: greenwich.location.coordinate.latitude, // latitude irrelevant to LST
             longitude: greenwich.location.coordinate.longitude + 180.0
         )
-        XCTAssertEqual(date.localSiderealTime(at: oppositeGreenwich), expectedGreenwichSiderealTime + .pi, accuracy: tolerance)
+
+        let expectedOpposite = normalizeRadians(expectedGreenwichSiderealTime + .pi)
+
+        XCTAssertEqual(
+            date.localSiderealTime(at: oppositeGreenwich),
+            expectedOpposite,
+            accuracy: tolerance
+        )
+
+        // --- Structural tests ---
+
+        // 1) Longitude shift: +15° east should add +15° (= π/12 rad) to LST, wrapped
+        let east15 = CLLocation(latitude: 0.0, longitude: 15.0)
+        let greenwichAtEquator = CLLocation(latitude: 0.0, longitude: 0.0)
+
+        let lstGreenwichEq = date.localSiderealTime(at: greenwichAtEquator)
+        let lstEast15 = date.localSiderealTime(at: east15)
+
+        let deltaLon = normalizeRadians(lstEast15 - lstGreenwichEq)
+        XCTAssertEqual(deltaLon, .pi / 12.0, accuracy: tolerance)
+
+        // 2) Time shift: +6 UT hours should advance GMST by:
+        //    360.98564736629° per UT day -> 15.041068640262083° per UT hour
+        //    -> for 6 hours: 90.2464118415725° (≈ 1.575096200... rad)
+        let datePlus6h = date.addingTimeInterval(6.0 * 3600.0)
+        let lstT0 = date.localSiderealTime(at: greenwich.location)
+        let lstT6 = datePlus6h.localSiderealTime(at: greenwich.location)
+
+        let deltaTime = normalizeRadians(lstT6 - lstT0)
+        let expectedDelta6h = 90.2464118415725 * .pi / 180.0
+        XCTAssertEqual(deltaTime, expectedDelta6h, accuracy: tolerance)
+
+        // 3) +1 solar day: should advance by 360.985647...° i.e. +0.985647...° mod 360
+        let datePlus1d = date.addingTimeInterval(24.0 * 3600.0)
+        let lstT24 = datePlus1d.localSiderealTime(at: greenwich.location)
+
+        let deltaDay = normalizeRadians(lstT24 - lstT0)
+        let expectedDelta1d = 0.98564736629 * .pi / 180.0
+        XCTAssertEqual(deltaDay, expectedDelta1d, accuracy: tolerance)
     }
+
     
     func testSiderealDriftPerDay() {
         let tolerance = 0.01

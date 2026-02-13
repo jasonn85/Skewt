@@ -75,59 +75,38 @@ extension SunState {
 
 extension Date {
     var julianDate: Double {
-        let calendar = Calendar(identifier: .gregorian)
-        let year = calendar.component(.year, from: self)
-        let month = calendar.component(.month, from: self)
-        let day = calendar.component(.day, from: self)
-        
-        var Y = year
-        var M = month
-        if M <= 2 {
-            Y -= 1
-            M += 12
-        }
-        
-        let D = Double(day)
-        let A = floor(Double(Y) / 100.0)
-        let B = 2 - A + floor(A / 4.0)
-        
-        let JD = floor(365.25 * Double(Y + 4716)) +
-                 floor(30.6001 * Double(M + 1)) +
-                 D + B - 1524.5
-        
-        let hour = Double(calendar.component(.hour, from: self))
-        let minute = Double(calendar.component(.minute, from: self))
-        let second = Double(calendar.component(.second, from: self))
-        
-        let fraction = (hour + minute / 60 + second / 3600) / 24.0
-        
-        return JD + fraction
+        // Unix epoch (1970-01-01 00:00:00 UTC) is JD 2440587.5
+        2440587.5 + timeIntervalSince1970 / 86400.0
     }
-    
+
     func localSiderealTime(at location: CLLocation) -> Double {
-        let JD = julianDate
-        let JD0 = floor(JD - 0.5) + 0.5  // JD at previous midnight
-        let H = (JD - JD0) * 24.0  // Hours past UT midnight
-        let D = JD - 2451545.0  // Days since J2000.0
-        let D0 = JD0 - 2451545.0
+        let jd = julianDate
+        let jd0 = floor(jd - 0.5) + 0.5  // previous midnight UT
+        let h = (jd - jd0) * 24.0  // hours since UT midnight
+        let d0 = jd0 - 2451545.0  // days since J2000.0 at UT midnight
+
+        var gmstHours = 6.697374558
+            + 0.06570982441908 * d0
+            + 1.00273790935 * h
+
+        gmstHours = gmstHours.truncatingRemainder(dividingBy: 24.0)
         
-        // GMST in hours
-        var GMST = 6.697374558 + 0.06570982441908 * D0 + 1.00273790935 * H
-        GMST = fmod(GMST, 24.0)
-        if GMST < 0 { GMST += 24 }
+        if gmstHours < 0 {
+            gmstHours += 24.0
+        }
+
+        let gmstRad = gmstHours * (.pi / 12.0)   // 24h -> 2π
+        let lonRad = location.coordinate.longitude * (.pi / 180.0)
+
+        var lst = (gmstRad + lonRad).truncatingRemainder(dividingBy: 2.0 * .pi)
         
-        // Convert to radians and apply longitude
-        let GMSTRad = GMST * .pi / 12.0   // 24 hours → 2π radians
-        let longitudeRad = location.coordinate.longitude * .pi / 180.0
-        var LST = GMSTRad + longitudeRad
-        LST = fmod(LST, 2 * .pi)
-        
-        if LST < 0 {
-            LST += 2 * .pi
+        if lst < 0 {
+            lst += 2.0 * .pi
         }
         
-        return LST
+        return lst
     }
+
     
     /// The percent of the year [0,2π], accurate to 24 hours
     var fractionalYearInRadians: Double {
