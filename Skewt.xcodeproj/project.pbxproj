@@ -86,13 +86,6 @@
 			remoteGlobalIDString = 96A8F5DE299DAC3E0021A170;
 			remoteInfo = Skewt;
 		};
-		96A8F5FA299DAC3F0021A170 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 96A8F5D7299DAC3E0021A170 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 96A8F5DE299DAC3E0021A170;
-			remoteInfo = Skewt;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -144,7 +137,6 @@
 		96A8F5E9299DAC3F0021A170 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		96A8F5EF299DAC3F0021A170 /* SkewtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingTests.swift; sourceTree = "<group>"; };
-		96A8F5F9299DAC3F0021A170 /* SkewtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkewtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F60C299DAC680021A170 /* RucSounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
 		96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquareTests.swift; sourceTree = "<group>"; };
@@ -184,13 +176,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		96A8F5EC299DAC3F0021A170 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		96A8F5F6299DAC3F0021A170 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -245,7 +230,6 @@
 			children = (
 				96A8F5DF299DAC3E0021A170 /* Skewt.app */,
 				96A8F5EF299DAC3F0021A170 /* SkewtTests.xctest */,
-				96A8F5F9299DAC3F0021A170 /* SkewtUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -401,24 +385,6 @@
 			productReference = 96A8F5EF299DAC3F0021A170 /* SkewtTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		96A8F5F8299DAC3F0021A170 /* SkewtUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 96A8F609299DAC3F0021A170 /* Build configuration list for PBXNativeTarget "SkewtUITests" */;
-			buildPhases = (
-				96A8F5F5299DAC3F0021A170 /* Sources */,
-				96A8F5F6299DAC3F0021A170 /* Frameworks */,
-				96A8F5F7299DAC3F0021A170 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				96A8F5FB299DAC3F0021A170 /* PBXTargetDependency */,
-			);
-			name = SkewtUITests;
-			productName = SkewtUITests;
-			productReference = 96A8F5F9299DAC3F0021A170 /* SkewtUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -433,10 +399,6 @@
 						CreatedOnToolsVersion = 13.4.1;
 					};
 					96A8F5EE299DAC3F0021A170 = {
-						CreatedOnToolsVersion = 13.4.1;
-						TestTargetID = 96A8F5DE299DAC3E0021A170;
-					};
-					96A8F5F8299DAC3F0021A170 = {
 						CreatedOnToolsVersion = 13.4.1;
 						TestTargetID = 96A8F5DE299DAC3E0021A170;
 					};
@@ -457,7 +419,6 @@
 			targets = (
 				96A8F5DE299DAC3E0021A170 /* Skewt */,
 				96A8F5EE299DAC3F0021A170 /* SkewtTests */,
-				96A8F5F8299DAC3F0021A170 /* SkewtUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -487,13 +448,6 @@
 				96F4B05A29A72D61006D23BE /* ord-gfs-1.txt in Resources */,
 				96081F772AFAEB0E006A8FE7 /* out-of-bounds-op40.txt in Resources */,
 				962B3C6129A43ECE000FDC8D /* san-op40-4.txt in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		96A8F5F7299DAC3F0021A170 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,13 +524,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		96A8F5F5299DAC3F0021A170 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -584,11 +531,6 @@
 			isa = PBXTargetDependency;
 			target = 96A8F5DE299DAC3E0021A170 /* Skewt */;
 			targetProxy = 96A8F5F0299DAC3F0021A170 /* PBXContainerItemProxy */;
-		};
-		96A8F5FB299DAC3F0021A170 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 96A8F5DE299DAC3E0021A170 /* Skewt */;
-			targetProxy = 96A8F5FA299DAC3F0021A170 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -815,42 +757,6 @@
 			};
 			name = Release;
 		};
-		96A8F60A299DAC3F0021A170 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HNS87AD5L9;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jasonneel.SkewtUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Skewt;
-			};
-			name = Debug;
-		};
-		96A8F60B299DAC3F0021A170 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HNS87AD5L9;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jasonneel.SkewtUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Skewt;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -877,15 +783,6 @@
 			buildConfigurations = (
 				96A8F607299DAC3F0021A170 /* Debug */,
 				96A8F608299DAC3F0021A170 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		96A8F609299DAC3F0021A170 /* Build configuration list for PBXNativeTarget "SkewtUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				96A8F60A299DAC3F0021A170 /* Debug */,
-				96A8F60B299DAC3F0021A170 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
