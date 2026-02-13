@@ -60,92 +60,92 @@ struct NCAFSoundingListTests {
     @Test("Pressure group parsing")
     func parsePressure() throws {
         // Surface pressure
-        #expect(NCAFSoundingMessage.PressureGroup(fromString: "99008")!.isSurface)
-        #expect(NCAFSoundingMessage.PressureGroup(fromString: "99008")!.pressure == 1008.0)
+        #expect(NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "99008")!.isSurface)
+        #expect(NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "99008")!.pressure == 1008.0)
         
         // Require height for surface
-        #expect(NCAFSoundingMessage.PressureGroup(fromString: "99///") == nil)
+        #expect(NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "99///") == nil)
         
         // Mandatory level pressures
-        let pressure00151 = NCAFSoundingMessage.PressureGroup(fromString: "00151")!
+        let pressure00151 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "00151")!
         #expect(pressure00151.pressure == 1000.0)
         #expect(pressure00151.height == 151)
-        let pressure00088 = NCAFSoundingMessage.PressureGroup(fromString: "00088")!
+        let pressure00088 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "00088")!
         #expect(pressure00088.pressure == 1000.0)
         #expect(pressure00088.height == 88)
-        let pressure00120 = NCAFSoundingMessage.PressureGroup(fromString: "00120")!
+        let pressure00120 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "00120")!
         #expect(pressure00120.pressure == 1000.0)
         #expect(pressure00120.height == 120)
-        let pressure92818 = NCAFSoundingMessage.PressureGroup(fromString: "92818")!
+        let pressure92818 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "92818")!
         #expect(pressure92818.pressure == 925.0)
         #expect(pressure92818.height == 818)
-        let pressure92791 = NCAFSoundingMessage.PressureGroup(fromString: "92791")!
+        let pressure92791 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "92791")!
         #expect(pressure92791.pressure == 925.0)
         #expect(pressure92791.height == 791)
-        let pressure92762 = NCAFSoundingMessage.PressureGroup(fromString: "92762")!
+        let pressure92762 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "92762")!
         #expect(pressure92762.pressure == 925.0)
         #expect(pressure92762.height == 762)
-        let pressure85529 = NCAFSoundingMessage.PressureGroup(fromString: "85529")!
+        let pressure85529 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "85529")!
         #expect(pressure85529.pressure == 850.0)
         #expect(pressure85529.height == 1529)
-        let pressure85456 = NCAFSoundingMessage.PressureGroup(fromString: "85456")!
+        let pressure85456 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "85456")!
         #expect(pressure85456.pressure == 850.0)
         #expect(pressure85456.height == 1456)
-        let pressure85612 = NCAFSoundingMessage.PressureGroup(fromString: "85612")!
+        let pressure85612 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "85612")!
         #expect(pressure85612.pressure == 850.0)
         #expect(pressure85612.height == 1612)
-        let pressure85508 = NCAFSoundingMessage.PressureGroup(fromString: "85508")!
+        let pressure85508 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "85508")!
         #expect(pressure85508.pressure == 850.0)
         #expect(pressure85508.height == 1508)
-        let pressure70108 = NCAFSoundingMessage.PressureGroup(fromString: "70108")!
+        let pressure70108 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "70108")!
         #expect(pressure70108.pressure == 700.0)
         #expect(pressure70108.height == 3108)
-        let pressure70023 = NCAFSoundingMessage.PressureGroup(fromString: "70023")!
+        let pressure70023 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "70023")!
         #expect(pressure70023.pressure == 700.0)
         #expect(pressure70023.height == 3023)
-        let pressure70189 = NCAFSoundingMessage.PressureGroup(fromString: "70189")!
+        let pressure70189 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "70189")!
         #expect(pressure70189.pressure == 700.0)
         #expect(pressure70189.height == 3189)
-        let pressure50575 = NCAFSoundingMessage.PressureGroup(fromString: "50575")!
+        let pressure50575 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "50575")!
         #expect(pressure50575.pressure == 500.0)
         #expect(pressure50575.height == 5750)
-        let pressure50548 = NCAFSoundingMessage.PressureGroup(fromString: "50548")!
+        let pressure50548 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "50548")!
         #expect(pressure50548.pressure == 500.0)
         #expect(pressure50548.height == 5480)
-        let pressure50621 = NCAFSoundingMessage.PressureGroup(fromString: "50621")!
+        let pressure50621 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "50621")!
         #expect(pressure50621.pressure == 500.0)
         #expect(pressure50621.height == 6210)
-        let pressure40740 = NCAFSoundingMessage.PressureGroup(fromString: "40740")!
+        let pressure40740 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "40740")!
         #expect(pressure40740.pressure == 400.0)
         #expect(pressure40740.height == 7400)
-        let pressure30941 = NCAFSoundingMessage.PressureGroup(fromString: "30941")!
+        let pressure30941 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "30941")!
         #expect(pressure30941.pressure == 300.0)
         #expect(pressure30941.height == 9410)
-        let pressure25060 = NCAFSoundingMessage.PressureGroup(fromString: "25060")!
+        let pressure25060 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "25060")!
         #expect(pressure25060.pressure == 250.0)
         #expect(pressure25060.height == 10600)
-        let pressure20205 = NCAFSoundingMessage.PressureGroup(fromString: "20205")!
+        let pressure20205 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "20205")!
         #expect(pressure20205.pressure == 200.0)
         #expect(pressure20205.height == 12050)
-        let pressure20123 = NCAFSoundingMessage.PressureGroup(fromString: "20123")!
+        let pressure20123 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "20123")!
         #expect(pressure20123.pressure == 200.0)
         #expect(pressure20123.height == 11230)
-        let pressure15391 = NCAFSoundingMessage.PressureGroup(fromString: "15391")!
+        let pressure15391 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "15391")!
         #expect(pressure15391.pressure == 150.0)
         #expect(pressure15391.height == 13910)
-        let pressure15234 = NCAFSoundingMessage.PressureGroup(fromString: "15234")!
+        let pressure15234 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "15234")!
         #expect(pressure15234.pressure == 150.0)
         #expect(pressure15234.height == 12340)
-        let pressure15789 = NCAFSoundingMessage.PressureGroup(fromString: "15789")!
+        let pressure15789 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "15789")!
         #expect(pressure15789.pressure == 150.0)
         #expect(pressure15789.height == 17890)
-        let pressure10649 = NCAFSoundingMessage.PressureGroup(fromString: "10649")!
+        let pressure10649 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "10649")!
         #expect(pressure10649.pressure == 100.0)
         #expect(pressure10649.height == 16490)
-        let pressure10234 = NCAFSoundingMessage.PressureGroup(fromString: "10234")!
+        let pressure10234 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "10234")!
         #expect(pressure10234.pressure == 100.0)
         #expect(pressure10234.height == 12340)
-        let pressure10567 = NCAFSoundingMessage.PressureGroup(fromString: "10567")!
+        let pressure10567 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "10567")!
         #expect(pressure10567.pressure == 100.0)
         #expect(pressure10567.height == 15670)
         

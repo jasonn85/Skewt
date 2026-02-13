@@ -53,64 +53,59 @@ struct NCAFSounding {
             case upperLevelPressureTempHumidityWindAerialSonde = "Z"
         }
     }
-    
-    enum ParseError: Error {
-        case empty
-        case unparseableHeader
-    }
 }
 
 extension NCAFSounding {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         let lines = s
             .components(separatedBy: .newlines)
             .filter { !$0.isEmpty }
         
-        guard lines.count >= 3 else {
-            throw ParseError.empty
+        guard lines.count >= 3,
+            let header = Header(fromString: lines[1]) else {
+                return nil
         }
         
-        self.header = try Header(fromString: lines[1])
+        self.header = header
 
-        let messages = try lines
+        let messages = lines
             .dropFirst(2)
             .joined(separator: " ")
             .components(separatedBy: "=")
             .filter { !$0.isEmpty }
             .compactMap(NCAFSoundingMessage.init(fromString:))
         
-        // TODO:
-        self.messages = []
-        
-        print("hi")
+        self.messages = messages
     }
 }
 
 extension NCAFSounding.Header {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         let groups = s.components(separatedBy: .whitespaces)
         
-        guard (3...4).contains(groups.count) else {
-            throw NCAFSounding.ParseError.unparseableHeader
+        guard (3...4).contains(groups.count),
+              let dataType = DataType(fromString: String(groups[0].prefix(2))),
+              let timestamp = NCAFSounding.Header.dateComponents(fromString: groups[2]) else {
+            return nil
         }
         
-        self.dataType = try DataType(fromString: String(groups[0].prefix(2)))
+        self.dataType = dataType
         self.originatingStation = groups[1]
-        self.timestamp = try NCAFSounding.Header.dateComponents(fromString: groups[2])
+        self.timestamp = timestamp
         
         if groups.count == 5 {
-            self.issuanceType = try NCAFSounding.Header.IssuanceType(fromString: groups[3])
+            self.issuanceType = NCAFSounding.Header.IssuanceType(fromString: groups[3])
         } else {
             self.issuanceType = nil
         }
     }
     
-    static func dateComponents(fromString s: String) throws -> DateComponents {
+    static func dateComponents(fromString s: String) -> DateComponents? {
         guard s.count == 6,
                 let day = Int(s.prefix(2)),
                 let hour = Int(s.dropFirst(2).prefix(2)),
                 let minute = Int(s.suffix(2)) else {
-            throw NCAFSounding.ParseError.unparseableHeader
+            return nil
         }
         
         var components = DateComponents()
@@ -125,9 +120,9 @@ extension NCAFSounding.Header {
 }
 
 extension NCAFSounding.Header.IssuanceType {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         guard s.count == 3 else {
-            throw NCAFSounding.ParseError.unparseableHeader
+            return nil
         }
         
         let prefix = s.prefix(2)
@@ -142,20 +137,20 @@ extension NCAFSounding.Header.IssuanceType {
         case let p where p.hasPrefix("P"):
             self = .segment(String(s.suffix(2)))
         default:
-            throw NCAFSounding.ParseError.unparseableHeader
+            return nil
         }
     }
 }
 
 extension NCAFSounding.Header.DataType {
-    init(fromString s: String) throws {
+    init?(fromString s: String) {
         guard s.count == 2 else {
-            throw NCAFSounding.ParseError.unparseableHeader
+            return nil
         }
         
         if s.prefix(1) == "U" {
             guard let upperAirType = NCAFSounding.Header.UpperAirDataType(rawValue: String(s.suffix(1))) else {
-                throw NCAFSounding.ParseError.unparseableHeader
+                return nil
             }
             
             self = .upperAirData(upperAirType)

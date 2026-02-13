@@ -121,7 +121,7 @@ extension NCAFSoundingMessage {
                 
         // MARK: - Section 2
         if type == .partA || type == .partC {
-            let terminators = ["88", "77", "31313", "51515"]
+            let terminators = ["88", "77", "66", "31313", "51515", "61616"]
             let endOfSection = groups[i...].firstIndex { group in
                 terminators.contains { group.hasPrefix($0) }
             } ?? groups[i...].endIndex
@@ -175,24 +175,29 @@ extension NCAFSoundingMessage {
         }
         
         // MARK: - Section 4
-        if groups[i...].first?.prefix(2) == "77" {
+        let nextTwo = groups[i...].first?.prefix(2)
+        
+        if nextTwo == "77" || nextTwo == "66" {
             if groups[i...].first == "77999" {
                 i = i.advanced(by: 1)
             } else {
-                let endOfSection = i.advanced(by: 3)
+                let terminators = ["31313", "51515", "61616"]
+                let endOfSection = groups[i...].firstIndex {
+                    terminators.contains($0)
+                } ?? groups[i...].endIndex
+                
                 let section = groups[i..<endOfSection]
                 i = endOfSection
                 
                 guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!),
-                      let temperatureGroup = TemperatureGroup(fromString: section.dropFirst().first!),
-                      let windGroup = WindGroup(fromString: section.last!) else {
+                      let windGroup = WindGroup(fromString: section.dropFirst().first!) else {
                     return nil
                 }
                 
                 let level = Level(
                     type: .maximumWind(pressureGroup.pressure),
                     pressureGroup: pressureGroup,
-                    temperatureGroup: temperatureGroup,
+                    temperatureGroup: nil,
                     windGroup: windGroup
                 )
                 
@@ -228,7 +233,7 @@ extension NCAFSoundingMessage {
         }
         
         // MARK: - Section 6
-        if groups[i] == "21212" {
+        if groups[i...].first == "21212" {
             let terminators = ["31313", "41414", "51515", "61616"]
             let endOfSection = groups[i...].firstIndex {
                 terminators.contains($0)

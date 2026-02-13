@@ -17,10 +17,10 @@ extension NCAFSoundingList {
     init(fromString s: String) throws {
         var result: [Int: NCAFSounding] = [:]
         
-        try s.components(separatedBy: CharacterSet(charactersIn: "\u{01}\u{03}"))
+        s.components(separatedBy: CharacterSet(charactersIn: "\u{01}\u{03}"))
              .compactMap { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
              .filter { !$0.isEmpty }
-             .map(NCAFSounding.init(fromString:))
+             .compactMap(NCAFSounding.init(fromString:))
              .forEach {
                  if let stationId = $0.messages.first?.stationId {
                      result[stationId] = $0
