@@ -14,7 +14,6 @@ struct NCAFSoundingMessage {
     let type: MessageType
     let stationId: Int
     let windUnit: WindUnit
-    let lowestPressure: Int?
     
     let levels: [LevelType: Level]
     
@@ -94,12 +93,6 @@ extension NCAFSoundingMessage {
               let hour = Int(timestampGroup.dropFirst(2).prefix(2)),
               let stationId = Int(stationIdGroup) else {
             return nil
-        }
-        
-        if let lowestPressure = Int(timestampGroup.suffix(1)) {
-            self.lowestPressure = lowestPressure * 100
-        } else {
-            self.lowestPressure = nil
         }
         
         self.type = type
