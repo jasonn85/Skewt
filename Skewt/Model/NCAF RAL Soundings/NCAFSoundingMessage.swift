@@ -14,7 +14,7 @@ struct NCAFSoundingMessage {
     let type: MessageType
     let stationId: Int
     let windUnit: WindUnit
-    let lowestPressure: Int?  // TODO: Decide if this is misnamed or not needed at all
+    let lowestPressure: Int?
     
     let levels: [LevelType: Level]
     
