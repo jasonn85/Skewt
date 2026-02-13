@@ -17,7 +17,6 @@ extension Double {
     public static let seaLevelLapseRate = -0.0065  // K / m
     public static let heatOfWaterVaporization = 2_501_000.0  // J / kg
     public static let vaporPressureAt0C = 0.611  // kPa
-    public static let latentHeatOfDeposition = 2.83e6  // J / kg
     public static let specificGasConstantDryAir = 287.0  // J / (kg * K)
     public static let specificGasConstantWaterVapor = 461.5  // J / (kg * K)
     public static let gasConstantRatioDryAirToWaterVapor = specificGasConstantDryAir / specificGasConstantWaterVapor  // ~0.622
@@ -78,11 +77,11 @@ public struct Temperature: Comparable {
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.value == rhs.value(inUnit: lhs.unit)
+        lhs.value(inUnit: .celsius) == rhs.value(inUnit: .celsius)
     }
     
     public static func < (lhs: Temperature, rhs: Temperature) -> Bool {
-        lhs.value < rhs.value(inUnit: lhs.unit)
+        lhs.value(inUnit: .celsius) < rhs.value(inUnit: .celsius)
     }
 }
 
@@ -156,7 +155,7 @@ extension Temperature {
         let logTerm = log((mixingRatioInGPerG * pressure.inKilopascals)
                           / (.vaporPressureAt0C * (mixingRatioInGPerG + .gasConstantRatioDryAirToWaterVapor)))
         
-        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .latentHeatOfDeposition) * logTerm)
+        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .heatOfWaterVaporization) * logTerm)
 
         return Temperature(resultInKelvin, unit: .kelvin)
     }
