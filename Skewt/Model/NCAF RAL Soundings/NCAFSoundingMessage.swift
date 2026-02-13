@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// A sounding message, originating from TEMP FM-35 format.
+/// reference: https://fly19.net/wp-content/uploads/2013/01/WMO_306_vol-I.1_en.pdf
 struct NCAFSoundingMessage {
     let time: DateComponents
     let type: MessageType

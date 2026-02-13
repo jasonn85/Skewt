@@ -183,6 +183,15 @@ struct NCAFSoundingListTests {
         #expect(abs(at925!.temperatureGroup!.dewPoint! - 13.8) <= tolerance)
         #expect(at925!.windGroup!.direction == 35)
         #expect(at925!.windGroup!.speed == 10)
+                
+        let at100 = message!.levels.first { levelType, _ in
+            levelType == .mandatory(100)
+        }?.value
+        #expect(at100 != nil)
+        #expect(abs(at100!.temperatureGroup!.temperature - -61.3) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
+        #expect(at100!.windGroup!.direction == 245)
+        #expect(at100!.windGroup!.speed == 18)
     }
     
     @Test("Significant level data is parsed")
@@ -221,6 +230,13 @@ struct NCAFSoundingListTests {
         #expect(at951 != nil)
         #expect(abs(at951!.temperatureGroup!.temperature - 17.0) <= tolerance)
         #expect(abs(at951!.temperatureGroup!.dewPoint! - 16.0) <= tolerance)
+        
+        let at100 = message!.levels.first { levelType, _ in
+            levelType == .significant(100)
+        }?.value
+        #expect(at100 != nil)
+        #expect(abs(at100!.temperatureGroup!.temperature - -61.3) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
     }
     
     @Test("Entire Current.rawins file parses without failure")
