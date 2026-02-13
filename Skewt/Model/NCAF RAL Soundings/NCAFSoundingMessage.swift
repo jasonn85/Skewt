@@ -14,6 +14,8 @@ struct NCAFSoundingMessage {
     let windUnit: WindUnit
     let lowestPressure: Int?  // TODO: Decide if this is misnamed or not needed at all
     
+    let levels: [LevelType: Level]
+    
     enum WindUnit {
         case ms
         case knots
@@ -26,11 +28,13 @@ struct NCAFSoundingMessage {
         case partD = "TTDD"
     }
     
-    enum LevelType {
+    enum LevelType: Hashable {
         case surface
-        case tropopause(Double)
-        case pressure(Double)
-        case altitude(Int)
+        case tropopause(Double)  // with tropopause pressure
+        case maximumWind(Double)  // with pressure at maximum wind
+        case mandatory(Double)  // with pressure
+        case significant(Double)  // with pressure
+        case altitude(Int)  // with height in meters
     }
     
     struct Level {
@@ -68,7 +72,7 @@ extension NCAFSoundingMessage {
             return nil
         }
         
-        var levels: [Level] = []
+        var levels: [LevelType: Level] = [:]
                 
         // MARK: - Section 1
         let section1 = groups[i..<(i + 3)]
@@ -117,74 +121,160 @@ extension NCAFSoundingMessage {
                 
         // MARK: - Section 2
         if type == .partA || type == .partC {
-            let section2Terminators = ["88", "77", "31313", "51515"]
-            let endOfSection2 = groups[i...].firstIndex { group in
-                section2Terminators.contains { group.hasPrefix($0) }
+            let terminators = ["88", "77", "31313", "51515"]
+            let endOfSection = groups[i...].firstIndex { group in
+                terminators.contains { group.hasPrefix($0) }
             } ?? groups[i...].endIndex
             
-            let section2 = groups[i..<endOfSection2]
-            i = endOfSection2
+            let section = groups[i..<endOfSection]
+            i = endOfSection
             
-            stride(from: section2.startIndex, to: section2.endIndex - 2, by: 3).forEach {
-                guard let pressureGroup = PressureGroup(fromString: section2[$0]) else {
+            stride(from: section.startIndex, to: section.endIndex - 2, by: 3).forEach {
+                guard let pressureGroup = PressureGroup(fromMandatoryLevelString: section[$0]) else {
                     return
                 }
                 
-                let temperatureGroup = TemperatureGroup(fromString: section2[$0 + 1])
-                let windGroup = WindGroup(fromString: section2[$0 + 2])
+                let temperatureGroup = TemperatureGroup(fromString: section[$0 + 1])
+                let windGroup = WindGroup(fromString: section[$0 + 2])
                                 
                 let level = Level(
-                    type: pressureGroup.isSurface ? .surface : .pressure(pressureGroup.pressure),
+                    type: pressureGroup.isSurface ? .surface : .mandatory(pressureGroup.pressure),
                     pressureGroup: pressureGroup,
                     temperatureGroup: temperatureGroup,
                     windGroup: windGroup
                 )
                 
-                levels.append(level)
+                levels[level.type] = level
             }
         }
         
         // MARK: - Section 3
         if groups[i...].first?.prefix(2) == "88" {
-            let section3Terminators = ["88", "77", "31313", "51515"]
-            let endOfSection3 = groups[i...].firstIndex { group in
-                section3Terminators.contains { group.hasPrefix($0) }
+            if groups[i...].first == "88999" {
+                i = i.advanced(by: 1)
+            } else {
+                let endOfSection = i.advanced(by: 3)
+                let section = groups[i..<endOfSection]
+                i = endOfSection
+                
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!),
+                      let temperatureGroup = TemperatureGroup(fromString: section.dropFirst().first!),
+                      let windGroup = WindGroup(fromString: section.last!) else {
+                    return nil
+                }
+                
+                let level = Level(
+                    type: .tropopause(pressureGroup.pressure),
+                    pressureGroup: pressureGroup,
+                    temperatureGroup: temperatureGroup,
+                    windGroup: windGroup
+                )
+                
+                levels[level.type] = level
+            }
+        }
+        
+        // MARK: - Section 4
+        if groups[i...].first?.prefix(2) == "77" {
+            if groups[i...].first == "77999" {
+                i = i.advanced(by: 1)
+            } else {
+                let endOfSection = i.advanced(by: 3)
+                let section = groups[i..<endOfSection]
+                i = endOfSection
+                
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!),
+                      let temperatureGroup = TemperatureGroup(fromString: section.dropFirst().first!),
+                      let windGroup = WindGroup(fromString: section.last!) else {
+                    return nil
+                }
+                
+                let level = Level(
+                    type: .maximumWind(pressureGroup.pressure),
+                    pressureGroup: pressureGroup,
+                    temperatureGroup: temperatureGroup,
+                    windGroup: windGroup
+                )
+                
+                levels[level.type] = level
+            }
+        }
+        
+        // MARK: - Section 5
+        if type == .partB || type == .partD {
+            let terminators = ["21212", "31313", "41414", "51515", "61616"]
+            let endOfSection = groups[i...].firstIndex {
+                terminators.contains($0)
             } ?? groups[i...].endIndex
             
-            let section3 = groups[i..<endOfSection3]
-            i = endOfSection3
+            let section = groups[i..<endOfSection]
+            i = endOfSection
             
-            guard section3.count >= 3,
-                  let tropopauseGroup = PressureGroup(fromTropopauseString: section3.first!),
-                  let temperatureGroup = TemperatureGroup(fromString: section3.dropFirst().first!),
-                  let windGroup = WindGroup(fromString: section3.last!) else {
-                return nil
+            stride(from: section.startIndex, to: section.endIndex - 1, by: 2).forEach {
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0]),
+                      let temperatureGroup = TemperatureGroup(fromString: section[$0 + 1]) else {
+                    return
+                }
+                
+                let level = Level(
+                    type: .significant(pressureGroup.pressure),
+                    pressureGroup: pressureGroup,
+                    temperatureGroup: temperatureGroup,
+                    windGroup: nil
+                )
+                
+                levels[level.type] = level
             }
-            
-            let tropopauseLevel = Level(
-                type: .tropopause(tropopauseGroup.pressure),
-                pressureGroup: tropopauseGroup,
-                temperatureGroup: temperatureGroup,
-                windGroup: windGroup
-            )
-            
-            levels.append(tropopauseLevel)
         }
+        
+        // MARK: - Section 6
+        if groups[i] == "21212" {
+            let terminators = ["31313", "41414", "51515", "61616"]
+            let endOfSection = groups[i...].firstIndex {
+                terminators.contains($0)
+            } ?? groups[i...].endIndex
+            
+            let section = groups[i..<endOfSection]
+            i = endOfSection
+            
+            stride(from: section.startIndex.advanced(by: 1), to: section.endIndex - 1, by: 2).forEach {
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0]),
+                      let windGroup = WindGroup(fromString: section[$0 + 1]) else {
+                    return
+                }
+                
+                let level = Level(
+                    type: .significant(pressureGroup.pressure),
+                    pressureGroup: pressureGroup,
+                    temperatureGroup: nil,
+                    windGroup: windGroup
+                )
+                
+                levels[level.type] = level
+            }
+        }
+        
+        self.levels = levels
     }
 }
 
 extension NCAFSoundingMessage.PressureGroup {
-    init?(fromTropopauseString s: String) {
+    init?(fromPressureSuffixString s: String) {
         guard s.prefix(2) == "88", let ppp = Int(s.suffix(3)) else {
             return nil
         }
         
+        if ppp < 100 {
+            self.pressure = Double(ppp + 1000)
+        } else {
+            self.pressure = Double(ppp)
+        }
+        
         self.isSurface = false
-        self.pressure = Double(ppp)
         self.height = nil
     }
     
-    init?(fromString s: String) {
+    init?(fromMandatoryLevelString s: String) {
         guard let pp = Int(s.prefix(2)) else {
             return nil
         }
