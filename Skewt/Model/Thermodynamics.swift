@@ -78,11 +78,11 @@ public struct Temperature: Comparable {
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.value == rhs.value(inUnit: lhs.unit)
+        lhs.value(inUnit: .celsius) == rhs.value(inUnit: .celsius)
     }
     
     public static func < (lhs: Temperature, rhs: Temperature) -> Bool {
-        lhs.value < rhs.value(inUnit: lhs.unit)
+        lhs.value(inUnit: .celsius) < rhs.value(inUnit: .celsius)
     }
 }
 
@@ -156,7 +156,7 @@ extension Temperature {
         let logTerm = log((mixingRatioInGPerG * pressure.inKilopascals)
                           / (.vaporPressureAt0C * (mixingRatioInGPerG + .gasConstantRatioDryAirToWaterVapor)))
         
-        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .latentHeatOfDeposition) * logTerm)
+        let resultInKelvin = 1.0 / ((1.0 / t0) - (.specificGasConstantWaterVapor / .heatOfWaterVaporization) * logTerm)
 
         return Temperature(resultInKelvin, unit: .kelvin)
     }
