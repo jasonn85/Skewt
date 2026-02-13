@@ -146,8 +146,6 @@ struct NCAFSoundingListTests {
         let pressure10567 = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "10567")!
         #expect(pressure10567.pressure == 100.0)
         #expect(pressure10567.height == 15670)
-        
-        // TODO: Add negative MSL height
     }
     
     @Test("Mandatory level data is parsed")
@@ -192,6 +190,14 @@ struct NCAFSoundingListTests {
         #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
         #expect(at100!.windGroup!.direction == 245)
         #expect(at100!.windGroup!.speed == 18)
+    }
+    
+    @Test("Negative MSL is parsed in mandatory data")
+    func negativeMsl() throws {
+        let g = NCAFSoundingMessage.PressureGroup(fromMandatoryLevelString: "00575")
+        #expect(g != nil)
+        #expect(g?.pressure == 1000)
+        #expect(g?.height == -75)
     }
     
     @Test("Significant level data is parsed")
@@ -248,6 +254,4 @@ struct NCAFSoundingListTests {
         
         let _ = try NCAFSoundingList(fromString: string)
     }
-//    
-//    // TODO: Test negative geopotential height
 }

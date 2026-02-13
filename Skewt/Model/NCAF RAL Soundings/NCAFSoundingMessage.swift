@@ -320,7 +320,9 @@ extension NCAFSoundingMessage.PressureGroup {
                 }
                 
                 // Some ugly height-guessing. It's up to us to divine these adjustments.
-                if self.pressure == 1000 || self.pressure == 925 {
+                if self.pressure == 1000 {
+                    self.height = hhh < 500 ? hhh : -(hhh - 500)
+                } else if self.pressure == 925 {
                     self.height = hhh
                 } else if self.pressure == 850 {
                     self.height = 1000 + hhh
