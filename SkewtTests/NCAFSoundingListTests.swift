@@ -152,38 +152,40 @@ struct NCAFSoundingListTests {
         // TODO: Add negative MSL height
     }
     
-//    @Test("Mandatory level data is parsed")
-//    func parseMandatoryLevel() throws {
-//        let tolerance = 0.0001
-//        let s = """
-//            72518  TTAA 69121 72518 99008 18407 35004 00151 18208 36007
-//            92818 15012 03510 85529 11034 04510 70142 06262 35005 50582
-//            08770 23006 40752 20569 22532 30958 35737 22563 25082 46359
-//            23568 20226 57758 22572 15407 59159 23552 10660 61360 24518
-//            88176 59758 22574 77181 22576 41218 51515 10164 00008 10194
-//            03011 02006=
-//            """
-//
-//        let list = try NCAFSoundingList(fromString: s)
-//        let sounding = list.dataByStationId[72518]
-//        #expect(sounding != nil)
-//
-//        let data = sounding!.data
-//        #expect(!data.dataPoints.isEmpty)
-//        
-//        let surfaceData = data.surfaceDataPoint!
-//        #expect(abs(surfaceData.pressure - 1008.0) <= tolerance)
-//        #expect(abs(surfaceData.temperature! - 18.4) <= tolerance)
-//        #expect(abs(surfaceData.dewPoint! - 17.7) <= tolerance)
-//        #expect(surfaceData.windDirection == 350)
-//        #expect(abs(surfaceData.windSpeed! - 4.0) <= tolerance)
-//        
-//        let at925 = data.dataPoints.filter({ $0.pressure == 925.0 }).first!
-//        #expect(abs(at925.temperature! - 15.0) <= tolerance)
-//        #expect(abs(at925.dewPoint! - 13.8) <= tolerance)
-//        #expect(at925.windDirection == 35)
-//        #expect(abs(at925.windSpeed! - 10.0) <= tolerance)
-//    }
+    @Test("Mandatory level data is parsed")
+    func parseMandatoryLevel() throws {
+        let tolerance = 0.0001
+        let s = """
+            72518  TTAA 69121 72518 99008 18407 35004 00151 18208 36007
+            92818 15012 03510 85529 11034 04510 70142 06262 35005 50582
+            08770 23006 40752 20569 22532 30958 35737 22563 25082 46359
+            23568 20226 57758 22572 15407 59159 23552 10660 61360 24518
+            88176 59758 22574 77181 22576 41218 51515 10164 00008 10194
+            03011 02006=
+            """
+        
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+
+        let surface = message!.levels.first { levelType, _ in
+            levelType == .surface
+        }?.value
+        #expect(surface != nil)
+        #expect(abs(surface!.pressureGroup!.pressure - 1008.0) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.temperature! - 18.4) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.dewPoint! - 17.7) <= tolerance)
+        #expect(surface!.windGroup!.direction == 350)
+        #expect(surface!.windGroup!.speed! == 4)
+        
+        let at925 = message!.levels.first { levelType, _ in
+            levelType == .mandatory(925.0)
+        }?.value
+        #expect(at925 != nil)
+        #expect(abs(at925!.temperatureGroup!.temperature! - 15.0) <= tolerance)
+        #expect(abs(at925!.temperatureGroup!.dewPoint! - 13.8) <= tolerance)
+        #expect(at925!.windGroup!.direction == 35)
+        #expect(at925!.windGroup!.speed! == 10)
+    }
 //    
 //    @Test("Significant level data is parsed")
 //    func parseSignificantLevel() throws {

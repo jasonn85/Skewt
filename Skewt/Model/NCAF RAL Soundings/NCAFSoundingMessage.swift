@@ -266,7 +266,7 @@ extension NCAFSoundingMessage {
 
 extension NCAFSoundingMessage.PressureGroup {
     init?(fromPressureSuffixString s: String) {
-        guard s.prefix(2) == "88", let ppp = Int(s.suffix(3)) else {
+        guard let ppp = Int(s.suffix(3)) else {
             return nil
         }
         
