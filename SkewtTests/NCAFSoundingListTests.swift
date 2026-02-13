@@ -15,8 +15,7 @@ struct NCAFSoundingListTests {
     @Test("Temperature group parsing")
     func parseTemperatureGroups() throws {
         // Omitted values
-        #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "/////")!.temperature == nil)
-        #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "/////")!.dewPoint == nil)
+        #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "/////") == nil)
         #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "200//")!.temperature == 20.0)
         #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "200//")!.dewPoint == nil)
 
@@ -41,8 +40,7 @@ struct NCAFSoundingListTests {
     @Test("Wind group parsing")
     func parseWind() throws {
         // Normal values
-        #expect(NCAFSoundingMessage.WindGroup(fromString: "/////")!.direction == nil)
-        #expect(NCAFSoundingMessage.WindGroup(fromString: "/////")!.speed == nil)
+        #expect(NCAFSoundingMessage.WindGroup(fromString: "/////") == nil)
         #expect(NCAFSoundingMessage.WindGroup(fromString: "09010")!.direction == 90)
         #expect(NCAFSoundingMessage.WindGroup(fromString: "09010")!.speed == 10)
         #expect(NCAFSoundingMessage.WindGroup(fromString: "22532")!.direction == 225)
@@ -172,19 +170,19 @@ struct NCAFSoundingListTests {
         }?.value
         #expect(surface != nil)
         #expect(abs(surface!.pressureGroup!.pressure - 1008.0) <= tolerance)
-        #expect(abs(surface!.temperatureGroup!.temperature! - 18.4) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.temperature - 18.4) <= tolerance)
         #expect(abs(surface!.temperatureGroup!.dewPoint! - 17.7) <= tolerance)
         #expect(surface!.windGroup!.direction == 350)
-        #expect(surface!.windGroup!.speed! == 4)
+        #expect(surface!.windGroup!.speed == 4)
         
         let at925 = message!.levels.first { levelType, _ in
             levelType == .mandatory(925.0)
         }?.value
         #expect(at925 != nil)
-        #expect(abs(at925!.temperatureGroup!.temperature! - 15.0) <= tolerance)
+        #expect(abs(at925!.temperatureGroup!.temperature - 15.0) <= tolerance)
         #expect(abs(at925!.temperatureGroup!.dewPoint! - 13.8) <= tolerance)
         #expect(at925!.windGroup!.direction == 35)
-        #expect(at925!.windGroup!.speed! == 10)
+        #expect(at925!.windGroup!.speed == 10)
     }
     
     @Test("Significant level data is parsed")
@@ -207,21 +205,21 @@ struct NCAFSoundingListTests {
         }?.value
         #expect(surface != nil)
         #expect(abs(surface!.pressureGroup!.pressure - 1008.0) <= tolerance)
-        #expect(abs(surface!.temperatureGroup!.temperature! - 18.4) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.temperature - 18.4) <= tolerance)
         #expect(abs(surface!.temperatureGroup!.dewPoint! - 17.7) <= tolerance)
         
         let at980 = message!.levels.first { levelType, _ in
             levelType == .significant(980.0)
         }?.value
         #expect(at980 != nil)
-        #expect(abs(at980!.temperatureGroup!.temperature! - 17.0) <= tolerance)
+        #expect(abs(at980!.temperatureGroup!.temperature - 17.0) <= tolerance)
         #expect(abs(at980!.temperatureGroup!.dewPoint! - 16.5) <= tolerance)
         
         let at951 = message!.levels.first { levelType, _ in
             levelType == .significant(951.0)
         }?.value
         #expect(at951 != nil)
-        #expect(abs(at951!.temperatureGroup!.temperature! - 17.0) <= tolerance)
+        #expect(abs(at951!.temperatureGroup!.temperature - 17.0) <= tolerance)
         #expect(abs(at951!.temperatureGroup!.dewPoint! - 16.0) <= tolerance)
     }
     
@@ -232,8 +230,7 @@ struct NCAFSoundingListTests {
         let data = try Data(contentsOf: fileUrl)
         let string = String(data: data, encoding: .utf8)!
         
-        let list = try NCAFSoundingList(fromString: string)
-        print("woo")
+        let _ = try NCAFSoundingList(fromString: string)
     }
 //    
 //    // TODO: Test negative geopotential height

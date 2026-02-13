@@ -52,13 +52,13 @@ struct NCAFSoundingMessage {
     }
     
     struct TemperatureGroup {
-        let temperature: Double?
+        let temperature: Double
         let dewPoint: Double?
     }
     
     struct WindGroup {
-        let direction: Int?
-        let speed: Int?
+        let direction: Int
+        let speed: Int
     }
 }
 
@@ -346,13 +346,7 @@ extension NCAFSoundingMessage.PressureGroup {
 
 extension NCAFSoundingMessage.TemperatureGroup {
     init?(fromString s: String) {
-        if s == "/////" {
-            self.temperature = nil
-            self.dewPoint = nil
-            return
-        }
-        
-        guard let ttt = Int(s.prefix(3)) else {
+        guard s != "/////", let ttt = Int(s.prefix(3)) else {
             return nil
         }
         
@@ -369,20 +363,15 @@ extension NCAFSoundingMessage.TemperatureGroup {
             }
             
             let dewPointDepression = rawDpd <= 50 ? Double(rawDpd) * 0.1 : Double(rawDpd - 50)
-            self.dewPoint = self.temperature! - dewPointDepression
+            self.dewPoint = self.temperature - dewPointDepression
         }
     }
 }
 
 extension NCAFSoundingMessage.WindGroup {
     init?(fromString s: String) {
-        if s == "/////" {
-            self.direction = nil
-            self.speed = nil
-            return
-        }
-        
-        guard let rawDirection = Int(s.prefix(3)),
+        guard s != "/////",
+              let rawDirection = Int(s.prefix(3)),
               let rawSpeed = Int(s.suffix(2)) else {
             return nil
         }
