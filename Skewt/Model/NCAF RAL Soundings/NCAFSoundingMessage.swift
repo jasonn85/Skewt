@@ -68,7 +68,8 @@ extension NCAFSoundingMessage {
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { !$0.isEmpty }
 
-        guard var i = groups.firstIndex(where: { MessageType(rawValue: $0) != nil }) else {
+        guard var i = groups.firstIndex(where: { MessageType(rawValue: $0) != nil }),
+              i + 2 < groups.endIndex else {
             return nil
         }
         
