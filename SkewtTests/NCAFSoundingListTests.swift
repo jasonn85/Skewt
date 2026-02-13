@@ -186,40 +186,45 @@ struct NCAFSoundingListTests {
         #expect(at925!.windGroup!.direction == 35)
         #expect(at925!.windGroup!.speed! == 10)
     }
-//    
-//    @Test("Significant level data is parsed")
-//    func parseSignificantLevel() throws {
-//        let tolerance = 0.0001
-//        let s = """
-//            72518  TTBB 69120 72518 00008 18407 11980 17005 22951 17010
-//            33897 12805 44850 11034 55831 12050 66758 09857 77726 07218
-//            88712 07065 99666 04458 11645 02249 22521 07562 33491 08972
-//            44372 24567 55367 25143 66358 26513 77349 26956 88332 29558
-//            99295 36731 11265 42959 22200 57758 33100 61360 31313 01102
-//            81106=
-//            """
-//        
-//        let list = try NCAFSoundingList(fromString: s)
-//        let sounding = list.dataByStationId[72518]
-//        #expect(sounding != nil)
-//        
-//        let data = sounding!.data
-//        #expect(!data.dataPoints.isEmpty)
-//        
-//        let surfaceData = data.surfaceDataPoint!
-//        #expect(abs(surfaceData.pressure - 1008.0) <= tolerance)
-//        #expect(abs(surfaceData.temperature! - 18.4) <= tolerance)
-//        #expect(abs(surfaceData.dewPoint! - 17.7) <= tolerance)
-//        
-//        let at980 = data.dataPoints.filter({ $0.pressure == 980.0 }).first!
-//        #expect(abs(at980.temperature! - 17.0) <= tolerance)
-//        #expect(abs(at980.dewPoint! - 16.5) <= tolerance)
-//        
-//        let at951 = data.dataPoints.filter({ $0.pressure == 951.0 }).first!
-//        #expect(abs(at951.temperature! - 17.0) <= tolerance)
-//        #expect(abs(at951.dewPoint! - 16.0) <= tolerance)
-//    }
-//    
+    
+    @Test("Significant level data is parsed")
+    func parseSignificantLevel() throws {
+        let tolerance = 0.0001
+        let s = """
+            72518  TTBB 69120 72518 00008 18407 11980 17005 22951 17010
+            33897 12805 44850 11034 55831 12050 66758 09857 77726 07218
+            88712 07065 99666 04458 11645 02249 22521 07562 33491 08972
+            44372 24567 55367 25143 66358 26513 77349 26956 88332 29558
+            99295 36731 11265 42959 22200 57758 33100 61360 31313 01102
+            81106=
+            """
+        
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+        
+        let surface = message!.levels.first { levelType, _ in
+            levelType == .surface
+        }?.value
+        #expect(surface != nil)
+        #expect(abs(surface!.pressureGroup!.pressure - 1008.0) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.temperature! - 18.4) <= tolerance)
+        #expect(abs(surface!.temperatureGroup!.dewPoint! - 17.7) <= tolerance)
+        
+        let at980 = message!.levels.first { levelType, _ in
+            levelType == .significant(980.0)
+        }?.value
+        #expect(at980 != nil)
+        #expect(abs(at980!.temperatureGroup!.temperature! - 17.0) <= tolerance)
+        #expect(abs(at980!.temperatureGroup!.dewPoint! - 16.5) <= tolerance)
+        
+        let at951 = message!.levels.first { levelType, _ in
+            levelType == .significant(951.0)
+        }?.value
+        #expect(at951 != nil)
+        #expect(abs(at951!.temperatureGroup!.temperature! - 17.0) <= tolerance)
+        #expect(abs(at951!.temperatureGroup!.dewPoint! - 16.0) <= tolerance)
+    }
+    
     @Test("Entire Current.rawins file parses without failure")
     func parseCurrentRawins() throws {
         let bundle = Bundle(for: NCAFSoundingListTestClass.self)

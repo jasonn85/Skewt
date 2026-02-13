@@ -222,8 +222,10 @@ extension NCAFSoundingMessage {
                     return
                 }
                 
+                let isSurface = section[$0].prefix(2) == "00"
+                
                 let level = Level(
-                    type: .significant(pressureGroup.pressure),
+                    type: isSurface ? .surface : .significant(pressureGroup.pressure),
                     pressureGroup: pressureGroup,
                     temperatureGroup: temperatureGroup,
                     windGroup: nil
