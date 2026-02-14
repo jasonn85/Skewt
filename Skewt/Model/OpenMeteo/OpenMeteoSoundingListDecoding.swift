@@ -57,7 +57,6 @@ extension OpenMeteoSoundingList {
 
             data[date] = SoundingData(
                 time: date,
-                elevation: response.elevation,
                 dataPoints: dataPoints,
                 surfaceDataPoint: surfaceDataPoint,
                 cape: response.hourly?.cape?[date],

@@ -28,7 +28,6 @@ extension RucSounding {
             radiosondeCode: nil,
             data: SoundingData(
                 time: Date(timeIntervalSince1970: 1693945305),
-                elevation: 0,
                 dataPoints: points,
                 surfaceDataPoint: points.first,
                 cape: nil,

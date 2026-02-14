@@ -18,7 +18,6 @@ struct SoundingData: Codable, Equatable {
     }
     
     let time: Date
-    let elevation: Int
     let dataPoints: [Point]
     let surfaceDataPoint: Point?
     

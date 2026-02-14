@@ -18,7 +18,6 @@ struct SoundingStateTests {
         let soundings = intervals.map {
             SoundingData(
                 time: epoch.addingTimeInterval($0),
-                elevation: 0,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,
@@ -128,7 +127,6 @@ struct SoundingStateTests {
     func changeLoadWithAlreadyGoodData(selectionAction: SoundingSelection.Action) {
         let soundingData = SoundingData(
             time: .now,
-            elevation: 0,
             dataPoints: [],
             surfaceDataPoint: nil,
             cape: nil,
@@ -163,7 +161,6 @@ struct SoundingStateTests {
     func changeTimeWithDataPresent() {
         let soundingData = SoundingData(
             time: .now,
-            elevation: 0,
             dataPoints: [],
             surfaceDataPoint: nil,
             cape: nil,
@@ -203,7 +200,6 @@ struct SoundingStateTests {
     func changeTimeWorksWithExistingData() {
         let soundingData = SoundingData(
             time: .now,
-            elevation: 0,
             dataPoints: [],
             surfaceDataPoint: nil,
             cape: nil,
@@ -246,7 +242,6 @@ struct SoundingStateTests {
     func reloadWithOldData() {
         let soundingData = SoundingData(
             time: .now.addingTimeInterval(-.oneHour),
-            elevation: 0,
             dataPoints: [],
             surfaceDataPoint: nil,
             cape: nil,
@@ -289,7 +284,6 @@ struct SoundingStateTests {
         dates.forEach {
             data[$0] = SoundingData(
                 time: $0,
-                elevation: 0,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,
@@ -335,7 +329,6 @@ struct SoundingStateTests {
         dates.forEach {
             data[$0] = SoundingData(
                 time: $0,
-                elevation: 0,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,

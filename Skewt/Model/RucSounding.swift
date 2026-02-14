@@ -285,7 +285,6 @@ extension RucSounding {
         
         try data = SoundingData(
             time: headerLine.dateFromHeaderLine(),
-            elevation: surfacePoint?.height ?? 0,
             dataPoints: rucData.map { SoundingData.Point(fromRucDataPoint: $0) },
             surfaceDataPoint: surfacePoint != nil ? SoundingData.Point(fromRucDataPoint: surfacePoint!) : nil,
             cape: cape,
