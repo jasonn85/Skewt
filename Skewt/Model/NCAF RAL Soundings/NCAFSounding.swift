@@ -10,6 +10,7 @@ import Foundation
 struct NCAFSounding {
     let header: Header
     let messages: [NCAFSoundingMessage]
+    let soundingData: SoundingData
     
     /// Header per https://www.weather.gov/tg/headef
     struct Header {
@@ -75,7 +76,42 @@ extension NCAFSounding {
             .filter { !$0.isEmpty }
             .compactMap(NCAFSoundingMessage.init(fromString:))
         
+        guard let firstMessage = messages.first else {
+            return nil
+        }
+        
         self.messages = messages
+        
+        var levels = firstMessage.levels
+        
+        messages[1...].forEach {
+            levels.merge($0.levels) {
+                guard let pressure = $0.pressureGroup?.pressure ?? $1.pressureGroup?.pressure else {
+                    // Both of these values are nonsense for our purposes. Pick one.
+                    return $0
+                }
+                
+                return NCAFSoundingMessage.Level(
+                    type: .significant(pressure),
+                    pressureGroup: $0.pressureGroup ?? $1.pressureGroup,
+                    temperatureGroup: $0.temperatureGroup ?? $1.temperatureGroup,
+                    windGroup: $0.windGroup ?? $1.windGroup
+                )
+            }
+        }
+        
+        self.soundingData = SoundingData(
+            time: Date.dateOfSounding(onDay: firstMessage.day, utcHour: firstMessage.hour),
+            dataPoints: levels
+                .values
+                .compactMap { $0.soundingDataPoint }
+                .sorted { $0.pressure > $1.pressure },
+            surfaceDataPoint: levels[.surface]?.soundingDataPoint,
+            cape: nil,
+            cin: nil,
+            helicity: nil,
+            precipitableWater: nil
+        )
     }
 }
 
@@ -157,6 +193,23 @@ extension NCAFSounding.Header.DataType {
         } else {
             self = .other
         }
+    }
+}
+
+extension NCAFSoundingMessage.Level {
+    var soundingDataPoint: SoundingData.Point? {
+        guard let pressure = pressureGroup?.pressure else {
+            return nil
+        }
+        
+        return SoundingData.Point(
+            pressure: pressure,
+            height: pressureGroup!.height != nil ? Double(pressureGroup!.height!) : nil,
+            temperature: temperatureGroup?.temperature,
+            dewPoint: temperatureGroup?.dewPoint,
+            windDirection: windGroup?.direction,
+            windSpeed: windGroup != nil ? Double(windGroup!.speed) : nil
+        )
     }
 }
 
