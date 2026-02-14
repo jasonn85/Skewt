@@ -159,3 +159,28 @@ extension NCAFSounding.Header.DataType {
         }
     }
 }
+
+extension Date {
+    static func dateOfSounding(onDay day: Int, utcHour hour: Int, currentDate now: Date = .now) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        
+        var components = calendar.dateComponents([.year, .month, .day], from: now)
+        components.hour = hour
+        
+        if day > components.day! {
+            if components.month! > 1 {
+                components.month = components.month! - 1
+            } else {
+                components.year = components.year! - 1
+                components.month = 12
+            }
+        }
+        
+        components.day = day
+        components.minute = 0
+        components.second = 0
+        
+        return calendar.date(from: components)!
+    }
+}

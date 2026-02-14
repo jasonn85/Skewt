@@ -254,4 +254,51 @@ struct NCAFSoundingListTests {
         
         let _ = try NCAFSoundingList(fromString: string)
     }
+    
+    // MARK: - Date parsing
+    @Test
+    func sameMonth_whenDayLessThanToday() {
+        let now = Date(timeIntervalSince1970: 1742040000) // Saturday, March 15, 2025 12:00:00 GMT
+        let expected = Date(timeIntervalSince1970: 1741564800)  // Monday, March 10, 2025 00:00:00 GMT
+        let result = Date.dateOfSounding(onDay: 10, utcHour: 0, currentDate: now)
+
+        #expect(result == expected)
+    }
+
+    @Test
+    func sameMonth_whenDayEqualsToday() {
+        let now = Date(timeIntervalSince1970: 1742040000)  // Saturday, March 15, 2025 12:00:00 GMT
+        let expected = Date(timeIntervalSince1970: 1742061600)  // Saturday, March 15, 2025 18:00:00 GMT
+        let result = Date.dateOfSounding(onDay: 15, utcHour: 18, currentDate: now)
+
+        #expect(result == expected)
+    }
+
+    @Test
+    func rollsBackToPreviousMonth_whenDayGreaterThanToday() {
+        let now = Date(timeIntervalSince1970: 1740782400)  // Saturday, March 1, 2025 12:00:00 GMT
+        let expected = Date(timeIntervalSince1970: 1740700800)  // Friday, February 28, 2025 00:00:00 GMT
+        let result = Date.dateOfSounding(onDay: 28, utcHour: 0, currentDate: now)
+
+        #expect(result == expected)
+    }
+
+    @Test
+    func rollsBackAcrossYearBoundary_janToDec() {
+        let now = Date(timeIntervalSince1970: 1735819200)  // Thursday, January 2, 2025 12:00:00 GMT
+        let expected = Date(timeIntervalSince1970: 1735646400)  // Tuesday, December 31, 2024 12:00:00 GMT
+        let result = Date.dateOfSounding(onDay: 31, utcHour: 12, currentDate: now)
+
+        #expect(result == expected)
+    }
+
+    @Test
+    func leapYear_feb29_isValid_whenNowIsMarch1() {
+        let now = Date(timeIntervalSince1970: 1709251200)       // Friday, March 1, 2024 00:00:00 GMT
+        let expected = Date(timeIntervalSince1970: 1709164800)  // Thursday, February 29, 2024 00:00:00 GMT
+
+        let result = Date.dateOfSounding(onDay: 29, utcHour: 0, currentDate: now)
+
+        #expect(result == expected)
+    }
 }

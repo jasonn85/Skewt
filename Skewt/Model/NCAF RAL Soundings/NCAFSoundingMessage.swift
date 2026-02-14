@@ -10,7 +10,9 @@ import Foundation
 /// A sounding message, originating from TEMP FM-35 format.
 /// reference: https://fly19.net/wp-content/uploads/2013/01/WMO_306_vol-I.1_en.pdf
 struct NCAFSoundingMessage {
-    let time: DateComponents
+    let day: Int
+    let hour: Int
+    
     let type: MessageType
     let stationId: Int
     let windUnit: WindUnit
@@ -107,13 +109,8 @@ extension NCAFSoundingMessage {
             day = rawDay
         }
         
-        var date = DateComponents()
-        date.calendar = Calendar(identifier: .gregorian)
-        date.timeZone = .gmt
-        date.day = day
-        date.hour = hour
-        
-        self.time = date
+        self.day = day
+        self.hour = hour
                 
         // MARK: - Section 2
         if type == .partA || type == .partC {
