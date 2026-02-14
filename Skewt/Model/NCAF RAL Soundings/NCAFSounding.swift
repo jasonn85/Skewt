@@ -9,6 +9,7 @@ import Foundation
 
 struct NCAFSounding {
     let header: Header
+    let stationId: Int
     let messages: [NCAFSoundingMessage]
     let soundingData: SoundingData
     
@@ -82,6 +83,7 @@ extension NCAFSounding {
         
         self.messages = messages
         
+        self.stationId = firstMessage.stationId
         var levels = firstMessage.levels
         
         messages[1...].forEach {
