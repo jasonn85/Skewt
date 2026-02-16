@@ -119,7 +119,9 @@ extension NCAFSounding {
 
 extension NCAFSounding.Header {
     init?(fromString s: String) {
-        let groups = s.components(separatedBy: .whitespaces)
+        let groups = s
+            .components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
         
         guard (3...4).contains(groups.count),
               let dataType = DataType(fromString: String(groups[0].prefix(2))),
