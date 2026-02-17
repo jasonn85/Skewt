@@ -7,28 +7,26 @@
 
 import Foundation
 
-struct NCAFSounding {
+struct NCAFReport {
     let header: Header
-    let stationId: Int
     let messages: [NCAFSoundingMessage]
-    let soundingData: SoundingData
     
     /// Header per https://www.weather.gov/tg/headef
-    struct Header {
+    struct Header: Equatable {
         let dataType: DataType
         let originatingStation: String
         let timestamp: Date
         let issuanceType: IssuanceType?
         
         /// Issuance type per https://www.weather.gov/tg/bbb
-        enum IssuanceType {
+        enum IssuanceType: Equatable {
             case delayed(String)  // A-X index, Y for lost record, Z over 24 hours old
             case correction(String)  // A-X index, Y for lost record, Z over 24 hours old
             case amendment(String)  // A-X index, Y for lost record, Z over 24 hours old
             case segment(String)  // AA through YZ and ZA through ZZ
         }
         
-        enum DataType {
+        enum DataType: Equatable {
             case upperAirData(UpperAirDataType)
             case other
         }
@@ -57,7 +55,7 @@ struct NCAFSounding {
     }
 }
 
-extension NCAFSounding {
+extension NCAFReport {
     init?(fromString s: String) {
         let lines = s
             .components(separatedBy: .newlines)
@@ -77,47 +75,17 @@ extension NCAFSounding {
             .filter { !$0.isEmpty }
             .compactMap(NCAFSoundingMessage.init(fromString:))
         
-        guard let firstMessage = messages.first else {
-            return nil
-        }
-        
         self.messages = messages
-        
-        self.stationId = firstMessage.stationId
-        var levels = firstMessage.levels
-        
-        messages[1...].forEach {
-            levels.merge($0.levels) {
-                guard let pressure = $0.pressureGroup?.pressure ?? $1.pressureGroup?.pressure else {
-                    // Both of these values are nonsense for our purposes. Pick one.
-                    return $0
-                }
-                
-                return NCAFSoundingMessage.Level(
-                    type: .significant(pressure),
-                    pressureGroup: $0.pressureGroup ?? $1.pressureGroup,
-                    temperatureGroup: $0.temperatureGroup ?? $1.temperatureGroup,
-                    windGroup: $0.windGroup ?? $1.windGroup
-                )
-            }
-        }
-        
-        self.soundingData = SoundingData(
-            time: Date.dateOfSounding(onDay: firstMessage.day, utcHour: firstMessage.hour),
-            dataPoints: levels
-                .values
-                .compactMap { $0.soundingDataPoint }
-                .sorted { $0.pressure > $1.pressure },
-            surfaceDataPoint: levels[.surface]?.soundingDataPoint,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil
-        )
     }
 }
 
-extension NCAFSounding.Header {
+extension NCAFReport: Equatable {
+    static func == (lhs: NCAFReport, rhs: NCAFReport) -> Bool {
+        lhs.header == rhs.header
+    }
+}
+
+extension NCAFReport.Header {
     init?(fromString s: String) {
         let groups = s
             .components(separatedBy: .whitespaces)
@@ -125,7 +93,7 @@ extension NCAFSounding.Header {
         
         guard (3...4).contains(groups.count),
               let dataType = DataType(fromString: String(groups[0].prefix(2))),
-              let dateComponents = NCAFSounding.Header.dateComponents(fromString: groups[2]) else {
+              let dateComponents = NCAFReport.Header.dateComponents(fromString: groups[2]) else {
             return nil
         }
         
@@ -142,7 +110,7 @@ extension NCAFSounding.Header {
         self.timestamp = timestamp
         
         if groups.count == 5 {
-            self.issuanceType = NCAFSounding.Header.IssuanceType(fromString: groups[3])
+            self.issuanceType = NCAFReport.Header.IssuanceType(fromString: groups[3])
         } else {
             self.issuanceType = nil
         }
@@ -167,7 +135,7 @@ extension NCAFSounding.Header {
     }
 }
 
-extension NCAFSounding.Header.IssuanceType {
+extension NCAFReport.Header.IssuanceType {
     init?(fromString s: String) {
         guard s.count == 3 else {
             return nil
@@ -190,14 +158,14 @@ extension NCAFSounding.Header.IssuanceType {
     }
 }
 
-extension NCAFSounding.Header.DataType {
+extension NCAFReport.Header.DataType {
     init?(fromString s: String) {
         guard s.count == 2 else {
             return nil
         }
         
         if s.prefix(1) == "U" {
-            guard let upperAirType = NCAFSounding.Header.UpperAirDataType(rawValue: String(s.suffix(1))) else {
+            guard let upperAirType = NCAFReport.Header.UpperAirDataType(rawValue: String(s.suffix(1))) else {
                 return nil
             }
             
@@ -222,30 +190,5 @@ extension NCAFSoundingMessage.Level {
             windDirection: windGroup?.direction,
             windSpeed: windGroup != nil ? Double(windGroup!.speed) : nil
         )
-    }
-}
-
-extension Date {
-    static func dateOfSounding(onDay day: Int, utcHour hour: Int, currentDate now: Date = .now) -> Date {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .gmt
-        
-        var components = calendar.dateComponents([.year, .month, .day], from: now)
-        components.hour = hour
-        
-        if day > components.day! {
-            if components.month! > 1 {
-                components.month = components.month! - 1
-            } else {
-                components.year = components.year! - 1
-                components.month = 12
-            }
-        }
-        
-        components.day = day
-        components.minute = 0
-        components.second = 0
-        
-        return calendar.date(from: components)!
     }
 }

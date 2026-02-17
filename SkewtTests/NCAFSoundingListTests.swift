@@ -252,9 +252,9 @@ struct NCAFSoundingListTests {
         let data = try Data(contentsOf: fileUrl)
         let string = String(data: data, encoding: .utf8)!
         
-        let list = try NCAFSoundingList(fromString: string)
+        let list = NCAFSoundingList(fromString: string)
 
-        let miramar = list.dataByStationId[72293]
+        let miramar = list.soundingData(forStationId: 72293)
         #expect(miramar != nil, "Expected station 72293 (Miramar MCAS) to be present in Current.rawins")
 
         let surface = miramar!.surfaceDataPoint

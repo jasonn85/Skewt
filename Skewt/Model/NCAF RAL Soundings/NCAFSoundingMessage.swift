@@ -9,7 +9,7 @@ import Foundation
 
 /// A sounding message, originating from TEMP FM-35 format.
 /// reference: https://fly19.net/wp-content/uploads/2013/01/WMO_306_vol-I.1_en.pdf
-struct NCAFSoundingMessage {
+struct NCAFSoundingMessage: Equatable {
     let day: Int
     let hour: Int
     
@@ -19,7 +19,7 @@ struct NCAFSoundingMessage {
     
     let levels: [LevelType: Level]
     
-    enum WindUnit {
+    enum WindUnit: Equatable {
         case ms
         case knots
     }
@@ -40,7 +40,7 @@ struct NCAFSoundingMessage {
         case altitude(Int)  // with height in meters
     }
     
-    struct Level {
+    struct Level: Equatable {
         let type: LevelType
         
         let pressureGroup: PressureGroup?
@@ -48,18 +48,18 @@ struct NCAFSoundingMessage {
         let windGroup: WindGroup?
     }
     
-    struct PressureGroup {
+    struct PressureGroup: Equatable {
         let isSurface: Bool
         let pressure: Double
         let height: Int?
     }
     
-    struct TemperatureGroup {
+    struct TemperatureGroup: Equatable {
         let temperature: Double
         let dewPoint: Double?
     }
     
-    struct WindGroup {
+    struct WindGroup: Equatable {
         let direction: Int
         let speed: Int
     }
