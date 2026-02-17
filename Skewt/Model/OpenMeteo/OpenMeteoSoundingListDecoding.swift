@@ -34,6 +34,9 @@ extension OpenMeteoSoundingList {
                     .convertToCelsius(from: response.hourlyUnits?.dewPoint?[pressure])
                 
                 return SoundingData.Point(
+                    time: nil,
+                    latitude: nil,
+                    longitude: nil,
                     pressure: Double(pressure),
                     height: response.hourly?.geopotentialHeight[date]?[pressure],
                     temperature: temperature,

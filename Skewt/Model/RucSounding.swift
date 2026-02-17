@@ -92,6 +92,9 @@ extension RucSounding {
 
 extension SoundingData.Point {
     init(fromRucDataPoint point: RucSounding.LevelDataPoint) {
+        time = nil
+        latitude = nil
+        longitude = nil
         pressure = point.pressure
         height = point.height != nil ? Double(point.height!) : nil
         temperature = point.temperature

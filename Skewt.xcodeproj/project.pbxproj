@@ -26,6 +26,8 @@
 		964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964998652B6A20A700899BC7 /* TouchCatchView.swift */; };
 		964A81A52ADDDD2300E3E1EC /* SunTimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964A81A42ADDDD2300E3E1EC /* SunTimes.swift */; };
 		964A81A72ADDE28100E3E1EC /* SunTimesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */; };
+		96510CF52F4431920079F22A /* UWYSoundingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96510CF42F4431920079F22A /* UWYSoundingRequest.swift */; };
+		96510CF72F44361C0079F22A /* UWYSounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96510CF62F44361C0079F22A /* UWYSounding.swift */; };
 		96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */; };
 		965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */; };
 		965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66582A52A09A0015FB4B /* RelativeLocations.swift */; };
@@ -113,6 +115,8 @@
 		964998652B6A20A700899BC7 /* TouchCatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchCatchView.swift; sourceTree = "<group>"; };
 		964A81A42ADDDD2300E3E1EC /* SunTimes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunTimes.swift; sourceTree = "<group>"; };
 		964A81A62ADDE28100E3E1EC /* SunTimesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunTimesTests.swift; sourceTree = "<group>"; };
+		96510CF42F4431920079F22A /* UWYSoundingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWYSoundingRequest.swift; sourceTree = "<group>"; };
+		96510CF62F44361C0079F22A /* UWYSounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWYSounding.swift; sourceTree = "<group>"; };
 		96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTimeSelectView.swift; sourceTree = "<group>"; };
 		965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionRow.swift; sourceTree = "<group>"; };
 		965D66582A52A09A0015FB4B /* RelativeLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocations.swift; sourceTree = "<group>"; };
@@ -215,6 +219,15 @@
 				96337ACC2C37263100787E2D /* SkyColor.metal */,
 			);
 			path = Shaders;
+			sourceTree = "<group>";
+		};
+		96510CF32F4430F20079F22A /* UWY CSV Soundings */ = {
+			isa = PBXGroup;
+			children = (
+				96510CF42F4431920079F22A /* UWYSoundingRequest.swift */,
+				96510CF62F44361C0079F22A /* UWYSounding.swift */,
+			);
+			path = "UWY CSV Soundings";
 			sourceTree = "<group>";
 		};
 		965D66572A5293A90015FB4B /* Selection */ = {
@@ -342,6 +355,7 @@
 		96AA78DC2A2E763A003338D8 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				96510CF32F4430F20079F22A /* UWY CSV Soundings */,
 				968180872F3897E80027FD17 /* NCAF RAL Soundings */,
 				9623DCAF2D21C0CD000A4887 /* OpenMeteo */,
 				96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */,
@@ -503,6 +517,7 @@
 				96A2A4D02F3AF24E00762E8D /* NCAFReport.swift in Sources */,
 				960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */,
 				967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */,
+				96510CF72F44361C0079F22A /* UWYSounding.swift in Sources */,
 				96A2A4D22F3AF2D000762E8D /* NCAFSoundingMessage.swift in Sources */,
 				9681808B2F3898920027FD17 /* NCAFSoundingList.swift in Sources */,
 				96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */,
@@ -520,6 +535,7 @@
 				96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */,
 				960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
+				96510CF52F4431920079F22A /* UWYSoundingRequest.swift in Sources */,
 				96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
 				96337ACD2C37263100787E2D /* SkyColor.metal in Sources */,

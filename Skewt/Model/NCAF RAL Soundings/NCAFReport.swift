@@ -183,6 +183,9 @@ extension NCAFSoundingMessage.Level {
         }
         
         return SoundingData.Point(
+            time: nil,
+            latitude: nil,
+            longitude: nil,
             pressure: pressure,
             height: pressureGroup!.height != nil ? Double(pressureGroup!.height!) : nil,
             temperature: temperatureGroup?.temperature,
