@@ -20,7 +20,8 @@ final class SkewtStateTests: XCTestCase {
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
-            locationState: LocationState()
+            locationState: LocationState(),
+            recentSoundings: RecentSoundingsState()
         )
         
         let state = SkewtState.reducer(
@@ -38,7 +39,8 @@ final class SkewtStateTests: XCTestCase {
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
-            locationState: LocationState()
+            locationState: LocationState(),
+            recentSoundings: RecentSoundingsState()
         )
                 
         let state = SkewtState.reducer(
@@ -57,7 +59,8 @@ final class SkewtStateTests: XCTestCase {
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
-            locationState: LocationState()
+            locationState: LocationState(),
+            recentSoundings: RecentSoundingsState()
         )
         
         for i in 0...failsafe {
@@ -88,7 +91,8 @@ final class SkewtStateTests: XCTestCase {
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
             plotOptions: PlotOptions(),
-            locationState: LocationState()
+            locationState: LocationState(),
+            recentSoundings: RecentSoundingsState()
         )
         
         XCTAssertEqual(originalState.pinnedSelections.count, 0)
@@ -109,7 +113,8 @@ final class SkewtStateTests: XCTestCase {
             pinnedSelections: [selection],
             recentSelections: [selection],
             plotOptions: PlotOptions(),
-            locationState: LocationState()
+            locationState: LocationState(),
+            recentSoundings: RecentSoundingsState()
         )
         
         let repinnedState = SkewtState.reducer(pinnedState, SkewtState.Action.pinSelection(selection))

@@ -22,6 +22,15 @@ extension Middlewares {
         
         switch state.currentSoundingState.status {
         case .loading, .refreshing(_):
+            switch state.currentSoundingState.selection.type {
+            case .sounding:
+                // We only do forecasts
+                return Empty().eraseToAnyPublisher()
+            case .forecast(_):
+                // This is for us. Continue.
+                break
+            }
+            
             guard oldState.currentSoundingState != state.currentSoundingState else {
                 return Empty().eraseToAnyPublisher()
             }

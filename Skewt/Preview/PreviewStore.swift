@@ -51,7 +51,8 @@ extension Store {
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState()
+                locationState: LocationState(),
+                recentSoundings: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

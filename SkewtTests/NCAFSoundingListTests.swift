@@ -245,6 +245,15 @@ struct NCAFSoundingListTests {
         #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
     }
     
+    @Test("Empty data makes nil list")
+    func parseEmptyData() throws {
+        let emptyStringList = NCAFSoundingList(fromString: "")
+        #expect(emptyStringList == nil)
+        
+        let lotsOfWhitespaceList = NCAFSoundingList(fromString: "\n \n   \n\t \n")
+        #expect(lotsOfWhitespaceList == nil)
+    }
+    
     @Test("Entire Current.rawins file parses without failure")
     func parseCurrentRawins() throws {
         let bundle = Bundle(for: NCAFSoundingListTestClass.self)
@@ -253,8 +262,9 @@ struct NCAFSoundingListTests {
         let string = String(data: data, encoding: .utf8)!
         
         let list = NCAFSoundingList(fromString: string)
+        #expect(list != nil, "Expected sounding list to be non-nil")
 
-        let miramar = list.soundingData(forStationId: 72293)
+        let miramar = list!.soundingData(forStationId: 72293)
         #expect(miramar != nil, "Expected station 72293 (Miramar MCAS) to be present in Current.rawins")
 
         let surface = miramar!.surfaceDataPoint

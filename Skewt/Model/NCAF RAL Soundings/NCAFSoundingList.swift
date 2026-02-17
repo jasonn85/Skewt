@@ -11,6 +11,9 @@ import Foundation
 /// https://weather.rap.ucar.edu/data/upper/Current.rawins
 struct NCAFSoundingList {
     let messagesByStationId: [Int: [NCAFSoundingMessage]]
+    let timestamp: Date
+    
+    static let url = URL(string: "https://weather.rap.ucar.edu/data/upper/Current.rawins")!
     
     func soundingData(forStationId stationId: Int) -> SoundingData? {
         guard let messages = messagesByStationId[stationId],
@@ -43,7 +46,7 @@ struct NCAFSoundingList {
 }
 
 extension NCAFSoundingList {
-    init(fromString s: String) {
+    init?(fromString s: String) {
         var messagesByStationId: [Int: [NCAFSoundingMessage]] = [:]
         
         s.components(separatedBy: CharacterSet(charactersIn: "\u{01}\u{03}"))
@@ -63,7 +66,12 @@ extension NCAFSoundingList {
                 }
             }
         
+        guard messagesByStationId.count > 0 else {
+            return nil
+        }
+        
         self.messagesByStationId = messagesByStationId
+        self.timestamp = .now
     }
 }
 

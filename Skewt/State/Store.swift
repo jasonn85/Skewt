@@ -75,6 +75,7 @@ struct SkewtState: Codable {
     
     var plotOptions: PlotOptions
     var locationState: LocationState
+    var recentSoundings: RecentSoundingsState
 }
 
 // Default initializer
@@ -88,6 +89,7 @@ extension SkewtState {
         pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
+        recentSoundings = RecentSoundingsState()
     }
 }
 
