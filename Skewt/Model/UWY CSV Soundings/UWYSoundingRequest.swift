@@ -8,6 +8,8 @@
 import Foundation
 
 struct UWYSoundingRequest {
+    static let apiUrl = URL(string: "http://weather.uwyo.edu/wsgi/sounding")!
+    
     let stationId: Int
     let time: SoundingTime
     
@@ -38,9 +40,17 @@ struct UWYSoundingRequest {
         }
     }
     
+    var url: URL {
+        var components = URLComponents(url: UWYSoundingRequest.apiUrl, resolvingAgainstBaseURL: false)!
+        components.queryItems = queryItems
+        
+        return components.url!
+    }
+    
     var queryItems: [URLQueryItem] {
-        var dateFormatter = DateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:00:00"
+        dateFormatter.timeZone = .gmt
         
         return [
             URLQueryItem(name: "id", value: String(stationId)),

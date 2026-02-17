@@ -93,7 +93,7 @@ fileprivate extension SoundingData.Point {
 
 fileprivate extension Dictionary where Key == String, Value == String {
     func doubleValue(forKey key: String) -> Double? {
-        guard let string = self[key] else {
+        guard let string = self[key]?.trimmingCharacters(in: .whitespaces) else {
             return nil
         }
         
@@ -101,7 +101,7 @@ fileprivate extension Dictionary where Key == String, Value == String {
     }
     
     func intValue(forKey key: String) -> Int? {
-        guard let string = self[key] else {
+        guard let string = self[key]?.trimmingCharacters(in: .whitespaces) else {
             return nil
         }
         
