@@ -17,7 +17,7 @@ struct NCAFSounding {
     struct Header {
         let dataType: DataType
         let originatingStation: String
-        let timestamp: DateComponents
+        let timestamp: Date
         let issuanceType: IssuanceType?
         
         /// Issuance type per https://www.weather.gov/tg/bbb
@@ -125,12 +125,20 @@ extension NCAFSounding.Header {
         
         guard (3...4).contains(groups.count),
               let dataType = DataType(fromString: String(groups[0].prefix(2))),
-              let timestamp = NCAFSounding.Header.dateComponents(fromString: groups[2]) else {
+              let dateComponents = NCAFSounding.Header.dateComponents(fromString: groups[2]) else {
             return nil
         }
         
         self.dataType = dataType
         self.originatingStation = groups[1]
+        
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
+        
+        guard let timestamp = calendar.date(from: dateComponents) else {
+            return nil
+        }
+        
         self.timestamp = timestamp
         
         if groups.count == 5 {
