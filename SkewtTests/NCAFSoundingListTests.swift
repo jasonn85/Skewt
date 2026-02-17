@@ -252,7 +252,20 @@ struct NCAFSoundingListTests {
         let data = try Data(contentsOf: fileUrl)
         let string = String(data: data, encoding: .utf8)!
         
-        let _ = try NCAFSoundingList(fromString: string)
+        let list = try NCAFSoundingList(fromString: string)
+
+        let miramar = list.dataByStationId[72293]
+        #expect(miramar != nil, "Expected station 72293 (Miramar MCAS) to be present in Current.rawins")
+
+        let surface = miramar!.surfaceDataPoint
+        #expect(surface != nil, "Expected a surface data point for station 72293")
+        #expect(abs(surface!.pressure - 1001.0) <= 2.0, "Surface pressure should be ~1001 hPa")
+        #expect(surface!.temperature != nil, "Surface temperature should be present")
+        #expect(abs(surface!.temperature! - 22.0) <= 0.5, "Surface temperature should be ~22.0 C")
+
+        // Presence of a 925 hPa mandatory level from TTAA (928xx group: 92814 ...)
+        let has925 = miramar!.dataPoints.contains { abs($0.pressure - 925.0) < 0.001 }
+        #expect(has925, "Expected a 925 hPa level in station 72293 data")
     }
     
     // MARK: - Date parsing
