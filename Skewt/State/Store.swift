@@ -102,6 +102,7 @@ extension SkewtState {
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
+        state.recentSoundings = RecentSoundingsState.reducer(state.recentSoundings, action)
         
         switch action as? SkewtState.Action {
         case .pinSelection(let selection):

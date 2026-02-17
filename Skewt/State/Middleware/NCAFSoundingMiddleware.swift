@@ -7,12 +7,18 @@
 
 import Foundation
 import Combine
-import OSLog
 
 extension Middlewares {
     static let ncafSoundingMiddleware: Middleware<SkewtState> = { oldState, state, action in
         switch state.recentSoundings.status {
         case .loading, .refreshing(_):
+            switch oldState.recentSoundings.status {
+            case .loading, .refreshing(_):
+                return Empty().eraseToAnyPublisher()
+            default:
+                break
+            }
+                        
             return URLSession.shared.dataTaskPublisher(for: NCAFSoundingList.url)
                 .map { data, response in
                     guard !data.isEmpty,

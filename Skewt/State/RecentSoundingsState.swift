@@ -78,3 +78,21 @@ extension RecentSoundingsState {
         self = RecentSoundingsState(status: .idle)
     }
 }
+
+extension RecentSoundingsState.Action: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .didReceiveData(let list):
+            return "Received recent soundings for \(list.messagesByStationId.count) stations"
+        case .didReceiveFailure(let error):
+            switch error {
+            case .requestFailed:
+                return "Request failed"
+            case .unparseableResponse:
+                return "Response was unparseable"
+            }
+        case .load:
+            return "Loading"
+        }
+    }
+}
