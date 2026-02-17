@@ -9,6 +9,8 @@ import Foundation
 import Combine
 
 extension Middlewares {
+    private static let parseQueue = DispatchQueue(label: "skewt.ncafSounding.parse", qos: .utility)
+    
     static let ncafSoundingMiddleware: Middleware<SkewtState> = { oldState, state, action in
         switch state.recentSoundings.status {
         case .loading, .refreshing(_):
@@ -20,6 +22,7 @@ extension Middlewares {
             }
                         
             return URLSession.shared.dataTaskPublisher(for: NCAFSoundingList.url)
+                .subscribe(on: parseQueue)
                 .map { data, response in
                     guard !data.isEmpty,
                           let text = String(data: data, encoding: .utf8),
