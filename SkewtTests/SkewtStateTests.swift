@@ -10,7 +10,7 @@ import XCTest
 
 final class SkewtStateTests: XCTestCase {
     let closestLatestForecast = SoundingSelection(type: .forecast(.automatic), location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
-    let closestLatestRaob = SoundingSelection(type: .sounding, location: .closest, time: .now, dataAgeBeforeRefresh: 15.0 * 60.0)
+    let closestLatestRaob = SoundingSelection(type: .sounding, location: .closest, time: .now, dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .sounding))
     let closestSixHourForecast = SoundingSelection(type: .forecast(.automatic), location: .closest, time: .relative(.hours(6)), dataAgeBeforeRefresh: 15.0 * 60.0)
 
     func testCurrentSoundingSavedInRecents() {
