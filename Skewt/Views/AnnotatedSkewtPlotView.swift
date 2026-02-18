@@ -148,7 +148,7 @@ struct AnnotatedSkewtPlotView: View {
         let plot = plot
 
         ZStack {
-            if case .loading = soundingState.status {
+            if soundingState.isLoading {
                 ProgressView().controlSize(.large)
             }
             

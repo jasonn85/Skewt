@@ -88,6 +88,7 @@
 		96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */; };
 		96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06529B165D0006D23BE /* SkewtPlot.swift */; };
 		96F4B06829B2C395006D23BE /* SkewTPlotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */; };
+		96F627322F46448200D4618C /* SoundingDataMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F627312F46448200D4618C /* SoundingDataMiddleware.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +186,7 @@
 		96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlotView.swift; sourceTree = "<group>"; };
 		96F4B06529B165D0006D23BE /* SkewtPlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtPlot.swift; sourceTree = "<group>"; };
 		96F4B06729B2C395006D23BE /* SkewTPlotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewTPlotTests.swift; sourceTree = "<group>"; };
+		96F627312F46448200D4618C /* SoundingDataMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingDataMiddleware.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -341,6 +343,7 @@
 				9664EBEB2F44FE0700656ADE /* NCAFSoundingMiddleware.swift */,
 				9623DCB02D21C4C7000A4887 /* OpenMeteoMiddleware.swift */,
 				967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */,
+				96F627312F46448200D4618C /* SoundingDataMiddleware.swift */,
 			);
 			path = Middleware;
 			sourceTree = "<group>";
@@ -555,6 +558,7 @@
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96510CF52F4431920079F22A /* UWYSoundingRequest.swift in Sources */,
 				96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */,
+				96F627322F46448200D4618C /* SoundingDataMiddleware.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
 				96337ACD2C37263100787E2D /* SkyColor.metal in Sources */,
 				9664EBEA2F44FB3800656ADE /* RecentSoundingsState.swift in Sources */,

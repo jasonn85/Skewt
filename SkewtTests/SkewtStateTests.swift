@@ -26,7 +26,7 @@ final class SkewtStateTests: XCTestCase {
         
         let state = SkewtState.reducer(
             originalState,
-            SoundingState.Action.changeAndLoadSelection(.selectModelType(.sounding))
+            SoundingState.Action.selection(.selectModelType(.sounding))
         )
         
         XCTAssertTrue(state.recentSelections.contains { $0 == closestLatestRaob })
@@ -45,7 +45,7 @@ final class SkewtStateTests: XCTestCase {
                 
         let state = SkewtState.reducer(
             originalState,
-            SoundingState.Action.changeAndLoadSelection(.selectTime(.relative(.hours(6))))
+            SoundingState.Action.selection(.selectTime(.relative(.hours(6))))
         )
         
         XCTAssertEqual(state.recentSelections, originalState.recentSelections)
@@ -67,7 +67,7 @@ final class SkewtStateTests: XCTestCase {
             let name = "Location \(i)"
             let recentCount = state.recentSelections.count
             
-            state = SkewtState.reducer(state, SoundingState.Action.changeAndLoadSelection(
+            state = SkewtState.reducer(state, SoundingState.Action.selection(
                 .selectLocation(.named(name: name, latitude: 0.0, longitude: 0.0))
             ))
             

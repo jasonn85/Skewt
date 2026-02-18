@@ -113,7 +113,7 @@ extension SkewtState {
             break
         }
         
-        if case .changeAndLoadSelection(let selectionAction) = action as? SoundingState.Action,
+        if case .selection(let selectionAction) = action as? SoundingState.Action,
            selectionAction.isCreatingNewSelection {
             
             let maximumRecentSelections = 5

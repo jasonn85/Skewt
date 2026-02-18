@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UWYSounding {
+struct UWYSounding: Sounding, Codable, Equatable {
     let data: SoundingData
 }
 

@@ -19,7 +19,9 @@ struct SkewtApp: App {
                 Middlewares.userDefaultsSaving,
                 Middlewares.locationSearchMiddleware,
                 Middlewares.openMeteoApi,
-                Middlewares.ncafSoundingMiddleware
+                Middlewares.ncafSoundingMiddleware,
+                Middlewares.ncafSoundingData,
+                Middlewares.uwySoundingData
             ]
         )
         
