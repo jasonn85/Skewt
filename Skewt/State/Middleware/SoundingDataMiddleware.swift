@@ -8,8 +8,11 @@
 import Foundation
 import Combine
 import CoreLocation
+import OSLog
 
 extension Middlewares {
+    
+    
     private static let soundingParseQueue = DispatchQueue(label: "skewt.sounding.parse", qos: .utility)
 
     static let ncafSoundingData: Middleware<SkewtState> = { oldState, state, action in
@@ -24,6 +27,9 @@ extension Middlewares {
         guard case .sounding = selection.type else {
             return Empty().eraseToAnyPublisher()
         }
+        
+        let url = NCAFSoundingList.url
+        Logger().info("Requesting soundings from NCAF via \(url.absoluteString)")
 
         return URLSession.shared.dataTaskPublisher(for: NCAFSoundingList.url)
             .subscribe(on: soundingParseQueue)
@@ -65,6 +71,8 @@ extension Middlewares {
 
         let request = UWYSoundingRequest(stationId: stationId, time: uwyTime(for: selection))
         let url = request.url
+        
+        Logger().info("Request soundings from UWY API via \(url.absoluteString)")
 
         return URLSession.shared.dataTaskPublisher(for: url)
             .subscribe(on: soundingParseQueue)
