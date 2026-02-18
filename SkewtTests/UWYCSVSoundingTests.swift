@@ -82,7 +82,7 @@ struct UWYCSVSoundingTests {
         997.0,98,8.4,6.4,25,1.5
         """
 
-        let sounding = UWYSounding(fromCsvString: csv)
+        let sounding = UWYSounding(fromCsvString: csv, soundingTime: .now)
         #expect(sounding != nil)
     }
 }

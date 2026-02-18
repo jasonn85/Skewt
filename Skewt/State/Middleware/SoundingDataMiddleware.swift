@@ -79,7 +79,7 @@ extension Middlewares {
             .map { data, response in
                 guard !data.isEmpty,
                       let text = String(data: data, encoding: .utf8),
-                      let sounding = UWYSounding(fromCsvString: text) else {
+                      let sounding = UWYSounding(fromCsvString: text, soundingTime: request.time.date) else {
                     return SoundingState.Action.requestFailed(.unparseableResponse)
                 }
 

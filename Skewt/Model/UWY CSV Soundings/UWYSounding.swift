@@ -12,7 +12,7 @@ struct UWYSounding: Sounding, Codable, Equatable {
 }
 
 extension UWYSounding {
-    init?(fromCsvString s: String) {
+    init?(fromCsvString s: String, soundingTime: Date? = nil) {
         let lines = s
             .components(separatedBy: .newlines)
             .filter { !$0.isEmpty }
@@ -36,8 +36,11 @@ extension UWYSounding {
                 return SoundingData.Point(fromUwyCsvDictionary: d)
             }
         
-        guard let surface = data.first,
-                let time = surface.time else {
+        guard let surface = data.first else {
+            return nil
+        }
+
+        guard let time = soundingTime ?? data.compactMap(\.time).first else {
             return nil
         }
         
@@ -63,10 +66,16 @@ fileprivate extension SoundingData.Point {
     }()
     
     init?(fromUwyCsvDictionary d: Dictionary<String, String>) {
-        guard let timeString = d["time"],
-              let time = SoundingData.Point.uwyDateFormatter.date(from: timeString),
-              let pressure = d.doubleValue(forKey: "pressure_hPa") else {
+        guard let pressure = d.doubleValue(forKey: "pressure_hPa") else {
             return nil
+        }
+        
+        let time: Date?
+        
+        if let timeString = d["time"] {
+            time = SoundingData.Point.uwyDateFormatter.date(from: timeString)
+        } else {
+            time = nil
         }
         
         let windSpeedKnots: Double?
