@@ -287,11 +287,13 @@ private extension SoundingState {
             return nil
         case .named(let name, let latitude, let longitude):
             if let list = try? LocationList.forType(.sounding),
-               let wmoId = list.locationNamed(name)?.wmoId {
+               let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
                 return wmoId
             }
 
-            if let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId {
+            if let wmoId = LocationList.allLocations
+                .locations
+                .first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
                 return wmoId
             }
 
