@@ -125,9 +125,10 @@ extension NCAFSoundingMessage {
             
             let section = groups[i..<endOfSection]
             i = endOfSection
+            let useUpperLevelPressure = type == .partC
             
             stride(from: section.startIndex, to: section.endIndex - 2, by: 3).forEach {
-                guard let pressureGroup = PressureGroup(fromMandatoryLevelString: section[$0]) else {
+                guard let pressureGroup = PressureGroup(fromMandatoryLevelString: section[$0], useUpperLevelPressure: useUpperLevelPressure) else {
                     return
                 }
                 
@@ -153,8 +154,9 @@ extension NCAFSoundingMessage {
                 let endOfSection = i.advanced(by: 3)
                 let section = groups[i..<endOfSection]
                 i = endOfSection
+                let useTenthsPressure = type == .partC || type == .partD
                 
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!),
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!, useTenths: useTenthsPressure),
                       let temperatureGroup = TemperatureGroup(fromString: section.dropFirst().first!),
                       let windGroup = WindGroup(fromString: section.last!) else {
                     return nil
@@ -185,8 +187,9 @@ extension NCAFSoundingMessage {
                 
                 let section = groups[i..<endOfSection]
                 i = endOfSection
+                let useTenthsPressure = type == .partC || type == .partD
                 
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!),
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!, useTenths: useTenthsPressure),
                       let windGroup = WindGroup(fromString: section.dropFirst().first!) else {
                     return nil
                 }
@@ -211,9 +214,10 @@ extension NCAFSoundingMessage {
             
             let section = groups[i..<endOfSection]
             i = endOfSection
+            let useTenthsPressure = type == .partD
             
             stride(from: section.startIndex, to: section.endIndex - 1, by: 2).forEach {
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0]),
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0], useTenths: useTenthsPressure),
                       let temperatureGroup = TemperatureGroup(fromString: section[$0 + 1]) else {
                     return
                 }
@@ -240,9 +244,10 @@ extension NCAFSoundingMessage {
             
             let section = groups[i..<endOfSection]
             i = endOfSection
+            let useTenthsPressure = type == .partD
             
             stride(from: section.startIndex.advanced(by: 1), to: section.endIndex - 1, by: 2).forEach {
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0]),
+                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section[$0], useTenths: useTenthsPressure),
                       let windGroup = WindGroup(fromString: section[$0 + 1]) else {
                     return
                 }
@@ -263,12 +268,14 @@ extension NCAFSoundingMessage {
 }
 
 extension NCAFSoundingMessage.PressureGroup {
-    init?(fromPressureSuffixString s: String) {
+    init?(fromPressureSuffixString s: String, useTenths: Bool = false) {
         guard let ppp = Int(s.suffix(3)) else {
             return nil
         }
         
-        if ppp < 100 {
+        if useTenths {
+            self.pressure = Double(ppp) / 10.0
+        } else if ppp < 100 {
             self.pressure = Double(ppp + 1000)
         } else {
             self.pressure = Double(ppp)
@@ -278,7 +285,7 @@ extension NCAFSoundingMessage.PressureGroup {
         self.height = nil
     }
     
-    init?(fromMandatoryLevelString s: String) {
+    init?(fromMandatoryLevelString s: String, useUpperLevelPressure: Bool = false) {
         guard let pp = Int(s.prefix(2)) else {
             return nil
         }
@@ -301,13 +308,17 @@ extension NCAFSoundingMessage.PressureGroup {
         } else {
             self.isSurface = false
             
-            switch pp {
-            case 0:
-                self.pressure = 1000
-            case 92:
-                self.pressure = 925
-            default:
-                self.pressure = Double(pp * 10)
+            if useUpperLevelPressure {
+                self.pressure = pp == 0 ? 100 : Double(pp)
+            } else {
+                switch pp {
+                case 0:
+                    self.pressure = 1000
+                case 92:
+                    self.pressure = 925
+                default:
+                    self.pressure = Double(pp * 10)
+                }
             }
             
             if hhhString == "///" {
