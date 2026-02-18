@@ -281,12 +281,20 @@ private extension SoundingState {
         switch selection.location {
         case .closest:
             return nil
-        case .named(let name, _, _):
-            if let list = try? LocationList.forType(.sounding) {
-                return list.locationNamed(name)?.wmoId
+        case .named(let name, let latitude, let longitude):
+            if let list = try? LocationList.forType(.sounding),
+               let wmoId = list.locationNamed(name)?.wmoId {
+                return wmoId
             }
 
-            return LocationList.allLocations.locationNamed(name)?.wmoId
+            if let wmoId = LocationList.allLocations.locationNamed(name)?.wmoId {
+                return wmoId
+            }
+
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            return LocationList.allLocations
+                .locationsSortedByProximity(to: location)
+                .first { $0.wmoId != nil }?.wmoId
         case .point(let latitude, let longitude):
             let location = CLLocation(latitude: latitude, longitude: longitude)
             guard let list = try? LocationList.forType(.sounding) else {
