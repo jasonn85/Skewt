@@ -292,7 +292,11 @@ extension NCAFSoundingMessage.PressureGroup {
             }
             
             self.isSurface = true
-            self.pressure = Double(1000 + hhh)
+            if hhh < 500 {
+                self.pressure = Double(1000 + hhh)
+            } else {
+                self.pressure = Double(hhh)
+            }
             self.height = nil
         } else {
             self.isSurface = false
