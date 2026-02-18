@@ -10,6 +10,7 @@
 		960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */; };
 		96081F772AFAEB0E006A8FE7 /* out-of-bounds-op40.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */; };
 		960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */; };
+		960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960F28F32F453CDB00145557 /* SoundingSelection.swift */; };
 		961202632A156B03009423D5 /* SoundingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202622A156B03009423D5 /* SoundingState.swift */; };
 		961202652A156B39009423D5 /* PlotOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961202642A156B39009423D5 /* PlotOptions.swift */; };
 		961CA9A92D2758BA00426A80 /* open-meteo-with-nulls.json in Resources */ = {isa = PBXBuildFile; fileRef = 961CA9A82D2758BA00426A80 /* open-meteo-with-nulls.json */; };
@@ -103,6 +104,7 @@
 		960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchMiddleware.swift; sourceTree = "<group>"; };
 		96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "out-of-bounds-op40.txt"; sourceTree = "<group>"; };
 		960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
+		960F28F32F453CDB00145557 /* SoundingSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelection.swift; sourceTree = "<group>"; };
 		961202622A156B03009423D5 /* SoundingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingState.swift; sourceTree = "<group>"; };
 		961202642A156B39009423D5 /* PlotOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotOptions.swift; sourceTree = "<group>"; };
 		961CA9A82D2758BA00426A80 /* open-meteo-with-nulls.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "open-meteo-with-nulls.json"; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
 				9664EBE92F44FB3800656ADE /* RecentSoundingsState.swift */,
+				960F28F32F453CDB00145557 /* SoundingSelection.swift */,
 				961202622A156B03009423D5 /* SoundingState.swift */,
 				96F4B05D29A80396006D23BE /* Store.swift */,
 			);
@@ -536,6 +539,7 @@
 				9681808B2F3898920027FD17 /* NCAFSoundingList.swift in Sources */,
 				96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */,
 				96693FB22B746C5900697291 /* ZoomedSquare.swift in Sources */,
+				960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */,
 				969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
