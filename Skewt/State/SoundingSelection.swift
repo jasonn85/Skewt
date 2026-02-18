@@ -119,9 +119,8 @@ extension SoundingSelection {
         type = .forecast(.automatic)
         location = .closest
         time = .now
-        
-        let fiveMinutes = TimeInterval(5.0 * 60.0)
-        dataAgeBeforeRefresh = fiveMinutes
+
+        dataAgeBeforeRefresh = SoundingSelection.defaultDataAgeBeforeRefresh(for: type)
     }
 }
 
@@ -209,6 +208,17 @@ extension SoundingSelection.ModelType {
     }
 }
 
+extension SoundingSelection {
+    static func defaultDataAgeBeforeRefresh(for type: ModelType) -> TimeInterval {
+        switch type {
+        case .forecast:
+            return TimeInterval(5.0 * 60.0)
+        case .sounding:
+            return TimeInterval(60.0 * 60.0)
+        }
+    }
+}
+
 // Reducer
 extension SoundingSelection {
     static let reducer: Reducer<Self> = { state, action in
@@ -218,17 +228,24 @@ extension SoundingSelection {
         
         switch action {
         case .selectModelType(let type, let time):
-            return SoundingSelection(type: type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
+            return SoundingSelection(
+                type: type,
+                location: state.location,
+                time: time,
+                dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: type)
+            )
         case .selectLocation(let location, let time):
             return SoundingSelection(type: state.type, location: location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
         case .selectTime(let time):
             return SoundingSelection(type: state.type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
         case .selectModelTypeAndLocation(let type, let location, let time):
+            let resolvedType = type ?? state.type
+            let resolvedDataAge = type == nil ? state.dataAgeBeforeRefresh : SoundingSelection.defaultDataAgeBeforeRefresh(for: resolvedType)
             return SoundingSelection(
-                type: type ?? state.type,
+                type: resolvedType,
                 location: location ?? state.location,
                 time: time,
-                dataAgeBeforeRefresh: state.dataAgeBeforeRefresh
+                dataAgeBeforeRefresh: resolvedDataAge
             )
         }
     }

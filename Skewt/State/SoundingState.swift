@@ -257,6 +257,7 @@ private extension SoundingState {
 
         if !forceReload,
            let list = state.ncafList,
+           Date.now.timeIntervalSince(list.timestamp) < selection.dataAgeBeforeRefresh,
            let stationId = stationId(for: selection) {
             if let data = list.soundingData(forStationId: stationId) {
                 state.resolvedSounding = ResolvedSounding(ncafData: data, timestamp: list.timestamp)

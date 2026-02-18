@@ -236,6 +236,35 @@ struct SoundingStateTests {
         #expect(resolved.resolvedSounding?.data.time == data.time)
         #expect(resolved.loadIntent == nil)
     }
+
+    @Test("Latest sounding reloads when cached NCAF is stale")
+    func latestSoundingReloadsWhenCachedNcafIsStale() {
+        guard let list = loadNcafList(),
+              let location = locationMatching(list: list) else {
+            Issue.record("Failed to load NCAF test data or find matching station")
+            return
+        }
+
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .named(name: location.name, latitude: location.latitude, longitude: location.longitude),
+            time: .now,
+            dataAgeBeforeRefresh: 15.0 * 60.0
+        )
+
+        let staleList = NCAFSoundingList(
+            messagesByStationId: list.messagesByStationId,
+            timestamp: .now.addingTimeInterval(-TimeInterval.hours(12))
+        )
+
+        var state = SoundingState(selection: selection)
+        state.ncafList = staleList
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+
+        #expect(resolved.resolvedSounding == nil)
+        #expect(resolved.loadIntent == .ncaf(selection))
+    }
 }
 
 private final class NcafTestBundleToken {}
