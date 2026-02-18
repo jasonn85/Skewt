@@ -74,4 +74,15 @@ struct UWYCSVSoundingTests {
         let expectedLastWindKt = 29.4 * 1.94384
         #expect(abs(last.windSpeed! - expectedLastWindKt) < 1e-6)
     }
+
+    @Test("Missing columns should still parse")
+    func missingColumnsShouldParse() {
+        let csv = """
+        pressure_hPa,geopotential height_m,temperature_C,dew point temperature_C,wind direction_degree,wind speed_m/s
+        997.0,98,8.4,6.4,25,1.5
+        """
+
+        let sounding = UWYSounding(fromCsvString: csv)
+        #expect(sounding != nil)
+    }
 }
