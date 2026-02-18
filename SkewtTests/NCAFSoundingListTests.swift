@@ -22,7 +22,7 @@ struct NCAFSoundingListTests {
         // Temperatures
         #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "00000")!.temperature == 0.0)
         #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "20000")!.temperature == 20.0)
-        #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "20100")!.temperature == -20.1)
+        #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "20100")!.temperature == -20.0)
 
         // Dew point depressions as hundreds
         #expect(NCAFSoundingMessage.TemperatureGroup(fromString: "30000")!.dewPoint == 30.0)
@@ -148,6 +148,61 @@ struct NCAFSoundingListTests {
         #expect(pressure10567.height == 15670)
     }
     
+    @Test("Upper-level and tenths pressures are parsed")
+    func parseUpperLevelAndTenthsPressures() throws {
+        let s = """
+            TTCC 68121 72376 70874 56364 22510 88874 56364 22510 77874 22510 31313=
+            """
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+
+        let mandatory70 = message!.levels.first { levelType, _ in
+            levelType == .mandatory(70.0)
+        }?.value
+        #expect(mandatory70 != nil)
+        #expect(mandatory70!.pressureGroup!.pressure == 70.0)
+
+        let tropopause = message!.levels.first { levelType, _ in
+            levelType == .tropopause(87.4)
+        }?.value
+        #expect(tropopause != nil)
+        #expect(tropopause!.pressureGroup!.pressure == 87.4)
+
+        let maxWind = message!.levels.first { levelType, _ in
+            levelType == .maximumWind(87.4)
+        }?.value
+        #expect(maxWind != nil)
+        #expect(maxWind!.pressureGroup!.pressure == 87.4)
+
+        let s2 = """
+            TTDD 68121 72376 88123 56364 21212 88123 22510 31313=
+            """
+        let message2 = NCAFSoundingMessage(fromString: s2)
+        #expect(message2 != nil)
+
+        let significant12 = message2!.levels.first { levelType, _ in
+            levelType == .significant(12.3)
+        }?.value
+        #expect(significant12 != nil)
+        #expect(significant12!.pressureGroup!.pressure == 12.3)
+
+        let s3 = """
+            TTCC 68121 72376 00000 00000 00000 31313=
+            """
+        let message3 = NCAFSoundingMessage(fromString: s3)
+        #expect(message3 != nil)
+
+        let mandatory100 = message3?.levels.first(where: { levelType, _ in
+            levelType == .mandatory(100.0)
+        })?.value
+        #expect(mandatory100 != nil)
+        #expect(mandatory100?.pressureGroup?.pressure == 100.0)
+        #expect(mandatory100?.temperatureGroup?.temperature == 0.0)
+        #expect(mandatory100?.windGroup?.direction == 0)
+        #expect(mandatory100?.windGroup?.speed == 0)
+
+    }
+    
     @Test("Mandatory level data is parsed")
     func parseMandatoryLevel() throws {
         let tolerance = 0.0001
@@ -186,8 +241,8 @@ struct NCAFSoundingListTests {
             levelType == .mandatory(100)
         }?.value
         #expect(at100 != nil)
-        #expect(abs(at100!.temperatureGroup!.temperature - -61.3) <= tolerance)
-        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.temperature - -61.2) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.2) <= tolerance)
         #expect(at100!.windGroup!.direction == 245)
         #expect(at100!.windGroup!.speed == 18)
     }
@@ -241,8 +296,8 @@ struct NCAFSoundingListTests {
             levelType == .significant(100)
         }?.value
         #expect(at100 != nil)
-        #expect(abs(at100!.temperatureGroup!.temperature - -61.3) <= tolerance)
-        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.temperature - -61.2) <= tolerance)
+        #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.2) <= tolerance)
     }
 
     @Test("NIL messages are ignored")
