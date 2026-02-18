@@ -56,6 +56,10 @@ extension NCAFSoundingList {
             .compactMap(NCAFReport.init(fromString:))
             .forEach { report in
                 report.messages.forEach { message in
+                    guard !message.levels.isEmpty else {
+                        return
+                    }
+
                     let existingMessagesThisStation = messagesByStationId[message.stationId]
                     
                     guard existingMessagesThisStation == nil || !existingMessagesThisStation!.contains(message) else {
