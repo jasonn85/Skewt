@@ -97,6 +97,10 @@ private extension Middlewares {
             return list.locationsSortedByProximity(to: location).first { $0.wmoId != nil }?.wmoId
 
         case .named(let name, _, _):
+            if let list = try? LocationList.forType(.sounding) {
+                return list.locationNamed(name)?.wmoId
+            }
+
             return LocationList.allLocations.locationNamed(name)?.wmoId
 
         case .point(let latitude, let longitude):

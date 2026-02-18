@@ -244,6 +244,12 @@ struct NCAFSoundingListTests {
         #expect(abs(at100!.temperatureGroup!.temperature - -61.3) <= tolerance)
         #expect(abs(at100!.temperatureGroup!.dewPoint! - -71.3) <= tolerance)
     }
+
+    @Test("NIL messages are ignored")
+    func parseNilMessage() throws {
+        let message = NCAFSoundingMessage(fromString: "TTAA 6812/ 72293 NIL")
+        #expect(message == nil)
+    }
     
     @Test("Empty data makes nil list")
     func parseEmptyData() throws {

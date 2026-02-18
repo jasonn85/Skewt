@@ -8,7 +8,7 @@
 import Foundation
 
 struct UWYSoundingRequest {
-    static let apiUrl = URL(string: "http://weather.uwyo.edu/wsgi/sounding")!
+    static let apiUrl = URL(string: "https://weather.uwyo.edu/wsgi/sounding")!
     
     let stationId: Int
     let time: SoundingTime

@@ -282,6 +282,10 @@ private extension SoundingState {
         case .closest:
             return nil
         case .named(let name, _, _):
+            if let list = try? LocationList.forType(.sounding) {
+                return list.locationNamed(name)?.wmoId
+            }
+
             return LocationList.allLocations.locationNamed(name)?.wmoId
         case .point(let latitude, let longitude):
             let location = CLLocation(latitude: latitude, longitude: longitude)

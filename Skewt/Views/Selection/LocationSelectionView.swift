@@ -276,7 +276,7 @@ struct LocationSelectionView: View {
                 
         switch store.state.displayState.forecastSelectionState.searchType {
         case .nearest:
-            guard let locations = try? LocationList.forType(.forecast(.automatic)) else {
+            guard let locations = try? LocationList.forType(.sounding) else {
                 return []
             }
             

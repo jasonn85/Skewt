@@ -111,6 +111,10 @@ extension NCAFSoundingMessage {
         
         self.day = day
         self.hour = hour
+
+        if i < groups.endIndex, groups[i].hasPrefix("NIL") {
+            return nil
+        }
                 
         // MARK: - Section 2
         if type == .partA || type == .partC {
@@ -344,8 +348,9 @@ extension NCAFSoundingMessage.TemperatureGroup {
             return nil
         }
         
-        let sign = (ttt % 2) == 0 ? 1 : -1
-        self.temperature = Double(ttt * sign) * 0.1
+        let isNegative = (ttt % 2) != 0
+        let magnitude = Double(ttt - (ttt % 2)) * 0.1
+        self.temperature = isNegative ? -magnitude : magnitude
 
         let dpdString = s.suffix(2)
         
