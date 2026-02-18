@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-struct SoundingState: Codable, Equatable {
+struct SoundingState: Codable {
     var selection: SoundingSelection
 
     // Latest data from each source
@@ -27,7 +27,7 @@ struct SoundingState: Codable, Equatable {
     // Last request error, if any
     var lastError: SoundingError?
 
-    enum SoundingError: Error, Codable, Equatable {
+    enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
         case emptyResponse
         case unparseableResponse
@@ -55,7 +55,7 @@ struct SoundingState: Codable, Equatable {
     }
 }
 
-struct ResolvedSounding: Codable, Equatable, Sounding {
+struct ResolvedSounding: Codable, Sounding {
     enum Source: Codable, Equatable {
         case openMeteo(fetchTime: Date)
         case ncaf(timestamp: Date)
@@ -116,17 +116,6 @@ extension SoundingState {
 
     var sounding: Sounding? {
         resolvedSounding
-    }
-
-    static func == (lhs: SoundingState, rhs: SoundingState) -> Bool {
-        lhs.selection == rhs.selection
-            && lhs.openMeteoList == rhs.openMeteoList
-            && lhs.openMeteoSelection == rhs.openMeteoSelection
-            && lhs.uwySounding == rhs.uwySounding
-            && lhs.uwySelection == rhs.uwySelection
-            && lhs.resolvedSounding == rhs.resolvedSounding
-            && lhs.loadIntent == rhs.loadIntent
-            && lhs.lastError == rhs.lastError
     }
 }
 
