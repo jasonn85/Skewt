@@ -80,6 +80,10 @@ struct ContentView: View {
         }
         .onAppear {
             timeSelectDebouncer.store = store
+            
+            if case .idle = store.state.recentSoundings.status {
+                store.dispatch(RecentSoundingsState.Action.load)
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
@@ -162,6 +166,15 @@ struct ContentView: View {
                 Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
             }
             .tag(DisplayState.DialogSelection.locationSelection(.forecast))
+            
+            NavigationStack {
+                LocationSelectionView(listType: .modelType(.sounding))
+                    .environmentObject(store)
+            }
+            .tabItem {
+                Label("Soundings", systemImage: "balloon")
+            }
+            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
