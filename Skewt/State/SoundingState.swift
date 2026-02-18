@@ -224,7 +224,7 @@ private extension SoundingState {
 
         if state.resolvedSounding != nil {
             state.lastError = nil
-        } else {
+        } else if state.lastError == nil {
             state.lastError = previousError
         }
     }
@@ -268,9 +268,13 @@ private extension SoundingState {
 
         if !forceReload,
            let list = state.ncafList,
-           let stationId = stationId(for: selection),
-           let data = list.soundingData(forStationId: stationId) {
-            state.resolvedSounding = ResolvedSounding(ncafData: data, timestamp: list.timestamp)
+           let stationId = stationId(for: selection) {
+            if let data = list.soundingData(forStationId: stationId) {
+                state.resolvedSounding = ResolvedSounding(ncafData: data, timestamp: list.timestamp)
+                return
+            }
+
+            state.lastError = .emptyResponse
             return
         }
 
