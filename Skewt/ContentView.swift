@@ -29,6 +29,7 @@ struct ContentView: View {
     
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.appEnvironment) private var appEnvironment
     
     @State private var selectingTime = false
     
@@ -79,6 +80,10 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            guard appEnvironment.isLive else {
+                return
+            }
+            
             timeSelectDebouncer.store = store
             
             if case .idle = store.state.recentSoundings.status {
@@ -86,6 +91,10 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
+            guard appEnvironment.isLive else {
+                return
+            }
+            
             if newPhase == .active {
                 store.dispatch(SoundingState.Action.refreshTapped)
             }
@@ -304,7 +313,9 @@ extension Store<SkewtState> {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environmentObject(Store<SkewtState>.previewStore)
+        ContentView()
+            .environmentObject(Store<SkewtState>.previewStore)
+            .environment(\.appEnvironment, AppEnvironment(isLive: false))
     }
 }
 
