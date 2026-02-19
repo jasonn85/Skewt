@@ -26,7 +26,9 @@ struct SkewtApp: App {
         )
         
         WindowGroup {
-            ContentView().environmentObject(store)
+            ContentView()
+                .environmentObject(store)
+                .environment(\.appEnvironment, AppEnvironment(isLive: true))
         }
     }
 }
