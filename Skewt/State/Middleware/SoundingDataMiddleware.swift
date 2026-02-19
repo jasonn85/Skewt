@@ -104,9 +104,20 @@ private extension Middlewares {
 
             return list.locationsSortedByProximity(to: location).first { $0.wmoId != nil }?.wmoId
 
-        case .named(let name, _, _):
-            if let list = try? LocationList.forType(.sounding),
-               let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+        case .named(let name, let latitude, let longitude):
+            if let list = try? LocationList.forType(.sounding) {
+                if let location = list.locationNamed(name, latitude: latitude, longitude: longitude),
+                   let wmoId = location.wmoId {
+                    return wmoId
+                }
+
+                if let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+                    return wmoId
+                }
+            }
+
+            if let location = LocationList.allLocations.locationNamed(name, latitude: latitude, longitude: longitude),
+               let wmoId = location.wmoId {
                 return wmoId
             }
 

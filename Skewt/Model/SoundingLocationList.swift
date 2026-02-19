@@ -210,6 +210,17 @@ extension LocationList {
     func locationNamed(_ name: String) -> Location? {
         locations.first { $0.name == name }
     }
+
+    func locationNamed(_ name: String, latitude: Double, longitude: Double, tolerance: Double = 0.001) -> Location? {
+        locations.first { location in
+            guard location.name == name else {
+                return false
+            }
+
+            return abs(location.latitude - latitude) <= tolerance
+                && abs(location.longitude - longitude) <= tolerance
+        }
+    }
     
     func locationsForSearch(_ text: String) -> [Location] {
         let upperText = text.uppercased()

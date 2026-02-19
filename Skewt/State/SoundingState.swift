@@ -276,8 +276,19 @@ private extension SoundingState {
         case .closest:
             return nil
         case .named(let name, let latitude, let longitude):
-            if let list = try? LocationList.forType(.sounding),
-               let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+            if let list = try? LocationList.forType(.sounding) {
+                if let location = list.locationNamed(name, latitude: latitude, longitude: longitude),
+                   let wmoId = location.wmoId {
+                    return wmoId
+                }
+
+                if let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+                    return wmoId
+                }
+            }
+
+            if let location = LocationList.allLocations.locationNamed(name, latitude: latitude, longitude: longitude),
+               let wmoId = location.wmoId {
                 return wmoId
             }
 
