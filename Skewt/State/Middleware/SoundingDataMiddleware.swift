@@ -11,8 +11,6 @@ import CoreLocation
 import OSLog
 
 extension Middlewares {
-    
-    
     private static let soundingParseQueue = DispatchQueue(label: "skewt.sounding.parse", qos: .utility)
 
     static let ncafSoundingData: Middleware<SkewtState> = { oldState, state, action in
