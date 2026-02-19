@@ -221,12 +221,18 @@ extension TimeInterval {
 }
 
 struct TimeSelectView_Previews: PreviewProvider {
-    static var previews: some View {
-        var time = SoundingSelection.Time.now
+    private struct PreviewWrapper: View {
+        @State private var time = SoundingSelection.Time.now
 
-        HourlyTimeSelectView(
-            value: Binding<SoundingSelection.Time>(get: { time }, set: { time = $0 }),
-            range: .hours(-24)...TimeInterval.hours(24)
-        )
+        var body: some View {
+            HourlyTimeSelectView(
+                value: $time,
+                range: .hours(-24)...TimeInterval.hours(24)
+            )
+        }
+    }
+
+    static var previews: some View {
+        PreviewWrapper()
     }
 }
