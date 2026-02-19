@@ -58,7 +58,7 @@ struct SoundingTimeSelectView: View {
         case .now:
             return 0
         case .numberOfSoundingsAgo(let soundingIndex):
-            return soundingIndex - 1
+            return soundingIndex
         default:
             return 0
         }
@@ -226,7 +226,7 @@ struct SoundingTimeSelectView: View {
         if index == 0 {
             value = .now
         } else {
-            value = .numberOfSoundingsAgo(index + 1)
+            value = .numberOfSoundingsAgo(index)
         }
     }
 }

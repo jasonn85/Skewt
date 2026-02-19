@@ -104,7 +104,7 @@ struct SoundingSelection: Codable, Hashable, Identifiable {
     enum Time: Codable, Hashable, Identifiable {
         case now
         case relative(TimeInterval)
-        case numberOfSoundingsAgo(Int)  // .numberOfSoundingsAgo(1) is equivalent to .now
+        case numberOfSoundingsAgo(Int)  // .numberOfSoundingsAgo(0) is equivalent to .now
         case specific(Date)
         
         var id: Self { self }
@@ -151,7 +151,7 @@ extension Date {
         case .sounding:
             let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
             
-            if abs(intervalCount) <= 1 {
+            if intervalCount == 0 {
                 return .now
             } else {
                 return .numberOfSoundingsAgo(-intervalCount)
