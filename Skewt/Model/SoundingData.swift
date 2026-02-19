@@ -9,6 +9,9 @@ import Foundation
 
 struct SoundingData: Codable, Equatable {
     struct Point: Codable, Hashable {
+        let time: Date?
+        let latitude: Double?
+        let longitude: Double?
         let pressure: Double  // Pressure in millibars
         let height: Double?  // Geopotential height in meters
         let temperature: Double?  // Temperature in C
@@ -18,7 +21,6 @@ struct SoundingData: Codable, Equatable {
     }
     
     let time: Date
-    let elevation: Int
     let dataPoints: [Point]
     let surfaceDataPoint: Point?
     

@@ -46,7 +46,7 @@ extension Middlewares {
         }
         
         switch action as? SoundingState.Action {
-        case .changeAndLoadSelection(_):
+        case .selection(_):
             UserDefaults.standard.save(state.currentSoundingState.selection, forKey: .currentSelection)
             UserDefaults.standard.save(state.recentSelections, forKey: .recentSelections)
             

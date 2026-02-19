@@ -11,6 +11,9 @@ import XCTest
 extension RucSounding {
     init(withJustData data: [RucSounding.LevelDataPoint]) throws {
         let points = data.map { SoundingData.Point(
+            time: nil,
+            latitude: nil,
+            longitude: nil,
             pressure: $0.pressure,
             height: $0.height != nil ? Double($0.height!) : nil,
             temperature: $0.temperature,
@@ -28,7 +31,6 @@ extension RucSounding {
             radiosondeCode: nil,
             data: SoundingData(
                 time: Date(timeIntervalSince1970: 1693945305),
-                elevation: 0,
                 dataPoints: points,
                 surfaceDataPoint: points.first,
                 cape: nil,

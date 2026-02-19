@@ -18,7 +18,10 @@ struct SkewtApp: App {
                 Middlewares.consoleLogger,
                 Middlewares.userDefaultsSaving,
                 Middlewares.locationSearchMiddleware,
-                Middlewares.openMeteoApi
+                Middlewares.openMeteoApi,
+                Middlewares.ncafSoundingMiddleware,
+                Middlewares.ncafSoundingData,
+                Middlewares.uwySoundingData
             ]
         )
         

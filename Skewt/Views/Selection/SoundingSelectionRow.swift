@@ -143,7 +143,7 @@ struct SoundingSelectionRow: View {
         }
         .onTapGesture {
             withAnimation {
-                store.dispatch(SoundingState.Action.changeAndLoadSelection(
+                store.dispatch(SoundingState.Action.selection(
                     .selectModelTypeAndLocation(
                         selection.type,
                         selection.location,

@@ -13,12 +13,11 @@ struct SoundingStateTests {
     @Test("Current sounding reflects time selection")
     func soundingForTimes() {
         let epoch = Date.now
-        
-        let intervals: [TimeInterval] = [-.twelveHours, .zero, .twelveHours]
+        let intervals: [TimeInterval] = [-TimeInterval.hours(12), .zero, TimeInterval.hours(12)]
+
         let soundings = intervals.map {
             SoundingData(
                 time: epoch.addingTimeInterval($0),
-                elevation: 0,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,
@@ -27,355 +26,267 @@ struct SoundingStateTests {
                 precipitableWater: nil
             )
         }
-        
+
         let soundingList = OpenMeteoSoundingList(
             fetchTime: .now,
             latitude: 0.0,
             longitude: 0.0,
             data: soundings.reduce(into: [Date: SoundingData]()) { $0[$1.time] = $1 }
         )
-        
+
         intervals.forEach { interval in
             let time = epoch.addingTimeInterval(interval)
-            
-            let relativeSelection = SoundingSelection(
+
+            let selection = SoundingSelection(
                 type: .forecast(.automatic),
                 location: .closest,
                 time: .relative(interval),
                 dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
             )
-            
-            let specificSelection = SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .specific(time),
-                dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
-            )
-            
-            let relativeState = SoundingState(selection: relativeSelection, status: .done(soundingList))
-            let specificState = SoundingState(selection: specificSelection, status: .done(soundingList))
-            
-            #expect(relativeState.sounding!.data.time == time)
-            #expect(specificState.sounding!.data.time == time)
+
+            var state = SoundingState(selection: selection)
+            state.openMeteoList = soundingList
+            state.openMeteoSelection = selection
+
+            let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.relative(interval))))
+            #expect(resolved.resolvedSounding?.data.time == time)
+            #expect(resolved.loadIntent == nil)
         }
     }
-    
-    @Test("Changing time selection works",
-          arguments: [
-            SoundingSelection.Time.now,
-            .numberOfSoundingsAgo(-10),
-            .numberOfSoundingsAgo(0),
-            .numberOfSoundingsAgo(1),
-            .relative(-.twentyFourHours),
-            .relative(.zero),
-            .relative(.twelveHours),
-            .specific(Date(timeIntervalSince1970: 1735936978.0))
-          ]
-    )
-    func changeTime(timeSelection: SoundingSelection.Time) {
-        let originalState = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .now,
-                dataAgeBeforeRefresh: 24.0 * 60.0 * 60.0
-            ),
-            status: .idle
-        )
-        
-        let state = SoundingState.reducer(
-            originalState,
-            SoundingState.Action.changeAndLoadSelection(.selectTime(timeSelection))
-        )
-        
-        #expect(state.selection.time == timeSelection)
-    }
-    
-    @Test("Change/load selection from idle state causes loading state",
-          arguments: [
-            SoundingSelection.Action.selectTime(.now),
-            SoundingSelection.Action.selectTime(.relative(60.0 * 60.0)),
-            SoundingSelection.Action.selectTime(.relative(-60.0 * 60.0)),
-            SoundingSelection.Action.selectTime(.relative(24.0 * 60.0 * 60.0)),
-            SoundingSelection.Action.selectTime(.specific(Date(timeIntervalSince1970: 1731695293))),
-            SoundingSelection.Action.selectModelType(.forecast(.automatic), .now),
-            SoundingSelection.Action.selectLocation(.closest, .now),
-            SoundingSelection.Action.selectLocation(.point(latitude: 39.8563, longitude: -104.6764), .now),
-            SoundingSelection.Action.selectModelTypeAndLocation(.forecast(.automatic), .closest, .now)
-          ]
-    )
-    func changeAndLoadFromIdle(selectionAction: SoundingSelection.Action) {
-        let state = SoundingState(
-            selection: SoundingSelection(type: .forecast(.automatic), location: .closest, time: .now, dataAgeBeforeRefresh: .fifteenMinutes),
-            status: .idle
-        )
-                
-        switch SoundingState.reducer(state, SoundingState.Action.changeAndLoadSelection(selectionAction)).status {
-        case .loading:
-            return
-        default:
-            Issue.record("Change/load selection did not effect a loading state")
-        }
-    }
-    
-    @Test("Change/load selection with recent data does not change state",
-          arguments: [
-            SoundingSelection.Action.selectTime(.now),
-            SoundingSelection.Action.selectModelType(.forecast(.automatic), .now),
-            SoundingSelection.Action.selectLocation(.closest, .now),
-            SoundingSelection.Action.selectModelTypeAndLocation(.forecast(.automatic), .closest, .now)
-          ])
-    func changeLoadWithAlreadyGoodData(selectionAction: SoundingSelection.Action) {
-        let soundingData = SoundingData(
+
+    @Test("Missing or stale list yields load intent")
+    func loadIntentWhenStale() {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .closest,
             time: .now,
-            elevation: 0,
-            dataPoints: [],
-            surfaceDataPoint: nil,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil
+            dataAgeBeforeRefresh: 15.0 * 60.0
         )
-        
-        let state = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
+
+        var state = SoundingState(selection: selection)
+        state.openMeteoList = OpenMeteoSoundingList(
+            fetchTime: .now.addingTimeInterval(-TimeInterval.hours(12)),
+            latitude: 0.0,
+            longitude: 0.0,
+            data: [Date.now: SoundingData(
                 time: .now,
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now,
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: [.now: soundingData]
-            )))
-        
-        switch SoundingState.reducer(state, SoundingState.Action.changeAndLoadSelection(selectionAction)).status {
-        case .done(_):
-            return
-        default:
-            Issue.record("Changing/loading with already existing data improperly effected another load")
-        }
-    }
-    
-    @Test("Change time to a time we have in existing, recent data does not change state")
-    func changeTimeWithDataPresent() {
-        let soundingData = SoundingData(
-            time: .now,
-            elevation: 0,
-            dataPoints: [],
-            surfaceDataPoint: nil,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil
-        )
-        
-        let state = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .now,
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now,
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: [
-                    .now: soundingData,
-                    .now.addingTimeInterval(.oneHour): soundingData
-                ]
-            )))
-        
-        let timeSelection = SoundingSelection.Action.selectTime(.relative(.oneHour))
-        
-        switch SoundingState.reducer(state, SoundingState.Action.changeAndLoadSelection(timeSelection)).status {
-        case .done(_):
-            return
-        default:
-            Issue.record("Changing/loading with already existing data improperly effected another load")
-        }
-    }
-    
-    @Test("Change time to a time we have in existing, recent data results in change of time selection")
-    func changeTimeWorksWithExistingData() {
-        let soundingData = SoundingData(
-            time: .now,
-            elevation: 0,
-            dataPoints: [],
-            surfaceDataPoint: nil,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil
-        )
-        
-        let startingState = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .now,
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now,
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: [
-                    .now: soundingData,
-                    .now.addingTimeInterval(.oneHour): soundingData
-                ]
-            )))
-        
-        let timeSelection = SoundingSelection.Action.selectTime(.relative(.oneHour))
-        let endState = SoundingState.reducer(startingState, SoundingState.Action.changeAndLoadSelection(timeSelection))
-        
-        switch endState.selection.time {
-        case .relative(.oneHour):
-            return
-        case .relative(let interval):
-            Issue.record("Relative time selection was \(interval) instead of one hour. That's odd.")
-        default:
-            Issue.record("Changing time selection with existing data erased the selection of a new time.")
-        }
-    }
-    
-    @Test("Changing time to now with hour old data effects a load")
-    func reloadWithOldData() {
-        let soundingData = SoundingData(
-            time: .now.addingTimeInterval(-.oneHour),
-            elevation: 0,
-            dataPoints: [],
-            surfaceDataPoint: nil,
-            cape: nil,
-            cin: nil,
-            helicity: nil,
-            precipitableWater: nil
-        )
-        
-        let state = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .now,
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now.addingTimeInterval(-.oneHour),
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: [.now: soundingData,]
-            )))
-        
-        switch SoundingState.reducer(state, SoundingState.Action.changeAndLoadSelection(.selectTime(.now))).status {
-        case .loading, .refreshing(_):
-            return
-        default:
-            Issue.record("Changing time with stale data did not effect a load")
-        }
-    }
-    
-    @Test("Appropriate data for time selection",
-          arguments: 0..<12)
-    func timeSelection(timeIndex: Int) {
-        let dates = stride(from: TimeInterval.zero, to: TimeInterval.twelveHours, by: .oneHour).map {
-            Date.now.addingTimeInterval($0)
-        }
-        
-        var data: [Date: SoundingData] = [:]
-        
-        dates.forEach {
-            data[$0] = SoundingData(
-                time: $0,
-                elevation: 0,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,
                 cin: nil,
                 helicity: nil,
                 precipitableWater: nil
-            )
-        }
-        
-        let specificTimeState = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .specific(dates[timeIndex]),
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now,
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: data
-            )))
-        
-        #expect(specificTimeState.sounding?.data.time == dates[timeIndex], "Specific time selection results in correct data")
-        
-        let relativeTimeState = SoundingState.reducer(
-            specificTimeState,
-            SoundingState.Action.changeAndLoadSelection(
-                .selectTime(.relative(.oneHour * Double(timeIndex))))
+            )]
         )
-        
-        #expect(relativeTimeState.sounding?.data.time == dates[timeIndex], "Relative time selection results in correct data")
+        state.openMeteoSelection = selection
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+        #expect(resolved.loadIntent == .openMeteo(selection))
+        #expect(resolved.resolvedSounding == nil)
     }
-    
-    @Test("Changing time selection to a time outside of our current data causes a load")
-    func needMoreData() {
-        let dates = stride(from: TimeInterval.zero, to: TimeInterval.twelveHours, by: .oneHour).map {
-            Date.now.addingTimeInterval($0)
-        }
-        
-        var data: [Date: SoundingData] = [:]
-        
-        dates.forEach {
-            data[$0] = SoundingData(
-                time: $0,
-                elevation: 0,
+
+    @Test("Forecast uses cached Open-Meteo when available")
+    func forecastUsesCachedOpenMeteo() {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .closest,
+            time: .now,
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        let data = SoundingData(
+            time: selection.timeAsConcreteDate,
+            dataPoints: [],
+            surfaceDataPoint: nil,
+            cape: nil,
+            cin: nil,
+            helicity: nil,
+            precipitableWater: nil
+        )
+
+        var state = SoundingState(selection: selection)
+        state.openMeteoList = OpenMeteoSoundingList(
+            fetchTime: .now,
+            latitude: 0.0,
+            longitude: 0.0,
+            data: [data.time: data]
+        )
+        state.openMeteoSelection = selection
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+
+        #expect(resolved.resolvedSounding?.data.time == data.time)
+        #expect(resolved.loadIntent == nil)
+    }
+
+    @Test("Refresh forces a load intent")
+    func refreshForcesLoad() {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .closest,
+            time: .now,
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        var state = SoundingState(selection: selection)
+        state.openMeteoList = OpenMeteoSoundingList(
+            fetchTime: .now,
+            latitude: 0.0,
+            longitude: 0.0,
+            data: [Date.now: SoundingData(
+                time: .now,
                 dataPoints: [],
                 surfaceDataPoint: nil,
                 cape: nil,
                 cin: nil,
                 helicity: nil,
                 precipitableWater: nil
-            )
-        }
-        
-        let state = SoundingState(
-            selection: SoundingSelection(
-                type: .forecast(.automatic),
-                location: .closest,
-                time: .now,
-                dataAgeBeforeRefresh: .fifteenMinutes
-            ),
-            status: .done(OpenMeteoSoundingList(
-                fetchTime: .now,
-                latitude: 39.8563,
-                longitude: -104.6764,
-                data: data
-            )))
-        
-        let tomorrowState = SoundingState.reducer(
-            state,
-            SoundingState.Action.changeAndLoadSelection(.selectTime(.relative(.oneDay)))
+            )]
         )
-        
-        switch tomorrowState.status {
-        case .loading:
+        state.openMeteoSelection = selection
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.refreshTapped)
+        #expect(resolved.loadIntent == .openMeteo(selection))
+        #expect(resolved.resolvedSounding == nil)
+    }
+
+    @Test("Historical sounding uses UWY intent")
+    func historicalSoundingUsesUwy() {
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .closest,
+            time: .relative(-TimeInterval.hours(12)),
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        let state = SoundingState(selection: selection)
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(selection.time)))
+
+        #expect(resolved.loadIntent == .uwy(selection))
+        #expect(resolved.resolvedSounding == nil)
+    }
+
+    @Test("Historical sounding uses cached UWY when available")
+    func historicalSoundingUsesCachedUwy() {
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .closest,
+            time: .relative(-TimeInterval.hours(12)),
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        let data = SoundingData(
+            time: selection.timeAsConcreteDate,
+            dataPoints: [],
+            surfaceDataPoint: nil,
+            cape: nil,
+            cin: nil,
+            helicity: nil,
+            precipitableWater: nil
+        )
+
+        var state = SoundingState(selection: selection)
+        state.uwySounding = UWYSounding(data: data)
+        state.uwySelection = selection
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(selection.time)))
+
+        #expect(resolved.resolvedSounding?.data.time == data.time)
+        #expect(resolved.loadIntent == nil)
+    }
+
+    @Test("Latest sounding uses NCAF intent")
+    func latestSoundingUsesNcaf() {
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .closest,
+            time: .now,
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        let state = SoundingState(selection: selection)
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+
+        #expect(resolved.loadIntent == .ncaf(selection))
+        #expect(resolved.resolvedSounding == nil)
+    }
+
+    @Test("Latest sounding uses cached NCAF when available")
+    func latestSoundingUsesCachedNcaf() {
+        guard let list = loadNcafList(),
+              let location = locationMatching(list: list),
+              let stationId = location.wmoId,
+              let data = list.soundingData(forStationId: stationId) else {
+            Issue.record("Failed to load NCAF test data or find matching station")
             return
-        default:
-            Issue.record("Changing time selection to a time outside of our data didn't trigger a load")
         }
+
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .named(name: location.name, latitude: location.latitude, longitude: location.longitude),
+            time: .now,
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        var state = SoundingState(selection: selection)
+        state.ncafList = list
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+
+        #expect(resolved.resolvedSounding?.data.time == data.time)
+        #expect(resolved.loadIntent == nil)
+    }
+
+    @Test("Latest sounding reloads when cached NCAF is stale")
+    func latestSoundingReloadsWhenCachedNcafIsStale() {
+        guard let list = loadNcafList(),
+              let location = locationMatching(list: list) else {
+            Issue.record("Failed to load NCAF test data or find matching station")
+            return
+        }
+
+        let selection = SoundingSelection(
+            type: .sounding,
+            location: .named(name: location.name, latitude: location.latitude, longitude: location.longitude),
+            time: .now,
+            dataAgeBeforeRefresh: 15.0 * 60.0
+        )
+
+        let staleList = NCAFSoundingList(
+            messagesByStationId: list.messagesByStationId,
+            timestamp: .now.addingTimeInterval(-TimeInterval.hours(12))
+        )
+
+        var state = SoundingState(selection: selection)
+        state.ncafList = staleList
+
+        let resolved = SoundingState.reducer(state, SoundingState.Action.selection(.selectTime(.now)))
+
+        #expect(resolved.resolvedSounding == nil)
+        #expect(resolved.loadIntent == .ncaf(selection))
     }
 }
 
-extension TimeInterval {
-    static let fifteenMinutes = TimeInterval(15.0 * 60.0)
-    static let oneHour = TimeInterval(60.0 * 60.0)
-    static let twelveHours = oneHour * 12.0
-    static let oneDay = twelveHours * 2.0
+private final class NcafTestBundleToken {}
+
+private extension SoundingStateTests {
+    func loadNcafList() -> NCAFSoundingList? {
+        let bundle = Bundle(for: NcafTestBundleToken.self)
+        guard let url = bundle.url(forResource: "Current", withExtension: "rawins"),
+              let text = try? String(contentsOf: url) else {
+            return nil
+        }
+
+        return NCAFSoundingList(fromString: text)
+    }
+
+    func locationMatching(list: NCAFSoundingList) -> LocationList.Location? {
+        LocationList.allLocations.locations.first { location in
+            guard let wmoId = location.wmoId else {
+                return false
+            }
+
+            return list.messagesByStationId[wmoId] != nil
+        }
+    }
 }

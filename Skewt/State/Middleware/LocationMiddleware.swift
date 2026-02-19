@@ -15,12 +15,11 @@ extension Middlewares {
         case .requestLocation:
             return LocationManager.shared.requestLocation()
         case .didDetermineLocation(_):
-            if case .idle = state.currentSoundingState.status,
-                state.currentSoundingState.selection.requiresLocation {
-                
-                return Just(SoundingState.Action.doRefresh).eraseToAnyPublisher()
+            if state.currentSoundingState.resolvedSounding == nil,
+               state.currentSoundingState.selection.requiresLocation {
+                return Just(SoundingState.Action.refreshTapped).eraseToAnyPublisher()
             }
-            
+
             fallthrough
         default:
             return Empty().eraseToAnyPublisher()

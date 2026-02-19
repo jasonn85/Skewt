@@ -92,6 +92,9 @@ extension RucSounding {
 
 extension SoundingData.Point {
     init(fromRucDataPoint point: RucSounding.LevelDataPoint) {
+        time = nil
+        latitude = nil
+        longitude = nil
         pressure = point.pressure
         height = point.height != nil ? Double(point.height!) : nil
         temperature = point.temperature
@@ -285,7 +288,6 @@ extension RucSounding {
         
         try data = SoundingData(
             time: headerLine.dateFromHeaderLine(),
-            elevation: surfacePoint?.height ?? 0,
             dataPoints: rucData.map { SoundingData.Point(fromRucDataPoint: $0) },
             surfaceDataPoint: surfacePoint != nil ? SoundingData.Point(fromRucDataPoint: surfacePoint!) : nil,
             cape: cape,

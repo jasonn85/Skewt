@@ -39,10 +39,12 @@ extension Store {
     static var previewStore: Store<SkewtState> {
         let selection = SoundingSelection()
         
-        let soundingState = SoundingState(
-            selection: selection,
-            status: .done(previewSoundingList)
-        )
+        var soundingState = SoundingState(selection: selection)
+        soundingState.openMeteoList = previewSoundingList
+        soundingState.openMeteoSelection = selection
+        if let closest = previewSoundingList.closestSounding() {
+            soundingState.resolvedSounding = ResolvedSounding(openMeteoSounding: closest)
+        }
         
         return Store<SkewtState>(
             initial: SkewtState(
@@ -51,7 +53,8 @@ extension Store {
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState()
+                locationState: LocationState(),
+                recentSoundings: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,
             middlewares: []

@@ -75,6 +75,7 @@ struct SkewtState: Codable {
     
     var plotOptions: PlotOptions
     var locationState: LocationState
+    var recentSoundings: RecentSoundingsState
 }
 
 // Default initializer
@@ -88,6 +89,7 @@ extension SkewtState {
         pinnedSelections = SkewtState.savedPinnedSelections ?? [SoundingSelection()]
         plotOptions = PlotOptions.saved ?? PlotOptions()
         locationState = LocationState()
+        recentSoundings = RecentSoundingsState()
     }
 }
 
@@ -100,6 +102,7 @@ extension SkewtState {
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)
+        state.recentSoundings = RecentSoundingsState.reducer(state.recentSoundings, action)
         
         switch action as? SkewtState.Action {
         case .pinSelection(let selection):
@@ -110,7 +113,7 @@ extension SkewtState {
             break
         }
         
-        if case .changeAndLoadSelection(let selectionAction) = action as? SoundingState.Action,
+        if case .selection(let selectionAction) = action as? SoundingState.Action,
            selectionAction.isCreatingNewSelection {
             
             let maximumRecentSelections = 5

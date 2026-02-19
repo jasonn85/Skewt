@@ -19,50 +19,55 @@ enum OpenMeteoRequestError: Error {
 extension Middlewares {
     static let openMeteoApi: Middleware<SkewtState> = { oldState, state, action in
         let logger = Logger()
-        
-        switch state.currentSoundingState.status {
-        case .loading, .refreshing(_):
-            guard oldState.currentSoundingState != state.currentSoundingState else {
-                return Empty().eraseToAnyPublisher()
-            }
-            
-            guard !state.currentSoundingState.selection.requiresLocation || state.locationState.locationIfKnown != nil else {
-                return Just(SoundingState.Action.didReceiveFailure(.lackingLocationPermission))
-                                .eraseToAnyPublisher()
-            }
-            
-            guard let request = try? OpenMeteoSoundingListRequest(
-                fromSoundingSelection: state.currentSoundingState.selection,
-                currentLocation: state.locationState.locationIfKnown
-            ) else {
-                return Just(SoundingState.Action.didReceiveFailure(.unableToGenerateRequestFromSelection))
-                    .eraseToAnyPublisher()
-            }
-            
-            let url = request.url
-            
-            logger.info("Request soundings from Open-Meteo via \(url.absoluteString)")
-            
-            return URLSession.shared.dataTaskPublisher(for: url)
-                .map { data, response in
-                    guard !data.isEmpty,
-                          let text = String(data: data, encoding: .utf8),
-                          !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                        return SoundingState.Action.didReceiveFailure(.emptyResponse)
-                    }
-                    
-                    guard let soundingList = try? OpenMeteoSoundingList(fromData: data) else {
-                        return SoundingState.Action.didReceiveFailure(.unparseableResponse)
-                    }
-
-                    return SoundingState.Action.didReceiveResponse(soundingList)
-                }
-                .replaceError(with: SoundingState.Action.didReceiveFailure(.requestFailed))
-                .eraseToAnyPublisher()
-            
-        default:
+        guard case .openMeteo(let selection) = state.currentSoundingState.loadIntent else {
             return Empty().eraseToAnyPublisher()
         }
+
+        guard oldState.currentSoundingState.loadIntent != state.currentSoundingState.loadIntent else {
+            return Empty().eraseToAnyPublisher()
+        }
+
+        switch selection.type {
+        case .sounding:
+            // Open-Meteo is forecast only
+            return Empty().eraseToAnyPublisher()
+        case .forecast:
+            break
+        }
+
+        guard !selection.requiresLocation || state.locationState.locationIfKnown != nil else {
+            return Just(SoundingState.Action.requestFailed(.lackingLocationPermission))
+                .eraseToAnyPublisher()
+        }
+
+        guard let request = try? OpenMeteoSoundingListRequest(
+            fromSoundingSelection: selection,
+            currentLocation: state.locationState.locationIfKnown
+        ) else {
+            return Just(SoundingState.Action.requestFailed(.unableToGenerateRequestFromSelection))
+                .eraseToAnyPublisher()
+        }
+
+        let url = request.url
+
+        logger.info("Request soundings from Open-Meteo via \(url.absoluteString)")
+
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map { data, response in
+                guard !data.isEmpty,
+                      let text = String(data: data, encoding: .utf8),
+                      !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                    return SoundingState.Action.requestFailed(.emptyResponse)
+                }
+
+                guard let soundingList = try? OpenMeteoSoundingList(fromData: data) else {
+                    return SoundingState.Action.requestFailed(.unparseableResponse)
+                }
+
+                return SoundingState.Action.openMeteoLoaded(soundingList)
+            }
+            .replaceError(with: SoundingState.Action.requestFailed(.requestFailed))
+            .eraseToAnyPublisher()
     }
 }
 

@@ -6,235 +6,27 @@
 //
 
 import Foundation
+import CoreLocation
 
-struct SoundingSelection: Codable, Hashable, Identifiable {
-    enum Action: Skewt.Action {
-        case selectModelType(ModelType, Time = .now)
-        case selectLocation(Location, Time = .now)
-        case selectTime(Time)
-        case selectModelTypeAndLocation(ModelType?, Location?, Time = .now)
-    }
-    
-    enum ModelType: Codable, Hashable, CaseIterable, Identifiable, Equatable {
-        case forecast(ForecastModel)
-        case sounding
-        
-        static var allCases: [ModelType] {
-            [.sounding] + ForecastModel.allCases.map { .forecast($0) }
-        }
-        
-        var id: String {
-            switch self {
-            case .sounding:
-                return "sounding"
-            case .forecast(let model):
-                return "forecast-\(model.rawValue)"
-            }
-        }
-    }
-    
-    enum ForecastModel: String, Codable, CaseIterable, Identifiable, Equatable {
-        case automatic = "auto"
+struct SoundingState: Codable {
+    var selection: SoundingSelection
 
-        // ICON (DWD)
-        case iconSeamlessEps = "icon_seamless_eps"
-        case iconGlobalEps = "icon_global_eps"
-        case iconEuEps = "icon_eu_eps"
-        case iconD2Eps = "icon_d2_eps"
+    // Latest data from each source
+    var openMeteoList: OpenMeteoSoundingList?
+    var openMeteoSelection: SoundingSelection?
+    var ncafList: NCAFSoundingList?
+    var uwySounding: UWYSounding?
+    var uwySelection: SoundingSelection?
 
-        case iconSeamless = "icon_seamless"
-        case iconGlobal = "icon_global"
-        case iconEu = "icon_eu"
-        case iconD2 = "icon_d2"
+    // Resolved output for the UI
+    var resolvedSounding: ResolvedSounding?
 
-        // UKMO
-        case ukmoGlobalEnsemble20km = "ukmo_global_ensemble_20km"
-        case ukmoUkEnsemble2km = "ukmo_uk_ensemble_2km"
+    // Derived request intent for middleware
+    var loadIntent: LoadIntent?
 
-        case ukmoGlobal = "ukmo_global"
-        case ukmoUk = "ukmo_uk"
+    // Last request error, if any
+    var lastError: SoundingError?
 
-        // NCEP
-        case ncepGefsSeamless = "ncep_gefs_seamless"
-        case ncepGefs025 = "ncep_gefs025"
-        case ncepGefs05 = "ncep_gefs05"
-        case ncepAigefs025 = "ncep_aigefs025"
-
-        case gfsSeamless = "gfs_seamless"
-        case gfs025 = "gfs025"
-        case gfs05 = "gfs05"
-
-        // MeteoSwiss
-        case meteoswissIconCh1Ensemble = "meteoswiss_icon_ch1_ensemble"
-        case meteoswissIconCh2Ensemble = "meteoswiss_icon_ch2_ensemble"
-
-        case meteoswissIconCh1 = "meteoswiss_icon_ch1"
-        case meteoswissIconCh2 = "meteoswiss_icon_ch2"
-
-        // ECMWF
-        case ecmwfIfs025Ensemble = "ecmwf_ifs025_ensemble"
-        case ecmwfAifs025Ensemble = "ecmwf_aifs025_ensemble"
-
-        case ecmwfIfs025 = "ecmwf_ifs025"
-        case ecmwfAifs025 = "ecmwf_aifs025"
-
-        // Others
-        case gemGlobalEnsemble = "gem_global_ensemble"
-        case gemGlobal = "gem_global"
-
-        case bomAccessGlobalEnsemble = "bom_access_global_ensemble"
-        case bomAccessGlobal = "bom_access_global"
-
-        var id: Self { self }
-    }
-    
-    enum Location: Codable, Hashable, Identifiable {
-        case closest
-        case point(latitude: Double, longitude: Double)
-        case named(name: String, latitude: Double, longitude: Double)
-        
-        var id: Self { self }
-    }
-    
-    enum Time: Codable, Hashable, Identifiable {
-        case now
-        case relative(TimeInterval)
-        case numberOfSoundingsAgo(Int)  // .numberOfSoundingsAgo(1) is equivalent to .now
-        case specific(Date)
-        
-        var id: Self { self }
-    }
-    
-    let type: ModelType
-    let location: Location
-    let time: Time
-    let dataAgeBeforeRefresh: TimeInterval
-    
-    var id: Self { self }
-}
-
-// Default initializer
-extension SoundingSelection {
-    init() {
-        type = .forecast(.automatic)
-        location = .closest
-        time = .now
-        
-        let fiveMinutes = TimeInterval(5.0 * 60.0)
-        dataAgeBeforeRefresh = fiveMinutes
-    }
-}
-
-extension SoundingSelection {
-    var requiresLocation: Bool {
-        switch self.location {
-        case .closest:
-            return true
-        default:
-            return false
-        }
-    }
-}
-
-extension SoundingSelection {
-    func isEqualIgnoringTime(to other: SoundingSelection) -> Bool {
-        type == other.type && location == other.location
-    }
-}
-
-extension Date {
-    func soundingSelectionTime(forModelType modelType: SoundingSelection.ModelType, referenceDate: Date = .now) -> SoundingSelection.Time {
-        let timeInterval = timeIntervalSince(referenceDate)
-
-        switch modelType {
-        case .forecast(_):
-            return timeInterval == 0.0 ? .now : .relative(timeInterval)
-        case .sounding:
-            let intervalCount = Int(round(timeInterval / 60.0 / 60.0 / Double(modelType.hourInterval)))
-            
-            if abs(intervalCount) <= 1 {
-                return .now
-            } else {
-                return .numberOfSoundingsAgo(-intervalCount)
-            }
-        }
-    }
-}
-
-extension SoundingSelection: CustomStringConvertible {
-    var description: String {
-        location.briefDescription
-    }
-}
-
-extension SoundingSelection.Location {
-    var briefDescription: String {
-        switch self {
-        case .closest:
-            return "Current location"
-        case .named(let name, _, _):
-            return name
-        case .point(latitude: let latitude, longitude: let longitude):
-            return String(format: "%.0f, %.0f", latitude, longitude)
-        }
-    }
-}
-
-extension SoundingSelection {
-    /// A wall clock time for the current selection, resolving any relative time
-    var timeAsConcreteDate: Date {
-        switch time {
-        case .now:
-            return Date.now
-        case .relative(let interval):
-            return Date.now.addingTimeInterval(interval)
-        case .specific(let date):
-            return date
-        case .numberOfSoundingsAgo(let soundingsAgo):
-            let interval = TimeInterval(soundingsAgo * type.hourInterval)
-            
-            return Date.now.addingTimeInterval(-interval)
-        }
-    }
-}
-
-extension SoundingSelection.ModelType {
-    var hourInterval: Int {
-        switch self {
-        case .forecast(_):
-            return 1
-        case .sounding:
-            return 12
-        }
-    }
-}
-
-// Reducer
-extension SoundingSelection {
-    static let reducer: Reducer<Self> = { state, action in
-        guard let action = action as? Action else {
-            return state
-        }
-        
-        switch action {
-        case .selectModelType(let type, let time):
-            return SoundingSelection(type: type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
-        case .selectLocation(let location, let time):
-            return SoundingSelection(type: state.type, location: location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
-        case .selectTime(let time):
-            return SoundingSelection(type: state.type, location: state.location, time: time, dataAgeBeforeRefresh: state.dataAgeBeforeRefresh)
-        case .selectModelTypeAndLocation(let type, let location, let time):
-            return SoundingSelection(
-                type: type ?? state.type,
-                location: location ?? state.location,
-                time: time,
-                dataAgeBeforeRefresh: state.dataAgeBeforeRefresh
-            )
-        }
-    }
-}
-
-struct SoundingState: Codable, Equatable {
     enum SoundingError: Error, Codable {
         case unableToGenerateRequestFromSelection
         case emptyResponse
@@ -242,80 +34,123 @@ struct SoundingState: Codable, Equatable {
         case requestFailed
         case lackingLocationPermission  // We can't do closest weather if we lack CL permission
     }
-    
+
+    enum LoadIntent: Codable, Equatable {
+        case openMeteo(SoundingSelection)
+        case ncaf(SoundingSelection)
+        case uwy(SoundingSelection)
+    }
+
     enum Action: Skewt.Action {
-        case doRefresh
-        case changeAndLoadSelection(SoundingSelection.Action)
-        case didReceiveFailure(SoundingError)
-        case didReceiveResponse(OpenMeteoSoundingList)
+        case selection(SoundingSelection.Action)
+        case refreshTapped
+        case openMeteoLoaded(OpenMeteoSoundingList)
+        case ncafLoaded(NCAFSoundingList)
+        case uwyLoaded(UWYSounding)
+        case requestFailed(SoundingError)
     }
-    
-    enum Status: Codable, Equatable {
-        case idle
-        case loading
-        case done(OpenMeteoSoundingList)
-        case refreshing(OpenMeteoSoundingList)
-        case failed(SoundingError)
+
+    enum CodingKeys: String, CodingKey {
+        case selection
     }
-    
-    var selection: SoundingSelection
-    var status: Status
-    
-    var sounding: Sounding? {
-        switch status {
-        case .idle, .loading, .failed(_):
-            return nil
-        case .done(let soundingList), .refreshing(let soundingList):
-            switch selection.time {
-            case .now:
-                return soundingList.closestSounding()
-            case .relative(let interval):
-                return soundingList.closestSounding(toDate: .now.addingTimeInterval(interval))
-            case .specific(let date):
-                return soundingList.closestSounding(toDate: date)
-            case.numberOfSoundingsAgo(let agoCount):
-                let secondsAgo = Double(agoCount) * Double(selection.type.hourInterval) * 60.0 * 60.0
-                return soundingList.closestSounding(toDate: .now.addingTimeInterval(-secondsAgo))
-            }
-        }
+}
+
+struct ResolvedSounding: Codable, Sounding {
+    enum Source: Codable, Equatable {
+        case openMeteo(fetchTime: Date)
+        case ncaf(timestamp: Date)
+        case uwy
     }
+
+    let data: SoundingData
+    let source: Source
 }
 
 // Default initializer
 extension SoundingState {
     init() {
         selection = SoundingSelection()
-        status = .idle
+        openMeteoList = nil
+        openMeteoSelection = nil
+        ncafList = nil
+        uwySounding = nil
+        uwySelection = nil
+        resolvedSounding = nil
+        loadIntent = nil
+        lastError = nil
     }
-    
+
     init(selection: SoundingSelection?) {
         self.selection = selection ?? SoundingSelection()
-        status = .idle
+        openMeteoList = nil
+        openMeteoSelection = nil
+        ncafList = nil
+        uwySounding = nil
+        uwySelection = nil
+        resolvedSounding = nil
+        loadIntent = nil
+        lastError = nil
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        selection = try container.decode(SoundingSelection.self, forKey: .selection)
+        openMeteoList = nil
+        openMeteoSelection = nil
+        ncafList = nil
+        uwySounding = nil
+        uwySelection = nil
+        resolvedSounding = nil
+        loadIntent = nil
+        lastError = nil
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(selection, forKey: .selection)
+    }
+
+    var isLoading: Bool {
+        loadIntent != nil && lastError == nil
+    }
+
+    var sounding: Sounding? {
+        resolvedSounding
     }
 }
 
-extension SoundingState.Status {
-    var isLoading: Bool {
-        switch self {
-        case .loading, .refreshing(_):
-            return true
-        case .idle, .done(_), .failed(_):
-            return false
-        }
-	}
+extension ResolvedSounding {
+    init(openMeteoSounding: OpenMeteoSounding) {
+        data = openMeteoSounding.data
+        source = .openMeteo(fetchTime: openMeteoSounding.fetchTime)
+    }
+
+    init(ncafData: SoundingData, timestamp: Date) {
+        data = ncafData
+        source = .ncaf(timestamp: timestamp)
+    }
+
+    init(uwySounding: UWYSounding) {
+        data = uwySounding.data
+        source = .uwy
+    }
 }
 
 extension SoundingState.Action: CustomStringConvertible {
     var description: String {
         switch self {
-        case .doRefresh:
+        case .refreshTapped:
             return "Refreshing"
-        case .changeAndLoadSelection(let selection):
-            return "Changing selection and reloading: \(selection)"
-        case .didReceiveFailure(let error):
+        case .selection(let selection):
+            return "Changing selection: \(selection)"
+        case .requestFailed(let error):
             return "Failed to load sounding: \(error)"
-        case .didReceiveResponse(let soundingList):
+        case .openMeteoLoaded(let soundingList):
             return "Received list of \(soundingList.data.count) sounding\(soundingList.data.count != 1 ? "s" : "")"
+        case .ncafLoaded(let soundingList):
+            return "Received recent soundings for \(soundingList.messagesByStationId.count) stations"
+        case .uwyLoaded:
+            return "Received UWY sounding"
         }
     }
 }
@@ -326,109 +161,166 @@ extension SoundingState {
         guard let action = action as? Action else {
             return state
         }
-        
+
+        var state = state
+
         switch action {
-        case .doRefresh:
-            var state = state
-            
-            switch state.status {
-            case .done(let soundingList):
-                if Date.now.timeIntervalSince(soundingList.fetchTime) > state.selection.dataAgeBeforeRefresh {
-                    state.status = .loading
-                } else {
-                    state.status = .refreshing(soundingList)
-                }
-            default:
-                state.status = .loading
-            }
-            
-            return state
-        case .changeAndLoadSelection(let action):
-            // Try to find data for the new selection already existing in our data. We'll return a .done state
-            //  if that succeeds. If not, we'll return a .loading at the bottom of this case.
-            
-            // Is our data stale?
-            if let openMeteoSounding = state.sounding as? OpenMeteoSounding,
-               Date.now.timeIntervalSince(openMeteoSounding.fetchTime) < state.selection.dataAgeBeforeRefresh {
-                // Our data is not stale. Now is the selection just a time change or no change at all?
-                switch state.status {
-                case .done(let soundingList):
-                    switch action {
-                    case .selectLocation(state.selection.location, state.selection.time),
-                            .selectModelType(state.selection.type, state.selection.time):
-                        return SoundingState(selection: state.selection, status: .done(soundingList))
-                        
-                    case .selectTime(let time),
-                            .selectModelTypeAndLocation(nil, nil, let time),
-                            .selectModelTypeAndLocation(state.selection.type, nil, let time),
-                            .selectModelTypeAndLocation(nil, state.selection.location, let time),
-                            .selectModelTypeAndLocation(state.selection.type, state.selection.location, let time):
-                        // It is just a time change. Do we have data for that time already?
-                        let date: Date
-                        
-                        switch time {
-                        case .now:
-                            date = .now
-                        case .numberOfSoundingsAgo(let countAgo):
-                            let intervalAgo = Double(countAgo) * Double(state.selection.type.hourInterval) * 60.0 * 60.0
-                            date = .now.addingTimeInterval(-intervalAgo)
-                        case .relative(let interval):
-                            date = .now.addingTimeInterval(interval)
-                        case .specific(let specificDate):
-                            date = specificDate
-                        }
-                        
-                        if let closestTime = soundingList.closestSounding(toDate: date)?.date,
-                           abs(closestTime.timeIntervalSince(date)) <= Double(state.selection.type.hourInterval) * 60.0 * 60.0 {
-                            // No loading needed! Hooray!
-                            return SoundingState(selection:
-                                                    SoundingSelection(
-                                                        type: state.selection.type,
-                                                        location: state.selection.location,
-                                                        time: time,
-                                                        dataAgeBeforeRefresh: state.selection.dataAgeBeforeRefresh
-                                                    ),
-                                                 status: .done(soundingList)
-                            )
-                        }
-                    default:
-                        break
-                    }
-                default:
-                    break
-                }
-            }
-            
-            // Load data for the new selection or stale data.
-            return SoundingState(
-                selection: SoundingSelection.reducer(state.selection, action),
-                status: .loading
-            )
-        case .didReceiveFailure(let error):
-            var state = state
-            state.status = .failed(error)
-            
-            return state
-        case .didReceiveResponse(let soundingList):
-            var state = state
-            state.status = .done(soundingList)
-            
-            return state
+        case .selection(let selectionAction):
+            state.selection = SoundingSelection.reducer(state.selection, selectionAction)
+            state.lastError = nil
+            resolve(state: &state, forceReload: false)
+
+        case .refreshTapped:
+            state.lastError = nil
+            resolve(state: &state, forceReload: true)
+
+        case .openMeteoLoaded(let soundingList):
+            state.openMeteoList = soundingList
+            state.openMeteoSelection = state.selection
+            resolve(state: &state, forceReload: false)
+
+        case .ncafLoaded(let soundingList):
+            state.ncafList = soundingList
+            resolve(state: &state, forceReload: false)
+
+        case .uwyLoaded(let sounding):
+            state.uwySounding = sounding
+            state.uwySelection = state.selection
+            resolve(state: &state, forceReload: false)
+
+        case .requestFailed(let error):
+            state.lastError = error
+            resolve(state: &state, forceReload: false)
         }
+
+        return state
     }
 }
 
-extension SoundingSelection.Action {
-    // Is this action changing the sounding type or location?
-    var isCreatingNewSelection: Bool {
-        switch self {
-        case .selectModelTypeAndLocation(let type, let location, _):
-            return type != nil || location != nil
-        case .selectLocation(_, _), .selectModelType(_, _):
-            return true
-        case .selectTime(_):
-            // Just changing time is not creating a new selection type
+private extension SoundingState {
+    static func resolve(state: inout SoundingState, forceReload: Bool) {
+        let previousError = state.lastError
+
+        state.resolvedSounding = nil
+        state.loadIntent = nil
+
+        switch state.selection.type {
+        case .forecast:
+            resolveForecast(state: &state, forceReload: forceReload)
+        case .sounding:
+            resolveSounding(state: &state, forceReload: forceReload)
+        }
+
+        if state.resolvedSounding != nil {
+            state.lastError = nil
+        } else if state.lastError == nil {
+            state.lastError = previousError
+        }
+    }
+
+    static func resolveForecast(state: inout SoundingState, forceReload: Bool) {
+        let selection = state.selection
+
+        if !forceReload,
+           let list = state.openMeteoList,
+           let listSelection = state.openMeteoSelection,
+           listSelection.isEqualIgnoringTime(to: selection),
+           Date.now.timeIntervalSince(list.fetchTime) < selection.dataAgeBeforeRefresh,
+           let closest = list.closestSounding(toDate: selection.timeAsConcreteDate) {
+
+            let maxDistance = TimeInterval(selection.type.hourInterval) * 60.0 * 60.0
+            if abs(closest.date.timeIntervalSince(selection.timeAsConcreteDate)) <= maxDistance {
+                state.resolvedSounding = ResolvedSounding(openMeteoSounding: closest)
+                return
+            }
+        }
+
+        state.loadIntent = .openMeteo(selection)
+    }
+
+    static func resolveSounding(state: inout SoundingState, forceReload: Bool) {
+        let selection = state.selection
+        let shouldUseHistorical = selection.requiresHistoricalSounding
+
+        if shouldUseHistorical {
+            if !forceReload,
+               let uwy = state.uwySounding,
+               let uwySelection = state.uwySelection,
+               uwySelection == selection {
+                state.resolvedSounding = ResolvedSounding(uwySounding: uwy)
+                return
+            }
+
+            state.loadIntent = .uwy(selection)
+            return
+        }
+
+        if !forceReload,
+           let list = state.ncafList,
+           Date.now.timeIntervalSince(list.timestamp) < selection.dataAgeBeforeRefresh,
+           let stationId = stationId(for: selection) {
+            if let data = list.soundingData(forStationId: stationId) {
+                state.resolvedSounding = ResolvedSounding(ncafData: data, timestamp: list.timestamp)
+                return
+            }
+
+            state.lastError = .emptyResponse
+            return
+        }
+
+        state.loadIntent = .ncaf(selection)
+    }
+
+    static func stationId(for selection: SoundingSelection) -> Int? {
+        switch selection.location {
+        case .closest:
+            return nil
+        case .named(let name, let latitude, let longitude):
+            if let list = try? LocationList.forType(.sounding) {
+                if let location = list.locationNamed(name, latitude: latitude, longitude: longitude),
+                   let wmoId = location.wmoId {
+                    return wmoId
+                }
+
+                if let wmoId = list.locations.first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+                    return wmoId
+                }
+            }
+
+            if let location = LocationList.allLocations.locationNamed(name, latitude: latitude, longitude: longitude),
+               let wmoId = location.wmoId {
+                return wmoId
+            }
+
+            if let wmoId = LocationList.allLocations
+                .locations
+                .first(where: { $0.name == name && $0.wmoId != nil })?.wmoId {
+                return wmoId
+            }
+
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            return LocationList.allLocations
+                .locationsSortedByProximity(to: location)
+                .first { $0.wmoId != nil }?.wmoId
+        case .point(let latitude, let longitude):
+            let location = CLLocation(latitude: latitude, longitude: longitude)
+            guard let list = try? LocationList.forType(.sounding) else {
+                return nil
+            }
+
+            return list.locationsSortedByProximity(to: location).first { $0.wmoId != nil }?.wmoId
+        }
+    }
+}
+private extension SoundingSelection {
+    var requiresHistoricalSounding: Bool {
+        switch time {
+        case .now:
             return false
+        case .numberOfSoundingsAgo(let count):
+            return count > 0
+        case .relative, .specific:
+            return true
         }
     }
 }

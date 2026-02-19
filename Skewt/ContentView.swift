@@ -18,7 +18,7 @@ class TimeSelectDebouncer: ObservableObject {
             .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink(receiveValue: { [weak self] in
-                self?.store?.dispatch(SoundingState.Action.changeAndLoadSelection(.selectTime($0)))
+                self?.store?.dispatch(SoundingState.Action.selection(.selectTime($0)))
             })
     }
 }
@@ -80,10 +80,14 @@ struct ContentView: View {
         }
         .onAppear {
             timeSelectDebouncer.store = store
+            
+            if case .idle = store.state.recentSoundings.status {
+                store.dispatch(RecentSoundingsState.Action.load)
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                store.dispatch(SoundingState.Action.doRefresh)
+                store.dispatch(SoundingState.Action.refreshTapped)
             }
         }
     }
@@ -164,6 +168,15 @@ struct ContentView: View {
             .tag(DisplayState.DialogSelection.locationSelection(.forecast))
             
             NavigationStack {
+                LocationSelectionView(listType: .modelType(.sounding))
+                    .environmentObject(store)
+            }
+            .tabItem {
+                Label("Soundings", systemImage: "balloon")
+            }
+            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
+            
+            NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
                     .environmentObject(store)
             }
@@ -216,7 +229,7 @@ struct ContentView: View {
                 Text(text)
             }
             
-            if store.state.currentSoundingState.status.isLoading {
+            if store.state.currentSoundingState.isLoading {
                 ProgressView()
             } else {
                 Image(systemName: "chevron.right")
@@ -254,17 +267,7 @@ struct ContentView: View {
     }
     
     private var statusText: String? {
-        switch store.state.currentSoundingState.status {
-        case .done(_), .refreshing(_):
-            let time = store.state.currentSoundingState.sounding?.data.time
-            let timeAgo = timeAgoFormatter.string(for: time)!
-            let dateString = dateFormatter.string(for: time)!
-            return "\(timeAgo) (\(dateString))"
-        case .idle:
-            return nil
-        case .loading:
-            return "Loading..."
-        case .failed(let error):
+        if let error = store.state.currentSoundingState.lastError {
             switch error {
             case .lackingLocationPermission:
                 return "Location is unavailable"
@@ -278,6 +281,18 @@ struct ContentView: View {
                 return "Data was not parseable"
             }
         }
+
+        if let time = store.state.currentSoundingState.resolvedSounding?.data.time {
+            let timeAgo = timeAgoFormatter.string(for: time)!
+            let dateString = dateFormatter.string(for: time)!
+            return "\(timeAgo) (\(dateString))"
+        }
+
+        if store.state.currentSoundingState.isLoading {
+            return "Loading..."
+        }
+
+        return nil
     }
 }
 
