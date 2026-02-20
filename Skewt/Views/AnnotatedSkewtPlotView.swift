@@ -434,10 +434,10 @@ struct AnnotatedSkewtPlotView: View {
                 .frame(width: windBarbContainerWidth)
                 .foregroundColor(.clear)
                 .overlay {
-                    if let sounding = plot.sounding {
+                    if let soundingData = plot.soundingData {
                         GeometryReader { geometry in
                             let x = geometry.size.width / 2.0
-                            let windData = sounding.data.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            let windData = soundingData.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
                                 let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)
@@ -507,7 +507,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var plot: SkewtPlot {
-        var plot = SkewtPlot(sounding: sounding)
+        var plot = SkewtPlot(soundingData: sounding?.data)
         plot.skew = plotOptions.skew
         
         if let altitudeRange = plotOptions.altitudeRange {

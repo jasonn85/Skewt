@@ -221,15 +221,18 @@ struct ContentView: View {
                 initialPosition: initialMapPosition,
                 interactionModes: [.pan, .zoom]
             ) {
-                if let stationIds = store.state.recentSoundings.soundingList?.messagesByStationId.keys {
-                    ForEach(Array(stationIds), id: \.self) { stationId in
+                if let soundingList = store.state.recentSoundings.soundingList {
+                    ForEach(Array(soundingList.messagesByStationId.keys), id: \.self) { stationId in
                         if let location = LocationList.allLocations.locations
-                            .first(where: { $0.wmoId == stationId }) {
-                    
-                            Annotation("\(stationId)", coordinate: location.coordinate) {
-                                Rectangle()
-                                    .foregroundStyle(.blue)
-                                    .frame(width: 100, height: 100)
+                            .first(where: { $0.wmoId == stationId }),
+                           let soundingData = soundingList.soundingData(forStationId: stationId)
+                        {
+                            Annotation(location.description, coordinate: location.coordinate, anchor: .bottom) {
+                                SoundingMapAnnotation(soundingData: soundingData)
+                                    .frame(width: 50, height: 50)
+                                    .onTapGesture {
+                                        selectMostRecentSounding(forLocation: location)
+                                    }
                             }
                         }
                     }
@@ -289,6 +292,20 @@ struct ContentView: View {
         }
     }
     
+    private func selectMostRecentSounding(forLocation location: LocationList.Location) {
+        store.dispatch(SoundingState.Action.selection(
+            .selectModelTypeAndLocation(
+                .sounding,
+                .named(
+                    name: location.name,
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                ),
+                .now
+            )
+        ))
+    }
+    
     private var timeSelectionChevronRotation: Angle {
         selectingTime ? .degrees(90) : .zero
     }
@@ -320,7 +337,7 @@ struct ContentView: View {
                     latitude: location.coordinate.latitude,
                     longitude: location.coordinate.longitude
                 ),
-                distance: 1_000_000  // 1,000 km
+                distance: 2_500_000  // 2,500 km
             )
         )
     }

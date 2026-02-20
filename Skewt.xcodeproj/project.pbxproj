@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */; };
+		9605117D2F48F36900140CF7 /* SoundingMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9605117C2F48F36900140CF7 /* SoundingMapAnnotation.swift */; };
 		96081F772AFAEB0E006A8FE7 /* out-of-bounds-op40.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */; };
 		960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */; };
 		960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960F28F32F453CDB00145557 /* SoundingSelection.swift */; };
@@ -104,6 +105,7 @@
 
 /* Begin PBXFileReference section */
 		960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchMiddleware.swift; sourceTree = "<group>"; };
+		9605117C2F48F36900140CF7 /* SoundingMapAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingMapAnnotation.swift; sourceTree = "<group>"; };
 		96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "out-of-bounds-op40.txt"; sourceTree = "<group>"; };
 		960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		960F28F32F453CDB00145557 /* SoundingSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelection.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
+				9605117C2F48F36900140CF7 /* SoundingMapAnnotation.swift */,
 				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
 				96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */,
 				964998652B6A20A700899BC7 /* TouchCatchView.swift */,
@@ -547,6 +550,7 @@
 				96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */,
 				96693FB22B746C5900697291 /* ZoomedSquare.swift in Sources */,
 				960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */,
+				9605117D2F48F36900140CF7 /* SoundingMapAnnotation.swift in Sources */,
 				969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */,
 				96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */,
 				967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */,
