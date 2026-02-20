@@ -189,9 +189,9 @@ final class ClosestTimeTests: XCTestCase {
         // RAOB minus one hour is most recent
         XCTAssertEqual(oneHourAgo.soundingSelectionTime(forModelType: .sounding, referenceDate: referenceDate), .now)
         
-        // RAOB 12 hours ago is most recent
+        // RAOB 12 hours ago is one sounding back
         let twelveHoursAgo = referenceDate.addingTimeInterval(-12.0 * 60.0 * 60.0)
-        XCTAssertEqual(twelveHoursAgo.soundingSelectionTime(forModelType: .sounding, referenceDate: referenceDate), .now)
+        XCTAssertEqual(twelveHoursAgo.soundingSelectionTime(forModelType: .sounding, referenceDate: referenceDate), .numberOfSoundingsAgo(1))
         
         // RAOB 24 hours ago is +2
         let dayAgo = referenceDate.addingTimeInterval(-24.0 * 60.0 * 60.0)
