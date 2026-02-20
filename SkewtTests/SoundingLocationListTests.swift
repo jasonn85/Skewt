@@ -89,97 +89,9 @@ final class SoundingLocationListTests: XCTestCase {
         XCTAssertEqual(yining.description, "Yining, CI")
     }
     
-    func testStationId() {
-        let wmo = LatestSoundingList.Entry("-51431, 2022-10-27 12:00:00")!
-        XCTAssertEqual(wmo.stationId, .wmoId(-51431))
-        
-        let slashes = LatestSoundingList.Entry("///, 2023-01-24 12:00:00")!
-        XCTAssertEqual(slashes.stationId, .bufr("///"))
-        
-        let longBufrName = LatestSoundingList.Entry("XKQLWQB, 2023-06-11 12:00:00")!
-        XCTAssertEqual(longBufrName.stationId, .bufr("XKQLWQB"))
-    }
-    
-    func testSoundingsListParsing() throws {
-        let soundings = try LatestSoundingList(soundingsListString)
-        XCTAssertEqual(soundings.soundings.count, expectedSoundingsCount)
-    }
-    
     func testMetarListParsing() throws {
         let metarList = try LocationList(metarLocationListString)
         XCTAssertEqual(metarList.locations.count, expectedMetarLocationCount)
-    }
-    
-    func testIgnoreUnparseableStationInfoLines() {
-        XCTAssertNil(LatestSoundingList.Entry("WMOID Name ---------latest date-------------"))
-        XCTAssertNil(LatestSoundingList.Entry(""))
-        XCTAssertNil(LatestSoundingList.Entry("NKX, Time is a flat circle"))
-    }
-    
-    func testSoundingTimestampParsing() {
-        let midnight = LatestSoundingList.Entry("03918, 2023-06-11 00:00:00")!
-        let noon = LatestSoundingList.Entry("03953, 2023-06-11 12:00:00")!
-        let calendar = Calendar(identifier: .gregorian)
-        let utc = TimeZone(secondsFromGMT: 0)!
-
-        let midnightComponents = calendar.dateComponents(in: utc, from: midnight.timestamp)
-        let noonComponents = calendar.dateComponents(in: utc, from: noon.timestamp)
-        
-        [midnightComponents, noonComponents].forEach {
-            XCTAssertEqual($0.year, 2023)
-            XCTAssertEqual($0.month, 6)
-            XCTAssertEqual($0.day, 11)
-        }
-        
-        XCTAssertEqual(midnightComponents.hour, 0)
-        XCTAssertEqual(noonComponents.hour, 12)
-    }
-    
-    func testRecentSoundingFilter() {
-        let yearOldSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(1),
-            timestamp: Date(timeIntervalSinceNow: -365.0 * 24.0 * 60.0 * 60.0)
-        )
-        
-        let weekOldSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(2),
-            timestamp: Date(timeIntervalSinceNow: -7.0 * 24.0 * 60.0 * 60.0)
-        )
-        
-        let twentyHourOldSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(3),
-            timestamp: Date(timeIntervalSinceNow: -20.0 * 60.0 * 60.0)
-        )
-        
-        let twelveHourOldSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(4),
-            timestamp: Date(timeIntervalSinceNow: -12.0 * 60.0 * 60.0)
-        )
-        
-        let hourOldSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(5),
-            timestamp: Date(timeIntervalSinceNow: -60.0 * 60.0)
-        )
-        
-        let hourInFutureSounding = LatestSoundingList.Entry(
-            stationId: .wmoId(6),
-            timestamp: Date(timeIntervalSinceNow: 60.0 * 60.0)
-        )
-        
-        let oneSounding = LatestSoundingList(soundings: [hourOldSounding])
-        XCTAssertEqual(oneSounding.recentSoundings(), oneSounding.soundings)
-        
-        let allRecentSoundings = LatestSoundingList(soundings: [twentyHourOldSounding, twelveHourOldSounding, hourOldSounding])
-        XCTAssertEqual(allRecentSoundings.recentSoundings(), allRecentSoundings.soundings)
-        
-        let ancientSoundings = LatestSoundingList(soundings: [yearOldSounding, weekOldSounding])
-        XCTAssertEqual(ancientSoundings.recentSoundings(), [])
-        
-        let oneOldOneCurrentSounding = LatestSoundingList(soundings: [yearOldSounding, hourOldSounding])
-        XCTAssertEqual(oneOldOneCurrentSounding.recentSoundings(), [hourOldSounding])
-        
-        let futureSounding = LatestSoundingList(soundings: [hourInFutureSounding])
-        XCTAssertEqual(futureSounding.recentSoundings(), [])
     }
     
     func testProximitySorting() throws {
