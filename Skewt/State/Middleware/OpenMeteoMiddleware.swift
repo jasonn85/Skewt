@@ -96,7 +96,9 @@ extension OpenMeteoSoundingListRequest {
         case .now:
             startHour = nil
         case .numberOfSoundingsAgo(let soundingsAgoCount):
-            startHour = .now.addingTimeInterval(-Double(soundingsAgoCount) * 60.0 * 60.0)
+            startHour = soundingsAgoCount == 0
+                ? nil
+                : .now.addingTimeInterval(-Double(soundingsAgoCount) * 60.0 * 60.0)
         case .relative(let interval):
             startHour = .now.addingTimeInterval(interval)
         case .specific(let date):
