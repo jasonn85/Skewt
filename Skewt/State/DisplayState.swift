@@ -12,6 +12,7 @@ struct DisplayState: Codable {
     enum DialogSelection: Hashable, Codable {
         case displayOptions
         case locationSelection(LocationDialogSelection)
+        case locationMap
     }
     
     enum LocationDialogSelection: Codable {

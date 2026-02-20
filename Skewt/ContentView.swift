@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import MapKit
 
 class TimeSelectDebouncer: ObservableObject {
     @Published var time = SoundingSelection.Time.now
@@ -186,6 +187,14 @@ struct ContentView: View {
             .tag(DisplayState.DialogSelection.locationSelection(.sounding))
             
             NavigationStack {
+                map
+            }
+            .tabItem {
+                Label("Map", systemImage: "map")
+            }
+            .tag(DisplayState.DialogSelection.locationMap)
+            
+            NavigationStack {
                 LocationSelectionView(listType: .favoritesAndRecents)
                     .environmentObject(store)
             }
@@ -202,6 +211,33 @@ struct ContentView: View {
                 Label("Options", systemImage: "slider.horizontal.3")
             }
             .tag(DisplayState.DialogSelection.displayOptions)
+        }
+    }
+    
+    @ViewBuilder
+    private var map: some View {
+        VStack {
+            Map(
+                initialPosition: initialMapPosition,
+                interactionModes: [.pan, .zoom]
+            ) {
+                if let stationIds = store.state.recentSoundings.soundingList?.messagesByStationId.keys {
+                    ForEach(Array(stationIds), id: \.self) { stationId in
+                        if let location = LocationList.allLocations.locations
+                            .first(where: { $0.wmoId == stationId }) {
+                    
+                            Annotation("\(stationId)", coordinate: location.coordinate) {
+                                Rectangle()
+                                    .foregroundStyle(.blue)
+                                    .frame(width: 100, height: 100)
+                            }
+                        }
+                    }
+                }
+            }
+            .mapControls {
+                MapUserLocationButton()
+            }
         }
     }
     
@@ -273,6 +309,20 @@ struct ContentView: View {
                 hourInterval: SoundingSelection.ModelType.sounding.hourInterval
             )
         }
+    }
+    
+    private var initialMapPosition: MapCameraPosition {
+        let location = store.state.locationState.locationIfKnown ?? .denver
+        
+        return .camera(
+            MapCamera(
+                centerCoordinate: CLLocationCoordinate2D(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude
+                ),
+                distance: 1_000_000  // 1,000 km
+            )
+        )
     }
     
     private var statusText: String? {

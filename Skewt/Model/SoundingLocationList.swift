@@ -24,6 +24,9 @@ struct LocationList: Codable {
         var description: String
         
         var id: String { name }
+        var coordinate: CLLocationCoordinate2D {
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
     }
     
     var locations: [Location]
