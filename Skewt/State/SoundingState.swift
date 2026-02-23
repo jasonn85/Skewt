@@ -190,7 +190,8 @@ extension SoundingState {
 
         case .requestFailed(let error):
             state.lastError = error
-            resolve(state: &state, forceReload: false)
+            state.loadIntent = nil
+            state.resolvedSounding = nil
         }
 
         return state
