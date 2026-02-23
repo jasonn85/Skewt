@@ -265,6 +265,26 @@ struct SoundingStateTests {
         #expect(resolved.resolvedSounding == nil)
         #expect(resolved.loadIntent == .ncaf(selection))
     }
+
+    @Test("Request failure clears load intent and loading state")
+    func requestFailureClearsLoadingState() {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .closest,
+            time: .now,
+            dataAgeBeforeRefresh: TimeInterval.hours(12)
+        )
+
+        let initial = SoundingState(selection: selection)
+        let loading = SoundingState.reducer(initial, SoundingState.Action.refreshTapped)
+        #expect(loading.loadIntent == .openMeteo(selection))
+        #expect(loading.isLoading)
+
+        let failed = SoundingState.reducer(loading, SoundingState.Action.requestFailed(.lackingLocationPermission))
+        #expect(failed.loadIntent == nil)
+        #expect(failed.lastError == .lackingLocationPermission)
+        #expect(!failed.isLoading)
+    }
 }
 
 private final class NcafTestBundleToken {}

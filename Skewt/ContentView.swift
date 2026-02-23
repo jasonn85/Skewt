@@ -85,6 +85,7 @@ struct ContentView: View {
             }
             
             timeSelectDebouncer.store = store
+            requestLocationIfNeeded()
             
             if case .idle = store.state.recentSoundings.status {
                 store.dispatch(RecentSoundingsState.Action.load)
@@ -96,8 +97,16 @@ struct ContentView: View {
             }
             
             if newPhase == .active {
+                requestLocationIfNeeded()
                 store.dispatch(SoundingState.Action.refreshTapped)
             }
+        }
+        .onChange(of: store.state.currentSoundingState.selection.location) { _, _ in
+            guard appEnvironment.isLive else {
+                return
+            }
+            
+            requestLocationIfNeeded()
         }
     }
     
@@ -302,6 +311,18 @@ struct ContentView: View {
         }
 
         return nil
+    }
+
+    private func requestLocationIfNeeded() {
+        guard store.state.currentSoundingState.selection.requiresLocation else {
+            return
+        }
+
+        guard store.state.locationState.locationIfKnown == nil else {
+            return
+        }
+
+        store.dispatch(LocationState.Action.requestLocation)
     }
 }
 
