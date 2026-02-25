@@ -89,6 +89,7 @@ struct ContentView: View {
             }
             
             timeSelectDebouncer.store = store
+            timeSelectDebouncer.time = store.state.currentSoundingState.selection.time
             requestLocationIfNeeded()
             
             if case .idle = store.state.recentSoundings.status {
@@ -111,6 +112,13 @@ struct ContentView: View {
             }
             
             requestLocationIfNeeded()
+        }
+        .onChange(of: store.state.currentSoundingState.selection.time) { _, newTime in
+            guard timeSelectDebouncer.time != newTime else {
+                return
+            }
+
+            timeSelectDebouncer.time = newTime
         }
         .onChange(of: store.state.currentSoundingState.selection) { _, _ in
             guard horizontalSizeClass == .compact else {
