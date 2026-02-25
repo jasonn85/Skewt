@@ -17,21 +17,45 @@ struct MenuView: View {
     @State private var soundingOrForecast = SoundingOrForecast.forecast
     @State private var forecastModel = SoundingSelection.ForecastModel.automatic
     @State private var location = SoundingSelection.Location.closest
+    let onReturnToSelection: (() -> Void)?
     
     enum SoundingOrForecast {
         case sounding
         case forecast
     }
+
+    init(onReturnToSelection: (() -> Void)? = nil) {
+        self.onReturnToSelection = onReturnToSelection
+    }
     
     var body: some View {
         VStack {
-            Picker("Forecast or Sounding", selection: $soundingOrForecast) {
-                Text("Forecast")
-                    .tag(SoundingOrForecast.forecast)
-                Text("Sounding")
-                    .tag(SoundingOrForecast.sounding)
+            if let onReturnToSelection = onReturnToSelection {
+                HStack {
+                    Spacer()
+                    
+                    Button {
+                        onReturnToSelection()
+                    } label: {
+                        Image(systemName: "chevron.forward")
+                            .font(.body.weight(.semibold))
+                            .frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .padding([.horizontal])
+                }
             }
-            .pickerStyle(.segmented)
+            
+            HStack {
+                Picker("Forecast or Sounding", selection: $soundingOrForecast) {
+                    Text("Forecast")
+                        .tag(SoundingOrForecast.forecast)
+                    Text("Sounding")
+                        .tag(SoundingOrForecast.sounding)
+                }
+                .pickerStyle(.segmented)
+            }
+            .padding()
             
             switch soundingOrForecast {
             case .sounding:
@@ -43,6 +67,7 @@ struct MenuView: View {
         }
         .onAppear {
             configurePickerTypography()
+            requestLocationForNearbyForecastsIfNeeded()
             
             forecastModel = store.state.currentSoundingState
                 .selection.type.forecastModel ?? .automatic
@@ -142,6 +167,14 @@ struct MenuView: View {
     
     private var currentLocation: CLLocationCoordinate2D {
         store.state.locationState.locationIfKnown ?? .denver
+    }
+
+    private func requestLocationForNearbyForecastsIfNeeded() {
+        guard store.state.locationState.locationIfKnown == nil else {
+            return
+        }
+
+        store.dispatch(LocationState.Action.requestLocation)
     }
 }
 

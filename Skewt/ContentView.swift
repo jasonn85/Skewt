@@ -53,7 +53,18 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView(columnVisibility: $splitViewVisibility,
                             preferredCompactColumn: $preferredCompactColumn) {
-            MenuView()
+            // If we're a compact UI, we'll set an action which will make a -> button appear
+            let dismissCompactMenuAction: (() -> Void)? = {
+                guard horizontalSizeClass == .compact else {
+                    return nil
+                }
+                
+                return {
+                    showDetailForCurrentSelection()
+                }
+            }()
+            
+            MenuView(onReturnToSelection: dismissCompactMenuAction)
                 .environmentObject(store)
         } detail: {
             plotView
@@ -107,8 +118,7 @@ struct ContentView: View {
                 return
             }
             
-            preferredCompactColumn = .detail
-            splitViewVisibility = .automatic
+            showDetailForCurrentSelection()
         }
     }
     
@@ -252,6 +262,11 @@ struct ContentView: View {
         }
         
         return location.description
+    }
+
+    private func showDetailForCurrentSelection() {
+        preferredCompactColumn = .detail
+        splitViewVisibility = .automatic
     }
 }
 
