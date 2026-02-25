@@ -116,7 +116,8 @@ extension TimeInterval {
 }
 
 extension LocationList {
-    func locationsSortedByProximity(to location: CLLocation, onlyWmoIds wmoIds: [Int]? = nil) -> [Location] {
+    func locationsSortedByProximity(to coordinate: CLLocationCoordinate2D, onlyWmoIds wmoIds: [Int]? = nil) -> [Location] {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         var locations = self.locations
         
         if let wmoIds = wmoIds {

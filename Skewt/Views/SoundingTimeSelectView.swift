@@ -13,7 +13,7 @@ struct SoundingTimeSelectView: View {
     var hourInterval = SoundingSelection.ModelType.sounding.hourInterval
     let daysRange = 4
     var date: Date = .now
-    @State var location: CLLocation? = nil  // Location for showing proper sunrise/sunset times
+    @State var location: CLLocationCoordinate2D? = nil  // Location for showing proper sunrise/sunset times
     
     private var intervals: [TimeInterval]
     

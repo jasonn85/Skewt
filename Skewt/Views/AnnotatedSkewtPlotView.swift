@@ -24,7 +24,7 @@ struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
     
-    let location: CLLocation?
+    let location: CLLocationCoordinate2D?
     var time: Date? = nil
     
     @State var annotationPoint: UnitPoint? = nil
@@ -137,7 +137,7 @@ struct AnnotatedSkewtPlotView: View {
         return text.size(withAttributes: attributes).height
     }
     
-    init(soundingState: SoundingState, plotOptions: PlotOptions, location: CLLocation? = nil, time: Date? = nil) {
+    init(soundingState: SoundingState, plotOptions: PlotOptions, location: CLLocationCoordinate2D? = nil, time: Date? = nil) {
         self.soundingState = soundingState
         self.plotOptions = plotOptions
         self.location = location

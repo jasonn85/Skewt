@@ -27,10 +27,10 @@ struct LocationState: Codable {
 }
 
 extension LocationState {
-    var locationIfKnown: CLLocation? {
+    var locationIfKnown: CLLocationCoordinate2D? {
         switch status {
         case .locationKnown(let latitude, let longitude, _):
-            return CLLocation(latitude: latitude, longitude: longitude)
+            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         default:
             return nil
         }
@@ -41,6 +41,10 @@ extension LocationState {
     init() {
         status = nil
     }
+}
+
+extension CLLocationCoordinate2D {
+    static let denver = CLLocationCoordinate2D(latitude: 39.87, longitude: -104.67)
 }
 
 extension LocationState.Action: CustomStringConvertible {

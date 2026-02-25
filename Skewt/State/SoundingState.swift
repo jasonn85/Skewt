@@ -299,12 +299,12 @@ private extension SoundingState {
                 return wmoId
             }
 
-            let location = CLLocation(latitude: latitude, longitude: longitude)
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             return LocationList.allLocations
                 .locationsSortedByProximity(to: location)
                 .first { $0.wmoId != nil }?.wmoId
         case .point(let latitude, let longitude):
-            let location = CLLocation(latitude: latitude, longitude: longitude)
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             guard let list = try? LocationList.forType(.sounding) else {
                 return nil
             }

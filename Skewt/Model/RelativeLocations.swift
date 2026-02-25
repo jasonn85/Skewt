@@ -69,12 +69,12 @@ extension OrdinalDirection {
     }
 }
 
-extension CLLocation {
-    func bearing(toLocation otherLocation: CLLocation) -> Degrees {
-        let c1 = (latitude: Degrees(self.coordinate.latitude).inRadians,
-                  longitude: Degrees(self.coordinate.longitude).inRadians)
-        let c2 = (latitude: Degrees(otherLocation.coordinate.latitude).inRadians,
-                  longitude: Degrees(otherLocation.coordinate.longitude).inRadians)
+extension CLLocationCoordinate2D {
+    func bearing(toLocation otherLocation: CLLocationCoordinate2D) -> Degrees {
+        let c1 = (latitude: Degrees(self.latitude).inRadians,
+                  longitude: Degrees(self.longitude).inRadians)
+        let c2 = (latitude: Degrees(otherLocation.latitude).inRadians,
+                  longitude: Degrees(otherLocation.longitude).inRadians)
         
         let dLongitude = c2.longitude - c1.longitude
         let y = sin(dLongitude) * cos(c2.latitude)

@@ -72,7 +72,7 @@ extension Middlewares {
 }
 
 extension OpenMeteoSoundingListRequest {
-    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocation? = nil) throws {
+    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocationCoordinate2D? = nil) throws {
         let latitude: Double
         let longitude: Double
         
@@ -82,8 +82,8 @@ extension OpenMeteoSoundingListRequest {
                 throw OpenMeteoRequestError.missingLocation
             }
             
-            latitude = location.coordinate.latitude
-            longitude = location.coordinate.longitude
+            latitude = location.latitude
+            longitude = location.longitude
         case .point(let pointLatitude, let pointLongitude),
                 .named(_, let pointLatitude, let pointLongitude):
             latitude = pointLatitude
