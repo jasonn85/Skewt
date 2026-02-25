@@ -31,6 +31,8 @@ struct ContentView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     
     @State private var selectingTime = false
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
+    @State private var splitViewVisibility: NavigationSplitViewVisibility = .automatic
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -48,7 +50,26 @@ struct ContentView: View {
     }
     
     var body: some View {
-        EmptyView()
+        NavigationSplitView(columnVisibility: $splitViewVisibility,
+                            preferredCompactColumn: $preferredCompactColumn) {
+            EmptyView()
+        } detail: {
+            plotView
+                .toolbar(.hidden, for: .navigationBar)
+                .frame(maxHeight: .infinity)
+                .overlay(alignment: .top) {
+                    Button {
+                        preferredCompactColumn = .content
+                        splitViewVisibility = .doubleColumn
+                    } label: {
+                        header
+                            .padding([.all], 14)
+                    }
+                    .buttonStyle(.plain)
+                    .glassEffect(in: RoundedRectangle(cornerRadius: 20))
+                }
+        }
+        .fontDesign(.monospaced)
         .onAppear {
             guard appEnvironment.isLive else {
                 return
@@ -88,15 +109,33 @@ struct ContentView: View {
                 location: store.state.locationState.locationIfKnown,
                 time: store.state.currentSoundingState.selection.timeAsConcreteDate
             )
-                .onAppear() {
-                    store.dispatch(LocationState.Action.requestLocation)
-                }
             
             footer
             
             if selectingTime {
                 timeSelection
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var header: some View {
+        VStack {
+            HStack {
+                if store.state.currentSoundingState.selection.location == .closest {
+                    Image(systemName: "location.fill")
+                        .font(.title2)
+                        .foregroundStyle(.blue)
+                }
+                
+                Text(store.state.currentSoundingState.selection.description)
+                    .font(.title2)
+                    .fontWeight(.bold)
+            }
+            
+            Text(store.state.currentSoundingState.selection.type.subtitle)
+                .font(.footnote)
+                .opacity(0.7)
         }
     }
     
@@ -185,21 +224,21 @@ struct ContentView: View {
     }
 }
 
+fileprivate extension SoundingSelection.ModelType {
+    var subtitle: String {
+        switch self {
+        case .sounding:
+            "Sounding"
+        case .forecast(let model):
+            "Model: \(model.description)"
+        }
+    }
+}
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
             .environmentObject(Store<SkewtState>.previewStore)
             .environment(\.appEnvironment, AppEnvironment(isLive: false))
-    }
-}
-
-extension SoundingSelection.ModelType: CustomStringConvertible {
-    var description: String {
-        switch self {
-        case .forecast(_):
-            return "Forecast"
-        case .sounding:
-            return "Sounding"
-        }
     }
 }
