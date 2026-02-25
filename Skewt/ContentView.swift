@@ -27,7 +27,6 @@ struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
     
-    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.appEnvironment) private var appEnvironment
     
@@ -49,36 +48,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-        let vertical = verticalSizeClass != .compact
-        
-        Group {
-            if isPhone {
-                if vertical {
-                    VStack {
-                        plotView
-                            .layoutPriority(1.0)
-                        
-                        tabView
-                            .frame(minHeight: 350.0)
-                    }
-                } else {
-                    HStack {
-                        locationNavigationStack
-
-                        plotView
-                    }
-                }
-            } else {
-                NavigationSplitView(columnVisibility: splitViewVisibility) {
-                    locationNavigationStack
-                } detail: {
-                    plotView
-                        .navigationBarTitleDisplayMode(.inline)
-                }
-                .navigationSplitViewStyle(.balanced)
-            }
-        }
+        EmptyView()
         .onAppear {
             guard appEnvironment.isLive else {
                 return
@@ -110,48 +80,8 @@ struct ContentView: View {
         }
     }
     
-    @ViewBuilder
-    private var locationNavigationStack: some View {
-        NavigationStack {
-            LocationSelectionView(listType: .modelType(.forecast(.automatic)))
-                .environmentObject(store)
-                .toolbar {
-                    Button("Options", systemImage: "slider.horizontal.3") {
-                        store.dispatch(DisplayState.Action.showDialog(.displayOptions))
-                    }
-                }
-                .navigationDestination(isPresented: Binding<Bool>(get: {
-                    store.state.displayState.dialogSelection == .displayOptions
-                }, set: { _ in })) {
-                    DisplayOptionsView()
-                        .environmentObject(store)
-                        .navigationTitle("Options")
-                }
-        }
-        .navigationTitle("Locations")
-    }
-    
-    private var splitViewVisibility: Binding<NavigationSplitViewVisibility> {
-        Binding {
-            switch store.state.displayState.dialogSelection {
-            case .displayOptions, .locationSelection(_):
-                return .doubleColumn
-            default:
-                return .detailOnly
-            }
-        } set: {
-            if $0 == .detailOnly {
-                store.dispatch(DisplayState.Action.hideDialog)
-            } else {
-                store.showLastLocationDialog()
-            }
-        }
-    }
-    
     private var plotView: some View {
-        VStack (alignment: .center) {
-            header
-            
+        VStack (alignment: .center) {            
             AnnotatedSkewtPlotView(
                 soundingState: store.state.currentSoundingState,
                 plotOptions: store.state.plotOptions,
@@ -166,77 +96,6 @@ struct ContentView: View {
             
             if selectingTime {
                 timeSelection
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private var tabView: some View {
-        TabView(selection: Binding<DisplayState.DialogSelection>(
-            get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
-            set: { store.dispatch(DisplayState.Action.showDialog($0)) }
-        )) {
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.forecast(.automatic)))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.forecast))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.sounding))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Soundings", systemImage: "balloon")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .favoritesAndRecents)
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Recents", systemImage: "list.bullet")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.recent))
-            
-            NavigationStack {
-                DisplayOptionsView()
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Options", systemImage: "slider.horizontal.3")
-            }
-            .tag(DisplayState.DialogSelection.displayOptions)
-        }
-    }
-    
-    private var header: some View {
-        HStack {
-            if store.state.currentSoundingState.selection.requiresLocation {
-                Image(systemName: "location")
-            }
-            
-            Text(store.state.currentSoundingState.selection.type.description)
-                
-            
-            switch store.state.currentSoundingState.selection.location {
-            case .named(let locationName, _, _):
-                Text("(\(locationName))")
-            case .point(_, _):
-                Text("(selected location)")
-            case .closest:
-                EmptyView()
-            }
-        }
-        .font(.headline.weight(.semibold))
-        .foregroundColor(.blue)
-        .onTapGesture {
-            withAnimation {
-                store.showLastLocationDialog()
             }
         }
     }
@@ -323,12 +182,6 @@ struct ContentView: View {
         }
 
         store.dispatch(LocationState.Action.requestLocation)
-    }
-}
-
-extension Store<SkewtState> {
-    func showLastLocationDialog() {
-        dispatch(DisplayState.Action.showDialog(.locationSelection(state.displayState.lastLocationDialogSelection)))
     }
 }
 
