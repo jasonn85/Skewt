@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import MapKit
 #if os(iOS)
 import UIKit
 #endif
@@ -135,7 +136,9 @@ struct MenuView: View {
     @ViewBuilder
     private var currentLocationView: some View {
         HStack {
-            Image(systemName: "location.fill")
+            Image(systemName: store.state.currentSoundingState.selection.location == .closest
+                  ? "location.fill"
+                  : "location")
                 .foregroundStyle(.blue)
             
             Text("Current location")
@@ -170,13 +173,37 @@ struct MenuView: View {
             longitude: forecastLocation.longitude
         )
 
-        HStack {
-            Text(forecastLocation.description)
+        VStack {
+            HStack {
+                Text(forecastLocation.description)
+                
+                Spacer()
+                
+                if location == rowLocation {
+                    Image(systemName: "checkmark")
+                }
+            }
             
-            Spacer()
-            
-            if location == rowLocation {
-                Image(systemName: "checkmark")
+            if let ourCoordinate = store.state.locationState.locationIfKnown {
+                let ourLocation = CLLocation(latitude: ourCoordinate.latitude, longitude: ourCoordinate.longitude)
+                let thisLocation = CLLocation(latitude: forecastLocation.latitude, longitude: forecastLocation.longitude)
+                let distance = ourLocation.distance(from: thisLocation)
+                let bearing = ourCoordinate.bearing(toLocation: thisLocation.coordinate)
+                let distanceString = distanceFormatter.string(fromDistance: distance)
+                let bearingString = OrdinalDirection.closest(toBearing: bearing)
+                
+                HStack {
+                    Text("\(distanceString) \(bearingString.abbreviation)")
+                        .opacity(0.7)
+                    
+                    Image(systemName: "location.north.fill")
+                        .foregroundColor(Color("DirectionalArrow"))
+                        .rotationEffect(Angle(degrees: bearing))
+                        .padding([.horizontal], 4)
+                    
+                    Spacer()
+                }
+                .font(.footnote)
             }
         }
         .contentShape(Rectangle())
@@ -208,6 +235,13 @@ struct MenuView: View {
         
         return Array(locations.prefix(count))
     }
+    
+    private let distanceFormatter: MKDistanceFormatter = {
+        let formatter = MKDistanceFormatter()
+        formatter.unitStyle = .abbreviated
+        
+        return formatter
+    }()
     
     private func configurePickerTypography() {
         #if os(iOS)
