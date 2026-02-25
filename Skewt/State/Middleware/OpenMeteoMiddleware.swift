@@ -105,13 +105,23 @@ extension OpenMeteoSoundingListRequest {
             startHour = date
         }
         
+        let model: SoundingSelection.ForecastModel?
+
+        switch selection.type {
+        case .sounding:
+            model = nil
+        case .forecast(let forecastModel):
+            model = forecastModel
+        }
+
         self.init(
             latitude: latitude,
             longitude: longitude,
             hourly: OpenMeteoSoundingListRequest.HourlyValue.skewtHourlyValues,
             forecast_hours: 12,
             past_hours: 12,
-            start_hour: startHour
+            start_hour: startHour,
+            model: model
         )
     }
 }

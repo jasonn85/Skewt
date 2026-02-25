@@ -139,4 +139,34 @@ struct OpenMeteoRequestTests {
         #expect(encodedStart == dateString)
         #expect(encodedEnd == dateString)
     }
+
+    @Test("Request from sounding selection includes non-automatic model")
+    func fromSoundingSelectionIncludesModel() throws {
+        let selection = SoundingSelection(
+            type: .forecast(.gfs025),
+            location: .named(name: "DEN", latitude: 39.7392, longitude: -104.9903),
+            time: .now,
+            dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .forecast(.gfs025))
+        )
+
+        let request = try OpenMeteoSoundingListRequest(fromSoundingSelection: selection)
+        let modelValue = request.queryItems?.first(where: { $0.name == "model" })?.value
+
+        #expect(modelValue == SoundingSelection.ForecastModel.gfs025.rawValue)
+    }
+
+    @Test("Request from sounding selection omits automatic model")
+    func fromSoundingSelectionOmitsAutomaticModel() throws {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .named(name: "DEN", latitude: 39.7392, longitude: -104.9903),
+            time: .now,
+            dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .forecast(.automatic))
+        )
+
+        let request = try OpenMeteoSoundingListRequest(fromSoundingSelection: selection)
+        let modelItems = request.queryItems?.filter({ $0.name == "model" }) ?? []
+
+        #expect(modelItems.isEmpty)
+    }
 }
