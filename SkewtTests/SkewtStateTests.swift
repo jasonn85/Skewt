@@ -15,7 +15,6 @@ final class SkewtStateTests: XCTestCase {
 
     func testCurrentSoundingSavedInRecents() {
         let originalState = SkewtState(
-            displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
@@ -34,7 +33,6 @@ final class SkewtStateTests: XCTestCase {
     
     func testChangingTimeDoesNotSaveNewRecent() {
         let originalState = SkewtState(
-            displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
@@ -54,7 +52,6 @@ final class SkewtStateTests: XCTestCase {
     func testRecentsIsCulled() {
         let failsafe = 1000
         var state = SkewtState(
-            displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
@@ -86,7 +83,6 @@ final class SkewtStateTests: XCTestCase {
         let selection = closestLatestForecast
         
         let originalState = SkewtState(
-            displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: closestLatestForecast),
             pinnedSelections: [],
             recentSelections: [closestLatestForecast],
@@ -108,7 +104,6 @@ final class SkewtStateTests: XCTestCase {
         let selection = closestLatestForecast
         
         let pinnedState = SkewtState(
-            displayState: DisplayState(),
             currentSoundingState: SoundingState(selection: selection),
             pinnedSelections: [selection],
             recentSelections: [selection],

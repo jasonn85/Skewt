@@ -96,7 +96,7 @@ final class SoundingLocationListTests: XCTestCase {
     
     func testProximitySorting() throws {
         let metarList = try LocationList(metarLocationListString)
-        let nearSanLocation = CLLocation(latitude: 32.74, longitude: -117.22)
+        let nearSanLocation = CLLocationCoordinate2D(latitude: 32.74, longitude: -117.22)
         
         let sorted = metarList.locationsSortedByProximity(to: nearSanLocation)
         XCTAssertEqual(sorted.count, metarList.locations.count)

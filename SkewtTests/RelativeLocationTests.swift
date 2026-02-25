@@ -10,15 +10,15 @@ import XCTest
 import CoreLocation
 
 final class RelativeLocationTests: XCTestCase {
-    let center = CLLocation(latitude: 30.0, longitude: 30.0)
-    let north = CLLocation(latitude: 40.0, longitude: 30.0)
-    let south = CLLocation(latitude: 20.0, longitude: 30.0)
-    let west = CLLocation(latitude: 30.0, longitude: 20.0)
-    let east = CLLocation(latitude: 30.0, longitude: 40.0)
-    let northeast = CLLocation(latitude: 35.0, longitude: 35.0)
-    let southeast = CLLocation(latitude: 25.0, longitude: 35.0)
-    let southwest = CLLocation(latitude: 25.0, longitude: 25.0)
-    let northwest = CLLocation(latitude: 35.0, longitude: 25.0)
+    let center = CLLocationCoordinate2D(latitude: 30.0, longitude: 30.0)
+    let north = CLLocationCoordinate2D(latitude: 40.0, longitude: 30.0)
+    let south = CLLocationCoordinate2D(latitude: 20.0, longitude: 30.0)
+    let west = CLLocationCoordinate2D(latitude: 30.0, longitude: 20.0)
+    let east = CLLocationCoordinate2D(latitude: 30.0, longitude: 40.0)
+    let northeast = CLLocationCoordinate2D(latitude: 35.0, longitude: 35.0)
+    let southeast = CLLocationCoordinate2D(latitude: 25.0, longitude: 35.0)
+    let southwest = CLLocationCoordinate2D(latitude: 25.0, longitude: 25.0)
+    let northwest = CLLocationCoordinate2D(latitude: 35.0, longitude: 25.0)
     
     func testRadiansToDegrees() {
         XCTAssertEqual(Radians(0.0).inDegrees, 0.0)
