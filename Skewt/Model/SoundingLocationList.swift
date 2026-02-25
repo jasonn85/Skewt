@@ -103,12 +103,6 @@ extension LocationList.Location {
     }
 }
 
-extension LocationList.Location {
-    var clLocation: CLLocation {
-        CLLocation(latitude: latitude, longitude: longitude)
-    }
-}
-
 extension TimeInterval {
     static var twentyFourHours: Self {
         60.0 * 60.0 * 24.0
