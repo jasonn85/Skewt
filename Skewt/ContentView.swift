@@ -100,6 +100,10 @@ struct ContentView: View {
             
             requestLocationIfNeeded()
         }
+        .onChange(of: store.state.currentSoundingState.selection) { _, _ in
+            preferredCompactColumn = .detail
+            splitViewVisibility = .automatic
+        }
     }
     
     private var plotView: some View {

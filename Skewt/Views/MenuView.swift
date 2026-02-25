@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 #if os(iOS)
 import UIKit
 #endif
@@ -15,6 +16,7 @@ struct MenuView: View {
 
     @State private var soundingOrForecast = SoundingOrForecast.forecast
     @State private var forecastModel = SoundingSelection.ForecastModel.automatic
+    @State private var location = SoundingSelection.Location.closest
     
     enum SoundingOrForecast {
         case sounding
@@ -40,7 +42,38 @@ struct MenuView: View {
                     }
                 }
                 .buttonStyle(.glass)
-                
+                                
+                List(forecastLocations, id: \.self) { forecastLocation in
+                    let rowLocation = SoundingSelection.Location.named(
+                        name: forecastLocation.name,
+                        latitude: forecastLocation.latitude,
+                        longitude: forecastLocation.longitude
+                    )
+
+                    HStack {
+                        Text(forecastLocation.description)
+                        
+                        Spacer()
+                        
+                        if location == rowLocation {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        location = rowLocation
+                        
+                        store.dispatch(
+                            SoundingState.Action.selection(
+                                SoundingSelection.Action.selectModelTypeAndLocation(
+                                    .forecast(forecastModel),
+                                    rowLocation,
+                                    .now
+                                )
+                            )
+                        )
+                    }
+                }
             }
         }
         .onAppear {
@@ -48,7 +81,19 @@ struct MenuView: View {
             
             forecastModel = store.state.currentSoundingState
                 .selection.type.forecastModel ?? .automatic
+            
+            location = store.state.currentSoundingState.selection.location
         }
+    }
+    
+    private var forecastLocations: [LocationList.Location] {
+        let count = 10
+        
+        guard let locations = try? LocationList.forType(.sounding).locationsSortedByProximity(to: currentLocation) else {
+            return []
+        }
+        
+        return Array(locations.prefix(count))
     }
     
     private func configurePickerTypography() {
@@ -62,6 +107,10 @@ struct MenuView: View {
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .normal)
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
         #endif
+    }
+    
+    private var currentLocation: CLLocationCoordinate2D {
+        store.state.locationState.locationIfKnown ?? .denver
     }
 }
 
