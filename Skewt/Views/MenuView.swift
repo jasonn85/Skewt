@@ -78,14 +78,23 @@ struct MenuView: View {
     
     @ViewBuilder
     private var forecastSelectionView: some View {
-        Menu("Model: \(forecastModel.description)") {
+        Menu {
             Picker("Model", selection: $forecastModel) {
                 ForEach(SoundingSelection.ForecastModel.allCases, id: \.self) {
                     Text($0.description)
                 }
             }
+        } label: {
+            HStack {
+                Text("Model: \(forecastModel.description)")
+                    .padding([.horizontal])
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding([.horizontal])
+        .padding([.horizontal, .bottom])
         .buttonStyle(.glass)
         .onChange(of: forecastModel) { _, newForecastModel in
             let modelType = store.state.currentSoundingState.selection.type
