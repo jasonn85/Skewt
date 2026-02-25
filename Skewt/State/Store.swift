@@ -68,7 +68,6 @@ struct SkewtState: Codable {
         case unpinSelection(SoundingSelection)
     }
     
-    var displayState: DisplayState
     var currentSoundingState: SoundingState
     var pinnedSelections: [SoundingSelection]
     var recentSelections: [SoundingSelection]
@@ -81,7 +80,6 @@ struct SkewtState: Codable {
 // Default initializer
 extension SkewtState {
     init() {
-        displayState = DisplayState.saved ?? DisplayState()
         currentSoundingState = SoundingState(
             selection: SoundingSelection.savedCurrentSelection ?? SoundingSelection()
         )
@@ -98,7 +96,6 @@ extension SkewtState {
     static let reducer: Reducer<Self> = { state, action in
         var state = state
         
-        state.displayState = DisplayState.reducer(state.displayState, action)
         state.currentSoundingState = SoundingState.reducer(state.currentSoundingState, action)
         state.plotOptions = PlotOptions.reducer(state.plotOptions, action)
         state.locationState = LocationState.reducer(state.locationState, action)

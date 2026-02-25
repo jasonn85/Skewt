@@ -48,7 +48,6 @@ extension Store {
         
         return Store<SkewtState>(
             initial: SkewtState(
-                displayState: DisplayState(),
                 currentSoundingState: soundingState,
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],

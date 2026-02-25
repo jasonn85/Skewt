@@ -58,10 +58,6 @@ extension Middlewares {
             UserDefaults.standard.save(state.plotOptions, forKey: .plotOptions)
         }
         
-        if action is DisplayState.Action {
-            UserDefaults.standard.save(state.displayState, forKey: .displayState)
-        }
-        
         return Empty().eraseToAnyPublisher()
     }
 }
@@ -75,20 +71,6 @@ extension SoundingSelection {
 extension PlotOptions {
     static var saved: PlotOptions? {
         UserDefaults.standard.loadValue(forKey: .plotOptions) as Self?
-    }
-}
-
-extension DisplayState {
-    static var saved: DisplayState? {
-        guard let savedDisplayState = UserDefaults.standard.loadValue(forKey: .displayState) as DisplayState? else {
-            return nil
-        }
-        
-        return DisplayState(
-            dialogSelection: nil,
-            lastLocationDialogSelection: savedDisplayState.lastLocationDialogSelection,
-            forecastSelectionState: savedDisplayState.forecastSelectionState
-        )
     }
 }
 

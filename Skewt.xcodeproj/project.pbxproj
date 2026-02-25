@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */; };
 		96081F772AFAEB0E006A8FE7 /* out-of-bounds-op40.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */; };
 		960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */; };
 		960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960F28F32F453CDB00145557 /* SoundingSelection.swift */; };
@@ -32,7 +31,6 @@
 		96510CF92F443EE60079F22A /* UWYCSVSoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96510CF82F443EE60079F22A /* UWYCSVSoundingTests.swift */; };
 		96510CFB2F443F490079F22A /* uwySounding.csv in Resources */ = {isa = PBXBuildFile; fileRef = 96510CFA2F443F490079F22A /* uwySounding.csv */; };
 		96590BA22A1D6562001143DB /* HourlyTimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */; };
-		965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */; };
 		965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D66582A52A09A0015FB4B /* RelativeLocations.swift */; };
 		965D665B2A52A1E40015FB4B /* RelativeLocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */; };
 		9664EBEA2F44FB3800656ADE /* RecentSoundingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9664EBE92F44FB3800656ADE /* RecentSoundingsState.swift */; };
@@ -40,12 +38,10 @@
 		96693FB22B746C5900697291 /* ZoomedSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96693FB12B746C5900697291 /* ZoomedSquare.swift */; };
 		967185E22F340928001A5FEB /* ForecastModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967185E12F340927001A5FEB /* ForecastModels.swift */; };
 		9675D33F2A71B4BC00CA1435 /* SoundingTimeSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */; };
-		967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24242A366064009262D9 /* SoundingLocationList.swift */; };
 		967E24272A3660F2009262D9 /* raob.short in Resources */ = {isa = PBXBuildFile; fileRef = 967E24262A3660F2009262D9 /* raob.short */; };
 		967E24292A366110009262D9 /* SoundingLocationListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E24282A366110009262D9 /* SoundingLocationListTests.swift */; };
 		967E242B2A3670F6009262D9 /* latest_pbraob.txt in Resources */ = {isa = PBXBuildFile; fileRef = 967E242A2A3670F6009262D9 /* latest_pbraob.txt */; };
 		967E2D052A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */; };
-		967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2B2A4299A600034A78 /* DisplayState.swift */; };
 		967FAF2E2A4386CB00034A78 /* SkewtStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */; };
 		968180892F3898440027FD17 /* Current.rawins in Resources */ = {isa = PBXBuildFile; fileRef = 968180882F3898440027FD17 /* Current.rawins */; };
 		9681808B2F3898920027FD17 /* NCAFSoundingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9681808A2F3898920027FD17 /* NCAFSoundingList.swift */; };
@@ -59,6 +55,7 @@
 		969B8BCA2B0FB6D8002D0F20 /* AnimatedWindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969B8BC92B0FB6D8002D0F20 /* AnimatedWindView.swift */; };
 		96A2A4D02F3AF24E00762E8D /* NCAFReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A2A4CF2F3AF24C00762E8D /* NCAFReport.swift */; };
 		96A2A4D22F3AF2D000762E8D /* NCAFSoundingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A2A4D12F3AF2CC00762E8D /* NCAFSoundingMessage.swift */; };
+		96A6A6B32F4EB033003442F4 /* SoundingLocationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A6A6B22F4EB033003442F4 /* SoundingLocationList.swift */; };
 		96A8F5E3299DAC3E0021A170 /* SkewtApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */; };
 		96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5E4299DAC3E0021A170 /* ContentView.swift */; };
 		96A8F5E7299DAC3F0021A170 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96A8F5E6299DAC3F0021A170 /* Assets.xcassets */; };
@@ -69,7 +66,6 @@
 		96B436E32B6AF73700C8A01A /* ZoomedSquareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */; };
 		96B46FEF2AB4EA01008AA3A1 /* ClosestTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */; };
 		96B46FF12AB4F8AE008AA3A1 /* ClosestTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */; };
-		96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CE4AE22BF7EAF0008D1DE9 /* LocationSelectionView.swift */; };
 		96CF5E782CEAFECF004A139A /* OpenMeteoRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CF5E772CEAFECF004A139A /* OpenMeteoRequestTests.swift */; };
 		96D30DF62F46B3E300A18B4F /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D30DF52F46B3E300A18B4F /* AppEnvironment.swift */; };
 		96D30F302A83581200986E7E /* WindBarb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D30F2F2A83581200986E7E /* WindBarb.swift */; };
@@ -103,7 +99,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchMiddleware.swift; sourceTree = "<group>"; };
 		96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "out-of-bounds-op40.txt"; sourceTree = "<group>"; };
 		960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		960F28F32F453CDB00145557 /* SoundingSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelection.swift; sourceTree = "<group>"; };
@@ -128,7 +123,6 @@
 		96510CF82F443EE60079F22A /* UWYCSVSoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UWYCSVSoundingTests.swift; sourceTree = "<group>"; };
 		96510CFA2F443F490079F22A /* uwySounding.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = uwySounding.csv; sourceTree = "<group>"; };
 		96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyTimeSelectView.swift; sourceTree = "<group>"; };
-		965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelectionRow.swift; sourceTree = "<group>"; };
 		965D66582A52A09A0015FB4B /* RelativeLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocations.swift; sourceTree = "<group>"; };
 		965D665A2A52A1E40015FB4B /* RelativeLocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelativeLocationTests.swift; sourceTree = "<group>"; };
 		9664EBE92F44FB3800656ADE /* RecentSoundingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentSoundingsState.swift; sourceTree = "<group>"; };
@@ -136,12 +130,10 @@
 		96693FB12B746C5900697291 /* ZoomedSquare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquare.swift; sourceTree = "<group>"; };
 		967185E12F340927001A5FEB /* ForecastModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastModels.swift; sourceTree = "<group>"; };
 		9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingTimeSelectView.swift; sourceTree = "<group>"; };
-		967E24242A366064009262D9 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		967E24262A3660F2009262D9 /* raob.short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = raob.short; sourceTree = "<group>"; };
 		967E24282A366110009262D9 /* SoundingLocationListTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationListTests.swift; sourceTree = "<group>"; };
 		967E242A2A3670F6009262D9 /* latest_pbraob.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = latest_pbraob.txt; sourceTree = "<group>"; };
 		967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMiddleware.swift; sourceTree = "<group>"; };
-		967FAF2B2A4299A600034A78 /* DisplayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayState.swift; sourceTree = "<group>"; };
 		967FAF2D2A4386CB00034A78 /* SkewtStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtStateTests.swift; sourceTree = "<group>"; };
 		968180882F3898440027FD17 /* Current.rawins */ = {isa = PBXFileReference; lastKnownFileType = text; path = Current.rawins; sourceTree = "<group>"; };
 		9681808A2F3898920027FD17 /* NCAFSoundingList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCAFSoundingList.swift; sourceTree = "<group>"; };
@@ -156,6 +148,7 @@
 		969B8BC92B0FB6D8002D0F20 /* AnimatedWindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedWindView.swift; sourceTree = "<group>"; };
 		96A2A4CF2F3AF24C00762E8D /* NCAFReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCAFReport.swift; sourceTree = "<group>"; };
 		96A2A4D12F3AF2CC00762E8D /* NCAFSoundingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCAFSoundingMessage.swift; sourceTree = "<group>"; };
+		96A6A6B22F4EB033003442F4 /* SoundingLocationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingLocationList.swift; sourceTree = "<group>"; };
 		96A8F5DF299DAC3E0021A170 /* Skewt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skewt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A8F5E2299DAC3E0021A170 /* SkewtApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkewtApp.swift; sourceTree = "<group>"; };
 		96A8F5E4299DAC3E0021A170 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -168,7 +161,6 @@
 		96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquareTests.swift; sourceTree = "<group>"; };
 		96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTimeTests.swift; sourceTree = "<group>"; };
 		96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTime.swift; sourceTree = "<group>"; };
-		96CE4AE22BF7EAF0008D1DE9 /* LocationSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSelectionView.swift; sourceTree = "<group>"; };
 		96CF5E772CEAFECF004A139A /* OpenMeteoRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoRequestTests.swift; sourceTree = "<group>"; };
 		96D30DF52F46B3E300A18B4F /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
 		96D30F2F2A83581200986E7E /* WindBarb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindBarb.swift; sourceTree = "<group>"; };
@@ -218,7 +210,6 @@
 			children = (
 				96AA78DA2A2E759D003338D8 /* Middleware */,
 				96D30DF52F46B3E300A18B4F /* AppEnvironment.swift */,
-				967FAF2B2A4299A600034A78 /* DisplayState.swift */,
 				967185E12F340927001A5FEB /* ForecastModels.swift */,
 				9689981F2A17323F005457D6 /* LocationState.swift */,
 				961202642A156B39009423D5 /* PlotOptions.swift */,
@@ -245,15 +236,6 @@
 				96510CF62F44361C0079F22A /* UWYSounding.swift */,
 			);
 			path = "UWY CSV Soundings";
-			sourceTree = "<group>";
-		};
-		965D66572A5293A90015FB4B /* Selection */ = {
-			isa = PBXGroup;
-			children = (
-				96CE4AE22BF7EAF0008D1DE9 /* LocationSelectionView.swift */,
-				965D664F2A528F420015FB4B /* SoundingSelectionRow.swift */,
-			);
-			path = Selection;
 			sourceTree = "<group>";
 		};
 		968180872F3897E80027FD17 /* NCAF RAL Soundings */ = {
@@ -342,7 +324,6 @@
 			children = (
 				96E334EE2A22963A00B90043 /* ConsoleLogMiddleware.swift */,
 				968998212A1759B1005457D6 /* LocationMiddleware.swift */,
-				960092782A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift */,
 				9664EBEB2F44FE0700656ADE /* NCAFSoundingMiddleware.swift */,
 				9623DCB02D21C4C7000A4887 /* OpenMeteoMiddleware.swift */,
 				967E2D042A3D7CAF0074CE1F /* UserDefaultsMiddleware.swift */,
@@ -354,7 +335,6 @@
 		96AA78DB2A2E75E2003338D8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				965D66572A5293A90015FB4B /* Selection */,
 				96337ACE2C3766D600787E2D /* Shaders */,
 				96DFD48D2A030B670095BC79 /* AnnotatedSkewtPlotView.swift */,
 				969B8BC92B0FB6D8002D0F20 /* AnimatedWindView.swift */,
@@ -385,8 +365,8 @@
 				96EF85B02CD0268600414011 /* Sounding.swift */,
 				96F4B06529B165D0006D23BE /* SkewtPlot.swift */,
 				96EF85AE2CCD83A200414011 /* SoundingData.swift */,
+				96A6A6B22F4EB033003442F4 /* SoundingLocationList.swift */,
 				969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */,
-				967E24242A366064009262D9 /* SoundingLocationList.swift */,
 				964A81A42ADDDD2300E3E1EC /* SunTimes.swift */,
 				9629E30429BBB07100C2904E /* Thermodynamics.swift */,
 			);
@@ -523,14 +503,12 @@
 				965D66592A52A09A0015FB4B /* RelativeLocations.swift in Sources */,
 				9664EBEC2F44FE0700656ADE /* NCAFSoundingMiddleware.swift in Sources */,
 				96DFD48E2A030B670095BC79 /* AnnotatedSkewtPlotView.swift in Sources */,
-				965D66502A528F420015FB4B /* SoundingSelectionRow.swift in Sources */,
 				96A8F5E5299DAC3E0021A170 /* ContentView.swift in Sources */,
 				968998202A17323F005457D6 /* LocationState.swift in Sources */,
 				969117902A29165000A5C72D /* PlotStyling.swift in Sources */,
 				96D30DF62F46B3E300A18B4F /* AppEnvironment.swift in Sources */,
 				9675D33F2A71B4BC00CA1435 /* SoundingTimeSelectView.swift in Sources */,
 				96B46FF12AB4F8AE008AA3A1 /* ClosestTime.swift in Sources */,
-				967E24252A366064009262D9 /* SoundingLocationList.swift in Sources */,
 				961202652A156B39009423D5 /* PlotOptions.swift in Sources */,
 				969B8BCA2B0FB6D8002D0F20 /* AnimatedWindView.swift in Sources */,
 				961202632A156B03009423D5 /* SoundingState.swift in Sources */,
@@ -540,11 +518,9 @@
 				96E334F32A2707E700B90043 /* DisplayOptionsView.swift in Sources */,
 				96A2A4D02F3AF24E00762E8D /* NCAFReport.swift in Sources */,
 				960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */,
-				967FAF2C2A4299A600034A78 /* DisplayState.swift in Sources */,
 				96510CF72F44361C0079F22A /* UWYSounding.swift in Sources */,
 				96A2A4D22F3AF2D000762E8D /* NCAFSoundingMessage.swift in Sources */,
 				9681808B2F3898920027FD17 /* NCAFSoundingList.swift in Sources */,
-				96CE4AE32BF7EAF0008D1DE9 /* LocationSelectionView.swift in Sources */,
 				96693FB22B746C5900697291 /* ZoomedSquare.swift in Sources */,
 				960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */,
 				969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */,
@@ -558,7 +534,6 @@
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
 				964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */,
 				96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */,
-				960092792A5A2DE500BCBAD0 /* LocationSearchMiddleware.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96510CF52F4431920079F22A /* UWYSoundingRequest.swift in Sources */,
 				96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */,
@@ -567,6 +542,7 @@
 				96337ACD2C37263100787E2D /* SkyColor.metal in Sources */,
 				9664EBEA2F44FB3800656ADE /* RecentSoundingsState.swift in Sources */,
 				96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */,
+				96A6A6B32F4EB033003442F4 /* SoundingLocationList.swift in Sources */,
 				9629E30529BBB07100C2904E /* Thermodynamics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
