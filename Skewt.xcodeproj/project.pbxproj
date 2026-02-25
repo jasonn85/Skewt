@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		960417432F4EC58100F74778 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960417422F4EC58100F74778 /* MenuView.swift */; };
 		96081F772AFAEB0E006A8FE7 /* out-of-bounds-op40.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */; };
 		960B6EA12A93FC08009BB545 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */; };
 		960F28F42F453CDB00145557 /* SoundingSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 960F28F32F453CDB00145557 /* SoundingSelection.swift */; };
@@ -99,6 +100,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		960417422F4EC58100F74778 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		96081F762AFAEB0E006A8FE7 /* out-of-bounds-op40.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "out-of-bounds-op40.txt"; sourceTree = "<group>"; };
 		960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		960F28F32F453CDB00145557 /* SoundingSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingSelection.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				96E334F22A2707E700B90043 /* DisplayOptionsView.swift */,
 				96590BA12A1D6562001143DB /* HourlyTimeSelectView.swift */,
 				96AA78DD2A2E7760003338D8 /* LineStyleView.swift */,
+				960417422F4EC58100F74778 /* MenuView.swift */,
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
@@ -532,6 +535,7 @@
 				96D30F302A83581200986E7E /* WindBarb.swift in Sources */,
 				967185E22F340928001A5FEB /* ForecastModels.swift in Sources */,
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
+				960417432F4EC58100F74778 /* MenuView.swift in Sources */,
 				964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */,
 				96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,

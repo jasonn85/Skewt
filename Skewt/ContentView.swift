@@ -52,7 +52,8 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView(columnVisibility: $splitViewVisibility,
                             preferredCompactColumn: $preferredCompactColumn) {
-            EmptyView()
+            MenuView()
+                .environmentObject(store)
         } detail: {
             plotView
                 .toolbar(.hidden, for: .navigationBar)
