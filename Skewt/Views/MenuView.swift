@@ -33,62 +33,12 @@ struct MenuView: View {
             }
             .pickerStyle(.segmented)
             
-            if soundingOrForecast == .forecast {
-                Menu("Model: \(forecastModel.description)") {
-                    Picker("Model", selection: $forecastModel) {
-                        ForEach(SoundingSelection.ForecastModel.allCases, id: \.self) {
-                            Text($0.description)
-                        }
-                    }
-                }
-                .buttonStyle(.glass)
-                .onChange(of: forecastModel) { _, newModel in
-                    guard store.state.currentSoundingState.selection.type.forecastModel != newModel else {
-                        return
-                    }
-
-                    store.dispatch(
-                        SoundingState.Action.selection(
-                            SoundingSelection.Action.selectModelTypeAndLocation(
-                                .forecast(newModel),
-                                location,
-                                .now
-                            )
-                        )
-                    )
-                }
-                                
-                List(forecastLocations, id: \.self) { forecastLocation in
-                    let rowLocation = SoundingSelection.Location.named(
-                        name: forecastLocation.name,
-                        latitude: forecastLocation.latitude,
-                        longitude: forecastLocation.longitude
-                    )
-
-                    HStack {
-                        Text(forecastLocation.description)
-                        
-                        Spacer()
-                        
-                        if location == rowLocation {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        location = rowLocation
-                        
-                        store.dispatch(
-                            SoundingState.Action.selection(
-                                SoundingSelection.Action.selectModelTypeAndLocation(
-                                    .forecast(forecastModel),
-                                    rowLocation,
-                                    .now
-                                )
-                            )
-                        )
-                    }
-                }
+            switch soundingOrForecast {
+            case .sounding:
+                // TODO: this
+                EmptyView()
+            case .forecast:
+                forecastSelectionView
             }
         }
         .onAppear {
@@ -98,6 +48,72 @@ struct MenuView: View {
                 .selection.type.forecastModel ?? .automatic
             
             location = store.state.currentSoundingState.selection.location
+        }
+    }
+    
+    @ViewBuilder
+    private var forecastSelectionView: some View {
+        Menu("Model: \(forecastModel.description)") {
+            Picker("Model", selection: $forecastModel) {
+                ForEach(SoundingSelection.ForecastModel.allCases, id: \.self) {
+                    Text($0.description)
+                }
+            }
+        }
+        .buttonStyle(.glass)
+        .onChange(of: forecastModel) { _, newForecastModel in
+            let modelType = store.state.currentSoundingState.selection.type
+            
+            guard case .forecast = modelType,
+                  modelType.forecastModel != newForecastModel else {
+                return
+            }
+
+            store.dispatch(
+                SoundingState.Action.selection(
+                    SoundingSelection.Action.selectModelTypeAndLocation(
+                        .forecast(newForecastModel),
+                        location,
+                        .now
+                    )
+                )
+            )
+        }
+                        
+        List(forecastLocations, id: \.self) { forecastLocation in
+            let rowLocation = SoundingSelection.Location.named(
+                name: forecastLocation.name,
+                latitude: forecastLocation.latitude,
+                longitude: forecastLocation.longitude
+            )
+
+            HStack {
+                Text(forecastLocation.description)
+                
+                Spacer()
+                
+                if location == rowLocation {
+                    Image(systemName: "checkmark")
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard location != rowLocation else {
+                    return
+                }
+                
+                location = rowLocation
+                
+                store.dispatch(
+                    SoundingState.Action.selection(
+                        SoundingSelection.Action.selectModelTypeAndLocation(
+                            .forecast(forecastModel),
+                            rowLocation,
+                            .now
+                        )
+                    )
+                )
+            }
         }
     }
     

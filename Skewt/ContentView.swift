@@ -25,6 +25,7 @@ class TimeSelectDebouncer: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
     
     @Environment(\.scenePhase) var scenePhase
@@ -101,6 +102,11 @@ struct ContentView: View {
             requestLocationIfNeeded()
         }
         .onChange(of: store.state.currentSoundingState.selection) { _, _ in
+            guard horizontalSizeClass == .compact else {
+                // Keep the content/left panel open on iPad
+                return
+            }
+            
             preferredCompactColumn = .detail
             splitViewVisibility = .automatic
         }
@@ -125,20 +131,30 @@ struct ContentView: View {
     
     @ViewBuilder
     private var header: some View {
+        let selection = store.state.currentSoundingState.selection
+        
         VStack {
             HStack {
-                if store.state.currentSoundingState.selection.location == .closest {
+                if selection.location == .closest {
                     Image(systemName: "location.fill")
                         .font(.title2)
                         .foregroundStyle(.blue)
                 }
                 
-                Text(store.state.currentSoundingState.selection.description)
+                let title: String = {
+                    if let longDescription = longerDescription(for: selection) {
+                        return "\(longDescription) (\(selection.location.briefDescription))"
+                    } else {
+                        return selection.location.briefDescription
+                    }
+                }()
+                
+                Text(title)
                     .font(.title2)
                     .fontWeight(.bold)
             }
             
-            Text(store.state.currentSoundingState.selection.type.subtitle)
+            Text(selection.type.subtitle)
                 .font(.footnote)
                 .opacity(0.7)
         }
@@ -226,6 +242,16 @@ struct ContentView: View {
         }
 
         store.dispatch(LocationState.Action.requestLocation)
+    }
+    
+    private func longerDescription(for selection: SoundingSelection) -> String? {
+        guard case .named(let name, let latitude, let longitude) = selection.location,
+              let list = try? LocationList.forType(selection.type),
+              let location = list.locationNamed(name, latitude: latitude, longitude: longitude) else {
+            return nil
+        }
+        
+        return location.description
     }
 }
 
