@@ -52,7 +52,11 @@ extension Store {
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState(),
+                locationState: LocationState(status: .locationKnown(
+                    latitude: 32.7335,
+                    longitude: -117.1897,
+                    time: .now
+                )),
                 recentSoundings: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,

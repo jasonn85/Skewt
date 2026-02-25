@@ -29,7 +29,7 @@ struct MenuView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             if let onReturnToSelection = onReturnToSelection {
                 HStack {
                     Spacer()
@@ -85,6 +85,7 @@ struct MenuView: View {
                 }
             }
         }
+        .padding([.horizontal])
         .buttonStyle(.glass)
         .onChange(of: forecastModel) { _, newForecastModel in
             let modelType = store.state.currentSoundingState.selection.type
@@ -104,41 +105,88 @@ struct MenuView: View {
                 )
             )
         }
-                        
-        List(forecastLocations, id: \.self) { forecastLocation in
-            let rowLocation = SoundingSelection.Location.named(
-                name: forecastLocation.name,
-                latitude: forecastLocation.latitude,
-                longitude: forecastLocation.longitude
-            )
-
-            HStack {
-                Text(forecastLocation.description)
-                
-                Spacer()
-                
-                if location == rowLocation {
-                    Image(systemName: "checkmark")
+        
+        List {
+            if store.state.locationState.locationIfKnown != nil {
+                Section {
+                    currentLocationView
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                guard location != rowLocation else {
-                    return
+            
+            Section("Nearby locations") {
+                ForEach(forecastLocations, id: \.self) {
+                    row(forLocation: $0)
                 }
-                
-                location = rowLocation
-                
-                store.dispatch(
-                    SoundingState.Action.selection(
-                        SoundingSelection.Action.selectModelTypeAndLocation(
-                            .forecast(forecastModel),
-                            rowLocation,
-                            .now
-                        )
+            }
+        }
+        .listSectionSpacing(.compact)
+        .listStyle(.plain)
+    }
+    
+    @ViewBuilder
+    private var currentLocationView: some View {
+        HStack {
+            Image(systemName: "location.fill")
+                .foregroundStyle(.blue)
+            
+            Text("Current location")
+            
+            Spacer()
+            
+            if location == .closest {
+                Image(systemName: "checkmark")
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            location = .closest
+            
+            store.dispatch(
+                SoundingState.Action.selection(
+                    SoundingSelection.Action.selectModelTypeAndLocation(
+                        .forecast(forecastModel),
+                        .closest,
+                        .now
                     )
                 )
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func row(forLocation forecastLocation: LocationList.Location) -> some View {
+        let rowLocation = SoundingSelection.Location.named(
+            name: forecastLocation.name,
+            latitude: forecastLocation.latitude,
+            longitude: forecastLocation.longitude
+        )
+
+        HStack {
+            Text(forecastLocation.description)
+            
+            Spacer()
+            
+            if location == rowLocation {
+                Image(systemName: "checkmark")
             }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard location != rowLocation else {
+                return
+            }
+            
+            location = rowLocation
+            
+            store.dispatch(
+                SoundingState.Action.selection(
+                    SoundingSelection.Action.selectModelTypeAndLocation(
+                        .forecast(forecastModel),
+                        rowLocation,
+                        .now
+                    )
+                )
+            )
         }
     }
     
@@ -190,7 +238,8 @@ fileprivate extension SoundingSelection.ModelType {
 }
 
 #Preview {
-    MenuView()
+    MenuView(onReturnToSelection: { return })
         .environmentObject(Store<SkewtState>.previewStore)
         .environment(\.appEnvironment, AppEnvironment(isLive: false))
+        .fontDesign(.monospaced)
 }
