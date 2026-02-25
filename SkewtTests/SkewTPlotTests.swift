@@ -87,13 +87,13 @@ final class SkewTPlotTests: XCTestCase {
     }
     
     func testNilSoundingMakesNilPaths() {
-        let plot = SkewtPlot(sounding: nil)
+        let plot = SkewtPlot(data: nil)
         XCTAssertNil(plot.temperaturePath, "No data generates a nil temperature path")
         XCTAssertNil(plot.dewPointPath, "No data generates a nil dew point path")
     }
 
     func testPlottablePointsMakePath() throws {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         
         XCTAssertFalse(plot.temperaturePath!.isEmpty, "Data generates a path for temperature")
         XCTAssertFalse(plot.dewPointPath!.isEmpty, "Data generates a path for dew point")
@@ -116,7 +116,7 @@ RAOB sounding valid at:
       5   2000  11879    -20    -40  99999  99999   1120  99999  99999
       5   1000  16212    -20    -40  99999  99999   1120  99999  99999
 """)
-        let plot = SkewtPlot(sounding: constantTempSounding)
+        let plot = SkewtPlot(data: constantTempSounding.data)
         
         XCTAssertTrue(plot.temperaturePath!.isPositiveSlope)
     }
@@ -127,7 +127,7 @@ RAOB sounding valid at:
         let d = try Data(contentsOf: fileUrl)
         let s = String(data: d, encoding: .utf8)!
         let sounding = try RucSounding(fromText: s)
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         
         // Allow off-screen left, right, and up by a factor of 1. Down should always be in bounds.
         let bounds = CGRect(x: -1.0, y: -1.0, width: 3.0, height: 2.0)
@@ -138,7 +138,7 @@ RAOB sounding valid at:
     
     func testIsobarNonLinearScale() {
         let height = 1.0
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         let isobarPaths = plot.isobarPaths
         let sortedIsobars = plot.isobarPaths.keys.sorted().reversed().map { isobarPaths[$0]! }
         
@@ -156,7 +156,7 @@ RAOB sounding valid at:
     }
     
     func testIsothermGeneration() {
-        let squarePlot = SkewtPlot(sounding: sounding)
+        let squarePlot = SkewtPlot(data: sounding.data)
         
         let bottomLeft = CGPoint(x: 0.0, y: 1.0)
         let middleBottom = CGPoint(x: 0.5, y: 1.0)
@@ -178,12 +178,12 @@ RAOB sounding valid at:
         XCTAssertEqual(halfOffLeftLine.0, middleLeft)
         XCTAssertEqual(halfOffLeftLine.1, middleTop)
         
-        let unskewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.0)
+        let unskewedSquarePlot = SkewtPlot(data: sounding.data, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.0)
         let vertical = unskewedSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(vertical.0, middleBottom)
         XCTAssertEqual(vertical.1, middleTop)
         
-        let lessSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
+        let lessSkewedSquarePlot = SkewtPlot(data: sounding.data, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 0.5)
         let steepFromBottomLeft = lessSkewedSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         let steepFromBottomMiddle = lessSkewedSquarePlot.isotherm(forTemperature: middleTemp)
         XCTAssertEqual(steepFromBottomLeft.0, bottomLeft)
@@ -191,14 +191,14 @@ RAOB sounding valid at:
         XCTAssertEqual(steepFromBottomMiddle.0, middleBottom)
         XCTAssertEqual(steepFromBottomMiddle.1, topRight)
         
-        let moreSkewedSquarePlot = SkewtPlot(sounding: sounding, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 2.0)
+        let moreSkewedSquarePlot = SkewtPlot(data: sounding.data, surfaceTemperatureRange: squarePlot.surfaceTemperatureRange, pressureRange: squarePlot.pressureRange, isothermSpacing: squarePlot.isothermSpacing, adiabatSpacing: squarePlot.adiabatSpacing, isobarSpacing: squarePlot.isothermSpacing, isohumes: squarePlot.isohumes, altitudeIsobars: squarePlot.altitudeIsobars, skew: 2.0)
         let shallowFromBottomLeft = moreSkewedSquarePlot.isotherm(forTemperature: bottomLeftTemp)
         XCTAssertEqual(shallowFromBottomLeft.0, bottomLeft)
         XCTAssertEqual(shallowFromBottomLeft.1, middleRight)
     }
     
     func testIsothermSkew() {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         
         XCTAssertTrue(plot.isothermPaths.count > 0)
         
@@ -209,7 +209,7 @@ RAOB sounding valid at:
     
     /// A roughly square plot should have twice as many isotherms as fill the X axis
     func testIsothermCount() {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         let singleAxisCount = Int((plot.surfaceTemperatureRange.upperBound
                                    - plot.surfaceTemperatureRange.lowerBound)
                                   / plot.isothermSpacing)
@@ -222,7 +222,7 @@ RAOB sounding valid at:
     func testAdiabatCount() {
         // It's not yet defined if/how many dry adiabats should be drawn from off screen right, so just
         // ensure that we have at least enough to cover the bottom.
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         let singleAxisCount = Int((plot.surfaceTemperatureRange.upperBound
                                    - plot.surfaceTemperatureRange.lowerBound)
                                   / plot.adiabatSpacing) - 2
@@ -240,7 +240,7 @@ RAOB sounding valid at:
     }
     
     func testDataToCoordinateAndBack() {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
 
         let data = sounding.data.dataPoints.filter({ $0.temperature != nil }).first!
         let expected = (pressure: data.pressure, temperature: data.temperature!)
@@ -258,7 +258,7 @@ RAOB sounding valid at:
     }
     
     func testCoordinateToPointAndBack() {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
 
         let data = sounding.data.dataPoints.filter({ $0.temperature != nil })[15]
         let point = plot.point(pressure: data.pressure, temperature: data.temperature!)
@@ -269,7 +269,7 @@ RAOB sounding valid at:
     }
     
     func testDefaultAltitudeRangeVsPressureRange() {
-        let plot = SkewtPlot(sounding: sounding)
+        let plot = SkewtPlot(data: sounding.data)
         let pressureTolerance = 1.0
         let altitudeTolerance = 50.0
         
@@ -291,7 +291,7 @@ RAOB sounding valid at:
         let pressureTolerance = 1.0
         let altitudeTolerance = 50.0
         
-        var plot = SkewtPlot(sounding: sounding)
+        var plot = SkewtPlot(data: sounding.data)
         let altitudeRange = 0.0...10_000.0
         plot.altitudeRange = altitudeRange
         

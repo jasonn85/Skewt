@@ -64,6 +64,7 @@
 		96A8F5F4299DAC3F0021A170 /* RucSoundingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */; };
 		96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A8F60C299DAC680021A170 /* RucSounding.swift */; };
 		96AA78DE2A2E7760003338D8 /* LineStyleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AA78DD2A2E7760003338D8 /* LineStyleView.swift */; };
+		96AC49932F4FB51100EEF561 /* SoundingMapAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96AC49922F4FB51100EEF561 /* SoundingMapAnnotation.swift */; };
 		96B436E32B6AF73700C8A01A /* ZoomedSquareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */; };
 		96B46FEF2AB4EA01008AA3A1 /* ClosestTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */; };
 		96B46FF12AB4F8AE008AA3A1 /* ClosestTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */; };
@@ -160,6 +161,7 @@
 		96A8F5F3299DAC3F0021A170 /* RucSoundingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSoundingTests.swift; sourceTree = "<group>"; };
 		96A8F60C299DAC680021A170 /* RucSounding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RucSounding.swift; sourceTree = "<group>"; };
 		96AA78DD2A2E7760003338D8 /* LineStyleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStyleView.swift; sourceTree = "<group>"; };
+		96AC49922F4FB51100EEF561 /* SoundingMapAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingMapAnnotation.swift; sourceTree = "<group>"; };
 		96B436E22B6AF73700C8A01A /* ZoomedSquareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomedSquareTests.swift; sourceTree = "<group>"; };
 		96B46FEE2AB4EA01008AA3A1 /* ClosestTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTimeTests.swift; sourceTree = "<group>"; };
 		96B46FF02AB4F8AE008AA3A1 /* ClosestTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClosestTime.swift; sourceTree = "<group>"; };
@@ -347,6 +349,7 @@
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
+				96AC49922F4FB51100EEF561 /* SoundingMapAnnotation.swift */,
 				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
 				96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */,
 				964998652B6A20A700899BC7 /* TouchCatchView.swift */,
@@ -536,6 +539,7 @@
 				967185E22F340928001A5FEB /* ForecastModels.swift in Sources */,
 				96E334EF2A22963A00B90043 /* ConsoleLogMiddleware.swift in Sources */,
 				960417432F4EC58100F74778 /* MenuView.swift in Sources */,
+				96AC49932F4FB51100EEF561 /* SoundingMapAnnotation.swift in Sources */,
 				964998662B6A20A700899BC7 /* TouchCatchView.swift in Sources */,
 				96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
@@ -779,7 +783,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HNS87AD5L9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasonneel.SkewtTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -798,7 +802,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HNS87AD5L9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jasonneel.SkewtTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -60,8 +60,7 @@ struct MenuView: View {
             
             switch soundingOrForecast {
             case .sounding:
-                // TODO: this
-                EmptyView()
+                soundingSelectionView
             case .forecast:
                 forecastSelectionView
             }
@@ -74,6 +73,31 @@ struct MenuView: View {
                 .selection.type.forecastModel ?? .automatic
             
             location = store.state.currentSoundingState.selection.location
+        }
+    }
+    
+    @ViewBuilder
+    private var soundingSelectionView: some View {
+        VStack {
+            Map (initialPosition: initialMapPosition, interactionModes: [.pan, .zoom]) {
+                if let soundingList = store.state.recentSoundings.soundingList {
+                    ForEach(Array(soundingList.messagesByStationId.keys), id: \.self) { stationId in
+                        if let location = LocationList.allLocations.locations.first(where: { $0.wmoId == stationId }),
+                           let soundingData = soundingList.soundingData(forStationId: stationId) {
+                            Annotation(location.description, coordinate: location.coordinate, anchor: .bottom) {
+                                SoundingMapAnnotation(data: soundingData)
+                                    .frame(width: 50, height: 50)
+                                    .onTapGesture {
+                                        selectLatestSounding(forLocation: location)
+                                    }
+                            }
+                        }
+                    }
+                }
+            }
+            .mapControls {
+                MapUserLocationButton()
+            }
         }
     }
     
@@ -226,6 +250,17 @@ struct MenuView: View {
         }
     }
     
+    private var initialMapPosition: MapCameraPosition {
+        let location = store.state.locationState.locationIfKnown ?? .denver
+        
+        return .camera(
+            MapCamera(
+                centerCoordinate: location,
+                distance: 1_000_000  // 1,000 km
+            )
+        )
+    }
+    
     private var forecastLocations: [LocationList.Location] {
         let count = 10
         
@@ -260,6 +295,22 @@ struct MenuView: View {
         store.state.locationState.locationIfKnown ?? .denver
     }
 
+    private func selectLatestSounding(forLocation location: LocationList.Location) {
+        store.dispatch(
+            SoundingState.Action.selection(
+                SoundingSelection.Action.selectModelTypeAndLocation(
+                    .sounding,
+                    .named(
+                        name: location.name,
+                        latitude: location.latitude,
+                        longitude: location.longitude
+                    ),
+                    .now
+                )
+            )
+        )
+    }
+    
     private func requestLocationForNearbyForecastsIfNeeded() {
         guard store.state.locationState.locationIfKnown == nil else {
             return
