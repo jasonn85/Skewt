@@ -42,6 +42,21 @@ struct MenuView: View {
                     }
                 }
                 .buttonStyle(.glass)
+                .onChange(of: forecastModel) { _, newModel in
+                    guard store.state.currentSoundingState.selection.type.forecastModel != newModel else {
+                        return
+                    }
+
+                    store.dispatch(
+                        SoundingState.Action.selection(
+                            SoundingSelection.Action.selectModelTypeAndLocation(
+                                .forecast(newModel),
+                                location,
+                                .now
+                            )
+                        )
+                    )
+                }
                                 
                 List(forecastLocations, id: \.self) { forecastLocation in
                     let rowLocation = SoundingSelection.Location.named(
