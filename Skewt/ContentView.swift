@@ -17,8 +17,10 @@ class TimeSelectDebouncer: ObservableObject {
         debouncer = $time
             .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
-            .sink(receiveValue: { [weak self] in
-                self?.store?.dispatch(SoundingState.Action.selection(.selectTime($0)))
+            .sink(receiveValue: { [weak self] time in
+                MainActor.assumeIsolated {
+                    self?.store?.dispatch(SoundingState.Action.selection(.selectTime(time)))
+                }
             })
     }
 }
