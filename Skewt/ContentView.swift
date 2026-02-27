@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 class TimeSelectDebouncer: ObservableObject {
     @Published var time = SoundingSelection.Time.now
     private var debouncer: AnyCancellable?
@@ -18,9 +19,7 @@ class TimeSelectDebouncer: ObservableObject {
             .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink(receiveValue: { [weak self] time in
-                MainActor.assumeIsolated {
-                    self?.store?.dispatch(SoundingState.Action.selection(.selectTime(time)))
-                }
+                self?.store?.dispatch(SoundingState.Action.selection(.selectTime(time)))
             })
     }
 }
