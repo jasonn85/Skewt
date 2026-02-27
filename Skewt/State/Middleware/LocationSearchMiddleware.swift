@@ -16,6 +16,8 @@ extension CLLocation {
 
 extension Middlewares {
     static let locationSearchLogger = Logger()
+    private static let locationSearchQueue = DispatchQueue(label: "com.skewt.locationSearch",
+                                                           target: .global(qos: .userInitiated))
     
     static let locationSearchMiddleware: Middleware<SkewtState> = { _, state, action in
         if case .didDetermineLocation(let location) = action as? LocationState.Action,
@@ -26,13 +28,7 @@ extension Middlewares {
         
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
-            return MainActor.assumeIsolated {
-                LocationSearchManager.shared.search(text)
-                    .map { _ in
-                        ForecastSelectionState.Action.load
-                    }
-                    .eraseToAnyPublisher()
-            }
+            return debouncedLoadPublisher(for: text)
         case .load:
             return search(withState: state)
         default:
@@ -68,60 +64,11 @@ extension Middlewares {
             forecastSearchType = .nearest
         }
         
-        return MainActor.assumeIsolated {
-            LocationSearchManager.shared.locationSearchPublisher(forType: searchType)
-                .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
-                .eraseToAnyPublisher()
-        }
-    }
-}
-
-@MainActor
-final class LocationSearchManager {
-    static let shared = LocationSearchManager()
-    
-    private let searchText = CurrentValueSubject<String?, Never>("")
-    private var searchDebouncePublisher: AnyCancellable!
-    private var searchDidDebouncePublisher: PassthroughSubject<String?, Never>? = nil
-    
-    private let searchQueue = DispatchQueue(label: "com.skewt.locationSearch",
-                                            target: .global(qos: .userInitiated))
-    
-    enum SearchType {
-        case location(CLLocation)
-        case text(String)
-    }
-    
-    init() {
-        // Set to nil so we can reference self when properly initializing it below
-        searchDebouncePublisher = nil
-        
-        searchDebouncePublisher = searchText
-            .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
-            .removeDuplicates()
-            .dropFirst()
-            .sink {
-                self.searchDidDebouncePublisher?.send($0)
-                self.searchDidDebouncePublisher = nil
-            }
-    }
-    
-    @discardableResult
-    func search(_ text: String?) -> AnyPublisher<String?, Never> {
-        searchDidDebouncePublisher?.send(completion: .finished)
-        searchDidDebouncePublisher = PassthroughSubject()
-        
-        searchText.send(text)
-        
-        return searchDidDebouncePublisher!.eraseToAnyPublisher()
-    }
-    
-    func locationSearchPublisher(forType type: SearchType) -> AnyPublisher<[LocationList.Location], Never> {
-        Deferred {
+        return Deferred {
             Just({
                 let locations = LocationList.allLocations
 
-                switch type {
+                switch searchType {
                 case .location(let location):
                     return locations.locationsSortedByProximity(to: location)
                 case .text(let text):
@@ -129,7 +76,75 @@ final class LocationSearchManager {
                 }
             }())
         }
-        .subscribe(on: searchQueue)
+        .subscribe(on: locationSearchQueue)
+        .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
         .eraseToAnyPublisher()
     }
+
+    private static func debouncedLoadPublisher(for text: String?) -> AnyPublisher<Action, Never> {
+        Deferred {
+            let subject = PassthroughSubject<Action, Never>()
+            let cancellableBox = SearchCancellableBox()
+
+            Task { @MainActor in
+                cancellableBox.cancellable = LocationSearchManager.shared.search(text)
+                    .map { _ in ForecastSelectionState.Action.load as Action }
+                    .sink(
+                        receiveCompletion: { _ in
+                            subject.send(completion: .finished)
+                            cancellableBox.cancellable = nil
+                        },
+                        receiveValue: { subject.send($0) }
+                    )
+            }
+
+            return subject
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
+final class LocationSearchManager {
+    @MainActor static let shared = LocationSearchManager()
+    
+    private var pendingDebounceWorkItem: DispatchWorkItem?
+    private var pendingSubject: PassthroughSubject<String?, Never>?
+    
+    enum SearchType {
+        case location(CLLocation)
+        case text(String)
+    }
+    
+    init() {}
+    
+    @discardableResult
+    func search(_ text: String?) -> AnyPublisher<String?, Never> {
+        pendingDebounceWorkItem?.cancel()
+        pendingDebounceWorkItem = nil
+
+        pendingSubject?.send(completion: .finished)
+
+        let subject = PassthroughSubject<String?, Never>()
+        pendingSubject = subject
+
+        let workItem = DispatchWorkItem { [weak self] in
+            subject.send(text)
+            subject.send(completion: .finished)
+
+            guard let self else { return }
+            if self.pendingSubject === subject {
+                self.pendingSubject = nil
+            }
+            self.pendingDebounceWorkItem = nil
+        }
+        pendingDebounceWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
+
+        return subject.eraseToAnyPublisher()
+    }
+    
+}
+
+private final class SearchCancellableBox {
+    var cancellable: AnyCancellable?
 }

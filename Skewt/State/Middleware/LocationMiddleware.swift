@@ -89,7 +89,12 @@ extension LocationManager: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        publisher.send(LocationState.Action.didDetermineLocation(locations.first!))
+        guard let location = locations.first else {
+            publisher.send(LocationState.Action.locationRequestDidFail)
+            return
+        }
+
+        publisher.send(LocationState.Action.didDetermineLocation(location))
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
