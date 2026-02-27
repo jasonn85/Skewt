@@ -19,7 +19,7 @@ fileprivate let defaultIsohumes = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 7.5, 10.0, 15.0
 fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                           30_000.0, 40_000.0]
 
-struct SkewtPlot {
+struct SkewtPlot: Sendable {
     var sounding: Sounding?
     
     // Ranges

@@ -49,9 +49,9 @@ extension SoundingSelection.ModelType {
 }
 
 extension LocationList {
-    static private var forecastLocations = try! LocationList.loadLocationForType(.forecast(.automatic))
-    static private var raobLocations = try! LocationList.loadLocationForType(.sounding)
-    static var allLocations = try! LocationList.loadAllLocations()
+    static private let forecastLocations = try! LocationList.loadLocationForType(.forecast(.automatic))
+    static private let raobLocations = try! LocationList.loadLocationForType(.sounding)
+    static let allLocations = try! LocationList.loadAllLocations()
     
     static private func loadAllLocations() throws -> Self {
         let lists = SoundingSelection.ModelType.allCases.map { try! Self.forType($0) }

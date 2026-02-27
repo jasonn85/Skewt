@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SoundingData: Codable, Equatable {
+struct SoundingData: Codable, Equatable, Sendable {
     struct Point: Codable, Hashable {
         let time: Date?
         let latitude: Double?

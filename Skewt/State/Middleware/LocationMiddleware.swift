@@ -13,7 +13,7 @@ extension Middlewares {
     static let locationMiddleware: Middleware<SkewtState> = { _, state, action in
         switch action as? LocationState.Action {
         case .requestLocation:
-            return LocationManager.shared.requestLocation()
+            return LocationManager.requestLocation()
         case .didDetermineLocation(_):
             if state.currentSoundingState.resolvedSounding == nil,
                state.currentSoundingState.selection.requiresLocation {
@@ -27,19 +27,32 @@ extension Middlewares {
     }
 }
 
-class LocationManager: NSObject {
-    static let shared = LocationManager()
-        
+final class LocationManager: NSObject {
     private let locationManager = CLLocationManager()
     private let publisher = PassthroughSubject<Action, Never>()
-    
+
+    static func requestLocation() -> AnyPublisher<Action, Never> {
+        let manager = LocationManager()
+        
+        return manager.requestLocationPublisher()
+            .handleEvents(
+                receiveCompletion: { [manager] _ in
+                    withExtendedLifetime(manager) {}
+                },
+                receiveCancel: { [manager] in
+                    withExtendedLifetime(manager) {}
+                }
+            )
+            .eraseToAnyPublisher()
+    }
+
     override init() {
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
     }
-    
-    func requestLocation() -> AnyPublisher<Action, Never> {
+
+    private func requestLocationPublisher() -> AnyPublisher<Action, Never> {
         switch locationManager.authorizationStatus {
         case .notDetermined:
             return requestPermission()

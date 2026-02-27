@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol Action {}
 typealias Reducer<State: Sendable> = @Sendable (State, any Action) -> State
-typealias Middleware<State: Sendable> = (State, State, any Action) -> AnyPublisher<any Action, Never>
+typealias Middleware<State: Sendable> = @Sendable (State, State, any Action) -> AnyPublisher<any Action, Never>
 enum Middlewares {}
 
 fileprivate let dispatchQueueLabel = "com.jasonneel.skewt.store"
