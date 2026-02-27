@@ -151,14 +151,22 @@ extension NCAFSoundingMessage {
             if groups[i...].first == "88999" {
                 i = i.advanced(by: 1)
             } else {
+                guard i.advanced(by: 2) < groups.endIndex else {
+                    self.levels = levels
+                    return
+                }
+
                 let endOfSection = i.advanced(by: 3)
                 let section = groups[i..<endOfSection]
                 i = endOfSection
                 let useTenthsPressure = type == .partC || type == .partD
                 
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!, useTenths: useTenthsPressure),
-                      let temperatureGroup = TemperatureGroup(fromString: section.dropFirst().first!),
-                      let windGroup = WindGroup(fromString: section.last!) else {
+                guard let pressureToken = section.first,
+                      let temperatureToken = section.dropFirst().first,
+                      let windToken = section.last,
+                      let pressureGroup = PressureGroup(fromPressureSuffixString: pressureToken, useTenths: useTenthsPressure),
+                      let temperatureGroup = TemperatureGroup(fromString: temperatureToken),
+                      let windGroup = WindGroup(fromString: windToken) else {
                     return nil
                 }
                 
@@ -189,19 +197,19 @@ extension NCAFSoundingMessage {
                 i = endOfSection
                 let useTenthsPressure = type == .partC || type == .partD
                 
-                guard let pressureGroup = PressureGroup(fromPressureSuffixString: section.first!, useTenths: useTenthsPressure),
-                      let windGroup = WindGroup(fromString: section.dropFirst().first!) else {
-                    return nil
+                if let pressureToken = section.first,
+                   let windToken = section.dropFirst().first,
+                   let pressureGroup = PressureGroup(fromPressureSuffixString: pressureToken, useTenths: useTenthsPressure),
+                   let windGroup = WindGroup(fromString: windToken) {
+                    let level = Level(
+                        type: .maximumWind(pressureGroup.pressure),
+                        pressureGroup: pressureGroup,
+                        temperatureGroup: nil,
+                        windGroup: windGroup
+                    )
+                    
+                    levels[level.type] = level
                 }
-                
-                let level = Level(
-                    type: .maximumWind(pressureGroup.pressure),
-                    pressureGroup: pressureGroup,
-                    temperatureGroup: nil,
-                    windGroup: windGroup
-                )
-                
-                levels[level.type] = level
             }
         }
         
