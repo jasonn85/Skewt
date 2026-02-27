@@ -305,6 +305,57 @@ struct NCAFSoundingListTests {
         let message = NCAFSoundingMessage(fromString: "TTAA 6812/ 72293 NIL")
         #expect(message == nil)
     }
+
+    @Test("Truncated TTCC section 4 without wind group does not crash")
+    func truncatedPartCSection4WithoutWindGroup() throws {
+        let s = """
+            TTCC 27122 23884 70758 61965 17018 50966 61966 18527 30282 61567 18543 20536 54768 19052 88999 77191
+            """
+
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+
+        let hasMaximumWind = message!.levels.keys.contains { levelType in
+            if case .maximumWind = levelType {
+                return true
+            }
+            return false
+        }
+        #expect(!hasMaximumWind)
+    }
+
+    @Test("Truncated TTCC section 3 with one token does not crash")
+    func truncatedPartCSection3OneToken() throws {
+        let s = """
+            TTCC 68121 72376 70874 56364 22510 88123
+            """
+
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+
+        let mandatory70 = message?.levels.first(where: { levelType, _ in
+            levelType == .mandatory(70.0)
+        })?.value
+        #expect(mandatory70 != nil)
+    }
+
+    @Test("Truncated TTCC section 3 with two tokens does not crash")
+    func truncatedPartCSection3TwoTokens() throws {
+        let s = """
+            TTCC 68121 72376 70874 56364 22510 88123 56364
+            """
+
+        let message = NCAFSoundingMessage(fromString: s)
+        #expect(message != nil)
+
+        let hasTropopause = message!.levels.keys.contains { levelType in
+            if case .tropopause = levelType {
+                return true
+            }
+            return false
+        }
+        #expect(!hasTropopause)
+    }
     
     @Test("Empty data makes nil list")
     func parseEmptyData() throws {
