@@ -6,12 +6,12 @@
 //
 
 import Foundation
-import Combine
+@preconcurrency import Combine
 import CoreLocation
 import OSLog
 
 extension CLLocation {
-    static var denver = CLLocation(latitude: 39.87, longitude: -104.67)
+    static let denver = CLLocation(latitude: 39.87, longitude: -104.67)
 }
 
 extension Middlewares {
@@ -26,11 +26,13 @@ extension Middlewares {
         
         switch action as? ForecastSelectionState.Action {
         case .setSearchText(let text):
-            return LocationSearchManager.shared.search(text)
-                .map { _ in
-                    ForecastSelectionState.Action.load
-                }
-                .eraseToAnyPublisher()
+            return MainActor.assumeIsolated {
+                LocationSearchManager.shared.search(text)
+                    .map { _ in
+                        ForecastSelectionState.Action.load
+                    }
+                    .eraseToAnyPublisher()
+            }
         case .load:
             return search(withState: state)
         default:
@@ -66,13 +68,16 @@ extension Middlewares {
             forecastSearchType = .nearest
         }
         
-        return LocationSearchManager.shared.locationSearchPublisher(forType: searchType)
-            .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
-            .eraseToAnyPublisher()
+        return MainActor.assumeIsolated {
+            LocationSearchManager.shared.locationSearchPublisher(forType: searchType)
+                .map { ForecastSelectionState.Action.didFinishSearch(forecastSearchType, $0) }
+                .eraseToAnyPublisher()
+        }
     }
 }
 
-class LocationSearchManager {
+@MainActor
+final class LocationSearchManager {
     static let shared = LocationSearchManager()
     
     private let searchText = CurrentValueSubject<String?, Never>("")
@@ -112,19 +117,19 @@ class LocationSearchManager {
     }
     
     func locationSearchPublisher(forType type: SearchType) -> AnyPublisher<[LocationList.Location], Never> {
-        let publisher = PassthroughSubject<[LocationList.Location], Never>()
-        
-        searchQueue.async {
-            let locations = LocationList.allLocations
+        Deferred {
+            Just({
+                let locations = LocationList.allLocations
 
-            switch type {
-            case .location(let location):
-                publisher.send(locations.locationsSortedByProximity(to: location))
-            case .text(let text):
-                publisher.send(locations.locationsForSearch(text))
-            }
+                switch type {
+                case .location(let location):
+                    return locations.locationsSortedByProximity(to: location)
+                case .text(let text):
+                    return locations.locationsForSearch(text)
+                }
+            }())
         }
-
-        return publisher.eraseToAnyPublisher()
+        .subscribe(on: searchQueue)
+        .eraseToAnyPublisher()
     }
 }
