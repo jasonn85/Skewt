@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import Combine
+import Combine
 import CoreLocation
 import OSLog
 
@@ -18,6 +18,10 @@ extension Middlewares {
     static let locationSearchLogger = Logger()
     private static let locationSearchQueue = DispatchQueue(label: "com.skewt.locationSearch",
                                                            target: .global(qos: .userInitiated))
+    private enum SearchType {
+        case location(CLLocation)
+        case text(String)
+    }
     
     static let locationSearchMiddleware: Middleware<SkewtState> = { _, state, action in
         if case .didDetermineLocation(let location) = action as? LocationState.Action,
@@ -38,7 +42,7 @@ extension Middlewares {
     
     private static func search(withState state: SkewtState) -> AnyPublisher<Action, Never> {
         let defaultLocation = CLLocation.denver
-        var searchType: LocationSearchManager.SearchType
+        var searchType: SearchType
         var forecastSearchType: ForecastSelectionState.SearchType
         
         if case .text(let text) = state.displayState.forecastSelectionState.searchType, text.count > 0 {
@@ -82,69 +86,9 @@ extension Middlewares {
     }
 
     private static func debouncedLoadPublisher(for text: String?) -> AnyPublisher<Action, Never> {
-        Deferred {
-            let subject = PassthroughSubject<Action, Never>()
-            let cancellableBox = SearchCancellableBox()
-
-            Task { @MainActor in
-                cancellableBox.cancellable = LocationSearchManager.shared.search(text)
-                    .map { _ in ForecastSelectionState.Action.load as Action }
-                    .sink(
-                        receiveCompletion: { _ in
-                            subject.send(completion: .finished)
-                            cancellableBox.cancellable = nil
-                        },
-                        receiveValue: { subject.send($0) }
-                    )
-            }
-
-            return subject
-        }
-        .eraseToAnyPublisher()
+        Just(text)
+            .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+            .map { _ in ForecastSelectionState.Action.load as Action }
+            .eraseToAnyPublisher()
     }
-}
-
-final class LocationSearchManager {
-    @MainActor static let shared = LocationSearchManager()
-    
-    private var pendingDebounceWorkItem: DispatchWorkItem?
-    private var pendingSubject: PassthroughSubject<String?, Never>?
-    
-    enum SearchType {
-        case location(CLLocation)
-        case text(String)
-    }
-    
-    init() {}
-    
-    @discardableResult
-    func search(_ text: String?) -> AnyPublisher<String?, Never> {
-        pendingDebounceWorkItem?.cancel()
-        pendingDebounceWorkItem = nil
-
-        pendingSubject?.send(completion: .finished)
-
-        let subject = PassthroughSubject<String?, Never>()
-        pendingSubject = subject
-
-        let workItem = DispatchWorkItem { [weak self] in
-            subject.send(text)
-            subject.send(completion: .finished)
-
-            guard let self else { return }
-            if self.pendingSubject === subject {
-                self.pendingSubject = nil
-            }
-            self.pendingDebounceWorkItem = nil
-        }
-        pendingDebounceWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: workItem)
-
-        return subject.eraseToAnyPublisher()
-    }
-    
-}
-
-private final class SearchCancellableBox {
-    var cancellable: AnyCancellable?
 }
