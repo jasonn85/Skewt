@@ -38,9 +38,9 @@ struct ReducedWindDataPoint {
 }
 
 extension SoundingData {
-    typealias WindReducer = (Int, Double) -> Double
+    typealias WindReducer = @Sendable (Int, Double) -> Double
     
-    static var magnitudeWindReducer: WindReducer = { _, speed in Double(speed) }
+    static let magnitudeWindReducer: WindReducer = { _, speed in Double(speed) }
     
     func maximumWindReducer() -> WindReducer {
         let windData = windData
@@ -50,12 +50,16 @@ extension SoundingData {
         }
         
         let maximumWindPoint = windData.reduce(windData.first!) { $1.windSpeed! > $0.windSpeed! ? $1 : $0 }
-        var maximumWindAngle = Double(maximumWindPoint.windDirection!) * .pi / 180.0
-        
-        // Pick an easterly direction so that westerly values will be negative when reduced
-        if maximumWindAngle >= .pi {
-            maximumWindAngle -= .pi
-        }
+        let maximumWindAngle: Double = {
+            var angle = Double(maximumWindPoint.windDirection!) * .pi / 180.0
+            
+            // Pick an easterly direction so that westerly values will be negative when reduced
+            if angle >= .pi {
+                angle -= .pi
+            }
+            
+            return angle
+        }()
         
         return { direction, speed in
             let thisAngle = Double(direction) * .pi / 180.0
