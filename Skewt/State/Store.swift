@@ -10,8 +10,8 @@ import Combine
 import SwiftUI
 
 protocol Action {}
-typealias Reducer<State> = (State, Action) -> State
-typealias Middleware<State> = (State, State, Action) -> AnyPublisher<Action, Never>
+typealias Reducer<State: Sendable> = @Sendable (State, any Action) -> State
+typealias Middleware<State: Sendable> = @Sendable (State, State, any Action) -> AnyPublisher<any Action, Never>
 enum Middlewares {}
 
 fileprivate let dispatchQueueLabel = "com.jasonneel.skewt.store"
@@ -22,12 +22,12 @@ extension AnyCancellable {
     }
 }
 
-final class Store<State>: ObservableObject {
+@MainActor
+final class Store<State: Sendable>: ObservableObject {
     @Published private(set) var state: State
     
     private var subscriptions: [UUID: AnyCancellable] = [:]
     
-    private let queue = DispatchQueue(label: dispatchQueueLabel, qos: .userInitiated)
     private let reducer: Reducer<State>
     private let middlewares: [Middleware<State>]
     
@@ -38,9 +38,7 @@ final class Store<State>: ObservableObject {
     }
     
     func dispatch(_ action: Action) {
-        queue.sync {
-            self.dispatch(action, currentState: self.state)
-        }
+        self.dispatch(action, currentState: self.state)
     }
     
     private func dispatch(_ action: Action, currentState: State) {
@@ -62,7 +60,7 @@ final class Store<State>: ObservableObject {
     }
 }
 
-struct SkewtState: Codable {
+struct SkewtState: Sendable, Codable {
     enum Action: Skewt.Action {
         case pinSelection(SoundingSelection)
         case unpinSelection(SoundingSelection)

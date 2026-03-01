@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// A UIKit view and coordinator to handle zoom/pan/touch gestures better than is yet possible in SwiftUI
+@MainActor
 struct TouchCatchView: UIViewRepresentable {
     typealias UIViewType = UIView
     
@@ -57,7 +58,7 @@ struct TouchCatchView: UIViewRepresentable {
 }
 
 extension TouchCatchView {
-    class Coordinator {
+    @MainActor class Coordinator {
         var parent: TouchCatchView
         
         var pincher: UIPinchGestureRecognizer?

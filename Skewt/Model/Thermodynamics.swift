@@ -26,14 +26,14 @@ extension Double {
     public static let feetPerKm = 3_280.84
 }
 
-public enum TemperatureUnit {
+public enum TemperatureUnit: Sendable {
     case celsius
     case fahrenheit
     case kelvin
 }
 
 /// Temperature (double precision), representable and comparable across C, F, and K
-public struct Temperature: Comparable {
+public struct Temperature: Comparable, Sendable {
     private let value: Double
     let unit: TemperatureUnit
     
