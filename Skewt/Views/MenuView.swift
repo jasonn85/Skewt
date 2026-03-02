@@ -13,6 +13,24 @@ import UIKit
 #endif
 
 struct MenuView: View {
+    private struct SoundingAnnotationItem: Identifiable {
+        let stationId: Int
+        let location: LocationList.Location
+        let soundingData: SoundingData
+        
+        var id: String { "\(stationId)-\(location.name)" }
+    }
+    
+    private static let soundingLocationsByWmoId: [Int: [LocationList.Location]] = LocationList.allLocations.locations
+        .sorted { $0.name < $1.name }
+        .reduce(into: [Int: [LocationList.Location]]()) { locationsByWmoId, location in
+            guard let wmoId = location.wmoId else {
+                return
+            }
+            
+            locationsByWmoId[wmoId, default: []].append(location)
+        }
+
     @EnvironmentObject var store: Store<SkewtState>
 
     @State private var soundingOrForecast = SoundingOrForecast.forecast
@@ -80,18 +98,13 @@ struct MenuView: View {
     private var soundingSelectionView: some View {
         VStack {
             Map (initialPosition: initialMapPosition, interactionModes: [.pan, .zoom]) {
-                if let soundingList = store.state.recentSoundings.soundingList {
-                    ForEach(Array(soundingList.messagesByStationId.keys), id: \.self) { stationId in
-                        if let location = LocationList.allLocations.locations.first(where: { $0.wmoId == stationId }),
-                           let soundingData = soundingList.soundingData(forStationId: stationId) {
-                            Annotation(location.description, coordinate: location.coordinate, anchor: .bottom) {
-                                SoundingMapAnnotation(data: soundingData)
-                                    .frame(width: 50, height: 50)
-                                    .onTapGesture {
-                                        selectLatestSounding(forLocation: location)
-                                    }
+                ForEach(soundingAnnotationItems) { item in
+                    Annotation(item.location.description, coordinate: item.location.coordinate, anchor: .bottom) {
+                        SoundingMapAnnotation(data: item.soundingData)
+                            .frame(width: 50, height: 50)
+                            .onTapGesture {
+                                selectLatestSounding(forLocation: item.location)
                             }
-                        }
                     }
                 }
             }
@@ -99,6 +112,45 @@ struct MenuView: View {
                 MapUserLocationButton()
             }
         }
+    }
+    
+    private var soundingAnnotationItems: [SoundingAnnotationItem] {
+        guard let soundingList = store.state.recentSoundings.soundingList else {
+            return []
+        }
+        
+        return soundingList.messagesByStationId.keys
+            .sorted()
+            .compactMap { stationId in
+                guard let locations = Self.soundingLocationsByWmoId[stationId],
+                      let representativeLocation = representativeSoundingLocation(
+                        forStationId: stationId,
+                        from: locations,
+                        using: soundingList
+                      ),
+                      let soundingData = soundingList.soundingData(forStationId: stationId) else {
+                    return nil
+                }
+                
+                return SoundingAnnotationItem(
+                    stationId: stationId,
+                    location: representativeLocation,
+                    soundingData: soundingData
+                )
+            }
+    }
+    
+    private func representativeSoundingLocation(
+        forStationId stationId: Int,
+        from locations: [LocationList.Location],
+        using soundingList: NCAFSoundingList
+    ) -> LocationList.Location? {
+        if let stationCode = soundingList.stationCodeByStationId[stationId],
+           let matchingLocation = locations.first(where: { $0.name.caseInsensitiveCompare(stationCode) == .orderedSame }) {
+            return matchingLocation
+        }
+        
+        return locations.first
     }
     
     @ViewBuilder

@@ -254,6 +254,7 @@ struct SoundingStateTests {
 
         let staleList = NCAFSoundingList(
             messagesByStationId: list.messagesByStationId,
+            stationCodeByStationId: [:],
             timestamp: .now.addingTimeInterval(-TimeInterval.hours(12))
         )
 
