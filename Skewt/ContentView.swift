@@ -33,8 +33,19 @@ struct ContentView: View {
     @Environment(\.appEnvironment) private var appEnvironment
     
     @State private var selectingTime = false
+    @State private var showingOptions = false
     @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
     @State private var splitViewVisibility: NavigationSplitViewVisibility = .automatic
+    
+    private struct OptionsButtonWidthKey: PreferenceKey {
+        static var defaultValue: CGFloat { 0 }
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
+
+    @State private var optionsButtonWidth: CGFloat = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -74,11 +85,26 @@ struct ContentView: View {
                 .overlay(alignment: .top) {
                     ViewThatFits {
                         HStack(alignment: .top) {
-                            optionsButton.opacity(0)
+                            Color.clear
+                                .frame(width: optionsButtonWidth)
+                            
                             Spacer()
                             titleButton
                             Spacer()
+                            
                             optionsButton
+                                .background {
+                                    GeometryReader {
+                                        Color.clear
+                                            .preference(
+                                                key: OptionsButtonWidthKey.self,
+                                                value: $0.size.width
+                                            )
+                                    }
+                                }
+                        }
+                        .onPreferenceChange(OptionsButtonWidthKey.self) {
+                            optionsButtonWidth = $0
                         }
                         .padding()
                         
@@ -156,12 +182,17 @@ struct ContentView: View {
     
     private var optionsButton: some View {
         Button {
-            // TODO:
-            return
+            showingOptions.toggle()
         } label: {
             Image(systemName: "slider.horizontal.3")
         }
         .buttonStyle(.glass)
+        .sheet(isPresented: $showingOptions) {
+            DisplayOptionsView()
+                .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled)
+        }
     }
     
     private var plotView: some View {
