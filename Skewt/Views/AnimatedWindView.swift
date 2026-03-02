@@ -47,7 +47,7 @@ struct AnimatedWindView: UIViewRepresentable {
     private let emitterWidth: CGFloat = 10.0
     private let windParticleBirthRateMultiplier: Float = 15.0
     
-    @Environment(\.self) var environment
+    @Environment(\.displayScale) private var displayScale
     
     init(frame: CGRect, winds: [Double : Double]?, particleColor: CGColor = CGColor(gray: 0.33, alpha: 0.2)) {
         self.frame = frame
@@ -101,7 +101,7 @@ struct AnimatedWindView: UIViewRepresentable {
             return nil
         }
         
-        let screenScale = UIScreen.main.scale
+        let screenScale = displayScale
         let emitter = WindEmitter()
         emitter.windSpan = verticalSpan
         emitter.windVelocity = velocity
@@ -112,7 +112,7 @@ struct AnimatedWindView: UIViewRepresentable {
         emitter.seed = UInt32(verticalSpan.hashValue & Int(UInt32.max))
         
         let cell = CAEmitterCell()
-        cell.contentsScale = UIScreen.main.scale
+        cell.contentsScale = displayScale
         cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
         cell.color = particleColor
         cell.scale = windParticleScale
@@ -129,7 +129,7 @@ struct AnimatedWindView: UIViewRepresentable {
     private func windEmitterSize(verticalSpan: WindSpan) -> CGSize {
         CGSize(
             width: emitterWidth,
-            height: UIScreen.main.scale * (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
+            height: displayScale * (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
         )
     }
     
