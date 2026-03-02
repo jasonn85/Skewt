@@ -120,6 +120,16 @@ struct ContentView: View {
                     }
                 }
         }
+        .overlay {
+            if showingOptions {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showingOptions = false
+                    }
+            }
+        }
         .fontDesign(.monospaced)
         .onAppear {
             guard appEnvironment.isLive else {
