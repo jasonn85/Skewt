@@ -70,17 +70,28 @@ struct ContentView: View {
         } detail: {
             plotView
                 .toolbar(.hidden, for: .navigationBar)
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(alignment: .top) {
-                    Button {
-                        preferredCompactColumn = .content
-                        splitViewVisibility = .doubleColumn
-                    } label: {
-                        header
-                            .padding([.all], 14)
+                    ViewThatFits {
+                        HStack(alignment: .top) {
+                            optionsButton.opacity(0)
+                            Spacer()
+                            titleButton
+                            Spacer()
+                            optionsButton
+                        }
+                        .padding()
+                        
+                        VStack {
+                            HStack(alignment: .top) {
+                                Spacer()
+                                optionsButton
+                            }
+                            
+                            titleButton
+                        }
+                        .padding()
                     }
-                    .buttonStyle(.plain)
-                    .glassEffect(in: RoundedRectangle(cornerRadius: 20))
                 }
         }
         .fontDesign(.monospaced)
@@ -129,6 +140,28 @@ struct ContentView: View {
             
             showDetailForCurrentSelection()
         }
+    }
+    
+    private var titleButton: some View {
+        Button {
+            preferredCompactColumn = .content
+            splitViewVisibility = .doubleColumn
+        } label: {
+            header
+                .padding([.all], 14)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(in: RoundedRectangle(cornerRadius: 20))
+    }
+    
+    private var optionsButton: some View {
+        Button {
+            // TODO:
+            return
+        } label: {
+            Image(systemName: "slider.horizontal.3")
+        }
+        .buttonStyle(.glass)
     }
     
     private var plotView: some View {
