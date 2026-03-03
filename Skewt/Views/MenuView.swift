@@ -320,11 +320,20 @@ struct MenuView: View {
     }
     
     private var initialMapPosition: MapCameraPosition {
-        let location = store.state.locationState.locationIfKnown ?? .denver
+        let coordinate: CLLocationCoordinate2D
+        
+        switch store.state.currentSoundingState.selection.location {
+        case .named(name: _, latitude: let latitude, longitude: let longitude),
+                .point(latitude: let latitude, longitude: let longitude):
+            coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        case .closest:
+            let location = store.state.locationState.locationIfKnown ?? .denver
+            coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
+        }
         
         return .camera(
             MapCamera(
-                centerCoordinate: location,
+                centerCoordinate: coordinate,
                 distance: 1_000_000  // 1,000 km
             )
         )
