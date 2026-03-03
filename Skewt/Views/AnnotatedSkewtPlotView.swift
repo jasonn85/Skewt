@@ -190,7 +190,7 @@ struct AnnotatedSkewtPlotView: View {
                                 GeometryReader { geometry in
                                     ZStack {
                                         let winds = plotOptions.showAnimatedWind ?
-                                        sounding?.data.reducedWindData(sounding!.data.maximumWindReducer()).reduce(into: [Double:Double]()) {
+                                        sounding?.data.reducedWindData(sounding!.data.pcaWindReducer()).reduce(into: [Double:Double]()) {
                                             $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
                                         }
                                         : nil
