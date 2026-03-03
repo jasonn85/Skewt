@@ -38,6 +38,11 @@ struct MenuView: View {
     @State private var location = SoundingSelection.Location.closest
     let onReturnToSelection: (() -> Void)?
     
+    private static let mapZoom = 1_000_000.0  // 1,000 km
+    @State private var mapPosition: MapCameraPosition = .camera(
+        MapCamera(centerCoordinate: .denver, distance: MenuView.mapZoom)
+    )
+    
     @State private var searchText = ""
         
     enum SoundingOrForecast {
@@ -84,6 +89,8 @@ struct MenuView: View {
             case .forecast:
                 forecastSelectionView
             }
+            
+            Spacer(minLength: 0)
         }
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
@@ -96,12 +103,21 @@ struct MenuView: View {
             
             location = store.state.currentSoundingState.selection.location
         }
+        .onChange(of: store.state.locationState) { oldLocationState, locationState in
+            guard store.state.currentSoundingState.selection.requiresLocation,
+                  oldLocationState.locationIfKnown == nil,
+                  locationState.locationIfKnown != nil else {
+                return
+            }
+            
+            mapPosition = initialMapPosition
+        }
     }
     
     @ViewBuilder
     private var soundingSelectionView: some View {
         VStack {
-            Map (initialPosition: initialMapPosition, interactionModes: [.pan, .zoom]) {
+            Map(position: $mapPosition, interactionModes: [.pan, .zoom]) {
                 ForEach(soundingAnnotationItems) { item in
                     Annotation(item.location.description, coordinate: item.location.coordinate, anchor: .bottom) {
                         SoundingMapAnnotation(data: item.soundingData)
@@ -112,8 +128,21 @@ struct MenuView: View {
                     }
                 }
             }
-            .mapControls {
-                MapUserLocationButton()
+            .frame(maxHeight: 500)
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    withAnimation {
+                        mapPosition = userPosition
+                    }
+                } label: {
+                    Image(systemName: "location")
+                        .padding(12)
+                }
+                .glassEffect(in: Circle())
+                .padding()
+            }
+            .onAppear {
+                mapPosition = initialMapPosition
             }
         }
     }
@@ -318,6 +347,20 @@ struct MenuView: View {
             )
         }
     }
+        
+    private var userPosition: MapCameraPosition {
+        let location = store.state.locationState.locationIfKnown ?? .denver
+        
+        return .camera(
+            MapCamera(
+                centerCoordinate: CLLocationCoordinate2D(
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                ),
+                distance: MenuView.mapZoom
+            )
+        )
+    }
     
     private var initialMapPosition: MapCameraPosition {
         let coordinate: CLLocationCoordinate2D
@@ -334,7 +377,7 @@ struct MenuView: View {
         return .camera(
             MapCamera(
                 centerCoordinate: coordinate,
-                distance: 1_000_000  // 1,000 km
+                distance: MenuView.mapZoom
             )
         )
     }

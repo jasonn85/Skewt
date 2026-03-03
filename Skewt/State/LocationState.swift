@@ -8,8 +8,8 @@
 import Foundation
 import CoreLocation
 
-struct LocationState: Codable {
-    enum Status: Codable {
+struct LocationState: Codable, Equatable {
+    enum Status: Codable, Equatable {
         case requestingPermission
         case permissionDenied
         case locationRequestFailed
