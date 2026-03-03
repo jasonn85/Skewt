@@ -352,6 +352,17 @@ struct MenuView: View {
             
             location = rowLocation
             
+            if soundingOrForecast == .sounding,
+               let wmoId = forecastLocation.wmoId,
+               let soundingList = store.state.recentSoundings.soundingList,
+               soundingList.messagesByStationId[wmoId] == nil {
+                // There is no sounding from this location. We'll just move the map.
+                mapPosition = mapPosition(forLocation: forecastLocation)
+                searchText = ""
+                
+                return
+            }
+            
             store.dispatch(
                 SoundingState.Action.selection(
                     SoundingSelection.Action.selectModelTypeAndLocation(
@@ -405,6 +416,10 @@ struct MenuView: View {
                 distance: MenuView.mapZoom
             )
         )
+    }
+    
+    private func mapPosition(forLocation location: LocationList.Location) -> MapCameraPosition {
+        .camera(MapCamera(centerCoordinate: location.coordinate, distance: MenuView.mapZoom))
     }
     
     private var forecastLocations: [LocationList.Location] {
