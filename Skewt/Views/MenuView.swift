@@ -281,6 +281,11 @@ struct MenuView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
+            guard location != .closest else {
+                onReturnToSelection?().self
+                return
+            }
+            
             location = .closest
             
             store.dispatch(

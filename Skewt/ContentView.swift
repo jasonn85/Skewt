@@ -80,6 +80,7 @@ struct ContentView: View {
                 .environmentObject(store)
         } detail: {
             plotView
+                .navigationBarBackButtonHidden(true)
                 .toolbar(.hidden, for: .navigationBar)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(alignment: .top) {
