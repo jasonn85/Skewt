@@ -32,7 +32,6 @@ struct MenuView: View {
         }
 
     @EnvironmentObject var store: Store<SkewtState>
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var soundingOrForecast = SoundingOrForecast.forecast
     @State private var forecastModel = SoundingSelection.ForecastModel.automatic
@@ -46,14 +45,6 @@ struct MenuView: View {
     
     @State private var searchText = ""
     
-    private var shouldHideNavigationBarChrome: Bool {
-        #if os(iOS)
-        UIDevice.current.userInterfaceIdiom == .phone && verticalSizeClass == .regular
-        #else
-        false
-        #endif
-    }
-        
     enum SoundingOrForecast {
         case sounding
         case forecast
@@ -102,8 +93,8 @@ struct MenuView: View {
             Spacer(minLength: 0)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(shouldHideNavigationBarChrome ? .hidden : .visible, for: .navigationBar)
-        .searchable(text: $searchText)
+        .toolbar(.visible, for: .navigationBar)
+        .searchable(text: $searchText, placement: .sidebar)
         .searchSuggestions {
             ForEach(searchSuggestionLocations, id: \.self) {
                 row(forLocation: $0)
