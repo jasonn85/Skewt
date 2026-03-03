@@ -121,6 +121,7 @@ struct ContentView: View {
                     }
                 }
         }
+        .toolbar(.hidden, for: .navigationBar)
         .overlay {
             if showingOptions {
                 Color.clear

@@ -93,6 +93,7 @@ struct MenuView: View {
             Spacer(minLength: 0)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .searchable(text: $searchText)
         .searchSuggestions {
             ForEach(searchSuggestionLocations, id: \.self) {
