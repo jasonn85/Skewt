@@ -94,13 +94,18 @@ struct MenuView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText)
+        .searchSuggestions {
+            ForEach(searchSuggestionLocations, id: \.self) {
+                row(forLocation: $0)
+            }
+        }
         .onAppear {
             configurePickerTypography()
             requestLocationForNearbyForecastsIfNeeded()
             
+            searchText = ""
             forecastModel = store.state.currentSoundingState
                 .selection.type.forecastModel ?? .automatic
-            
             location = store.state.currentSoundingState.selection.location
         }
         .onChange(of: store.state.locationState) { oldLocationState, locationState in
@@ -184,6 +189,16 @@ struct MenuView: View {
         }
         
         return locations.first
+    }
+    
+    private var searchSuggestionLocations: [LocationList.Location] {
+        guard soundingOrForecast == .sounding,
+              !searchText.isEmpty,
+              let locationList = try? LocationList.forType(.sounding) else {
+            return []
+        }
+        
+        return locationList.locationsForSearch(searchText)
     }
     
     @ViewBuilder
@@ -331,6 +346,7 @@ struct MenuView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             guard location != rowLocation else {
+                onReturnToSelection?()
                 return
             }
             
@@ -339,12 +355,21 @@ struct MenuView: View {
             store.dispatch(
                 SoundingState.Action.selection(
                     SoundingSelection.Action.selectModelTypeAndLocation(
-                        .forecast(forecastModel),
+                        modelTypeForSelection,
                         rowLocation,
                         .now
                     )
                 )
             )
+        }
+    }
+    
+    private var modelTypeForSelection: SoundingSelection.ModelType {
+        switch soundingOrForecast {
+        case .sounding:
+                .sounding
+        case .forecast:
+                .forecast(forecastModel)
         }
     }
         
@@ -385,7 +410,10 @@ struct MenuView: View {
     private var forecastLocations: [LocationList.Location] {
         let count = 10
         
-        guard let locations = try? LocationList.forType(.sounding).locationsSortedByProximity(to: currentLocation) else {
+        guard let locations = try? LocationList
+            .forType(.forecast(.automatic))
+            .locationsSortedByProximity(to: currentLocation) else {
+            
             return []
         }
         
@@ -430,6 +458,8 @@ struct MenuView: View {
                 )
             )
         )
+        
+        onReturnToSelection?()
     }
     
     private func requestLocationForNearbyForecastsIfNeeded() {
