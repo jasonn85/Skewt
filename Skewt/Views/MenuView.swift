@@ -38,6 +38,8 @@ struct MenuView: View {
     @State private var location = SoundingSelection.Location.closest
     let onReturnToSelection: (() -> Void)?
     
+    @State private var searchText = ""
+        
     enum SoundingOrForecast {
         case sounding
         case forecast
@@ -83,6 +85,8 @@ struct MenuView: View {
                 forecastSelectionView
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText)
         .onAppear {
             configurePickerTypography()
             requestLocationForNearbyForecastsIfNeeded()
@@ -193,15 +197,21 @@ struct MenuView: View {
         }
         
         List {
-            if store.state.locationState.locationIfKnown != nil {
-                Section {
-                    currentLocationView
-                }
+            if !searchText.isEmpty {
+                searchResultRows
             }
             
-            Section("Nearby locations") {
-                ForEach(forecastLocations, id: \.self) {
-                    row(forLocation: $0)
+            if searchText.isEmpty {
+                if store.state.locationState.locationIfKnown != nil {
+                    Section {
+                        currentLocationView
+                    }
+                }
+                
+                Section("Nearby locations") {
+                    ForEach(forecastLocations, id: \.self) {
+                        row(forLocation: $0)
+                    }
                 }
             }
         }
@@ -238,6 +248,13 @@ struct MenuView: View {
                     )
                 )
             )
+        }
+    }
+    
+    @ViewBuilder
+    private var searchResultRows: some View {
+        ForEach(try! LocationList.forType(.forecast(.automatic)).locationsForSearch(searchText), id: \.self) {
+            row(forLocation: $0)
         }
     }
     
