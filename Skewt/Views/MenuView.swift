@@ -44,6 +44,14 @@ struct MenuView: View {
     )
     
     @State private var searchText = ""
+    
+    private var shouldHideNavigationBarChrome: Bool {
+        #if os(iOS)
+        UIDevice.current.userInterfaceIdiom == .phone
+        #else
+        false
+        #endif
+    }
         
     enum SoundingOrForecast {
         case sounding
@@ -93,7 +101,7 @@ struct MenuView: View {
             Spacer(minLength: 0)
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(shouldHideNavigationBarChrome ? .hidden : .visible, for: .navigationBar)
         .searchable(text: $searchText)
         .searchSuggestions {
             ForEach(searchSuggestionLocations, id: \.self) {
