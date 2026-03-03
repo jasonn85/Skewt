@@ -7,9 +7,6 @@
 
 import SwiftUI
 import Combine
-#if os(iOS)
-import UIKit
-#endif
 
 @MainActor
 class TimeSelectDebouncer: ObservableObject {
@@ -49,14 +46,6 @@ struct ContentView: View {
     }
 
     @State private var optionsButtonWidth: CGFloat = 0
-    
-    private var shouldHideNavigationBarChrome: Bool {
-        #if os(iOS)
-        UIDevice.current.userInterfaceIdiom == .phone
-        #else
-        false
-        #endif
-    }
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -132,7 +121,6 @@ struct ContentView: View {
                     }
                 }
         }
-        .toolbar(shouldHideNavigationBarChrome ? .hidden : .visible, for: .navigationBar)
         .overlay {
             if showingOptions {
                 Color.clear

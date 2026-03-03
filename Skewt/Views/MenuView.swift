@@ -32,6 +32,7 @@ struct MenuView: View {
         }
 
     @EnvironmentObject var store: Store<SkewtState>
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var soundingOrForecast = SoundingOrForecast.forecast
     @State private var forecastModel = SoundingSelection.ForecastModel.automatic
@@ -47,7 +48,7 @@ struct MenuView: View {
     
     private var shouldHideNavigationBarChrome: Bool {
         #if os(iOS)
-        UIDevice.current.userInterfaceIdiom == .phone
+        UIDevice.current.userInterfaceIdiom == .phone && verticalSizeClass == .regular
         #else
         false
         #endif
