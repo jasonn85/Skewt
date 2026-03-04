@@ -92,6 +92,7 @@ struct MenuView: View {
             
             Spacer(minLength: 0)
         }
+        .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible, for: .navigationBar)
         .searchable(text: $searchText, placement: .sidebar)
@@ -260,7 +261,6 @@ struct MenuView: View {
                 }
             }
         }
-        .listSectionSpacing(.compact)
         .listStyle(.plain)
     }
     
@@ -316,37 +316,58 @@ struct MenuView: View {
             longitude: forecastLocation.longitude
         )
 
-        VStack {
-            HStack {
+        HStack {
+            VStack(alignment: .leading) {
                 Text(forecastLocation.description)
+                    .foregroundStyle(.menuTitle)
                 
-                Spacer()
-                
-                if location == rowLocation {
-                    Image(systemName: "checkmark")
+                if let ourCoordinate = store.state.locationState.locationIfKnown {
+                    let ourLocation = CLLocation(latitude: ourCoordinate.latitude, longitude: ourCoordinate.longitude)
+                    let thisLocation = CLLocation(latitude: forecastLocation.latitude, longitude: forecastLocation.longitude)
+                    let distance = ourLocation.distance(from: thisLocation)
+                    let bearing = ourCoordinate.bearing(toLocation: thisLocation.coordinate)
+                    let distanceString = distanceFormatter.string(fromDistance: distance)
+                    let bearingString = OrdinalDirection.closest(toBearing: bearing)
+                    
+                    HStack {
+                        Text("\(distanceString) \(bearingString.abbreviation)")
+                            .opacity(0.7)
+                        
+                        Image(systemName: "location.north.fill")
+                            .foregroundColor(Color("DirectionalArrow"))
+                            .rotationEffect(Angle(degrees: bearing))
+                            .padding([.horizontal], 4)
+                        
+                        Spacer()
+                    }
+                    .font(.footnote)
                 }
             }
             
-            if let ourCoordinate = store.state.locationState.locationIfKnown {
-                let ourLocation = CLLocation(latitude: ourCoordinate.latitude, longitude: ourCoordinate.longitude)
-                let thisLocation = CLLocation(latitude: forecastLocation.latitude, longitude: forecastLocation.longitude)
-                let distance = ourLocation.distance(from: thisLocation)
-                let bearing = ourCoordinate.bearing(toLocation: thisLocation.coordinate)
-                let distanceString = distanceFormatter.string(fromDistance: distance)
-                let bearingString = OrdinalDirection.closest(toBearing: bearing)
-                
-                HStack {
-                    Text("\(distanceString) \(bearingString.abbreviation)")
-                        .opacity(0.7)
-                    
-                    Image(systemName: "location.north.fill")
-                        .foregroundColor(Color("DirectionalArrow"))
-                        .rotationEffect(Angle(degrees: bearing))
-                        .padding([.horizontal], 4)
-                    
-                    Spacer()
-                }
-                .font(.footnote)
+            Spacer()
+            
+            if location == rowLocation {
+                Image(systemName: "checkmark")
+                    .font(.title3)
+                    .foregroundStyle(.menuTitle)
+                    .padding([.trailing], 6)
+            }
+        }
+        .foregroundStyle(.white)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets([.vertical], 8)
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
+        .padding([.horizontal], 10)
+        .padding([.vertical], 6)
+        .background {
+            ZStack {
+                Rectangle()
+                    .foregroundStyle(Gradient(colors: [.menuItemGradient1, .menuItemGradient2]))
+                Rectangle()
+                    .stroke(Color.white, lineWidth: 2)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+
             }
         }
         .contentShape(Rectangle())
