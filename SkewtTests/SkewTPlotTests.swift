@@ -132,6 +132,27 @@ final class SkewTPlotTests: XCTestCase {
         let plot = SkewtPlot(data: noSurfaceTemperatureData)
         XCTAssertNil(plot.surfaceParcelPath)
     }
+
+    func testSinglePointTemperatureAndDewPointPathDoNotCrash() {
+        guard let onePoint = sounding.data.dataPoints.first(where: { $0.temperature != nil && $0.dewPoint != nil }) else {
+            XCTFail("Fixture should include at least one point with both temperature and dew point")
+            return
+        }
+
+        let singlePointData = SoundingData(
+            time: sounding.data.time,
+            dataPoints: [onePoint],
+            surfaceDataPoint: onePoint,
+            cape: sounding.data.cape,
+            cin: sounding.data.cin,
+            helicity: sounding.data.helicity,
+            precipitableWater: sounding.data.precipitableWater
+        )
+
+        let plot = SkewtPlot(data: singlePointData)
+        XCTAssertNotNil(plot.temperaturePath)
+        XCTAssertNotNil(plot.dewPointPath)
+    }
     
     func testConstantTemperatureSlopesRight() throws {
         let constantTempSounding = try RucSounding(fromText: """

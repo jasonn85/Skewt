@@ -60,7 +60,7 @@ struct SkewtPlot: Sendable {
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].temperature!)
         path.move(to: lastPoint)
         
-        data[1...].forEach {
+        data.dropFirst().forEach {
             let point = point(pressure: $0.pressure, temperature: $0.temperature!)
             
             if bounds.contains(lastPoint) || bounds.contains(point) {
@@ -86,7 +86,7 @@ struct SkewtPlot: Sendable {
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].dewPoint!)
         path.move(to: lastPoint)
         
-        data[1...].forEach {
+        data.dropFirst().forEach {
             let point = point(pressure: $0.pressure, temperature: $0.dewPoint!)
             
             if bounds.contains(lastPoint) || bounds.contains(point) {
