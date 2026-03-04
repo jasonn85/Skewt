@@ -102,6 +102,36 @@ final class SkewTPlotTests: XCTestCase {
         XCTAssertTrue(plot.dewPointPath!.boundingBox.size.width > 0)
         XCTAssertTrue(plot.dewPointPath!.boundingBox.size.height > 0)
     }
+
+    func testMissingSurfaceTemperatureMakesNilSurfaceParcelPath() {
+        guard let surface = sounding.data.surfaceDataPoint else {
+            XCTFail("Fixture should include a surface data point")
+            return
+        }
+
+        let noSurfaceTemperatureData = SoundingData(
+            time: sounding.data.time,
+            dataPoints: sounding.data.dataPoints,
+            surfaceDataPoint: SoundingData.Point(
+                time: surface.time,
+                latitude: surface.latitude,
+                longitude: surface.longitude,
+                pressure: surface.pressure,
+                height: surface.height,
+                temperature: nil,
+                dewPoint: surface.dewPoint,
+                windDirection: surface.windDirection,
+                windSpeed: surface.windSpeed
+            ),
+            cape: sounding.data.cape,
+            cin: sounding.data.cin,
+            helicity: sounding.data.helicity,
+            precipitableWater: sounding.data.precipitableWater
+        )
+
+        let plot = SkewtPlot(data: noSurfaceTemperatureData)
+        XCTAssertNil(plot.surfaceParcelPath)
+    }
     
     func testConstantTemperatureSlopesRight() throws {
         let constantTempSounding = try RucSounding(fromText: """

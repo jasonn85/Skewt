@@ -102,11 +102,12 @@ struct SkewtPlot: Sendable {
     }
     
     var surfaceParcelPath: CGPath? {
-        guard let surface = data?.surfaceDataPoint else {
+        guard let surface = data?.surfaceDataPoint,
+              let temperature = surface.temperature else {
             return nil
         }
         
-        return parcelPath(forTemperature: surface.temperature!, pressure: surface.pressure)
+        return parcelPath(forTemperature: temperature, pressure: surface.pressure)
     }
 }
 
