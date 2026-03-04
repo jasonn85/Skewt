@@ -254,13 +254,30 @@ struct MenuView: View {
                     }
                 }
                 
-                Section("Nearby locations") {
+                Section(header:
+                            Text("Nearby locations")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+                    .padding([.horizontal], 10)
+                    .listRowInsets(EdgeInsets())
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    .foregroundStyle(.menuSectionHeaderText)
+                    .background(
+                        LinearGradient(
+                            colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                ) {
                     ForEach(forecastLocations, id: \.self) {
                         row(forLocation: $0)
                     }
                 }
             }
         }
+        .contentMargins(.horizontal, 0, for: .scrollContent)
         .listStyle(.plain)
     }
     
@@ -350,7 +367,7 @@ struct MenuView: View {
                 Image(systemName: "checkmark")
                     .font(.title3)
                     .foregroundStyle(.menuTitle)
-                    .padding([.trailing], 6)
+                    .padding([.trailing], 4)
             }
         }
         .foregroundStyle(.white)
@@ -358,8 +375,8 @@ struct MenuView: View {
         .listRowSeparator(.hidden)
         .listRowInsets([.vertical], 8)
         .shadow(color: .black, radius: 1, x: 1, y: 1)
-        .padding([.horizontal], 10)
-        .padding([.vertical], 6)
+        .padding([.horizontal], 14)
+        .padding([.vertical], 8)
         .background {
             ZStack {
                 Rectangle()
