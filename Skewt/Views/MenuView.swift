@@ -291,6 +291,8 @@ struct MenuView: View {
                     }
                 }
             Text(text)
+                .minimumScaleFactor(0.6)
+                .lineLimit(1, reservesSpace: false)
                 .padding([.leading], 8)
         }
         .font(.title3)
