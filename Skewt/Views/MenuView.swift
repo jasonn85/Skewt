@@ -70,6 +70,7 @@ struct MenuView: View {
                     .buttonStyle(.plain)
                     .padding([.horizontal])
                 }
+                .foregroundStyle(.menuTitle)
             }
             
             HStack {
@@ -80,6 +81,8 @@ struct MenuView: View {
                         .tag(SoundingOrForecast.sounding)
                 }
                 .pickerStyle(.segmented)
+                .tint(.menuSectionHeaderGradient1)
+                .foregroundStyle(.menuTitle)
             }
             .padding()
             
@@ -525,10 +528,20 @@ struct MenuView: View {
             ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize,
             weight: .regular
         )
-        let attributes: [NSAttributedString.Key: Any] = [.font: monospacedBody]
+        let normalAttributes: [NSAttributedString.Key: Any] = [
+            .font: monospacedBody,
+            .foregroundColor: UIColor(Color.menuSectionHeaderText)
+        ]
+        let selectedAttributes: [NSAttributedString.Key: Any] = [
+            .font: monospacedBody,
+            .foregroundColor: UIColor(Color.menuTitle)
+        ]
 
-        UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .normal)
-        UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
+        let appearance = UISegmentedControl.appearance()
+        appearance.backgroundColor = UIColor(Color.menuItemGradient2).withAlphaComponent(0.2)
+        appearance.selectedSegmentTintColor = UIColor(Color.menuSectionHeaderGradient1)
+        appearance.setTitleTextAttributes(normalAttributes, for: .normal)
+        appearance.setTitleTextAttributes(selectedAttributes, for: .selected)
         #endif
     }
     
