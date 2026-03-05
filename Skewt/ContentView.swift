@@ -44,8 +44,17 @@ struct ContentView: View {
             value = max(value, nextValue())
         }
     }
+    
+    private struct TitleTextHeightKey: PreferenceKey {
+        static var defaultValue: CGFloat { 0 }
+        
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
 
     @State private var optionsButtonWidth: CGFloat = 0
+    @State private var titleTextHeight: CGFloat = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -88,40 +97,19 @@ struct ContentView: View {
                         .ignoresSafeArea()
                 }
                 .overlay(alignment: .top) {
-                    ViewThatFits {
-                        HStack(alignment: .top) {
-                            Color.clear
-                                .frame(width: optionsButtonWidth)
-                            
-                            Spacer()
-                            titleButton
-                            Spacer()
-                            
-                            optionsButton
-                                .background {
-                                    GeometryReader {
-                                        Color.clear
-                                            .preference(
-                                                key: OptionsButtonWidthKey.self,
-                                                value: $0.size.width
-                                            )
-                                    }
-                                }
-                        }
-                        .onPreferenceChange(OptionsButtonWidthKey.self) {
-                            optionsButtonWidth = $0
-                        }
-                        .padding()
-                        
-                        VStack {
-                            HStack(alignment: .top) {
-                                Spacer()
-                                optionsButton
-                            }
-                            
-                            titleButton
-                        }
-                        .padding()
+                    HStack {
+                        titleButton
+                        Spacer()
+                        optionsButton
+                    }
+                    .padding([.horizontal], 30)
+                    .onPreferenceChange(TitleTextHeightKey.self) {
+                        titleTextHeight = $0
+                    }
+                    .background {
+                        LinearGradient(colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2], startPoint: .top, endPoint: .bottom)
+                            .ignoresSafeArea(edges: [.horizontal])
+                            .frame(height: max(titleTextHeight + 12, 44))
                     }
                 }
         }
@@ -188,11 +176,31 @@ struct ContentView: View {
         Button {
             preferredCompactColumn = .content
             splitViewVisibility = .doubleColumn
-        } label: {
-            header
-                .padding([.all], 14)
+        } label : {
+            Image("SkewtLogo")
+                .padding([.trailing], 8)
+            
+            let selection = store.state.currentSoundingState.selection
+            let title: String = {
+                if let longDescription = longerDescription(for: selection) {
+                    return "\(longDescription) (\(selection.location.briefDescription))"
+                } else {
+                    return selection.location.briefDescription
+                }
+            }()
+            
+            Text(title)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(.menuTitle)
+                .font(.title2)
+                .fontWeight(.bold)
+                .shadow(color: .black, radius: 1, x: 1, y: 1)
+                .background {
+                    GeometryReader {
+                        Color.clear.preference(key: TitleTextHeightKey.self, value: $0.size.height)
+                    }
+                }
         }
-        .buttonStyle(.plain)
     }
     
     private var optionsButton: some View {
