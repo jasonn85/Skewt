@@ -97,6 +97,7 @@ struct MenuView: View {
         }
         .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar(.visible, for: .navigationBar)
         .searchable(text: $searchText, placement: .sidebar)
         .searchSuggestions {
