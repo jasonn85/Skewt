@@ -357,6 +357,7 @@ struct MenuView: View {
             VStack(alignment: .leading) {
                 content()
                     .foregroundStyle(.menuTitle)
+                    .font(.title2)
                 
                 subtitle()
                     .font(.footnote)

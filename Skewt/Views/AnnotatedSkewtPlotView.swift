@@ -161,7 +161,7 @@ struct AnnotatedSkewtPlotView: View {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot, parcelPoint: annotationPointAsCGPoint)
                             .aspectRatio(1.0, contentMode: .fit)
                             .scaleEffect(zoom, anchor: zoomAnchor)
-                            .border(.black)
+//                            .border(.black)
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
@@ -189,6 +189,10 @@ struct AnnotatedSkewtPlotView: View {
                             .background {
                                 GeometryReader { geometry in
                                     ZStack {
+                                        Rectangle()
+                                            .stroke(Color.white, lineWidth: 4)
+                                            .shadow(color: .black, radius: 1, x: 1, y: 1)
+                                        
                                         let winds = plotOptions.showAnimatedWind ?
                                         sounding?.data.reducedWindData(sounding!.data.pcaWindReducer()).reduce(into: [Double:Double]()) {
                                             $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude

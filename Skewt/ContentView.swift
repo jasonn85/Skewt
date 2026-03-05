@@ -83,6 +83,10 @@ struct ContentView: View {
                 .navigationBarBackButtonHidden(true)
                 .toolbar(.hidden, for: .navigationBar)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    LinearGradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2], startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
+                }
                 .overlay(alignment: .top) {
                     ViewThatFits {
                         HStack(alignment: .top) {
@@ -132,6 +136,7 @@ struct ContentView: View {
             }
         }
         .fontDesign(.monospaced)
+        .colorScheme(.dark)
         .onAppear {
             guard appEnvironment.isLive else {
                 return
@@ -188,7 +193,6 @@ struct ContentView: View {
                 .padding([.all], 14)
         }
         .buttonStyle(.plain)
-        .glassEffect(in: RoundedRectangle(cornerRadius: 20))
     }
     
     private var optionsButton: some View {
@@ -227,30 +231,38 @@ struct ContentView: View {
     private var header: some View {
         let selection = store.state.currentSoundingState.selection
         
-        VStack {
-            HStack {
-                if selection.location == .closest {
-                    Image(systemName: "location.fill")
-                        .font(.title2)
-                        .foregroundStyle(.blue)
+        VStack(alignment: .center) {
+            let title: String = {
+                if let longDescription = longerDescription(for: selection) {
+                    return "\(longDescription) (\(selection.location.briefDescription))"
+                } else {
+                    return selection.location.briefDescription
                 }
-                
-                let title: String = {
-                    if let longDescription = longerDescription(for: selection) {
-                        return "\(longDescription) (\(selection.location.briefDescription))"
-                    } else {
-                        return selection.location.briefDescription
-                    }
-                }()
-                
-                Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-            }
+            }()
+            
+            Text(title)
+                .foregroundStyle(.menuTitle)
+                .font(.title)
             
             Text(selection.type.subtitle)
-                .font(.footnote)
-                .opacity(0.7)
+                .font(.subheadline)
+        }
+        .foregroundStyle(.white)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets([.vertical], 8)
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
+        .padding([.horizontal], 14)
+        .padding([.vertical], 8)
+        .background {
+            ZStack {
+                Rectangle()
+                    .foregroundStyle(Gradient(colors: [.menuItemGradient1, .menuItemGradient2]))
+                Rectangle()
+                    .stroke(Color.white, lineWidth: 2)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+
+            }
         }
     }
     
