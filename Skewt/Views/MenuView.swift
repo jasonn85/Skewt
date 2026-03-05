@@ -249,28 +249,18 @@ struct MenuView: View {
             
             if searchText.isEmpty {
                 if store.state.locationState.locationIfKnown != nil {
-                    Section {
+                    Section(header: sectionHeader(
+                        image: Image(systemName:"location.fill"),
+                        text: "Current location"
+                    )) {
                         currentLocationView
                     }
                 }
-                
-                Section(header:
-                            Text("Nearby locations")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
-                    .padding([.horizontal], 10)
-                    .listRowInsets(EdgeInsets())
-                    .shadow(color: .black, radius: 1, x: 1, y: 1)
-                    .foregroundStyle(.menuSectionHeaderText)
-                    .background(
-                        LinearGradient(
-                            colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                ) {
+                                
+                Section(header: sectionHeader(
+                    image: Image(systemName:"map.fill"),
+                    text: "Nearby locations"
+                )) {
                     ForEach(forecastLocations, id: \.self) {
                         row(forLocation: $0)
                     }
@@ -279,6 +269,42 @@ struct MenuView: View {
         }
         .contentMargins(.horizontal, 0, for: .scrollContent)
         .listStyle(.plain)
+    }
+    
+    private func sectionHeader(image: Image, text: String) -> some View {
+        HStack {
+            // The blue rectangle is put into an overlay instead of fill/background
+            //  to avoid SwiftUI hiding it when the header is pinned at the top.
+            Rectangle()
+                .frame(width: 50, height: 50)
+                .shadow(color: .black, radius: 1, x: 1, y: 1)
+                .overlay {
+                    ZStack {
+                        Rectangle()
+                            .fill(.blue)
+                        
+                        image
+                    }
+                }
+            Text(text)
+                .padding([.leading], 8)
+        }
+        .font(.title3)
+        .fontWeight(.semibold)
+        .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+        .padding([.horizontal], 10)
+        .listRowInsets(EdgeInsets())
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
+        .foregroundStyle(.menuSectionHeaderText)
+        .background(
+            LinearGradient(
+                colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(maxHeight: 40)
+        )
+        .padding([.bottom], 5)
     }
     
     @ViewBuilder
