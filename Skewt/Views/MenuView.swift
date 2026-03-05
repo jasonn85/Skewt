@@ -309,39 +309,29 @@ struct MenuView: View {
     
     @ViewBuilder
     private var currentLocationView: some View {
-        HStack {
-            Image(systemName: store.state.currentSoundingState.selection.location == .closest
-                  ? "location.fill"
-                  : "location")
-                .foregroundStyle(.blue)
-            
-            Text("Current location")
-            
-            Spacer()
-            
-            if location == .closest {
-                Image(systemName: "checkmark")
-            }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            guard location != .closest else {
-                onReturnToSelection?().self
-                return
-            }
-            
-            location = .closest
-            
-            store.dispatch(
-                SoundingState.Action.selection(
-                    SoundingSelection.Action.selectModelTypeAndLocation(
-                        .forecast(forecastModel),
-                        .closest,
-                        .now
+        row(
+            withContent: { Text("Current location") },
+            subtitle: { EmptyView() },
+            isChecked: location == .closest,
+            tapAction: {
+                guard location != .closest else {
+                    onReturnToSelection?().self
+                    return
+                }
+                
+                location = .closest
+                
+                store.dispatch(
+                    SoundingState.Action.selection(
+                        SoundingSelection.Action.selectModelTypeAndLocation(
+                            .forecast(forecastModel),
+                            .closest,
+                            .now
+                        )
                     )
                 )
-            )
-        }
+            }
+        )
     }
     
     @ViewBuilder
@@ -351,45 +341,24 @@ struct MenuView: View {
         }
     }
     
-    @ViewBuilder
-    private func row(forLocation forecastLocation: LocationList.Location) -> some View {
-        let rowLocation = SoundingSelection.Location.named(
-            name: forecastLocation.name,
-            latitude: forecastLocation.latitude,
-            longitude: forecastLocation.longitude
-        )
-
+    private func row<Content: View, Subtitle: View>(
+        @ViewBuilder withContent content: () -> Content,
+        @ViewBuilder subtitle: () -> Subtitle,
+        isChecked: Bool = false,
+        tapAction: (() -> Void)? = nil
+    ) -> some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(forecastLocation.description)
+                content()
                     .foregroundStyle(.menuTitle)
                 
-                if let ourCoordinate = store.state.locationState.locationIfKnown {
-                    let ourLocation = CLLocation(latitude: ourCoordinate.latitude, longitude: ourCoordinate.longitude)
-                    let thisLocation = CLLocation(latitude: forecastLocation.latitude, longitude: forecastLocation.longitude)
-                    let distance = ourLocation.distance(from: thisLocation)
-                    let bearing = ourCoordinate.bearing(toLocation: thisLocation.coordinate)
-                    let distanceString = distanceFormatter.string(fromDistance: distance)
-                    let bearingString = OrdinalDirection.closest(toBearing: bearing)
-                    
-                    HStack {
-                        Text("\(distanceString) \(bearingString.abbreviation)")
-                            .opacity(0.7)
-                        
-                        Image(systemName: "location.north.fill")
-                            .foregroundColor(Color("DirectionalArrow"))
-                            .rotationEffect(Angle(degrees: bearing))
-                            .padding([.horizontal], 4)
-                        
-                        Spacer()
-                    }
+                subtitle()
                     .font(.footnote)
-                }
             }
-            
+                
             Spacer()
             
-            if location == rowLocation {
+            if isChecked {
                 Image(systemName: "checkmark")
                     .font(.title3)
                     .foregroundStyle(.menuTitle)
@@ -415,34 +384,72 @@ struct MenuView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            guard location != rowLocation else {
-                onReturnToSelection?()
-                return
-            }
-            
-            location = rowLocation
-            
-            if soundingOrForecast == .sounding,
-               let wmoId = forecastLocation.wmoId,
-               let soundingList = store.state.recentSoundings.soundingList,
-               soundingList.messagesByStationId[wmoId] == nil {
-                // There is no sounding from this location. We'll just move the map.
-                mapPosition = mapPosition(forLocation: forecastLocation)
-                searchText = ""
+            tapAction?()
+        }
+    }
+    
+    @ViewBuilder
+    private func row(forLocation forecastLocation: LocationList.Location) -> some View {
+        let rowLocation = SoundingSelection.Location.named(
+            name: forecastLocation.name,
+            latitude: forecastLocation.latitude,
+            longitude: forecastLocation.longitude
+        )
+        
+        row(withContent: { Text(forecastLocation.description) },
+            subtitle: {
+                if let ourCoordinate = store.state.locationState.locationIfKnown {
+                    let ourLocation = CLLocation(latitude: ourCoordinate.latitude, longitude: ourCoordinate.longitude)
+                    let thisLocation = CLLocation(latitude: forecastLocation.latitude, longitude: forecastLocation.longitude)
+                    let distance = ourLocation.distance(from: thisLocation)
+                    let bearing = ourCoordinate.bearing(toLocation: thisLocation.coordinate)
+                    let distanceString = distanceFormatter.string(fromDistance: distance)
+                    let bearingString = OrdinalDirection.closest(toBearing: bearing)
+                    
+                    HStack {
+                        Text("\(distanceString) \(bearingString.abbreviation)")
+                            .opacity(0.7)
+                        
+                        Image(systemName: "location.north.fill")
+                            .foregroundColor(Color("DirectionalArrow"))
+                            .rotationEffect(Angle(degrees: bearing))
+                            .padding([.horizontal], 4)
+                    }
+                } else {
+                    EmptyView()
+                }
+            },
+            isChecked: location == rowLocation,
+            tapAction: {
+                guard location != rowLocation else {
+                    onReturnToSelection?()
+                    return
+                }
                 
-                return
-            }
-            
-            store.dispatch(
-                SoundingState.Action.selection(
-                    SoundingSelection.Action.selectModelTypeAndLocation(
-                        modelTypeForSelection,
-                        rowLocation,
-                        .now
+                location = rowLocation
+                
+                if soundingOrForecast == .sounding,
+                   let wmoId = forecastLocation.wmoId,
+                   let soundingList = store.state.recentSoundings.soundingList,
+                   soundingList.messagesByStationId[wmoId] == nil {
+                    // There is no sounding from this location. We'll just move the map.
+                    mapPosition = mapPosition(forLocation: forecastLocation)
+                    searchText = ""
+                    
+                    return
+                }
+                
+                store.dispatch(
+                    SoundingState.Action.selection(
+                        SoundingSelection.Action.selectModelTypeAndLocation(
+                            modelTypeForSelection,
+                            rowLocation,
+                            .now
+                        )
                     )
                 )
-            )
-        }
+            }
+        )
     }
     
     private var modelTypeForSelection: SoundingSelection.ModelType {
