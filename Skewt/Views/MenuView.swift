@@ -56,23 +56,6 @@ struct MenuView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let onReturnToSelection = onReturnToSelection {
-                HStack {
-                    Spacer()
-                    
-                    Button {
-                        onReturnToSelection()
-                    } label: {
-                        Image(systemName: "chevron.forward")
-                            .font(.body.weight(.semibold))
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .padding([.horizontal])
-                }
-                .foregroundStyle(.menuTitle)
-            }
-            
             HStack {
                 Picker("Forecast or Sounding", selection: $soundingOrForecast) {
                     Text("Forecast")
@@ -99,6 +82,18 @@ struct MenuView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar(.visible, for: .navigationBar)
+        .toolbar {
+            if let onReturnToSelection = onReturnToSelection {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        onReturnToSelection()
+                    } label: {
+                        Image(systemName: "chevron.forward")
+                    }
+                    .foregroundStyle(.menuTitle)
+                }
+            }
+        }
         .searchable(text: $searchText, placement: .sidebar)
         .searchSuggestions {
             ForEach(searchSuggestionLocations, id: \.self) {
