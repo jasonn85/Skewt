@@ -6,28 +6,11 @@
 //
 
 import SwiftUI
-import Combine
-
-@MainActor
-class TimeSelectDebouncer: ObservableObject {
-    @Published var time = SoundingSelection.Time.now
-    private var debouncer: AnyCancellable?
-    var store: Store<SkewtState>? = nil
-    
-    init() {
-        debouncer = $time
-            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
-            .removeDuplicates()
-            .sink(receiveValue: { [weak self] time in
-                self?.store?.dispatch(SoundingState.Action.selection(.selectTime(time)))
-            })
-    }
-}
+import CoreLocation
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
     
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.appEnvironment) private var appEnvironment
@@ -130,8 +113,6 @@ struct ContentView: View {
                 return
             }
             
-            timeSelectDebouncer.store = store
-            timeSelectDebouncer.time = store.state.currentSoundingState.selection.time
             requestLocationIfNeeded()
             
             if case .idle = store.state.recentSoundings.status {
@@ -154,13 +135,6 @@ struct ContentView: View {
             }
             
             requestLocationIfNeeded()
-        }
-        .onChange(of: store.state.currentSoundingState.selection.time) { _, newTime in
-            guard timeSelectDebouncer.time != newTime else {
-                return
-            }
-
-            timeSelectDebouncer.time = newTime
         }
         .onChange(of: store.state.currentSoundingState.selection) { _, _ in
             guard horizontalSizeClass == .compact else {
@@ -325,19 +299,12 @@ struct ContentView: View {
     
     @ViewBuilder
     private var timeSelection: some View {
-        switch store.state.currentSoundingState.selection.type {
-        case .forecast(_):
-            HourlyTimeSelectView(
-                value: $timeSelectDebouncer.time,
-                range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.forecast(.automatic).hourInterval),
-                location: store.state.locationState.locationIfKnown
-            )
-        case .sounding:
-            SoundingTimeSelectView(
-                value: $timeSelectDebouncer.time,
-                hourInterval: SoundingSelection.ModelType.sounding.hourInterval
-            )
+        TimeSelectionContainer(
+            selectionType: store.state.currentSoundingState.selection.type,
+            committedTime: store.state.currentSoundingState.selection.time,
+            location: store.state.locationState.locationIfKnown
+        ) { time in
+            store.dispatch(SoundingState.Action.selection(.selectTime(time)))
         }
     }
     
@@ -395,6 +362,72 @@ struct ContentView: View {
     private func showDetailForCurrentSelection() {
         preferredCompactColumn = .detail
         splitViewVisibility = .automatic
+    }
+}
+
+private struct TimeSelectionContainer: View {
+    let selectionType: SoundingSelection.ModelType
+    let committedTime: SoundingSelection.Time
+    let location: CLLocationCoordinate2D?
+    let onCommit: (SoundingSelection.Time) -> Void
+    
+    @State private var draftTime: SoundingSelection.Time
+    @State private var debounceTask: Task<Void, Never>?
+    
+    init(
+        selectionType: SoundingSelection.ModelType,
+        committedTime: SoundingSelection.Time,
+        location: CLLocationCoordinate2D?,
+        onCommit: @escaping (SoundingSelection.Time) -> Void
+    ) {
+        self.selectionType = selectionType
+        self.committedTime = committedTime
+        self.location = location
+        self.onCommit = onCommit
+        _draftTime = State(initialValue: committedTime)
+    }
+    
+    var body: some View {
+        selector
+            .onChange(of: draftTime) { _, newTime in
+                debounceTask?.cancel()
+                debounceTask = Task {
+                    try? await Task.sleep(for: .milliseconds(200))
+                    guard !Task.isCancelled else {
+                        return
+                    }
+                    onCommit(newTime)
+                }
+            }
+            .onChange(of: committedTime) { _, newTime in
+                guard draftTime != newTime else {
+                    return
+                }
+                
+                debounceTask?.cancel()
+                draftTime = newTime
+            }
+            .onDisappear {
+                debounceTask?.cancel()
+            }
+    }
+    
+    @ViewBuilder
+    private var selector: some View {
+        switch selectionType {
+        case .forecast(_):
+            HourlyTimeSelectView(
+                value: $draftTime,
+                range: .hours(-24)...TimeInterval.hours(24),
+                stepSize: .hours(SoundingSelection.ModelType.forecast(.automatic).hourInterval),
+                location: location
+            )
+        case .sounding:
+            SoundingTimeSelectView(
+                value: $draftTime,
+                hourInterval: SoundingSelection.ModelType.sounding.hourInterval
+            )
+        }
     }
 }
 
