@@ -188,7 +188,7 @@ struct DisplayOptionsView: View {
                         case .tens:
                             Text("10s")
                         case .zeroOnly:
-                            Text("only 0")
+                            Text("0")
                         }
                     }
                    }

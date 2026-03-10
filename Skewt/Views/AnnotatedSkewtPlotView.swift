@@ -161,7 +161,6 @@ struct AnnotatedSkewtPlotView: View {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot, parcelPoint: annotationPointAsCGPoint)
                             .aspectRatio(1.0, contentMode: .fit)
                             .scaleEffect(zoom, anchor: zoomAnchor)
-//                            .border(.black)
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
@@ -308,12 +307,12 @@ struct AnnotatedSkewtPlotView: View {
                             
                             Spacer()
                             
-                            Image(systemName: "xmark.circle.fill")
-                                .annotationFraming()
-                                .foregroundColor(.gray)
-                                .onTapGesture {
-                                    self.annotationPoint = nil
-                                }
+                            Button {
+                                self.annotationPoint = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.glass)
                         }
                     }
                     .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
@@ -537,10 +536,7 @@ struct AnnotationFraming: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background {
-                RoundedRectangle(cornerRadius: 6)
-                    .foregroundColor(backgroundColor)
-            }
+            .glassEffect(.regular.tint(backgroundColor), in: RoundedRectangle(cornerRadius: 6))
     }
 }
 
