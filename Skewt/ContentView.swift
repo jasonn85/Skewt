@@ -189,17 +189,41 @@ struct ContentView: View {
                 }
             }()
             
-            Text(title)
-                .multilineTextAlignment(.leading)
-                .foregroundStyle(.menuTitle)
-                .font(.title2)
-                .fontWeight(.bold)
-                .shadow(color: .black, radius: 1, x: 1, y: 1)
-                .background {
-                    GeometryReader {
-                        Color.clear.preference(key: TitleTextHeightKey.self, value: $0.size.height)
-                    }
+            VStack (alignment: .leading) {
+                ViewThatFits {
+                    Text(title)
+                        .lineLimit(1)
+                    
+                    Text(title)
+                        .lineLimit(1)
+                        .font(.subheadline)
+                    
+                    Text(title)
                 }
+                .foregroundStyle(.menuTitle)
+                .font(.title3)
+                .fontWeight(.bold)
+                
+                switch store.state.currentSoundingState.selection.type {
+                case .forecast(let model):
+                    if model != .automatic {
+                        Text("Model: \(model.description)")
+                            .font(.footnote)
+                            .foregroundStyle(.white)
+                            .opacity(0.7)
+                        
+                    }
+                default:
+                    EmptyView()
+                }
+            }
+            .multilineTextAlignment(.leading)
+            .shadow(color: .black, radius: 1, x: 1, y: 1)
+            .background {
+                GeometryReader {
+                    Color.clear.preference(key: TitleTextHeightKey.self, value: $0.size.height)
+                }
+            }
         }
     }
     
@@ -287,7 +311,7 @@ struct ContentView: View {
                     .rotationEffect(timeSelectionChevronRotation)
             }
         }
-        .font(.footnote)
+        .font(.subheadline)
         .onTapGesture {
             withAnimation {
                 selectingTime.toggle()

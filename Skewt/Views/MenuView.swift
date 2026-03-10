@@ -357,7 +357,7 @@ struct MenuView: View {
             VStack(alignment: .leading) {
                 content()
                     .foregroundStyle(.menuTitle)
-                    .font(.title2)
+                    .font(.title3)
                 
                 subtitle()
                     .font(.footnote)
@@ -384,7 +384,7 @@ struct MenuView: View {
                 Rectangle()
                     .foregroundStyle(Gradient(colors: [.menuItemGradient1, .menuItemGradient2]))
                 Rectangle()
-                    .stroke(Color.white, lineWidth: 2)
+                    .stroke(Color("MenuBorder"), lineWidth: 2)
                     .shadow(color: .black, radius: 1, x: 1, y: 1)
 
             }
