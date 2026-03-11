@@ -317,6 +317,7 @@ struct AnnotatedSkewtPlotView: View {
                     }
                     .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
             }
+            .minimumScaleFactor(0.5)
             .font(Font(axisLabelFont))
             
         } else {
