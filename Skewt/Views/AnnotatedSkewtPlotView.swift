@@ -319,7 +319,6 @@ struct AnnotatedSkewtPlotView: View {
             }
             .minimumScaleFactor(0.5)
             .font(Font(axisLabelFont))
-            
         } else {
             EmptyView()
         }

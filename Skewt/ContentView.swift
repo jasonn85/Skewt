@@ -185,7 +185,6 @@ struct ContentView: View {
                             .font(.footnote)
                             .foregroundStyle(.white)
                             .opacity(0.7)
-                        
                     }
                 default:
                     EmptyView()
