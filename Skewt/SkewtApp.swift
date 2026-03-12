@@ -9,21 +9,21 @@ import SwiftUI
 
 @main
 struct SkewtApp: App {
+    @StateObject private var store = Store(
+        initial: SkewtState(),
+        reducer: SkewtState.reducer,
+        middlewares: [
+            Middlewares.locationMiddleware,
+            Middlewares.consoleLogger,
+            Middlewares.userDefaultsSaving,
+            Middlewares.openMeteoApi,
+            Middlewares.ncafSoundingMiddleware,
+            Middlewares.ncafSoundingData,
+            Middlewares.uwySoundingData
+        ]
+    )
+
     var body: some Scene {
-        let store = Store(
-            initial: SkewtState(),
-            reducer: SkewtState.reducer,
-            middlewares: [
-                Middlewares.locationMiddleware,
-                Middlewares.consoleLogger,
-                Middlewares.userDefaultsSaving,
-                Middlewares.openMeteoApi,
-                Middlewares.ncafSoundingMiddleware,
-                Middlewares.ncafSoundingData,
-                Middlewares.uwySoundingData
-            ]
-        )
-        
         WindowGroup {
             ContentView()
                 .environmentObject(store)
