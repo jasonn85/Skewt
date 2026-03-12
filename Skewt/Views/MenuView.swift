@@ -16,12 +16,12 @@ struct MenuView: View {
     private struct SoundingAnnotationItem: Identifiable {
         let stationId: Int
         let location: LocationList.Location
-        let soundingData: SoundingData
+        let soundingData: SoundingData?
         
         var id: String { "\(stationId)-\(location.name)" }
     }
     
-    private static let soundingLocationsByWmoId: [Int: [LocationList.Location]] = LocationList.allLocations.locations
+    private static let soundingLocationsByWmoId: [Int: [LocationList.Location]] = try! LocationList.forType(.sounding).locations
         .sorted { $0.name < $1.name }
         .reduce(into: [Int: [LocationList.Location]]()) { locationsByWmoId, location in
             guard let wmoId = location.wmoId else {
@@ -42,6 +42,8 @@ struct MenuView: View {
     @State private var mapPosition: MapCameraPosition = .camera(
         MapCamera(centerCoordinate: .denver, distance: MenuView.mapZoom)
     )
+    @State private var selectedAnnotationID: String?
+    @State private var soundingAnnotationItems: [SoundingAnnotationItem] = []
     
     @State private var searchText = ""
     
@@ -123,14 +125,22 @@ struct MenuView: View {
     @ViewBuilder
     private var soundingSelectionView: some View {
         VStack {
-            Map(position: $mapPosition, interactionModes: [.pan, .zoom]) {
+            Map(
+                position: $mapPosition,
+                interactionModes: [.pan, .zoom],
+                selection: $selectedAnnotationID
+            ) {
                 ForEach(soundingAnnotationItems) { item in
-                    Annotation(item.location.description, coordinate: item.location.coordinate, anchor: .bottom) {
-                        SoundingMapAnnotation(data: item.soundingData)
-                            .frame(width: 50, height: 50)
-                            .onTapGesture {
-                                selectLatestSounding(forLocation: item.location)
-                            }
+                    switch item.soundingData {
+                    case .some(let data):
+                        Annotation(item.location.description, coordinate: item.location.coordinate, anchor: .bottom) {
+                            SoundingMapAnnotation(data: data)
+                                .frame(width: 50, height: 50)
+                        }
+                        .tag(item.id)
+                    case .none:
+                        Marker(item.location.description, coordinate: item.location.coordinate)
+                            .tag(item.id)
                     }
                 }
             }
@@ -149,34 +159,60 @@ struct MenuView: View {
             }
             .onAppear {
                 mapPosition = initialMapPosition
+                refreshSoundingAnnotationItems()
+            }
+            .onChange(of: store.state.recentSoundings.soundingList?.timestamp) { _, _ in
+                refreshSoundingAnnotationItems()
+            }
+            .onChange(of: selectedAnnotationID) { _, selectedAnnotationID in
+                guard
+                    let selectedAnnotationID,
+                    let item = soundingAnnotationItems.first(where: { $0.id == selectedAnnotationID })
+                else {
+                    return
+                }
+
+                selectLatestSounding(forLocation: item.location)
+                self.selectedAnnotationID = nil
             }
         }
     }
     
-    private var soundingAnnotationItems: [SoundingAnnotationItem] {
-        guard let soundingList = store.state.recentSoundings.soundingList else {
-            return []
-        }
-        
-        return soundingList.messagesByStationId.keys
+    private func buildSoundingAnnotationItems() -> [SoundingAnnotationItem] {
+        let soundingList = store.state.recentSoundings.soundingList
+
+        return Self.soundingLocationsByWmoId.keys
             .sorted()
             .compactMap { stationId in
-                guard let locations = Self.soundingLocationsByWmoId[stationId],
-                      let representativeLocation = representativeSoundingLocation(
+                guard let locations = Self.soundingLocationsByWmoId[stationId] else {
+                    return nil
+                }
+
+                let representativeLocation: LocationList.Location?
+                if let soundingList {
+                    representativeLocation = representativeSoundingLocation(
                         forStationId: stationId,
                         from: locations,
                         using: soundingList
-                      ),
-                      let soundingData = soundingList.soundingData(forStationId: stationId) else {
+                    )
+                } else {
+                    representativeLocation = locations.first
+                }
+
+                guard let representativeLocation else {
                     return nil
                 }
                 
                 return SoundingAnnotationItem(
                     stationId: stationId,
                     location: representativeLocation,
-                    soundingData: soundingData
+                    soundingData: soundingList?.soundingData(forStationId: stationId)
                 )
             }
+    }
+
+    private func refreshSoundingAnnotationItems() {
+        soundingAnnotationItems = buildSoundingAnnotationItems()
     }
     
     private func representativeSoundingLocation(
