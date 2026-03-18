@@ -28,6 +28,7 @@ struct DisplayOptionsView: View {
         NavigationStack {
             List {
                 Section {
+                    background
                     windBarbs
                     animatedWind
                     parcels
@@ -60,7 +61,7 @@ struct DisplayOptionsView: View {
                             value: Binding<Double>(
                                 get: { store.state.plotOptions.altitudeRange?.upperBound ?? Self.maximumAltitude },
                                 set: {
-                                    store.dispatch(PlotOptions.Action.changeAltitudeRange(0.0...$0))
+                                    store.dispatch(PlotOptions.Action.setAltitudeRange(0.0...$0))
                                 }
                             ),
                             in: Self.minimumMaximumAltitude...Self.maximumAltitude,
@@ -83,6 +84,24 @@ struct DisplayOptionsView: View {
                 }
             }
             .pickerStyle(.segmented)
+        }
+    }
+    
+    @ViewBuilder
+    private var background: some View {
+        HStack {
+            Image("logoBackground")
+                .border(.black, width: 1.0)
+                        
+            Toggle(isOn: Binding<Bool>(get: {
+                store.state.plotOptions.showSkyBackground
+            }, set: { showSkyBackground in
+                withAnimation {
+                    store.dispatch(PlotOptions.Action.setShowSkyBackground(showSkyBackground))
+                }
+            })) {
+                Text("Sky background")
+            }
         }
     }
     
@@ -179,7 +198,7 @@ struct DisplayOptionsView: View {
             Picker("Isotherms",
                    selection: Binding<PlotOptions.IsothermTypes>(
                     get: { store.state.plotOptions.isothermTypes },
-                    set: { store.dispatch(PlotOptions.Action.changeIsothermTypes($0)) }
+                    set: { store.dispatch(PlotOptions.Action.setIsothermTypes($0)) }
                    )) {
                     ForEach(PlotOptions.IsothermTypes.allCases, id: \.id) {
                         switch $0 {
@@ -206,7 +225,7 @@ struct DisplayOptionsView: View {
                     get: { store.state.plotOptions.isobarTypes },
                     set: { type in
                         withAnimation {
-                            store.dispatch(PlotOptions.Action.changeIsobarTypes(type))
+                            store.dispatch(PlotOptions.Action.setIsobarTypes(type))
                         }
                     }
                    )) {
@@ -233,7 +252,7 @@ struct DisplayOptionsView: View {
             Picker("Adiabats",
                    selection: Binding<PlotOptions.AdiabatTypes>(
                     get: { store.state.plotOptions.adiabatTypes },
-                    set: { store.dispatch(PlotOptions.Action.changeAdiabatTypes($0)) }
+                    set: { store.dispatch(PlotOptions.Action.setAdiabatTypes($0)) }
                    )) {
                        ForEach(PlotOptions.AdiabatTypes.allCases, id: \.id) {
                            switch $0 {
@@ -253,7 +272,7 @@ struct DisplayOptionsView: View {
             
             Toggle(isOn: Binding<Bool>(
                 get: { store.state.plotOptions.showMixingLines },
-                set: { store.dispatch(PlotOptions.Action.setMixingLines($0)) }
+                set: { store.dispatch(PlotOptions.Action.setShowMixingLines($0)) }
             )) {
                 Text("Mixing lines")
             }
