@@ -40,6 +40,7 @@ struct SoundingMapAnnotation: View {
             showIsothermLabels: false,
             showWindBarbs: false,
             showAnimatedWind: false,
+            showSkyBackground: true,
             plotStyling: plotStyling
         )
     }

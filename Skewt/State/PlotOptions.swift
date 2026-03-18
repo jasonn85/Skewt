@@ -9,18 +9,19 @@ import Foundation
 
 struct PlotOptions: Codable {
     enum Action: Skewt.Action, Codable {
-        case changeAltitudeRange(ClosedRange<Double>)
-        case changeSkew(Double)
+        case setAltitudeRange(ClosedRange<Double>)
+        case setSkew(Double)
         case setShowSurfaceParcelByDefault(Bool)
         case setShowMovableParcel(Bool)
-        case changeIsothermTypes(IsothermTypes)
-        case changeIsobarTypes(IsobarTypes)
-        case changeAdiabatTypes(AdiabatTypes)
-        case setMixingLines(Bool)
+        case setIsothermTypes(IsothermTypes)
+        case setIsobarTypes(IsobarTypes)
+        case setAdiabatTypes(AdiabatTypes)
+        case setShowMixingLines(Bool)
         case setIsobarLabels(Bool)
         case setIsothermLabels(Bool)
         case setWindBarbs(Bool)
         case setShowAnimatedWind(Bool)
+        case setShowSkyBackground(Bool)
     }
     
     struct PlotStyling: Codable {
@@ -90,6 +91,7 @@ struct PlotOptions: Codable {
     var showIsothermLabels: Bool
     var showWindBarbs: Bool
     var showAnimatedWind: Bool
+    var showSkyBackground: Bool
     var plotStyling: PlotStyling
 }
 
@@ -107,6 +109,7 @@ extension PlotOptions {
         showIsothermLabels = true
         showWindBarbs = false
         showAnimatedWind = true
+        showSkyBackground = true
         plotStyling = PlotStyling()
     }
 }
@@ -124,21 +127,21 @@ extension PlotOptions {
         
         if let action = action as? PlotOptions.Action {
             switch action  {
-            case .changeAltitudeRange(let range):
+            case .setAltitudeRange(let range):
                 options.altitudeRange = range
-            case .changeSkew(let skew):
+            case .setSkew(let skew):
                 options.skew = skew
             case .setShowSurfaceParcelByDefault(let showSurfaceParcel):
                 options.showSurfaceParcelByDefault = showSurfaceParcel
             case .setShowMovableParcel(let showParcel):
                 options.showMovableParcel = showParcel
-            case .changeIsothermTypes(let types):
+            case .setIsothermTypes(let types):
                 options.isothermTypes = types
-            case .changeIsobarTypes(let types):
+            case .setIsobarTypes(let types):
                 options.isobarTypes = types
-            case .changeAdiabatTypes(let types):
+            case .setAdiabatTypes(let types):
                 options.adiabatTypes = types
-            case .setMixingLines(let mixingLines):
+            case .setShowMixingLines(let mixingLines):
                 options.showMixingLines = mixingLines
             case .setIsobarLabels(let isobarLabels):
                 options.showIsobarLabels = isobarLabels
@@ -148,6 +151,8 @@ extension PlotOptions {
                 options.showWindBarbs = showWindBarbs
             case .setShowAnimatedWind(let showAnimatedWind):
                 options.showAnimatedWind = showAnimatedWind
+            case .setShowSkyBackground(let showSkyBackground):
+                options.showSkyBackground = showSkyBackground
             }
         }
         

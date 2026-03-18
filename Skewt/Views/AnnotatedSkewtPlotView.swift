@@ -198,7 +198,11 @@ struct AnnotatedSkewtPlotView: View {
                                         }
                                         : nil
                                         
-                                        SunlightGradientView(location: location, time: time)
+                                        if plotOptions.showSkyBackground {
+                                            SunlightGradientView(location: location, time: time)
+                                        } else {
+                                            Color.white
+                                        }
                                         
                                         AnimatedWindView(
                                             frame: CGRect(origin: .zero, size: geometry.size),
