@@ -254,6 +254,7 @@ struct SoundingStateTests {
 
         let staleList = NCAFSoundingList(
             messagesByStationId: list.messagesByStationId,
+            stationCodeByStationId: [:],
             timestamp: .now.addingTimeInterval(-TimeInterval.hours(12))
         )
 
@@ -293,7 +294,7 @@ private extension SoundingStateTests {
     func loadNcafList() -> NCAFSoundingList? {
         let bundle = Bundle(for: NcafTestBundleToken.self)
         guard let url = bundle.url(forResource: "Current", withExtension: "rawins"),
-              let text = try? String(contentsOf: url) else {
+              let text = try? String(contentsOf: url, encoding: .utf8) else {
             return nil
         }
 

@@ -12,7 +12,7 @@ struct HourlyTimeSelectView: View {
     @Binding var value: SoundingSelection.Time
     @State var range: ClosedRange<TimeInterval>
     @State var stepSize: TimeInterval = .hours(1)
-    @State var location: CLLocation? = nil  // Location for showing proper sunrise/sunset times
+    @State var location: CLLocationCoordinate2D? = nil  // Location for showing proper sunrise/sunset times
     
     @State private var dragging = false
     
@@ -184,7 +184,7 @@ extension SunState {
 }
 
 extension LinearGradient {
-    static func horizontalSunGradient(inTimeRange range: ClosedRange<Date>, at location: CLLocation) -> LinearGradient {
+    static func horizontalSunGradient(inTimeRange range: ClosedRange<Date>, at location: CLLocationCoordinate2D) -> LinearGradient {
         let states = SunState.states(inRange: range, at: location)
         let dateRange = range.upperBound.timeIntervalSince(range.lowerBound)
         let transition = TimeInterval(60.0 * 60.0)  // 60 minutes

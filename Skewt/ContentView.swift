@@ -6,33 +6,38 @@
 //
 
 import SwiftUI
-import Combine
-
-@MainActor
-class TimeSelectDebouncer: ObservableObject {
-    @Published var time = SoundingSelection.Time.now
-    private var debouncer: AnyCancellable?
-    var store: Store<SkewtState>? = nil
-    
-    init() {
-        debouncer = $time
-            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
-            .removeDuplicates()
-            .sink(receiveValue: { [weak self] time in
-                self?.store?.dispatch(SoundingState.Action.selection(.selectTime(time)))
-            })
-    }
-}
+import CoreLocation
 
 struct ContentView: View {
     @EnvironmentObject var store: Store<SkewtState>
-    @StateObject var timeSelectDebouncer = TimeSelectDebouncer()
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
-    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.appEnvironment) private var appEnvironment
     
     @State private var selectingTime = false
+    @State private var showingOptions = false
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
+    @State private var splitViewVisibility: NavigationSplitViewVisibility = .automatic
+    
+    private struct OptionsButtonWidthKey: PreferenceKey {
+        static var defaultValue: CGFloat { 0 }
+
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
+    
+    private struct TitleTextHeightKey: PreferenceKey {
+        static var defaultValue: CGFloat { 0 }
+        
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
+
+    @State private var optionsButtonWidth: CGFloat = 0
+    @State private var titleTextHeight: CGFloat = 0
     
     private var timeAgoFormatter: RelativeDateTimeFormatter {
         let formatter = RelativeDateTimeFormatter()
@@ -50,42 +55,64 @@ struct ContentView: View {
     }
     
     var body: some View {
-        let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-        let vertical = verticalSizeClass != .compact
-        
-        Group {
-            if isPhone {
-                if vertical {
-                    VStack {
-                        plotView
-                            .layoutPriority(1.0)
-                        
-                        tabView
-                            .frame(minHeight: 350.0)
-                    }
-                } else {
+        NavigationSplitView(columnVisibility: $splitViewVisibility,
+                            preferredCompactColumn: $preferredCompactColumn) {
+            // If we're a compact UI, we'll set an action which will make a -> button appear
+            let dismissCompactMenuAction: (() -> Void)? = {
+                guard horizontalSizeClass == .compact else {
+                    return nil
+                }
+                
+                return {
+                    showDetailForCurrentSelection()
+                }
+            }()
+            
+            MenuView(onReturnToSelection: dismissCompactMenuAction)
+                .environmentObject(store)
+        } detail: {
+            plotView
+                .navigationBarBackButtonHidden(true)
+                .toolbar(.hidden, for: .navigationBar)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background {
+                    LinearGradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2], startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
+                }
+                .overlay(alignment: .top) {
                     HStack {
-                        locationNavigationStack
-
-                        plotView
+                        titleButton
+                        Spacer()
+                        optionsButton
+                    }
+                    .padding([.horizontal], 30)
+                    .onPreferenceChange(TitleTextHeightKey.self) {
+                        titleTextHeight = $0
+                    }
+                    .background {
+                        LinearGradient(colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2], startPoint: .top, endPoint: .bottom)
+                            .ignoresSafeArea(edges: [.horizontal])
+                            .frame(height: max(titleTextHeight + 12, 44))
                     }
                 }
-            } else {
-                NavigationSplitView(columnVisibility: splitViewVisibility) {
-                    locationNavigationStack
-                } detail: {
-                    plotView
-                        .navigationBarTitleDisplayMode(.inline)
-                }
-                .navigationSplitViewStyle(.balanced)
+        }
+        .overlay {
+            if showingOptions {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showingOptions = false
+                    }
             }
         }
+        .fontDesign(.monospaced)
+        .colorScheme(.dark)
         .onAppear {
             guard appEnvironment.isLive else {
                 return
             }
             
-            timeSelectDebouncer.store = store
             requestLocationIfNeeded()
             
             if case .idle = store.state.recentSoundings.status {
@@ -109,59 +136,93 @@ struct ContentView: View {
             
             requestLocationIfNeeded()
         }
-    }
-    
-    @ViewBuilder
-    private var locationNavigationStack: some View {
-        NavigationStack {
-            LocationSelectionView(listType: .modelType(.forecast(.automatic)))
-                .environmentObject(store)
-                .toolbar {
-                    Button("Options", systemImage: "slider.horizontal.3") {
-                        store.dispatch(DisplayState.Action.showDialog(.displayOptions))
-                    }
-                }
-                .navigationDestination(isPresented: Binding<Bool>(get: {
-                    store.state.displayState.dialogSelection == .displayOptions
-                }, set: { _ in })) {
-                    DisplayOptionsView()
-                        .environmentObject(store)
-                        .navigationTitle("Options")
-                }
+        .onChange(of: store.state.currentSoundingState.selection) { _, _ in
+            guard horizontalSizeClass == .compact else {
+                // Keep the content/left panel open on iPad
+                return
+            }
+            
+            showDetailForCurrentSelection()
         }
-        .navigationTitle("Locations")
     }
     
-    private var splitViewVisibility: Binding<NavigationSplitViewVisibility> {
-        Binding {
-            switch store.state.displayState.dialogSelection {
-            case .displayOptions, .locationSelection(_):
-                return .doubleColumn
-            default:
-                return .detailOnly
+    private var titleButton: some View {
+        Button {
+            preferredCompactColumn = .content
+            splitViewVisibility = .doubleColumn
+        } label : {
+            Image("SkewtLogo")
+                .padding([.trailing], 8)
+            
+            let selection = store.state.currentSoundingState.selection
+            let title: String = {
+                if let longDescription = longerDescription(for: selection) {
+                    return "\(longDescription) (\(selection.location.briefDescription))"
+                } else {
+                    return selection.location.briefDescription
+                }
+            }()
+            
+            VStack (alignment: .leading) {
+                ViewThatFits {
+                    Text(title)
+                        .lineLimit(1)
+                    
+                    Text(title)
+                        .lineLimit(1)
+                        .font(.subheadline)
+                    
+                    Text(title)
+                }
+                .foregroundStyle(.menuTitle)
+                .font(.title3)
+                .fontWeight(.bold)
+                
+                switch store.state.currentSoundingState.selection.type {
+                case .forecast(let model):
+                    if model != .automatic {
+                        Text("Model: \(model.description)")
+                            .font(.footnote)
+                            .foregroundStyle(.white)
+                            .opacity(0.7)
+                    }
+                default:
+                    EmptyView()
+                }
             }
-        } set: {
-            if $0 == .detailOnly {
-                store.dispatch(DisplayState.Action.hideDialog)
-            } else {
-                store.showLastLocationDialog()
+            .multilineTextAlignment(.leading)
+            .shadow(color: .black, radius: 1, x: 1, y: 1)
+            .background {
+                GeometryReader {
+                    Color.clear.preference(key: TitleTextHeightKey.self, value: $0.size.height)
+                }
             }
+        }
+    }
+    
+    private var optionsButton: some View {
+        Button {
+            showingOptions.toggle()
+        } label: {
+            Image(systemName: "slider.horizontal.3")
+        }
+        .buttonStyle(.glass)
+        .sheet(isPresented: $showingOptions) {
+            DisplayOptionsView()
+                .environmentObject(store)
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled)
         }
     }
     
     private var plotView: some View {
-        VStack (alignment: .center) {
-            header
-            
+        VStack (alignment: .center) {            
             AnnotatedSkewtPlotView(
                 soundingState: store.state.currentSoundingState,
                 plotOptions: store.state.plotOptions,
                 location: store.state.locationState.locationIfKnown,
                 time: store.state.currentSoundingState.selection.timeAsConcreteDate
             )
-                .onAppear() {
-                    store.dispatch(LocationState.Action.requestLocation)
-                }
             
             footer
             
@@ -172,72 +233,40 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private var tabView: some View {
-        TabView(selection: Binding<DisplayState.DialogSelection>(
-            get: { store.state.displayState.dialogSelection ?? .locationSelection(store.state.displayState.lastLocationDialogSelection) },
-            set: { store.dispatch(DisplayState.Action.showDialog($0)) }
-        )) {
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.forecast(.automatic)))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Forecasts", systemImage: "chart.line.uptrend.xyaxis")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.forecast))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .modelType(.sounding))
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Soundings", systemImage: "balloon")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.sounding))
-            
-            NavigationStack {
-                LocationSelectionView(listType: .favoritesAndRecents)
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Recents", systemImage: "list.bullet")
-            }
-            .tag(DisplayState.DialogSelection.locationSelection(.recent))
-            
-            NavigationStack {
-                DisplayOptionsView()
-                    .environmentObject(store)
-            }
-            .tabItem {
-                Label("Options", systemImage: "slider.horizontal.3")
-            }
-            .tag(DisplayState.DialogSelection.displayOptions)
-        }
-    }
-    
     private var header: some View {
-        HStack {
-            if store.state.currentSoundingState.selection.requiresLocation {
-                Image(systemName: "location")
-            }
+        let selection = store.state.currentSoundingState.selection
+        
+        VStack(alignment: .center) {
+            let title: String = {
+                if let longDescription = longerDescription(for: selection) {
+                    return "\(longDescription) (\(selection.location.briefDescription))"
+                } else {
+                    return selection.location.briefDescription
+                }
+            }()
             
-            Text(store.state.currentSoundingState.selection.type.description)
-                
+            Text(title)
+                .foregroundStyle(.menuTitle)
+                .font(.title)
             
-            switch store.state.currentSoundingState.selection.location {
-            case .named(let locationName, _, _):
-                Text("(\(locationName))")
-            case .point(_, _):
-                Text("(selected location)")
-            case .closest:
-                EmptyView()
-            }
+            Text(selection.type.subtitle)
+                .font(.subheadline)
         }
-        .font(.headline.weight(.semibold))
-        .foregroundColor(.blue)
-        .onTapGesture {
-            withAnimation {
-                store.showLastLocationDialog()
+        .foregroundStyle(.white)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets([.vertical], 8)
+        .shadow(color: .black, radius: 1, x: 1, y: 1)
+        .padding([.horizontal], 14)
+        .padding([.vertical], 8)
+        .background {
+            ZStack {
+                Rectangle()
+                    .foregroundStyle(Gradient(colors: [.menuItemGradient1, .menuItemGradient2]))
+                Rectangle()
+                    .stroke(Color.white, lineWidth: 2)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+
             }
         }
     }
@@ -255,7 +284,7 @@ struct ContentView: View {
                     .rotationEffect(timeSelectionChevronRotation)
             }
         }
-        .font(.footnote)
+        .font(.subheadline)
         .onTapGesture {
             withAnimation {
                 selectingTime.toggle()
@@ -269,19 +298,12 @@ struct ContentView: View {
     
     @ViewBuilder
     private var timeSelection: some View {
-        switch store.state.currentSoundingState.selection.type {
-        case .forecast(_):
-            HourlyTimeSelectView(
-                value: $timeSelectDebouncer.time,
-                range: .hours(-24)...TimeInterval.hours(24),
-                stepSize: .hours(SoundingSelection.ModelType.forecast(.automatic).hourInterval),
-                location: store.state.locationState.locationIfKnown
-            )
-        case .sounding:
-            SoundingTimeSelectView(
-                value: $timeSelectDebouncer.time,
-                hourInterval: SoundingSelection.ModelType.sounding.hourInterval
-            )
+        TimeSelectionContainer(
+            selectionType: store.state.currentSoundingState.selection.type,
+            committedTime: store.state.currentSoundingState.selection.time,
+            location: store.state.locationState.locationIfKnown
+        ) { time in
+            store.dispatch(SoundingState.Action.selection(.selectTime(time)))
         }
     }
     
@@ -325,11 +347,97 @@ struct ContentView: View {
 
         store.dispatch(LocationState.Action.requestLocation)
     }
+    
+    private func longerDescription(for selection: SoundingSelection) -> String? {
+        guard case .named(let name, let latitude, let longitude) = selection.location,
+              let list = try? LocationList.forType(selection.type),
+              let location = list.locationNamed(name, latitude: latitude, longitude: longitude) else {
+            return nil
+        }
+        
+        return location.description
+    }
+
+    private func showDetailForCurrentSelection() {
+        preferredCompactColumn = .detail
+        splitViewVisibility = .automatic
+    }
 }
 
-extension Store<SkewtState> {
-    func showLastLocationDialog() {
-        dispatch(DisplayState.Action.showDialog(.locationSelection(state.displayState.lastLocationDialogSelection)))
+private struct TimeSelectionContainer: View {
+    let selectionType: SoundingSelection.ModelType
+    let committedTime: SoundingSelection.Time
+    let location: CLLocationCoordinate2D?
+    let onCommit: (SoundingSelection.Time) -> Void
+    
+    @State private var draftTime: SoundingSelection.Time
+    @State private var debounceTask: Task<Void, Never>?
+    
+    init(
+        selectionType: SoundingSelection.ModelType,
+        committedTime: SoundingSelection.Time,
+        location: CLLocationCoordinate2D?,
+        onCommit: @escaping (SoundingSelection.Time) -> Void
+    ) {
+        self.selectionType = selectionType
+        self.committedTime = committedTime
+        self.location = location
+        self.onCommit = onCommit
+        _draftTime = State(initialValue: committedTime)
+    }
+    
+    var body: some View {
+        selector
+            .onChange(of: draftTime) { _, newTime in
+                debounceTask?.cancel()
+                debounceTask = Task {
+                    try? await Task.sleep(for: .milliseconds(200))
+                    guard !Task.isCancelled else {
+                        return
+                    }
+                    onCommit(newTime)
+                }
+            }
+            .onChange(of: committedTime) { _, newTime in
+                guard draftTime != newTime else {
+                    return
+                }
+                
+                debounceTask?.cancel()
+                draftTime = newTime
+            }
+            .onDisappear {
+                debounceTask?.cancel()
+            }
+    }
+    
+    @ViewBuilder
+    private var selector: some View {
+        switch selectionType {
+        case .forecast(_):
+            HourlyTimeSelectView(
+                value: $draftTime,
+                range: .hours(-24)...TimeInterval.hours(24),
+                stepSize: .hours(SoundingSelection.ModelType.forecast(.automatic).hourInterval),
+                location: location
+            )
+        case .sounding:
+            SoundingTimeSelectView(
+                value: $draftTime,
+                hourInterval: SoundingSelection.ModelType.sounding.hourInterval
+            )
+        }
+    }
+}
+
+fileprivate extension SoundingSelection.ModelType {
+    var subtitle: String {
+        switch self {
+        case .sounding:
+            "Sounding"
+        case .forecast(let model):
+            "Model: \(model.description)"
+        }
     }
 }
 
@@ -338,16 +446,5 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
             .environmentObject(Store<SkewtState>.previewStore)
             .environment(\.appEnvironment, AppEnvironment(isLive: false))
-    }
-}
-
-extension SoundingSelection.ModelType: CustomStringConvertible {
-    var description: String {
-        switch self {
-        case .forecast(_):
-            return "Forecast"
-        case .sounding:
-            return "Sounding"
-        }
     }
 }

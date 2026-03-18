@@ -24,6 +24,10 @@ struct LocationList: Codable {
         var description: String
         
         var id: String { name }
+        
+        var coordinate: CLLocationCoordinate2D {
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
     }
     
     var locations: [Location]
@@ -103,12 +107,6 @@ extension LocationList.Location {
     }
 }
 
-extension LocationList.Location {
-    var clLocation: CLLocation {
-        CLLocation(latitude: latitude, longitude: longitude)
-    }
-}
-
 extension TimeInterval {
     static var twentyFourHours: Self {
         60.0 * 60.0 * 24.0
@@ -116,7 +114,8 @@ extension TimeInterval {
 }
 
 extension LocationList {
-    func locationsSortedByProximity(to location: CLLocation, onlyWmoIds wmoIds: [Int]? = nil) -> [Location] {
+    func locationsSortedByProximity(to coordinate: CLLocationCoordinate2D, onlyWmoIds wmoIds: [Int]? = nil) -> [Location] {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         var locations = self.locations
         
         if let wmoIds = wmoIds {

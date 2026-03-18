@@ -148,7 +148,7 @@ struct SkewtPlotView_Previews: PreviewProvider {
     static var previews: some View {
         GeometryReader { geometry in
             let store = Store<SkewtState>.previewStore
-            let plot = SkewtPlot(sounding: Store<SkewtState>.previewSoundingList.closestSounding())
+            let plot = SkewtPlot(data: Store<SkewtState>.previewSoundingList.closestSounding()?.data)
             
             SkewtPlotView(plotOptions: store.state.plotOptions, plot: plot, parcelPoint: nil)
         }

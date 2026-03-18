@@ -9,6 +9,7 @@ import SwiftUI
 
 fileprivate let windSpanKey = "windVerticalSpan"
 fileprivate let windVelocityKey = "windVelocity"
+fileprivate let fixedAnimationEpoch: CFTimeInterval = 0
 
 fileprivate typealias WindSpan = ClosedRange<CGFloat>
 fileprivate typealias WindEmitter = CAEmitterLayer
@@ -47,9 +48,13 @@ struct AnimatedWindView: UIViewRepresentable {
     private let emitterWidth: CGFloat = 10.0
     private let windParticleBirthRateMultiplier: Float = 15.0
     
-    @Environment(\.self) var environment
+    @Environment(\.displayScale) private var displayScale
     
-    init(frame: CGRect, winds: [Double : Double]?, particleColor: CGColor = CGColor(gray: 0.33, alpha: 0.2)) {
+    init(
+        frame: CGRect,
+        winds: [Double : Double]?,
+        particleColor: CGColor = CGColor(gray: 0.33, alpha: 0.2)
+    ) {
         self.frame = frame
         self.winds = winds
         self.particleColor = particleColor
@@ -69,17 +74,37 @@ struct AnimatedWindView: UIViewRepresentable {
     }
     
     private func rebuildWindEmittersIfNeeded(inView view: UIView) {
-        let wind = windByRange
-        
-        let existingWind = view.windEmitters.reduce(into: [WindSpan:Double]()) {
-            $0[$1.windSpan!] = $1.windVelocity!
-        }
-        
-        if existingWind != wind {
+        let desiredWind = windByRange.filter { abs($0.value) >= minimumWindToAnimate }
+
+        let existingEmitters = view.windEmitters
+
+        guard existingEmitters.count == desiredWind.count else {
             view.windEmitters.forEach { $0.removeFromSuperlayer() }
             
-            wind.compactMap { windEmitter(verticalSpan: $0, velocity: $1) }
+            desiredWind.compactMap {
+                windEmitter(
+                    verticalSpan: $0,
+                    velocity: $1
+                )
+            }
                 .forEach { view.layer.addSublayer($0) }
+            return
+        }
+
+        let sortedEmitters = existingEmitters.sorted {
+            $0.windSpan!.lowerBound < $1.windSpan!.lowerBound
+        }
+        let sortedDesired = desiredWind.sorted {
+            $0.key.lowerBound < $1.key.lowerBound
+        }
+
+        for (emitter, desired) in zip(sortedEmitters, sortedDesired) {
+            let desiredSpan = desired.key
+            let desiredVelocity = desired.value
+
+            emitter.windSpan = desiredSpan
+            emitter.windVelocity = desiredVelocity
+            emitter.emitterCells = [windEmitterCell(verticalSpan: desiredSpan, velocity: desiredVelocity)]
         }
     }
     
@@ -101,7 +126,7 @@ struct AnimatedWindView: UIViewRepresentable {
             return nil
         }
         
-        let screenScale = UIScreen.main.scale
+        let screenScale = displayScale
         let emitter = WindEmitter()
         emitter.windSpan = verticalSpan
         emitter.windVelocity = velocity
@@ -111,8 +136,23 @@ struct AnimatedWindView: UIViewRepresentable {
         // Prevent all wind emitters from weirdly aligning at first appearance
         emitter.seed = UInt32(verticalSpan.hashValue & Int(UInt32.max))
         
+        let cell = windEmitterCell(verticalSpan: verticalSpan, velocity: velocity)
+
+        // Use a fixed epoch so recreated views stay on one timeline.
+        // Subtract one lifetime to prewarm the first rendered frame.
+        emitter.beginTime = fixedAnimationEpoch - CFTimeInterval(cell.lifetime)
+        
+        emitter.emitterCells = [cell]
+        
+        return emitter
+    }
+
+    private func windEmitterCell(verticalSpan: WindSpan, velocity: Double) -> CAEmitterCell {
+        let positiveVelocity = abs(velocity)
+        let screenScale = displayScale
+
         let cell = CAEmitterCell()
-        cell.contentsScale = UIScreen.main.scale
+        cell.contentsScale = displayScale
         cell.contents = UIImage(named: "WindParticle", in: nil, compatibleWith: nil)?.cgImage
         cell.color = particleColor
         cell.scale = windParticleScale
@@ -120,16 +160,14 @@ struct AnimatedWindView: UIViewRepresentable {
         cell.velocityRange = velocityRangeMultiplier * positiveVelocity
         cell.lifetime = Float(screenScale * frame.size.width / (velocityScale * positiveVelocity - positiveVelocity * velocityRangeMultiplier * velocityScale))
         cell.birthRate =  Float((verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height) * windParticleBirthRateMultiplier / cell.lifetime
-        
-        emitter.emitterCells = [cell]
-        
-        return emitter
+
+        return cell
     }
     
     private func windEmitterSize(verticalSpan: WindSpan) -> CGSize {
         CGSize(
             width: emitterWidth,
-            height: UIScreen.main.scale * (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
+            height: displayScale * (verticalSpan.upperBound - verticalSpan.lowerBound) * frame.size.height
         )
     }
     

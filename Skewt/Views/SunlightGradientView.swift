@@ -9,14 +9,14 @@ import SwiftUI
 import CoreLocation
 
 struct SunlightGradientView: View {
-    let location: CLLocation
+    let location: CLLocationCoordinate2D
     let time: Date
     
     var viewBearing: Double = 0.0  /// Bearing in degrees, 90.0 being east
     var horizontalFovDegrees: Double = 90.0
     
     init(
-        location: CLLocation? = nil,
+        location: CLLocationCoordinate2D? = nil,
         time: Date? = nil,
         viewBearing: Double = 0.0,
         horizontalFovDegrees: Double = 90.0
@@ -35,7 +35,7 @@ struct SunlightGradientView: View {
                 .float(.pi + time.hourAngle(at: location) + viewBearing * .pi / 180.0),
                 .float(.pi / 2.0 - time.solarZenithAngle(at: location)),
                 .float(time.localSiderealTime(at: location) + viewBearing * .pi / 180.0),
-                .float(location.coordinate.latitude * .pi / 180.0),
+                .float(location.latitude * .pi / 180.0),
                 .float(horizontalFovDegrees * .pi / 180.0),
                 .image(Image("StarBox"))
             ))

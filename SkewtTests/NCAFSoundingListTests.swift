@@ -375,6 +375,7 @@ struct NCAFSoundingListTests {
         
         let list = NCAFSoundingList(fromString: string)
         #expect(list != nil, "Expected sounding list to be non-nil")
+        #expect(list!.stationCodeByStationId[72293] == "NKX", "Expected station 72293 to resolve to NKX from bulletin header")
 
         let miramar = list!.soundingData(forStationId: 72293)
         #expect(miramar != nil, "Expected station 72293 (Miramar MCAS) to be present in Current.rawins")

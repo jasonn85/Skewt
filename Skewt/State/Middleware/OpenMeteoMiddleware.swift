@@ -72,7 +72,7 @@ extension Middlewares {
 }
 
 extension OpenMeteoSoundingListRequest {
-    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocation? = nil) throws {
+    init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocationCoordinate2D? = nil) throws {
         let latitude: Double
         let longitude: Double
         
@@ -82,8 +82,8 @@ extension OpenMeteoSoundingListRequest {
                 throw OpenMeteoRequestError.missingLocation
             }
             
-            latitude = location.coordinate.latitude
-            longitude = location.coordinate.longitude
+            latitude = location.latitude
+            longitude = location.longitude
         case .point(let pointLatitude, let pointLongitude),
                 .named(_, let pointLatitude, let pointLongitude):
             latitude = pointLatitude
@@ -105,13 +105,23 @@ extension OpenMeteoSoundingListRequest {
             startHour = date
         }
         
+        let model: SoundingSelection.ForecastModel?
+
+        switch selection.type {
+        case .sounding:
+            model = nil
+        case .forecast(let forecastModel):
+            model = forecastModel
+        }
+
         self.init(
             latitude: latitude,
             longitude: longitude,
             hourly: OpenMeteoSoundingListRequest.HourlyValue.skewtHourlyValues,
             forecast_hours: 12,
             past_hours: 12,
-            start_hour: startHour
+            start_hour: startHour,
+            model: model
         )
     }
 }

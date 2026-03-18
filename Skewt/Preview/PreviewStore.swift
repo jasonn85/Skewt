@@ -48,12 +48,15 @@ extension Store {
         
         return Store<SkewtState>(
             initial: SkewtState(
-                displayState: DisplayState(),
                 currentSoundingState: soundingState,
                 pinnedSelections: previewPinnedSelections,
                 recentSelections: [selection],
                 plotOptions: PlotOptions(),
-                locationState: LocationState(),
+                locationState: LocationState(status: .locationKnown(
+                    latitude: 32.7335,
+                    longitude: -117.1897,
+                    time: .now
+                )),
                 recentSoundings: RecentSoundingsState()
             ),
             reducer: SkewtState.reducer,

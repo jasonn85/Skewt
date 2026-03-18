@@ -12,11 +12,11 @@ extension Double {
     static let sunriseZenith = 1.58533492  // 90.833° zenith for sunrise/sunset
 }
 
-extension CLLocation {
-    static func equatorialLocation(inTimeZone timeZone: TimeZone = Calendar.current.timeZone) -> CLLocation {
+extension CLLocationCoordinate2D {
+    static func equatorialLocation(inTimeZone timeZone: TimeZone = Calendar.current.timeZone) -> CLLocationCoordinate2D {
         let gmtOffset = timeZone.secondsFromGMT() / 3_600
         
-        return CLLocation(latitude: 0.0, longitude: 15.0 * Double(gmtOffset))
+        return CLLocationCoordinate2D(latitude: 0.0, longitude: 15.0 * Double(gmtOffset))
     }
 }
 
@@ -44,7 +44,7 @@ extension SunState {
         }
     }
     
-    static func states(inRange range: ClosedRange<Date>, at location: CLLocation) -> [SunState] {
+    static func states(inRange range: ClosedRange<Date>, at location: CLLocationCoordinate2D) -> [SunState] {
         var nextState: SunState? = SunState(
             type: range.lowerBound.isDaylight(at: location) ? .day : .night,
             date: range.lowerBound
@@ -79,7 +79,7 @@ extension Date {
         2440587.5 + timeIntervalSince1970 / 86400.0
     }
 
-    func localSiderealTime(at location: CLLocation) -> Double {
+    func localSiderealTime(at location: CLLocationCoordinate2D) -> Double {
         let jd = julianDate
         let jd0 = floor(jd - 0.5) + 0.5  // previous midnight UT
         let h = (jd - jd0) * 24.0  // hours since UT midnight
@@ -96,7 +96,7 @@ extension Date {
         }
 
         let gmstRad = gmstHours * (.pi / 12.0)   // 24h -> 2π
-        let lonRad = location.coordinate.longitude * (.pi / 180.0)
+        let lonRad = location.longitude * (.pi / 180.0)
 
         var lst = (gmstRad + lonRad).truncatingRemainder(dividingBy: 2.0 * .pi)
         
@@ -141,8 +141,8 @@ extension Date {
     }
     
     /// Local hour angle in radians
-    func hourAngle(at location: CLLocation) -> Double {
-        let timeOffset: TimeInterval = equationOfTime + 4.0 * location.coordinate.longitude * 60.0
+    func hourAngle(at location: CLLocationCoordinate2D) -> Double {
+        let timeOffset: TimeInterval = equationOfTime + 4.0 * location.longitude * 60.0
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents(in: .gmt, from: self)
         let solarTime: TimeInterval = (
@@ -155,21 +155,21 @@ extension Date {
         return 15.0 * (solarTime / 3600.0  - 12.0) * .pi / 180.0
     }
     
-    func solarZenithAngle(at location: CLLocation) -> Double {
-        let latitude = location.coordinate.latitude * .pi / 180.0
+    func solarZenithAngle(at location: CLLocationCoordinate2D) -> Double {
+        let latitude = location.latitude * .pi / 180.0
         let hourAngle = hourAngle(at: location)
         
         return acos(sin(latitude) * sin(solarDeclination) + cos(latitude) * cos(solarDeclination) * cos(hourAngle))
     }
     
-    func isDaylight(at location: CLLocation) -> Bool {
+    func isDaylight(at location: CLLocationCoordinate2D) -> Bool {
         solarZenithAngle(at: location) <= Double.sunriseZenith
     }
     
     /// Sunrise or sunset on the same calendar UTC day.
     /// - Returns: nil if the day occurs during polar night or polar day.
-    private static func sunriseOrSunset(sunrise: Bool, at location: CLLocation, onDate date: Date = .now) -> Date? {
-        let latitude = location.coordinate.latitude * .pi / 180.0
+    private static func sunriseOrSunset(sunrise: Bool, at location: CLLocationCoordinate2D, onDate date: Date = .now) -> Date? {
+        let latitude = location.latitude * .pi / 180.0
         let solarDeclination = date.solarDeclination
         let sign = sunrise ? 1.0 : -1.0
         let hourAngle = sign * acos((cos(Double.sunriseZenith) / cos(latitude) * cos(solarDeclination)) - tan(latitude) * tan(solarDeclination))
@@ -179,7 +179,7 @@ extension Date {
             return nil
         }
         
-        let minutesUtc = 720.0 - 4.0 * (location.coordinate.longitude + hourAngle * 180.0 / .pi) - (date.equationOfTime / 60.0)
+        let minutesUtc = 720.0 - 4.0 * (location.longitude + hourAngle * 180.0 / .pi) - (date.equationOfTime / 60.0)
         let secondsUtc = Int(minutesUtc * 60.0)
         
         let calendar = Calendar(identifier: .gregorian)
@@ -196,19 +196,19 @@ extension Date {
     
     /// Sunrise on the same calendar UTC day.
     /// - Returns: nil if the day occurs during polar night or polar day.
-    static func sunrise(at location: CLLocation, onDate date: Date = .now) -> Date? {
+    static func sunrise(at location: CLLocationCoordinate2D, onDate date: Date = .now) -> Date? {
         sunriseOrSunset(sunrise: true, at: location, onDate: date)
     }
     
     /// Sunset on the same calendar UTC day.
     /// - Returns: nil if the day occurs during polar night or polar day.
-    static func sunset(at location: CLLocation, onDate date: Date = .now) -> Date? {
+    static func sunset(at location: CLLocationCoordinate2D, onDate date: Date = .now) -> Date? {
         sunriseOrSunset(sunrise: false, at: location, onDate: date)
     }
     
     /// Prior sunrise or sunset to a time at a specified location, including appropriate, estimated polar
     ///  sunrise/sunset if it is 24+ hours prior.
-    static func priorSunriseOrSunset(sunrise: Bool, at location: CLLocation, toDate date: Date = .now) -> Date? {
+    static func priorSunriseOrSunset(sunrise: Bool, at location: CLLocationCoordinate2D, toDate date: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
         let minimumDate = date.addingTimeInterval(-eightMonths)
         var date = date
@@ -228,7 +228,7 @@ extension Date {
     
     /// Next sunrise or sunset after a time at a specified location, including appropriate, estimated polar
     ///  sunrise/sunset if it is 24+ hours hence.
-    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocation, afterDate initialDate: Date = .now) -> Date? {
+    static func nextSunriseOrSunset(sunrise: Bool, at location: CLLocationCoordinate2D, afterDate initialDate: Date = .now) -> Date? {
         let eightMonths = TimeInterval(8.0 * 30.0 * 24.0 * 60.0 * 60.0)
         let maximumDate = initialDate.addingTimeInterval(eightMonths)
         var date = initialDate.addingTimeInterval(-24.0 * 60.0 * 60.0)

@@ -10,7 +10,7 @@ import XCTest
 import CoreLocation
 
 struct Location {
-    let location: CLLocation
+    let location: CLLocationCoordinate2D
     let name: String
     let gmtOffset: Int?
 
@@ -36,7 +36,7 @@ final class SunTimesTests: XCTestCase {
         // Source to calculate sunrise/sunset/noon times: https://gml.noaa.gov/grad/solcalc/
         
         denver = Location(
-            location: CLLocation(latitude: 39.87, longitude: -104.67),
+            location: CLLocationCoordinate2D(latitude: 39.87, longitude: -104.67),
             name: "Denver",
             gmtOffset: -7,
             sunrises: [
@@ -51,7 +51,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         greenwich = Location(
-            location: CLLocation(latitude: 51.47783, longitude: -0.00139),
+            location: CLLocationCoordinate2D(latitude: 51.47783, longitude: -0.00139),
             name: "Greenwich",
             gmtOffset: 0,
             sunrises: [
@@ -69,7 +69,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         kualaLumpur = Location(
-            location: CLLocation(latitude: 3.16, longitude: 101.71),
+            location: CLLocationCoordinate2D(latitude: 3.16, longitude: 101.71),
             name: "Kuala Lumpur",
             gmtOffset: nil,
             sunrises: [
@@ -82,7 +82,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         capeTown = Location(
-            location: CLLocation(latitude: -33.93, longitude: 18.46),
+            location: CLLocationCoordinate2D(latitude: -33.93, longitude: 18.46),
             name: "Cape Town",
             gmtOffset: 2,
             sunrises: [
@@ -95,7 +95,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         tokyo = Location(
-            location: CLLocation(latitude: 35.67, longitude: 139.8),
+            location: CLLocationCoordinate2D(latitude: 35.67, longitude: 139.8),
             name: "Tokyo",
             gmtOffset: 9,
             sunrises: [
@@ -110,7 +110,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         sanDiego = Location(
-            location: CLLocation(latitude: 32.7335, longitude: -117.1897),
+            location: CLLocationCoordinate2D(latitude: 32.7335, longitude: -117.1897),
             name: "San Diego",
             gmtOffset: -8,
             sunrises: [
@@ -127,7 +127,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         southPole = Location(
-            location: CLLocation(latitude: -90.0, longitude: 0.0),
+            location: CLLocationCoordinate2D(latitude: -90.0, longitude: 0.0),
             name: "South Pole",
             gmtOffset: nil,
             sunrises: nil,
@@ -136,7 +136,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         mcmurdo = Location(
-            location: CLLocation(latitude: -77.85, longitude: 166.6),
+            location: CLLocationCoordinate2D(latitude: -77.85, longitude: 166.6),
             name: "McMurdo Station",
             gmtOffset: nil,
             sunrises: nil,
@@ -145,7 +145,7 @@ final class SunTimesTests: XCTestCase {
         )
         
         northPole = Location(
-            location: CLLocation(latitude: 90.0, longitude: 0.0),
+            location: CLLocationCoordinate2D(latitude: 90.0, longitude: 0.0),
             name: "North Pole",
             gmtOffset: nil,
             sunrises: nil,
@@ -200,9 +200,9 @@ final class SunTimesTests: XCTestCase {
         )
 
         // Opposite meridian (+180° longitude) should be +π, wrapped
-        let oppositeGreenwich = CLLocation(
-            latitude: greenwich.location.coordinate.latitude, // latitude irrelevant to LST
-            longitude: greenwich.location.coordinate.longitude + 180.0
+        let oppositeGreenwich = CLLocationCoordinate2D(
+            latitude: greenwich.location.latitude, // latitude irrelevant to LST
+            longitude: greenwich.location.longitude + 180.0
         )
 
         let expectedOpposite = normalizeRadians(expectedGreenwichSiderealTime + .pi)
@@ -216,8 +216,8 @@ final class SunTimesTests: XCTestCase {
         // --- Structural tests ---
 
         // 1) Longitude shift: +15° east should add +15° (= π/12 rad) to LST, wrapped
-        let east15 = CLLocation(latitude: 0.0, longitude: 15.0)
-        let greenwichAtEquator = CLLocation(latitude: 0.0, longitude: 0.0)
+        let east15 = CLLocationCoordinate2D(latitude: 0.0, longitude: 15.0)
+        let greenwichAtEquator = CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
 
         let lstGreenwichEq = date.localSiderealTime(at: greenwichAtEquator)
         let lstEast15 = date.localSiderealTime(at: east15)
@@ -249,7 +249,7 @@ final class SunTimesTests: XCTestCase {
     func testSiderealDriftPerDay() {
         let tolerance = 0.01
         
-        let location = CLLocation(latitude: 0, longitude: 0)
+        let location = CLLocationCoordinate2D(latitude: 0, longitude: 0)
         
         let t0 = Date(timeIntervalSince1970: 1_000_000)
         let t1 = t0.addingTimeInterval(86400) // +1 solar day
@@ -296,10 +296,10 @@ final class SunTimesTests: XCTestCase {
             let timeZone = TimeZone(secondsFromGMT: $0.gmtOffset! * 3_600)!
             
             XCTAssertEqual(
-                CLLocation.equatorialLocation(inTimeZone: timeZone).coordinate.longitude,
-                $0.location.coordinate.longitude,
+                CLLocationCoordinate2D.equatorialLocation(inTimeZone: timeZone).longitude,
+                $0.location.longitude,
                 accuracy: longitudeAccuracy,
-                "\($0.name) GMT \($0.gmtOffset! >= 0 ? "+" : "-") \($0.gmtOffset!) estimated longitude is ~\($0.location.coordinate.longitude)"
+                "\($0.name) GMT \($0.gmtOffset! >= 0 ? "+" : "-") \($0.gmtOffset!) estimated longitude is ~\($0.location.longitude)"
             )
         }
     }
@@ -390,7 +390,7 @@ final class SunTimesTests: XCTestCase {
             }
         }
         
-        let nonPolarLocations = locations.filter { abs($0.location.coordinate.latitude) > 33.0 }
+        let nonPolarLocations = locations.filter { abs($0.location.latitude) > 33.0 }
         
         nonPolarLocations.forEach { location in
             location.solarNoons?.forEach { solarNoon in

@@ -20,7 +20,7 @@ fileprivate let defaultAltitudeIsobars = [0.0, 5_000.0, 10_000.0, 20_000.0,
                                           30_000.0, 40_000.0]
 
 struct SkewtPlot: Sendable {
-    var sounding: Sounding?
+    var data: SoundingData?
     
     // Ranges
     var surfaceTemperatureRange: ClosedRange<Double>
@@ -50,7 +50,7 @@ struct SkewtPlot: Sendable {
     var skew: CGFloat
     
     var temperaturePath: CGPath? {
-        guard let data = sounding?.data.dataPoints.filter({ $0.temperature != nil }),
+        guard let data = data?.dataPoints.filter({ $0.temperature != nil }),
               data.count > 0 else {
             return nil
         }
@@ -60,7 +60,7 @@ struct SkewtPlot: Sendable {
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].temperature!)
         path.move(to: lastPoint)
         
-        data[1...].forEach {
+        data.dropFirst().forEach {
             let point = point(pressure: $0.pressure, temperature: $0.temperature!)
             
             if bounds.contains(lastPoint) || bounds.contains(point) {
@@ -76,7 +76,7 @@ struct SkewtPlot: Sendable {
     }
     
     var dewPointPath: CGPath? {
-        guard let data = sounding?.data.dataPoints.filter({ $0.dewPoint != nil }),
+        guard let data = data?.dataPoints.filter({ $0.dewPoint != nil }),
               data.count > 0 else {
             return nil
         }
@@ -86,7 +86,7 @@ struct SkewtPlot: Sendable {
         var lastPoint = point(pressure: data[0].pressure, temperature: data[0].dewPoint!)
         path.move(to: lastPoint)
         
-        data[1...].forEach {
+        data.dropFirst().forEach {
             let point = point(pressure: $0.pressure, temperature: $0.dewPoint!)
             
             if bounds.contains(lastPoint) || bounds.contains(point) {
@@ -102,11 +102,12 @@ struct SkewtPlot: Sendable {
     }
     
     var surfaceParcelPath: CGPath? {
-        guard let surface = sounding?.data.surfaceDataPoint else {
+        guard let surface = data?.surfaceDataPoint,
+              let temperature = surface.temperature else {
             return nil
         }
         
-        return parcelPath(forTemperature: surface.temperature!, pressure: surface.pressure)
+        return parcelPath(forTemperature: temperature, pressure: surface.pressure)
     }
 }
 
@@ -157,9 +158,9 @@ extension SkewtPlot {
                                                                       dewPoint: SoundingData.Point)? {
         let pressure = pressure(atY: y)
 
-        guard let sounding = sounding,
-              let temperature = sounding.data.closestValue(toPressure: pressure, withValueFor: \.temperature),
-              let dewPoint = sounding.data.closestValue(toPressure: pressure, withValueFor: \.dewPoint) else {
+        guard let data = data,
+              let temperature = data.closestValue(toPressure: pressure, withValueFor: \.temperature),
+              let dewPoint = data.closestValue(toPressure: pressure, withValueFor: \.dewPoint) else {
                   return nil
               }
         
@@ -169,9 +170,9 @@ extension SkewtPlot {
     public func temperatureAndDewPoint(nearestY y: CGFloat) -> (temperature: Double, dewPoint: Double)? {
         let pressure = pressure(atY: y)
 
-        guard let sounding = sounding,
-              let temperature = sounding.data.interpolatedValue(for: \.temperature, atPressure: pressure),
-              let dewPoint = sounding.data.interpolatedValue(for: \.dewPoint, atPressure: pressure) else {
+        guard let data = data,
+              let temperature = data.interpolatedValue(for: \.temperature, atPressure: pressure),
+              let dewPoint = data.interpolatedValue(for: \.dewPoint, atPressure: pressure) else {
             return nil
         }
         
@@ -181,8 +182,8 @@ extension SkewtPlot {
 
 // MARK: - Initialization
 extension SkewtPlot {
-    init(sounding: Sounding?) {
-        self.sounding = sounding
+    init(data: SoundingData?) {
+        self.data = data
         skew = defaultSkew
         
         surfaceTemperatureRange = defaultSurfaceTemperatureRange
@@ -368,8 +369,8 @@ extension SkewtPlot {
     func parcelPath(forTemperature startingTemperature: Double, pressure startingPressure: Double) -> CGPath? {
         let dy = 1.0 / 500.0
         
-        guard let sounding = sounding,
-              let dewPoint = sounding.data.interpolatedValue(for: \.dewPoint, atPressure: startingPressure) else {
+        guard let data = data,
+              let dewPoint = data.interpolatedValue(for: \.dewPoint, atPressure: startingPressure) else {
             return nil
         }
         

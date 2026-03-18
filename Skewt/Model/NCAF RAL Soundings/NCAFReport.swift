@@ -9,6 +9,7 @@ import Foundation
 
 struct NCAFReport {
     let header: Header
+    let stationCode: String?
     let messages: [NCAFSoundingMessage]
     
     /// Header per https://www.weather.gov/tg/headef
@@ -67,6 +68,7 @@ extension NCAFReport {
         }
         
         self.header = header
+        self.stationCode = Self.stationCode(from: lines)
 
         let messages = lines
             .dropFirst(2)
@@ -74,8 +76,32 @@ extension NCAFReport {
             .components(separatedBy: "=")
             .filter { !$0.isEmpty }
             .compactMap(NCAFSoundingMessage.init(fromString:))
-        
+
         self.messages = messages
+    }
+    
+    private static func stationCode(from lines: [String]) -> String? {
+        lines
+            .dropFirst(2)
+            .compactMap { line -> String? in
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard trimmed.count > 3,
+                      trimmed == trimmed.uppercased(),
+                      !trimmed.contains(" "),
+                      !trimmed.hasPrefix("TT"),
+                      !trimmed.hasPrefix("PP"),
+                      !trimmed.hasPrefix("UU") else {
+                    return nil
+                }
+                
+                let suffix = String(trimmed.suffix(3))
+                guard suffix.allSatisfy(\.isLetter) else {
+                    return nil
+                }
+                
+                return suffix
+            }
+            .first
     }
 }
 

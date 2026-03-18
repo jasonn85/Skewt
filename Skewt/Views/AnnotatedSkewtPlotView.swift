@@ -24,7 +24,7 @@ struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
     
-    let location: CLLocation?
+    let location: CLLocationCoordinate2D?
     var time: Date? = nil
     
     @State var annotationPoint: UnitPoint? = nil
@@ -137,7 +137,7 @@ struct AnnotatedSkewtPlotView: View {
         return text.size(withAttributes: attributes).height
     }
     
-    init(soundingState: SoundingState, plotOptions: PlotOptions, location: CLLocation? = nil, time: Date? = nil) {
+    init(soundingState: SoundingState, plotOptions: PlotOptions, location: CLLocationCoordinate2D? = nil, time: Date? = nil) {
         self.soundingState = soundingState
         self.plotOptions = plotOptions
         self.location = location
@@ -161,7 +161,6 @@ struct AnnotatedSkewtPlotView: View {
                         SkewtPlotView(plotOptions: plotOptions, plot: plot, parcelPoint: annotationPointAsCGPoint)
                             .aspectRatio(1.0, contentMode: .fit)
                             .scaleEffect(zoom, anchor: zoomAnchor)
-                            .border(.black)
                             .clipped()
                             .overlay {
                                 GeometryReader { geometry in
@@ -189,8 +188,12 @@ struct AnnotatedSkewtPlotView: View {
                             .background {
                                 GeometryReader { geometry in
                                     ZStack {
+                                        Rectangle()
+                                            .stroke(Color.white, lineWidth: 4)
+                                            .shadow(color: .black, radius: 1, x: 1, y: 1)
+                                        
                                         let winds = plotOptions.showAnimatedWind ?
-                                        sounding?.data.reducedWindData(sounding!.data.maximumWindReducer()).reduce(into: [Double:Double]()) {
+                                        sounding?.data.reducedWindData(sounding!.data.pcaWindReducer()).reduce(into: [Double:Double]()) {
                                             $0[plot.y(forPressure: $1.pressure)] = $1.windMagnitude
                                         }
                                         : nil
@@ -304,18 +307,18 @@ struct AnnotatedSkewtPlotView: View {
                             
                             Spacer()
                             
-                            Image(systemName: "xmark.circle.fill")
-                                .annotationFraming()
-                                .foregroundColor(.gray)
-                                .onTapGesture {
-                                    self.annotationPoint = nil
-                                }
+                            Button {
+                                self.annotationPoint = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.glass)
                         }
                     }
                     .position(x: bounds.size.width - (rightRoom / 2.0), y: temperaturePoint.y * bounds.size.height)
             }
+            .minimumScaleFactor(0.5)
             .font(Font(axisLabelFont))
-            
         } else {
             EmptyView()
         }
@@ -434,10 +437,10 @@ struct AnnotatedSkewtPlotView: View {
                 .frame(width: windBarbContainerWidth)
                 .foregroundColor(.clear)
                 .overlay {
-                    if let sounding = plot.sounding {
+                    if let data = plot.data {
                         GeometryReader { geometry in
                             let x = geometry.size.width / 2.0
-                            let windData = sounding.data.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            let windData = data.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
                             
                             ForEach(windData, id: \.self) {
                                 let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)
@@ -507,7 +510,7 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var plot: SkewtPlot {
-        var plot = SkewtPlot(sounding: sounding)
+        var plot = SkewtPlot(data: sounding?.data)
         plot.skew = plotOptions.skew
         
         if let altitudeRange = plotOptions.altitudeRange {
@@ -533,10 +536,7 @@ struct AnnotationFraming: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(padding)
-            .background {
-                RoundedRectangle(cornerRadius: 6)
-                    .foregroundColor(backgroundColor)
-            }
+            .glassEffect(.regular.tint(backgroundColor), in: RoundedRectangle(cornerRadius: 6))
     }
 }
 

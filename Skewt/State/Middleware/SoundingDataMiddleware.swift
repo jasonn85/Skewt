@@ -89,7 +89,7 @@ extension Middlewares {
 }
 
 private extension Middlewares {
-    static func stationId(for selection: SoundingSelection, currentLocation: CLLocation?) -> Int? {
+    static func stationId(for selection: SoundingSelection, currentLocation: CLLocationCoordinate2D?) -> Int? {
         switch selection.location {
         case .closest:
             guard let location = currentLocation else {
@@ -128,7 +128,7 @@ private extension Middlewares {
                 return nil
             }
 
-            let location = CLLocation(latitude: latitude, longitude: longitude)
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             return list.locationsSortedByProximity(to: location).first { $0.wmoId != nil }?.wmoId
         }
     }

@@ -96,4 +96,40 @@ final class SoundingWindDataTests: XCTestCase {
             }
         }
     }
+    
+    func testPCAWindReducerFindsDominantWindAxis() throws {
+        let data: [RucSounding.LevelDataPoint] = [
+            .init(type: .windLevel, pressure: 1000, height: nil, temperature: nil, dewPoint: nil, windDirection: 90, windSpeed: 40),
+            .init(type: .windLevel, pressure: 950, height: nil, temperature: nil, dewPoint: nil, windDirection: 270, windSpeed: 30),
+            .init(type: .windLevel, pressure: 900, height: nil, temperature: nil, dewPoint: nil, windDirection: 90, windSpeed: 20),
+            .init(type: .windLevel, pressure: 850, height: nil, temperature: nil, dewPoint: nil, windDirection: 270, windSpeed: 10),
+            .init(type: .windLevel, pressure: 800, height: nil, temperature: nil, dewPoint: nil, windDirection: 0, windSpeed: 2),
+            .init(type: .windLevel, pressure: 750, height: nil, temperature: nil, dewPoint: nil, windDirection: 180, windSpeed: 2)
+        ]
+        
+        let sounding = try RucSounding(withJustData: data)
+        let reduced = sounding.data.reducedWindData(sounding.data.pcaWindReducer())
+        
+        XCTAssertEqual(reduced[0].windMagnitude, 40.0, accuracy: 0.5)
+        XCTAssertEqual(reduced[1].windMagnitude, -30.0, accuracy: 0.5)
+        XCTAssertEqual(reduced[2].windMagnitude, 20.0, accuracy: 0.5)
+        XCTAssertEqual(reduced[3].windMagnitude, -10.0, accuracy: 0.5)
+        XCTAssertEqual(reduced[4].windMagnitude, 0.0, accuracy: 1.0)
+        XCTAssertEqual(reduced[5].windMagnitude, 0.0, accuracy: 1.0)
+    }
+    
+    func testPCAWindReducerFallsBackWhenNoVariance() throws {
+        let data: [RucSounding.LevelDataPoint] = [
+            .init(type: .windLevel, pressure: 1000, height: nil, temperature: nil, dewPoint: nil, windDirection: 45, windSpeed: 20),
+            .init(type: .windLevel, pressure: 900, height: nil, temperature: nil, dewPoint: nil, windDirection: 45, windSpeed: 20),
+            .init(type: .windLevel, pressure: 800, height: nil, temperature: nil, dewPoint: nil, windDirection: 45, windSpeed: 20)
+        ]
+        
+        let sounding = try RucSounding(withJustData: data)
+        let reduced = sounding.data.reducedWindData(sounding.data.pcaWindReducer())
+        
+        reduced.forEach {
+            XCTAssertEqual($0.windMagnitude, 20.0, accuracy: 0.001)
+        }
+    }
 }
