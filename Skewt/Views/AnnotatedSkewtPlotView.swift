@@ -42,6 +42,7 @@ struct AnnotatedSkewtPlotView: View {
         
     private let windBarbContainerWidth: CGFloat = 20.0
     private let windBarbLength: CGFloat = 20.0
+    private let minimumWindBarbSpacingFactor: CGFloat = 0.8
     
     private var shortenedAltitudeFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -72,6 +73,11 @@ struct AnnotatedSkewtPlotView: View {
         case .pressure:
             return pressureAxisLabelFormatter
         }
+    }
+    
+    private struct PositionedWindBarb: Hashable {
+        let point: SoundingData.Point
+        let y: CGFloat
     }
     
     private var sounding: Sounding? {
@@ -444,24 +450,22 @@ struct AnnotatedSkewtPlotView: View {
                     if let data = plot.data {
                         GeometryReader { geometry in
                             let x = geometry.size.width / 2.0
-                            let windData = data.dataPoints.filter { $0.windDirection != nil && $0.windSpeed != nil }
+                            let windBarbs = positionedWindBarbs(
+                                from: data.dataPoints,
+                                withPlot: plot,
+                                plotHeight: geometry.size.height
+                            )
                             
-                            ForEach(windData, id: \.self) {
-                                let unzoomedNormalizedY = plot.y(forPressure: $0.pressure)
-                                let normalizedY = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: unzoomedNormalizedY)).y
-                                let y = normalizedY * plotSize.height
-                                
-                                if y >= 0.0 && y <= geometry.size.height {
-                                    WindBarb(
-                                        bearingInDegrees: $0.windDirection!,
-                                        speed: $0.windSpeed!,
-                                        length: windBarbLength,
-                                        tickLength: windBarbLength * 0.3
-                                    )
-                                    .stroke(.red, lineWidth: 1.0)
-                                    .fill($0.windSpeed! >= 5 ? .red : .clear)
-                                    .position(x: x, y: y)
-                                }
+                            ForEach(windBarbs, id: \.self) { windBarb in
+                                WindBarb(
+                                    bearingInDegrees: windBarb.point.windDirection!,
+                                    speed: windBarb.point.windSpeed!,
+                                    length: windBarbLength,
+                                    tickLength: windBarbLength * 0.3
+                                )
+                                .stroke(.red, lineWidth: 1.0)
+                                .fill(windBarb.point.windSpeed! >= 5 ? .red : .clear)
+                                .position(x: x, y: windBarb.y)
                             }
                         }
                     } else {
@@ -469,6 +473,62 @@ struct AnnotatedSkewtPlotView: View {
                     }
                 }
         }
+    }
+
+    private func positionedWindBarbs(
+        from dataPoints: [SoundingData.Point],
+        withPlot plot: SkewtPlot,
+        plotHeight: CGFloat
+    ) -> [PositionedWindBarb] {
+        let visibleWindBarbs = dataPoints.compactMap { point -> PositionedWindBarb? in
+            guard point.windDirection != nil, point.windSpeed != nil else {
+                return nil
+            }
+
+            let unzoomedNormalizedY = plot.y(forPressure: point.pressure)
+            let normalizedY = zoomedSquare.visiblePointForActualPoint(
+                UnitPoint(x: 0.0, y: unzoomedNormalizedY)
+            ).y
+            let y = normalizedY * plotHeight
+
+            guard y >= 0.0, y <= plotHeight else {
+                return nil
+            }
+
+            return PositionedWindBarb(point: point, y: y)
+        }
+        .sorted { $0.y < $1.y }
+
+        guard visibleWindBarbs.count > 2 else {
+            return visibleWindBarbs
+        }
+
+        let minimumSpacing = windBarbLength * minimumWindBarbSpacingFactor
+        var thinnedWindBarbs: [PositionedWindBarb] = []
+        thinnedWindBarbs.reserveCapacity(visibleWindBarbs.count)
+
+        for windBarb in visibleWindBarbs {
+            guard let previousWindBarb = thinnedWindBarbs.last else {
+                thinnedWindBarbs.append(windBarb)
+                continue
+            }
+
+            if windBarb.y - previousWindBarb.y >= minimumSpacing {
+                thinnedWindBarbs.append(windBarb)
+            }
+        }
+
+        if let lastVisibleWindBarb = visibleWindBarbs.last,
+           thinnedWindBarbs.last != lastVisibleWindBarb {
+            if let previousWindBarb = thinnedWindBarbs.dropLast().last,
+               lastVisibleWindBarb.y - previousWindBarb.y < minimumSpacing {
+                thinnedWindBarbs[thinnedWindBarbs.count - 1] = lastVisibleWindBarb
+            } else {
+                thinnedWindBarbs.append(lastVisibleWindBarb)
+            }
+        }
+
+        return thinnedWindBarbs
     }
     
     private func isobars(withPlot plot: SkewtPlot) -> [Double: CGPath] {
