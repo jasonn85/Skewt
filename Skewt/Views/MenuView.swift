@@ -84,7 +84,17 @@ struct MenuView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar(.visible, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .title) {
+                Text("Locations")
+                    .foregroundStyle(.menuTitle)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    .font(.title3)
+                    .fontWeight(.bold)
+            }
+            
             if let onReturnToSelection = onReturnToSelection {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -623,8 +633,12 @@ fileprivate extension SoundingSelection.ModelType {
 }
 
 #Preview {
-    MenuView(onReturnToSelection: { return })
-        .environmentObject(Store<SkewtState>.previewStore)
-        .environment(\.appEnvironment, AppEnvironment(isLive: false))
-        .fontDesign(.monospaced)
+    NavigationSplitView {
+        MenuView(onReturnToSelection: { return })
+            .environmentObject(Store<SkewtState>.previewStore)
+            .environment(\.appEnvironment, AppEnvironment(isLive: false))
+            .fontDesign(.monospaced)
+    } detail: {
+        EmptyView()
+    }
 }
