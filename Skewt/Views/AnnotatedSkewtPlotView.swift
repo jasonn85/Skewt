@@ -221,6 +221,7 @@ struct AnnotatedSkewtPlotView: View {
                                 }
                             }
                     }
+                    .padding(2)
                     
                     windBarbView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
@@ -620,11 +621,17 @@ extension View {
     }
 }
 
-struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
-    static var previews: some View {
-        let store = Store<SkewtState>.previewStore
-        let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
-        
-        AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
+#Preview {
+    let store = Store<SkewtState>.previewStore
+    let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
+
+    return AnnotatedSkewtPlotView(
+        soundingState: store.state.currentSoundingState,
+        plotOptions: store.state.plotOptions
+    )
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background {
+        LinearGradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
     }
 }
