@@ -101,9 +101,12 @@ struct MenuView: View {
                         onReturnToSelection()
                     } label: {
                         Image(systemName: "chevron.forward")
+                            .padding(5)
                     }
                     .foregroundStyle(.menuTitle)
+                    .buttonStyle(.glass)
                 }
+                .sharedBackgroundVisibility(.hidden)
             }
         }
         .searchable(text: $searchText, placement: .sidebar)
