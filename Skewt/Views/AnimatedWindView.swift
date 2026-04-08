@@ -77,8 +77,15 @@ struct AnimatedWindView: UIViewRepresentable {
         let desiredWind = windByRange.filter { abs($0.value) >= minimumWindToAnimate }
 
         let existingEmitters = view.windEmitters
+        let needsColorRefresh = existingEmitters.contains(where: { emitter in
+            guard let existingColor = emitter.emitterCells?.first?.color else {
+                return true
+            }
 
-        guard existingEmitters.count == desiredWind.count else {
+            return existingColor != particleColor
+        })
+
+        guard existingEmitters.count == desiredWind.count, !needsColorRefresh else {
             view.windEmitters.forEach { $0.removeFromSuperlayer() }
             
             desiredWind.compactMap {

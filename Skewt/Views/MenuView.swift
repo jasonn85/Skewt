@@ -84,16 +84,29 @@ struct MenuView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar(.visible, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .title) {
+                Text("Locations")
+                    .foregroundStyle(.menuTitle)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    .font(.title3)
+                    .fontWeight(.bold)
+            }
+            
             if let onReturnToSelection = onReturnToSelection {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         onReturnToSelection()
                     } label: {
                         Image(systemName: "chevron.forward")
+                            .padding(5)
                     }
                     .foregroundStyle(.menuTitle)
+                    .buttonStyle(.glass)
                 }
+                .sharedBackgroundVisibility(.hidden)
             }
         }
         .searchable(text: $searchText, placement: .sidebar)
@@ -563,13 +576,19 @@ struct MenuView: View {
             ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize,
             weight: .regular
         )
+        let textShadow = NSShadow()
+        textShadow.shadowColor = UIColor.black
+        textShadow.shadowBlurRadius = 1
+        textShadow.shadowOffset = CGSize(width: 1, height: 1)
         let normalAttributes: [NSAttributedString.Key: Any] = [
             .font: monospacedBody,
-            .foregroundColor: UIColor(Color.menuSectionHeaderText)
+            .foregroundColor: UIColor(Color.menuSectionHeaderText),
+            .shadow: textShadow
         ]
         let selectedAttributes: [NSAttributedString.Key: Any] = [
             .font: monospacedBody,
-            .foregroundColor: UIColor(Color.menuTitle)
+            .foregroundColor: UIColor(Color.menuTitle),
+            .shadow: textShadow
         ]
 
         let appearance = UISegmentedControl.appearance()
@@ -623,8 +642,12 @@ fileprivate extension SoundingSelection.ModelType {
 }
 
 #Preview {
-    MenuView(onReturnToSelection: { return })
-        .environmentObject(Store<SkewtState>.previewStore)
-        .environment(\.appEnvironment, AppEnvironment(isLive: false))
-        .fontDesign(.monospaced)
+    NavigationSplitView {
+        MenuView(onReturnToSelection: { return })
+            .environmentObject(Store<SkewtState>.previewStore)
+            .environment(\.appEnvironment, AppEnvironment(isLive: false))
+            .fontDesign(.monospaced)
+    } detail: {
+        EmptyView()
+    }
 }

@@ -96,6 +96,14 @@ struct AnnotatedSkewtPlotView: View {
         axisLabelFont
     }
     
+    private var windParticleColor: CGColor {
+        if plotOptions.showSkyBackground {
+            CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+        } else {
+            CGColor(gray: 0.0, alpha: 0.4)
+        }
+    }
+    
     private func widestAltitudeText() -> CGFloat? {
         guard plotOptions.showIsobarLabels,
                 plotOptions.isobarTypes != .none else {
@@ -213,7 +221,7 @@ struct AnnotatedSkewtPlotView: View {
                                         AnimatedWindView(
                                             frame: CGRect(origin: .zero, size: geometry.size),
                                             winds: winds,
-                                            particleColor: CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+                                            particleColor: windParticleColor
                                         )
                                         .scaleEffect(zoom, anchor: zoomAnchor)
                                         .clipped()
@@ -221,6 +229,7 @@ struct AnnotatedSkewtPlotView: View {
                                 }
                             }
                     }
+                    .padding(2)
                     
                     windBarbView(withPlot: plot)
                         .gridCellUnsizedAxes(.vertical)
@@ -620,11 +629,17 @@ extension View {
     }
 }
 
-struct AnnotatedSkewtPlotView_Previews: PreviewProvider {
-    static var previews: some View {
-        let store = Store<SkewtState>.previewStore
-        let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
-        
-        AnnotatedSkewtPlotView(soundingState: store.state.currentSoundingState, plotOptions: store.state.plotOptions)
+#Preview {
+    let store = Store<SkewtState>.previewStore
+    let _ = store.dispatch(PlotOptions.Action.setWindBarbs(true))
+
+    return AnnotatedSkewtPlotView(
+        soundingState: store.state.currentSoundingState,
+        plotOptions: store.state.plotOptions
+    )
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background {
+        LinearGradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
     }
 }
