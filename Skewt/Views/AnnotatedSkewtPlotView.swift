@@ -96,6 +96,14 @@ struct AnnotatedSkewtPlotView: View {
         axisLabelFont
     }
     
+    private var windParticleColor: CGColor {
+        if plotOptions.showSkyBackground {
+            CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+        } else {
+            CGColor(gray: 0.0, alpha: 0.4)
+        }
+    }
+    
     private func widestAltitudeText() -> CGFloat? {
         guard plotOptions.showIsobarLabels,
                 plotOptions.isobarTypes != .none else {
@@ -213,7 +221,7 @@ struct AnnotatedSkewtPlotView: View {
                                         AnimatedWindView(
                                             frame: CGRect(origin: .zero, size: geometry.size),
                                             winds: winds,
-                                            particleColor: CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+                                            particleColor: windParticleColor
                                         )
                                         .scaleEffect(zoom, anchor: zoomAnchor)
                                         .clipped()
