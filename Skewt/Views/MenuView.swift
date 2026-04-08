@@ -576,13 +576,19 @@ struct MenuView: View {
             ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize,
             weight: .regular
         )
+        let textShadow = NSShadow()
+        textShadow.shadowColor = UIColor.black
+        textShadow.shadowBlurRadius = 1
+        textShadow.shadowOffset = CGSize(width: 1, height: 1)
         let normalAttributes: [NSAttributedString.Key: Any] = [
             .font: monospacedBody,
-            .foregroundColor: UIColor(Color.menuSectionHeaderText)
+            .foregroundColor: UIColor(Color.menuSectionHeaderText),
+            .shadow: textShadow
         ]
         let selectedAttributes: [NSAttributedString.Key: Any] = [
             .font: monospacedBody,
-            .foregroundColor: UIColor(Color.menuTitle)
+            .foregroundColor: UIColor(Color.menuTitle),
+            .shadow: textShadow
         ]
 
         let appearance = UISegmentedControl.appearance()
