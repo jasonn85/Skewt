@@ -286,6 +286,37 @@ struct SoundingStateTests {
         #expect(failed.lastError == .lackingLocationPermission)
         #expect(!failed.isLoading)
     }
+
+    @Test("A restored selection with no data needs an initial load")
+    func restoredSelectionNeedsInitialLoad() {
+        let state = SoundingState(selection: SoundingSelection())
+
+        #expect(state.needsInitialLoad)
+    }
+
+    @Test("Resolved data suppresses the initial load trigger")
+    func resolvedStateDoesNotNeedInitialLoad() {
+        let selection = SoundingSelection()
+        var state = SoundingState(selection: selection)
+        state.resolvedSounding = ResolvedSounding(openMeteoSounding: OpenMeteoSounding(
+            date: .now,
+            fetchTime: .now,
+            latitude: 0.0,
+            longitude: 0.0,
+            data: SoundingData(
+                time: .now,
+                dataPoints: [],
+                surfaceDataPoint: nil,
+                cape: nil,
+                cin: nil,
+                helicity: nil,
+                precipitableWater: nil
+            )
+        ))
+
+        #expect(!state.needsInitialLoad)
+    }
+
 }
 
 private final class NcafTestBundleToken {}

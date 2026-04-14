@@ -115,6 +115,10 @@ struct ContentView: View {
             
             requestLocationIfNeeded()
             
+            if store.state.currentSoundingState.needsInitialLoad {
+                store.dispatch(SoundingState.Action.refreshTapped)
+            }
+            
             if case .idle = store.state.recentSoundings.status {
                 store.dispatch(RecentSoundingsState.Action.load)
             }
