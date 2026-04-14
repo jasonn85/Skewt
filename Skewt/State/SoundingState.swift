@@ -114,6 +114,10 @@ extension SoundingState {
         loadIntent != nil && lastError == nil
     }
 
+    var needsInitialLoad: Bool {
+        resolvedSounding == nil && loadIntent == nil && lastError == nil
+    }
+
     var sounding: Sounding? {
         resolvedSounding
     }
