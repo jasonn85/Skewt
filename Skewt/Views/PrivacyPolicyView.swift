@@ -56,6 +56,8 @@ struct PrivacyPolicyView: View {
         heading: "Third Party Data Providers",
         paragraphs: [
             "• Open-Meteo",
+            "• University Corporation for Atmospheric Research",
+            "• University of Wyoming Atmospheric Science Radiosonde Archive",
             "Please refer to the privacy policies of these third-party data providers for information regarding their data practices."
         ]
     )
