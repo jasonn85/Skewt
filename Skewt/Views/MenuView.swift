@@ -48,6 +48,8 @@ struct MenuView: View {
     @State private var searchText = ""
     let onShowSlideOverMenu: () -> Void
     
+    private let toolbarButtonSize = 28.0
+    
     enum SoundingOrForecast {
         case sounding
         case forecast
@@ -97,7 +99,7 @@ struct MenuView: View {
                     onShowSlideOverMenu()
                 } label: {
                     Image(systemName: "line.3.horizontal")
-                        .padding(5)
+                        .frame(width: toolbarButtonSize, height: toolbarButtonSize)
                 }
                 .foregroundStyle(.menuTitle)
                 .buttonStyle(.glass)
@@ -119,7 +121,7 @@ struct MenuView: View {
                         onReturnToSelection()
                     } label: {
                         Image(systemName: "chevron.forward")
-                            .padding(5)
+                            .frame(width: toolbarButtonSize, height: toolbarButtonSize)
                     }
                     .foregroundStyle(.menuTitle)
                     .buttonStyle(.glass)
