@@ -37,11 +37,18 @@ struct PrivacyPolicyView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Privacy Policy")
-                    .foregroundStyle(.menuTitle)
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                HStack {
+                    Image("SkewtLogo")
+                        .padding(.trailing, 8)
+                        .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    
+                    Text("Privacy Policy")
+                        .minimumScaleFactor(0.5)
+                        .foregroundStyle(.menuTitle)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .shadow(color: .black, radius: 1, x: 1, y: 1)
+                }
             }
         }
     }

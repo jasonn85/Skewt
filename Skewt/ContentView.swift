@@ -205,6 +205,7 @@ struct ContentView: View {
         } label : {
             Image("SkewtLogo")
                 .padding([.trailing], 8)
+                .shadow(color: .black, radius: 1, x: 1, y: 1)
             
             let selection = store.state.currentSoundingState.selection
             let title: String = {

@@ -10,12 +10,17 @@ import SwiftUI
 struct SlideOverMenuView: View {
     let onClose: () -> Void
     
+    @State private var showingWhatIsSkewt = false
     @State private var showingPrivacyPolicy = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("Menu")
+                Image("SkewtLogo")
+                    .padding(.trailing, 8)
+                    .shadow(color: .black, radius: 1, x: 1, y: 1)
+                
+                Text("Skew-T²")
                     .foregroundStyle(.menuTitle)
                     .font(.title)
                     .fontWeight(.bold)
@@ -33,8 +38,8 @@ struct SlideOverMenuView: View {
                 .buttonStyle(.glass)
                 .accessibilityLabel("Close menu")
             }
-            .padding(.vertical)
-            .padding(.horizontal, 25)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 15)
             .background(
                 LinearGradient(
                     colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2],
@@ -45,8 +50,27 @@ struct SlideOverMenuView: View {
             
             List {
                 Section {
-                    Button("Privacy policy") {
+                    Button {
+                        showingWhatIsSkewt = true
+                    } label: {
+                        HStack(alignment: .center) {
+                            Text("What is a Skew-T Log-P chart?")
+                            Spacer()
+                            Image(systemName: "chevron.forward")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .foregroundStyle(.primary)
+                    
+                    Button {
                         showingPrivacyPolicy = true
+                    } label: {
+                        HStack(alignment: .center) {
+                            Text("Privacy policy")
+                            Spacer()
+                            Image(systemName: "chevron.forward")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .foregroundStyle(.primary)
                     
@@ -69,6 +93,19 @@ struct SlideOverMenuView: View {
         .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .shadow(color: .black.opacity(0.45), radius: 20, x: 4, y: 0)
+        .sheet(isPresented: $showingWhatIsSkewt) {
+            NavigationStack {
+                WhatIsSkewtView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") {
+                                showingWhatIsSkewt = false
+                            }
+                        }
+                    }
+            }
+            .colorScheme(.dark)
+        }
         .sheet(isPresented: $showingPrivacyPolicy) {
             NavigationStack {
                 PrivacyPolicyView()
