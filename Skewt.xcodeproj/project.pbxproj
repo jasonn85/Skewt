@@ -351,13 +351,13 @@
 				9691178F2A29165000A5C72D /* PlotStyling.swift */,
 				960B6EA02A93FC08009BB545 /* PrivacyPolicyView.swift */,
 				96F4B06129A9B12E006D23BE /* SkewtPlotView.swift */,
+				968D4D752FC78661007FD05B /* SlideOverMenuView.swift */,
 				96AC49922F4FB51100EEF561 /* SoundingMapAnnotation.swift */,
 				9675D33E2A71B4BC00CA1435 /* SoundingTimeSelectView.swift */,
 				96337ACA2C34B86C00787E2D /* SunlightGradientView.swift */,
 				964998652B6A20A700899BC7 /* TouchCatchView.swift */,
 				96D30F2F2A83581200986E7E /* WindBarb.swift */,
 				96693FB12B746C5900697291 /* ZoomedSquare.swift */,
-				968D4D752FC78661007FD05B /* SlideOverMenuView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

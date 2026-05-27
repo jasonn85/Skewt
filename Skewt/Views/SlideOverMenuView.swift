@@ -17,7 +17,7 @@ struct SlideOverMenuView: View {
             HStack {
                 Text("Menu")
                     .foregroundStyle(.menuTitle)
-                    .font(.title3)
+                    .font(.title)
                     .fontWeight(.bold)
                     .shadow(color: .black, radius: 1, x: 1, y: 1)
                 
@@ -33,7 +33,8 @@ struct SlideOverMenuView: View {
                 .buttonStyle(.glass)
                 .accessibilityLabel("Close menu")
             }
-            .padding()
+            .padding(.vertical)
+            .padding(.horizontal, 25)
             .background(
                 LinearGradient(
                     colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2],
@@ -43,17 +44,22 @@ struct SlideOverMenuView: View {
             )
             
             List {
-                Section("About") {
+                Section {
                     Button("Privacy policy") {
                         showingPrivacyPolicy = true
                     }
+                    .foregroundStyle(.primary)
                     
                     Link(destination: URL(string: "https://github.com/jasonn85/Skewt")!) {
                         HStack(alignment: .center) {
                             Text("Skew-T² on GitHub")
                             Image(systemName: "safari")
                         }
+                        .foregroundStyle(.blue)
                     }
+                } header: {
+                    Text("About")
+                        .foregroundStyle(.primary)
                 }
             }
             .scrollContentBackground(.hidden)
@@ -78,3 +84,13 @@ struct SlideOverMenuView: View {
         }
     }
 }
+
+#Preview {
+    SlideOverMenuView(onClose: {})
+        .frame(width: 420)
+        .padding(28)
+        .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
+        .colorScheme(.dark)
+        .fontDesign(.monospaced)
+}
+
