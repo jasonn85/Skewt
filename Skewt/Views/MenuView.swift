@@ -46,6 +46,7 @@ struct MenuView: View {
     @State private var soundingAnnotationItems: [SoundingAnnotationItem] = []
     
     @State private var searchText = ""
+    @State private var showingSlideOverMenu = false
     
     enum SoundingOrForecast {
         case sounding
@@ -87,6 +88,21 @@ struct MenuView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    withAnimation(.snappy) {
+                        showingSlideOverMenu = true
+                    }
+                } label: {
+                    Image(systemName: "line.3.horizontal")
+                        .padding(5)
+                }
+                .foregroundStyle(.menuTitle)
+                .buttonStyle(.glass)
+                .accessibilityLabel("Open menu")
+            }
+            .sharedBackgroundVisibility(.hidden)
+            
             ToolbarItem(placement: .title) {
                 Text("Locations")
                     .foregroundStyle(.menuTitle)
@@ -132,6 +148,41 @@ struct MenuView: View {
             }
             
             mapPosition = initialMapPosition
+        }
+        .overlay(alignment: .leading) {
+            slideOverMenu
+        }
+    }
+    
+    private var slideOverMenu: some View {
+        GeometryReader { geometry in
+            let drawerWidth = min(340, max(0, geometry.size.width - 24))
+            let hiddenOffset = -(drawerWidth + geometry.safeAreaInsets.leading + 24)
+            
+            ZStack(alignment: .leading) {
+                Color.black.opacity(showingSlideOverMenu ? 0.35 : 0)
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .allowsHitTesting(showingSlideOverMenu)
+                    .onTapGesture {
+                        closeSlideOverMenu()
+                    }
+                
+                SlideOverMenuView(onClose: closeSlideOverMenu)
+                    .frame(width: drawerWidth)
+                    .frame(maxHeight: .infinity)
+                    .padding(.vertical, 12)
+                    .padding(.leading, 12)
+                    .offset(x: showingSlideOverMenu ? 0 : hiddenOffset)
+                    .allowsHitTesting(showingSlideOverMenu)
+            }
+            .animation(.snappy, value: showingSlideOverMenu)
+        }
+    }
+    
+    private func closeSlideOverMenu() {
+        withAnimation(.snappy) {
+            showingSlideOverMenu = false
         }
     }
     

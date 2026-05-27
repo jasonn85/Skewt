@@ -49,6 +49,7 @@
 		9681808D2F3899C00027FD17 /* NCAFSoundingListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9681808C2F3899C00027FD17 /* NCAFSoundingListTests.swift */; };
 		968998202A17323F005457D6 /* LocationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9689981F2A17323F005457D6 /* LocationState.swift */; };
 		968998222A1759B1005457D6 /* LocationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968998212A1759B1005457D6 /* LocationMiddleware.swift */; };
+		968D4D762FC78661007FD05B /* SlideOverMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 968D4D752FC78661007FD05B /* SlideOverMenuView.swift */; };
 		969117902A29165000A5C72D /* PlotStyling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9691178F2A29165000A5C72D /* PlotStyling.swift */; };
 		969117922A29178900A5C72D /* PlotStylingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969117912A29178900A5C72D /* PlotStylingTests.swift */; };
 		969B8BC42AFEE986002D0F20 /* SoundingWindData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */; };
@@ -144,6 +145,7 @@
 		9689981F2A17323F005457D6 /* LocationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationState.swift; sourceTree = "<group>"; };
 		968998212A1759B1005457D6 /* LocationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMiddleware.swift; sourceTree = "<group>"; };
 		968998232A17F8E2005457D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		968D4D752FC78661007FD05B /* SlideOverMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverMenuView.swift; sourceTree = "<group>"; };
 		9691178F2A29165000A5C72D /* PlotStyling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStyling.swift; sourceTree = "<group>"; };
 		969117912A29178900A5C72D /* PlotStylingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotStylingTests.swift; sourceTree = "<group>"; };
 		969B8BC32AFEE986002D0F20 /* SoundingWindData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundingWindData.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 				964998652B6A20A700899BC7 /* TouchCatchView.swift */,
 				96D30F2F2A83581200986E7E /* WindBarb.swift */,
 				96693FB12B746C5900697291 /* ZoomedSquare.swift */,
+				968D4D752FC78661007FD05B /* SlideOverMenuView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -544,6 +547,7 @@
 				96A8F60D299DAC680021A170 /* RucSounding.swift in Sources */,
 				96F4B06229A9B12E006D23BE /* SkewtPlotView.swift in Sources */,
 				96510CF52F4431920079F22A /* UWYSoundingRequest.swift in Sources */,
+				968D4D762FC78661007FD05B /* SlideOverMenuView.swift in Sources */,
 				96337ACB2C34B86C00787E2D /* SunlightGradientView.swift in Sources */,
 				96F627322F46448200D4618C /* SoundingDataMiddleware.swift in Sources */,
 				96F4B06629B165D0006D23BE /* SkewtPlot.swift in Sources */,
