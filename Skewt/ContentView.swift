@@ -17,6 +17,7 @@ struct ContentView: View {
     
     @State private var selectingTime = false
     @State private var showingOptions = false
+    @State private var showingSlideOverMenu = false
     @State private var preferredCompactColumn: NavigationSplitViewColumn = .detail
     @State private var splitViewVisibility: NavigationSplitViewVisibility = .automatic
     
@@ -68,8 +69,11 @@ struct ContentView: View {
                 }
             }()
             
-            MenuView(onReturnToSelection: dismissCompactMenuAction)
-                .environmentObject(store)
+            MenuView(
+                onReturnToSelection: dismissCompactMenuAction,
+                onShowSlideOverMenu: openSlideOverMenu
+            )
+            .environmentObject(store)
         } detail: {
             plotView
                 .navigationBarBackButtonHidden(true)
@@ -105,6 +109,9 @@ struct ContentView: View {
                         showingOptions = false
                     }
             }
+        }
+        .overlay {
+            slideOverMenu
         }
         .fontDesign(.monospaced)
         .colorScheme(.dark)
@@ -147,6 +154,47 @@ struct ContentView: View {
             }
             
             showDetailForCurrentSelection()
+        }
+    }
+    
+    private var slideOverMenu: some View {
+        GeometryReader { geometry in
+            let horizontalMargin = 28.0
+            let drawerWidth = min(420, max(0, geometry.size.width - horizontalMargin * 2))
+            let shownOffset = (geometry.size.width - drawerWidth) / 2
+            let hiddenOffset = -(drawerWidth + geometry.safeAreaInsets.leading + shownOffset)
+            let verticalPadding = max(28, geometry.safeAreaInsets.top + 24)
+            
+            ZStack(alignment: .topLeading) {
+                Color.black.opacity(showingSlideOverMenu ? 0.35 : 0)
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                    .allowsHitTesting(showingSlideOverMenu)
+                    .onTapGesture {
+                        closeSlideOverMenu()
+                    }
+                
+                SlideOverMenuView(onClose: closeSlideOverMenu)
+                    .frame(width: drawerWidth)
+                    .frame(maxHeight: .infinity)
+                    .padding(.top, verticalPadding)
+                    .padding(.bottom, max(28, geometry.safeAreaInsets.bottom + 24))
+                    .offset(x: showingSlideOverMenu ? shownOffset : hiddenOffset)
+                    .allowsHitTesting(showingSlideOverMenu)
+            }
+            .animation(.snappy, value: showingSlideOverMenu)
+        }
+    }
+    
+    private func openSlideOverMenu() {
+        withAnimation(.snappy) {
+            showingSlideOverMenu = true
+        }
+    }
+    
+    private func closeSlideOverMenu() {
+        withAnimation(.snappy) {
+            showingSlideOverMenu = false
         }
     }
     
