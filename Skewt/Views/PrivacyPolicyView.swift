@@ -77,9 +77,9 @@ struct PrivacyPolicyView: View {
     }
     
     private var userData = Section(
-        heading: "No User Data is Stored",
+        heading: "Local User Data",
         paragraphs: [
-            "Skew-T² does not store any user data and does not collect any user data aside from Location Information as described below."
+            "Skew-T² stores app preferences and recent selections on your device. Skew-T² does not use accounts, analytics, advertising identifiers, or tracking."
         ]
     )
     
@@ -87,7 +87,7 @@ struct PrivacyPolicyView: View {
         heading: "Location Information",
         paragraphs: [
             "If the user opts to share their location with the Skew-T² app to list nearby sounding or forecast locations, the user's location is not sent off device.",
-            "If the user opts to share their location and view a forecast for that location, that location is partially obscured before being sent to any third party weather data provider and includes no other user information."
+            "If the user opts to share their location and view a forecast for that location, the location is rounded to two decimal places of latitude/longitude before being sent to any third party weather data provider and includes no other user information."
         ]
     )
     

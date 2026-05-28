@@ -7,6 +7,7 @@
 
 import Testing
 import Foundation
+import CoreLocation
 @testable import Skewt
 
 struct OpenMeteoRequestTests {
@@ -168,5 +169,60 @@ struct OpenMeteoRequestTests {
         let modelItems = request.queryItems?.filter({ $0.name == "model" }) ?? []
 
         #expect(modelItems.isEmpty)
+    }
+
+    @Test("Request from sounding selection preserves named coordinates")
+    func fromSoundingSelectionPreservesNamedCoordinates() throws {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .named(name: "DEN", latitude: 39.7392, longitude: -104.9903),
+            time: .now,
+            dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .forecast(.automatic))
+        )
+
+        let request = try OpenMeteoSoundingListRequest(fromSoundingSelection: selection)
+
+        #expect(request.latitude == 39.7392)
+        #expect(request.longitude == -104.9903)
+        #expect(request.queryItems?.first(where: { $0.name == "latitude" })?.value == "39.7392")
+        #expect(request.queryItems?.first(where: { $0.name == "longitude" })?.value == "-104.9903")
+    }
+
+    @Test("Request from sounding selection rounds point coordinates for privacy")
+    func fromSoundingSelectionRoundsPointCoordinates() throws {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .point(latitude: 39.7392, longitude: -104.9903),
+            time: .now,
+            dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .forecast(.automatic))
+        )
+
+        let request = try OpenMeteoSoundingListRequest(fromSoundingSelection: selection)
+
+        #expect(request.latitude == 39.74)
+        #expect(request.longitude == -104.99)
+        #expect(request.queryItems?.first(where: { $0.name == "latitude" })?.value == "39.74")
+        #expect(request.queryItems?.first(where: { $0.name == "longitude" })?.value == "-104.99")
+    }
+
+    @Test("Request from sounding selection rounds current location for privacy")
+    func fromSoundingSelectionRoundsCurrentLocation() throws {
+        let selection = SoundingSelection(
+            type: .forecast(.automatic),
+            location: .closest,
+            time: .now,
+            dataAgeBeforeRefresh: SoundingSelection.defaultDataAgeBeforeRefresh(for: .forecast(.automatic))
+        )
+        let currentLocation = CLLocationCoordinate2D(latitude: 32.7335, longitude: -117.1897)
+
+        let request = try OpenMeteoSoundingListRequest(
+            fromSoundingSelection: selection,
+            currentLocation: currentLocation
+        )
+
+        #expect(request.latitude == 32.73)
+        #expect(request.longitude == -117.19)
+        #expect(request.queryItems?.first(where: { $0.name == "latitude" })?.value == "32.73")
+        #expect(request.queryItems?.first(where: { $0.name == "longitude" })?.value == "-117.19")
     }
 }

@@ -72,9 +72,10 @@ extension Middlewares {
 }
 
 extension OpenMeteoSoundingListRequest {
+    private static let locationPrivacyDecimalPlaces = 2
+
     init(fromSoundingSelection selection: SoundingSelection, currentLocation: CLLocationCoordinate2D? = nil) throws {
-        let latitude: Double
-        let longitude: Double
+        let coordinate: CLLocationCoordinate2D
         
         switch selection.location {
         case .closest:
@@ -82,12 +83,14 @@ extension OpenMeteoSoundingListRequest {
                 throw OpenMeteoRequestError.missingLocation
             }
             
-            latitude = location.latitude
-            longitude = location.longitude
-        case .point(let pointLatitude, let pointLongitude),
-                .named(_, let pointLatitude, let pointLongitude):
-            latitude = pointLatitude
-            longitude = pointLongitude
+            coordinate = location.roundedForForecastPrivacy(
+                decimalPlaces: Self.locationPrivacyDecimalPlaces
+            )
+        case .point(let latitude, let longitude):
+            coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                .roundedForForecastPrivacy(decimalPlaces: Self.locationPrivacyDecimalPlaces)
+        case .named(_, let latitude, let longitude):
+            coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         }
         
         let startHour: Date?
@@ -115,14 +118,30 @@ extension OpenMeteoSoundingListRequest {
         }
 
         self.init(
-            latitude: latitude,
-            longitude: longitude,
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
             hourly: OpenMeteoSoundingListRequest.HourlyValue.skewtHourlyValues,
             forecast_hours: 12,
             past_hours: 12,
             start_hour: startHour,
             model: model
         )
+    }
+}
+
+private extension CLLocationCoordinate2D {
+    func roundedForForecastPrivacy(decimalPlaces: Int) -> CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: latitude.rounded(decimalPlaces: decimalPlaces),
+            longitude: longitude.rounded(decimalPlaces: decimalPlaces)
+        )
+    }
+}
+
+private extension Double {
+    func rounded(decimalPlaces: Int) -> Double {
+        let scale = pow(10.0, Double(decimalPlaces))
+        return (self * scale).rounded(.toNearestOrAwayFromZero) / scale
     }
 }
 
