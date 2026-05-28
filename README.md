@@ -34,8 +34,7 @@ Weather balloons are released twice a day from dozens of locations around the US
 Forecasts provide predicted sounding data on a grid. The default model used for the US is hourly on a 3-25 km grid for up to 16 days in the future. Specifics for other locations vary.
 
 # Further Skew-T Log-P references
-- [NOAA's sounding web API](https://rucsoundings.noaa.gov/)
-- [Return of Skew-T](https://www.ifr-magazine.com/training-sims/return-of-skew-t/)
+- [Return of Skew-T](https://www.flyingmag.com/return-of-skew-t/)
     - An explanation of Skew-T Log-P for pilots
 - [Skew-T tutorials](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html)
     - An overview of information that can be divined from a plot

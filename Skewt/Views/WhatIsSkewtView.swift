@@ -280,14 +280,9 @@ struct WhatIsSkewtView: View {
         heading: "Further Skew-T Log-P references",
         content: [
             .link(ReferenceLink(
-                title: "NOAA's sounding web API",
-                subtitle: nil,
-                url: URL(string: "https://rucsoundings.noaa.gov/")!
-            )),
-            .link(ReferenceLink(
                 title: "Return of Skew-T",
                 subtitle: "An explanation of Skew-T Log-P for pilots",
-                url: URL(string: "https://www.ifr-magazine.com/training-sims/return-of-skew-t/")!
+                url: URL(string: "https://www.flyingmag.com/return-of-skew-t/")!
             )),
             .link(ReferenceLink(
                 title: "Skew-T tutorials",
