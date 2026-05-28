@@ -90,8 +90,12 @@ struct ContentView: View {
                         optionsButton
                     }
                     .padding([.horizontal], 30)
-                    .onPreferenceChange(TitleTextHeightKey.self) {
-                        titleTextHeight = $0
+                    .onPreferenceChange(TitleTextHeightKey.self) { height in
+                        guard titleTextHeight != height else {
+                            return
+                        }
+
+                        titleTextHeight = height
                     }
                     .background {
                         LinearGradient(colors: [.menuSectionHeaderGradient1, .menuSectionHeaderGradient2], startPoint: .top, endPoint: .bottom)
