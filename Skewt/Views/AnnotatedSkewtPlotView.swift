@@ -8,18 +8,6 @@
 import SwiftUI
 import CoreLocation
 
-struct PlotSizePreferenceKey: PreferenceKey {
-    static let defaultValue: CGSize = .zero
-    
-    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
-        let newValue = nextValue()
-        
-        if newValue != .zero {
-            value = newValue
-        }
-    }
-}
-
 struct AnnotatedSkewtPlotView: View {
     let soundingState: SoundingState
     let plotOptions: PlotOptions
@@ -35,8 +23,6 @@ struct AnnotatedSkewtPlotView: View {
     private var zoomedSquare: ZoomedSquare {
         try! ZoomedSquare(zoom: zoom, anchor: zoomAnchor)
     }
-    
-    @State private var plotSize: CGSize = .zero
     
     private let temperatureTickLength: CGFloat = 10.0
         
@@ -186,16 +172,11 @@ struct AnnotatedSkewtPlotView: View {
                                             bounceBackAnimation: .easeOut(duration: 0.2)
                                         )
 
-                                        Rectangle()
-                                            .foregroundColor(.clear)
-                                            .preference(key: PlotSizePreferenceKey.self, value: geometry.size)
-                                            .overlay {
-                                                annotations(
-                                                    inBounds: CGRect(origin: .zero, size: plotSize),
-                                                    fromPlot: plot
-                                                )
-                                                .clipped()
-                                            }
+                                        annotations(
+                                            inBounds: CGRect(origin: .zero, size: geometry.size),
+                                            fromPlot: plot
+                                        )
+                                        .clipped()
                                     }
                                 }
                             }
@@ -246,11 +227,6 @@ struct AnnotatedSkewtPlotView: View {
             }
         }
         .aspectRatio(1.0, contentMode: .fit)
-        .onPreferenceChange(PlotSizePreferenceKey.self) { preference in
-            withAnimation {
-                self.plotSize = preference
-            }
-        }
     }
     
     @ViewBuilder
@@ -353,21 +329,14 @@ struct AnnotatedSkewtPlotView: View {
         }
     }
     
-    private func updateAnnotationPoint(_ point: CGPoint) {
-        annotationPoint = UnitPoint(
-            x: point.x / plotSize.width,
-            y: point.y / plotSize.height
-        )
-    }
-    
     @ViewBuilder
     private func temperatureTick(atNormalizedPoint normalizedPoint: CGPoint,
                                  inRect rect: CGRect,
                                  style: PlotOptions.PlotStyling.LineStyle) -> some View {
         let halfLength = temperatureTickLength / 2.0
         let point = CGPoint(
-            x: normalizedPoint.x * plotSize.width + rect.origin.x,
-            y: normalizedPoint.y * plotSize.height + rect.origin.y
+            x: normalizedPoint.x * rect.size.width + rect.origin.x,
+            y: normalizedPoint.y * rect.size.height + rect.origin.y
         )
         
         Path() { path in
@@ -390,12 +359,13 @@ struct AnnotatedSkewtPlotView: View {
                 .overlay {
                     GeometryReader { geometry in
                         let isobars = isobars(withPlot: plot)
+                        let plotHeight = geometry.size.height
                         
                         ForEach(isobars.keys.sorted().reversed(), id: \.self) { key in
                             let unitPoint = zoomedSquare.visiblePointForActualPoint(UnitPoint(x: 0.0, y: yForIsobar(key, inPlot: plot)))
-                            let y = unitPoint.y * plotSize.height
+                            let y = unitPoint.y * plotHeight
                             
-                            if y >= 0.0 && y < plotSize.height {
+                            if y >= 0.0 && y < plotHeight {
                                 Text(isobarAxisLabelFormatter.string(from: key as NSNumber) ?? "")
                                     .font(Font(leftAxisLabelFont))
                                     .lineLimit(1)
@@ -425,13 +395,14 @@ struct AnnotatedSkewtPlotView: View {
                         if plotOptions.showIsothermLabels {
                             let isotherms = plot.isothermPaths
                             let bottom = zoomedSquare.visibleRect.maxY
+                            let plotWidth = geometry.size.width
                             
                             ForEach(isotherms.keys.sorted(), id: \.self) { temperature in
                                 let unzoomedX = plot.x(forIsotherm: temperature, atY: bottom)
                                 let normalizedPoint = UnitPoint(x: unzoomedX, y: bottom)
-                                let x = zoomedSquare.visiblePointForActualPoint(normalizedPoint).x * plotSize.width
+                                let x = zoomedSquare.visiblePointForActualPoint(normalizedPoint).x * plotWidth
                                 
-                                if x >= 0 && x < plotSize.width {
+                                if x >= 0 && x < plotWidth {
                                     Text(String(Int(temperature)))
                                         .font(Font(bottomAxisLabelFont))
                                         .foregroundColor(isothermColor)
