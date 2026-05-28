@@ -54,7 +54,7 @@ struct SlideOverMenuView: View {
                         showingWhatIsSkewt = true
                     } label: {
                         HStack(alignment: .center) {
-                            Text("What is a Skew-T Log-P chart?")
+                            Text("What is a Skew‑T Log‑P chart?")
                             Spacer()
                             Image(systemName: "chevron.forward")
                                 .foregroundStyle(.secondary)

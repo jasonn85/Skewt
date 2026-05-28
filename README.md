@@ -1,11 +1,11 @@
 # <img alt="Skew-T logo" align="top" src="https://github.com/jasonn85/Skewt/assets/1328743/cf0a415c-214d-4c3b-847b-41530bbec41e">&nbsp; Skew-T²
 An open-source, iOS app for viewing sounding data and forecasts from NOAA
 
-# What's a Skew-T Log-P?
-If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Meteorologists and glider pilots understand. All pilots should!
+# What's a Skew‑T Log‑P?
+If weather is the Matrix, reading a Skew‑T Log‑P chart is reading the green text. Meteorologists and glider pilots understand. All pilots should!
 
 ## 📈 The lines
-The two plotted lines are temperature (red) and moisture/dew point (blue). Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.
+The two plotted lines are temperature (red) and moisture/dew point (blue). Height is height. (Pressure altitude is plotted logarithmically, hence Log‑P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew‑T.
 
 ![Temperature line example](https://github.com/jasonn85/Skewt/assets/1328743/a8de626d-3a9e-4129-8153-b1dec61b286b)
 
@@ -22,7 +22,7 @@ And a thick layer of rain:
 
 
 ## 📐 The other lines
-All sorts of other weather characteristics are easily identifiable on a Skew-T Log-P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.
+All sorts of other weather characteristics are easily identifiable on a Skew‑T Log‑P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.
 
 <img width="335" alt="Guidelines" src="https://github.com/jasonn85/Skewt/assets/1328743/df9ceb27-a238-4f28-b29f-68123bbaf5fc">
 
@@ -35,12 +35,12 @@ Forecasts provide predicted sounding data on a grid. The default model used for 
 
 # Further Skew-T Log-P references
 - [Return of Skew-T](https://www.flyingmag.com/return-of-skew-t/)
-    - An explanation of Skew-T Log-P for pilots
+    - An explanation of Skew‑T Log‑P for pilots
 - [Skew-T tutorials](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html)
     - An overview of information that can be divined from a plot
         - [Examples of some typical patterns](https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html#SKEW3)
-- [Weather Explained: Intro to Reading Skew-T Graphs](https://youtu.be/1lJ9Kaieoco)
-    - A five minute video, explaining weather balloons, Skew-T plots, and how to read them
+- [Weather Explained: Intro to Reading Skew‑T Graphs](https://youtu.be/1lJ9Kaieoco)
+    - A five minute video, explaining weather balloons, Skew‑T plots, and how to read them
 	
 
 # How was this app built?
@@ -70,7 +70,7 @@ Forecasts provide predicted sounding data on a grid. The default model used for 
 - User location, if granted, is anonymized before being sent to any external API.
 
 # Free?
-Skew-T Log-P plots will stay free as long as a free API exists. Future interactive lessons, quizzes, integrations with external tools, and more advanced visualizations may appear with a cost.
+Skew‑T Log‑P plots will stay free as long as a free API exists. Future interactive lessons, quizzes, integrations with external tools, and more advanced visualizations may appear with a cost.
 
 # Hire me to build your app
 [Itsa me](https://github.com/jasonn85)

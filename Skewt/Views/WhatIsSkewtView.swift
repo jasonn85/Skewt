@@ -84,7 +84,7 @@ struct WhatIsSkewtView: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
-        .navigationTitle("What is Skew-T Log-P?")
+        .navigationTitle("What is Skew‑T Log‑P?")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
@@ -98,7 +98,7 @@ struct WhatIsSkewtView: View {
                         .frame(width: 44, height: 44)
                         .shadow(color: .black, radius: 1, x: 1, y: 1)
                     
-                    Text("What is Skew-T Log-P?")
+                    Text("What is Skew‑T Log‑P?")
                         .minimumScaleFactor(0.5)
                         .foregroundStyle(.menuTitle)
                         .font(.title)
@@ -213,7 +213,7 @@ struct WhatIsSkewtView: View {
     private var skewTLogP = Section(
         heading: nil,
         content: [
-            .paragraph(.plain("If weather is the Matrix, reading a Skew-T Log-P chart is reading the green text. Meteorologists and glider pilots understand. All pilots should!"))
+            .paragraph(.plain("If weather is the Matrix, reading a Skew‑T Log‑P chart is reading the green text. Meteorologists and glider pilots understand. All pilots should!"))
         ]
     )
     
@@ -225,7 +225,7 @@ struct WhatIsSkewtView: View {
                 InlineText("temperature", style: .temperature),
                 InlineText(" and "),
                 InlineText("moisture/dew point", style: .dewPoint),
-                InlineText(". Height is height. (Pressure altitude is plotted logarithmically, hence Log-P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew-T.")
+                InlineText(". Height is height. (Pressure altitude is plotted logarithmically, hence Log‑P). Left is cold; right is hot. Temperature is skewed so that a constant temperature atmosphere would slope up and to the right, hence Skew‑T.")
             ])),
             .image(AssetImage(
                 name: "WhatIsSkewtTemperatureLine",
@@ -254,7 +254,7 @@ struct WhatIsSkewtView: View {
     private var otherLines = Section(
         heading: "📐 The other lines",
         content: [
-            .paragraph(.plain("All sorts of other weather characteristics are easily identifiable on a Skew-T Log-P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.")),
+            .paragraph(.plain("All sorts of other weather characteristics are easily identifiable on a Skew‑T Log‑P plot. The plot often includes guidelines that show how temperature tends to fall with altitude for dry and moist air. These can be used to predict icing, convective activity/thunderstorms, and wind shear, to start.")),
             .image(AssetImage(
                 name: "WhatIsSkewtGuidelines",
                 description: "Guidelines"
@@ -277,26 +277,26 @@ struct WhatIsSkewtView: View {
     )
     
     private var references = Section(
-        heading: "Further Skew-T Log-P references",
+        heading: "Further Skew‑T Log‑P references",
         content: [
             .link(ReferenceLink(
-                title: "Return of Skew-T",
-                subtitle: "An explanation of Skew-T Log-P for pilots",
+                title: "Return of Skew‑T",
+                subtitle: "An explanation of Skew‑T Log‑P for pilots",
                 url: URL(string: "https://www.flyingmag.com/return-of-skew-t/")!
             )),
             .link(ReferenceLink(
-                title: "Skew-T tutorials",
+                title: "Skew‑T tutorials",
                 subtitle: "An overview of information that can be divined from a plot",
                 url: URL(string: "https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html")!
             )),
             .link(ReferenceLink(
-                title: "Typical Skew-T patterns",
+                title: "Typical Skew‑T patterns",
                 subtitle: "Examples of some typical patterns",
                 url: URL(string: "https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/skewt/skewtinfo.html#SKEW3")!
             )),
             .link(ReferenceLink(
-                title: "Weather Explained: Intro to Reading Skew-T Graphs",
-                subtitle: "A five minute video, explaining weather balloons, Skew-T plots, and how to read them",
+                title: "Weather Explained: Intro to Reading Skew‑T Graphs",
+                subtitle: "A five minute video, explaining weather balloons, Skew‑T plots, and how to read them",
                 url: URL(string: "https://youtu.be/1lJ9Kaieoco")!
             ))
         ]
