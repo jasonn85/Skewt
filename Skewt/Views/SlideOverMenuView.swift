@@ -61,7 +61,11 @@ struct SlideOverMenuView: View {
                         }
                     }
                     .foregroundStyle(.primary)
-                    
+                } header: {
+                    Text("Info")
+                }
+                
+                Section {
                     Button {
                         showingPrivacyPolicy = true
                     } label: {
@@ -82,7 +86,7 @@ struct SlideOverMenuView: View {
                         .foregroundStyle(.blue)
                     }
                 } header: {
-                    Text("About")
+                    Text("About Skew-T²")
                         .foregroundStyle(.primary)
                 }
             }
