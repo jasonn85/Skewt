@@ -14,19 +14,58 @@ struct PrivacyPolicyView: View {
     }
     
     var body: some View {
-        List() {
+        List {
             ForEach(sections, id: \.self) { section in
-                SwiftUI.Section(header: Text(section.heading).font(.title2)) {
+                SwiftUI.Section(header: sectionHeader(section.heading)) {
                     ForEach(section.paragraphs, id: \.self) {
                         Text($0)
+                            .foregroundStyle(.white)
                             .padding(.leading, 12)
+                            .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                     }
                 }
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
         .navigationTitle("Privacy Policy")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 12) {
+                    Image("SkewtLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 44, height: 44)
+                        .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    
+                    Text("Privacy Policy")
+                        .minimumScaleFactor(0.5)
+                        .foregroundStyle(.menuTitle)
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .shadow(color: .black, radius: 1, x: 1, y: 1)
+                    
+                    Image("SkewtLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 44, height: 44)
+                        .hidden()
+                }
+            }
+        }
+    }
+    
+    private func sectionHeader(_ heading: String) -> some View {
+        Text(heading)
+            .font(.title2)
+            .foregroundStyle(.menuTitle)
+            .shadow(color: .black, radius: 1, x: 1, y: 1)
     }
     
     private var sections: [Section] {

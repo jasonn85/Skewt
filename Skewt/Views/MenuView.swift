@@ -46,14 +46,21 @@ struct MenuView: View {
     @State private var soundingAnnotationItems: [SoundingAnnotationItem] = []
     
     @State private var searchText = ""
+    let onShowSlideOverMenu: () -> Void
+    
+    private let toolbarButtonSize = 28.0
     
     enum SoundingOrForecast {
         case sounding
         case forecast
     }
 
-    init(onReturnToSelection: (() -> Void)? = nil) {
+    init(
+        onReturnToSelection: (() -> Void)? = nil,
+        onShowSlideOverMenu: @escaping () -> Void = {}
+    ) {
         self.onReturnToSelection = onReturnToSelection
+        self.onShowSlideOverMenu = onShowSlideOverMenu
     }
     
     var body: some View {
@@ -87,6 +94,19 @@ struct MenuView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(.menuSectionHeaderGradient1, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    onShowSlideOverMenu()
+                } label: {
+                    Image(systemName: "line.3.horizontal")
+                        .frame(width: toolbarButtonSize, height: toolbarButtonSize)
+                }
+                .foregroundStyle(.menuTitle)
+                .buttonStyle(.glass)
+                .accessibilityLabel("Open menu")
+            }
+            .sharedBackgroundVisibility(.hidden)
+            
             ToolbarItem(placement: .title) {
                 Text("Locations")
                     .foregroundStyle(.menuTitle)
@@ -101,7 +121,7 @@ struct MenuView: View {
                         onReturnToSelection()
                     } label: {
                         Image(systemName: "chevron.forward")
-                            .padding(5)
+                            .frame(width: toolbarButtonSize, height: toolbarButtonSize)
                     }
                     .foregroundStyle(.menuTitle)
                     .buttonStyle(.glass)
