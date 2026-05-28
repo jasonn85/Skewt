@@ -349,7 +349,7 @@ struct MenuView: View {
                 .overlay {
                     ZStack {
                         Rectangle()
-                            .fill(.blue)
+                            .fill(.menuIconBackground)
                         
                         image
                     }
