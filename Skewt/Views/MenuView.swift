@@ -45,6 +45,7 @@ struct MenuView: View {
     @State private var selectedAnnotationID: String?
     @State private var soundingAnnotationItems: [SoundingAnnotationItem] = []
     
+    @State private var isSearching: Bool = false
     @State private var searchText = ""
     let onShowSlideOverMenu: () -> Void
     
@@ -129,7 +130,7 @@ struct MenuView: View {
                 .sharedBackgroundVisibility(.hidden)
             }
         }
-        .searchable(text: $searchText, placement: .sidebar)
+        .searchable(text: $searchText, isPresented: $isSearching, placement: .sidebar)
         .searchSuggestions {
             ForEach(searchSuggestionLocations, id: \.self) {
                 row(forLocation: $0)
@@ -272,7 +273,7 @@ struct MenuView: View {
     }
     
     @ViewBuilder
-    private var forecastSelectionView: some View {
+    private var modelSelectionView: some View {
         Menu {
             Picker("Model", selection: $forecastModel) {
                 ForEach(SoundingSelection.ForecastModel.allCases, id: \.self) {
@@ -308,6 +309,13 @@ struct MenuView: View {
                     )
                 )
             )
+        }
+    }
+    
+    @ViewBuilder
+    private var forecastSelectionView: some View {
+        if !isSearching {
+            modelSelectionView
         }
         
         List {
