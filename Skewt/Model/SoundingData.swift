@@ -47,18 +47,29 @@ extension SoundingData {
             return exactMatch[keyPath: valuePath]
         }
         
-        let below = points.filter { $0.pressure > pressure }
-        let above = points.filter { $0.pressure < pressure }
+        let lowerPressurePoint = points
+            .filter { $0.pressure > pressure }
+            .min { $0.pressure < $1.pressure }
+        let upperPressurePoint = points
+            .filter { $0.pressure < pressure }
+            .max { $0.pressure < $1.pressure }
         
-        guard below.count > 0 else {
-            return above.first![keyPath: valuePath]
+        guard let lowerPressurePoint else {
+            return points.min { $0.pressure < $1.pressure }?[keyPath: valuePath]
         }
         
-        guard above.count > 0 else {
-            return below.last![keyPath: valuePath]
+        guard let upperPressurePoint else {
+            return points.max { $0.pressure < $1.pressure }?[keyPath: valuePath]
         }
         
-        return (below.last![keyPath: valuePath]! + above.first![keyPath: valuePath]!) / 2.0
+        guard let lowerValue = lowerPressurePoint[keyPath: valuePath],
+              let upperValue = upperPressurePoint[keyPath: valuePath] else {
+            return nil
+        }
+        
+        let fraction = (pressure - lowerPressurePoint.pressure)
+            / (upperPressurePoint.pressure - lowerPressurePoint.pressure)
+        return lowerValue + fraction * (upperValue - lowerValue)
     }
     
     func closestValue(toPressure pressure: Double, withValueFor valuePath: KeyPath<Point, Double?>) -> Point? {
