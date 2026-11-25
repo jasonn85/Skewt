@@ -111,4 +111,63 @@ final class SoundingTests: XCTestCase {
         XCTAssertTrue(hopefullyNegativeFifteen! > temperaturesAndPressures[0].0)
         XCTAssertTrue(hopefullyNegativeFifteen! < temperaturesAndPressures[1].0)
     }
+    
+    func testInterpolationWeightsUnevenPressureIntervals() throws {
+        let points = [
+            RucSounding.LevelDataPoint(
+                type: .significantLevel,
+                pressure: 1000.0,
+                height: nil,
+                temperature: 0.0,
+                dewPoint: -10.0,
+                windDirection: nil,
+                windSpeed: nil
+            ),
+            RucSounding.LevelDataPoint(
+                type: .significantLevel,
+                pressure: 800.0,
+                height: nil,
+                temperature: 20.0,
+                dewPoint: 10.0,
+                windDirection: nil,
+                windSpeed: nil
+            )
+        ]
+        let sounding = try RucSounding(withJustData: points)
+        
+        let interpolatedTemperature = try XCTUnwrap(
+            sounding.data.interpolatedValue(for: \.temperature, atPressure: 950.0)
+        )
+        XCTAssertEqual(interpolatedTemperature, 5.0, accuracy: 0.001)
+        
+        let interpolatedDewPoint = try XCTUnwrap(
+            sounding.data.interpolatedValue(for: \.dewPoint, atPressure: 950.0)
+        )
+        XCTAssertEqual(interpolatedDewPoint, -5.0, accuracy: 0.001)
+    }
+    
+    func testInterpolationUsesNearestEndpointOutsidePressureRange() throws {
+        let temperaturesAndPressures = [(-20.0, 1000.0), (-10.0, 900.0)]
+        let points = temperaturesAndPressures.map {
+            RucSounding.LevelDataPoint(
+                type: .significantLevel,
+                pressure: $0.1,
+                height: nil,
+                temperature: $0.0,
+                dewPoint: $0.0 - 5.0,
+                windDirection: nil,
+                windSpeed: nil
+            )
+        }
+        let sounding = try RucSounding(withJustData: points)
+        
+        XCTAssertEqual(
+            sounding.data.interpolatedValue(for: \.temperature, atPressure: 1100.0),
+            -20.0
+        )
+        XCTAssertEqual(
+            sounding.data.interpolatedValue(for: \.temperature, atPressure: 800.0),
+            -10.0
+        )
+    }
 }
