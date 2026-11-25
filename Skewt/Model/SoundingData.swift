@@ -55,11 +55,11 @@ extension SoundingData {
             .max { $0.pressure < $1.pressure }
         
         guard let lowerPressurePoint else {
-            return points.min { $0.pressure < $1.pressure }?[keyPath: valuePath]
+            return points.max { $0.pressure < $1.pressure }?[keyPath: valuePath]
         }
         
         guard let upperPressurePoint else {
-            return points.max { $0.pressure < $1.pressure }?[keyPath: valuePath]
+            return points.min { $0.pressure < $1.pressure }?[keyPath: valuePath]
         }
         
         guard let lowerValue = lowerPressurePoint[keyPath: valuePath],

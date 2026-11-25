@@ -135,16 +135,15 @@ final class SoundingTests: XCTestCase {
         ]
         let sounding = try RucSounding(withJustData: points)
         
-        XCTAssertEqual(
-            sounding.data.interpolatedValue(for: \.temperature, atPressure: 950.0),
-            5.0,
-            accuracy: 0.001
+        let interpolatedTemperature = try XCTUnwrap(
+            sounding.data.interpolatedValue(for: \.temperature, atPressure: 950.0)
         )
-        XCTAssertEqual(
-            sounding.data.interpolatedValue(for: \.dewPoint, atPressure: 950.0),
-            -5.0,
-            accuracy: 0.001
+        XCTAssertEqual(interpolatedTemperature, 5.0, accuracy: 0.001)
+        
+        let interpolatedDewPoint = try XCTUnwrap(
+            sounding.data.interpolatedValue(for: \.dewPoint, atPressure: 950.0)
         )
+        XCTAssertEqual(interpolatedDewPoint, -5.0, accuracy: 0.001)
     }
     
     func testInterpolationUsesNearestEndpointOutsidePressureRange() throws {
