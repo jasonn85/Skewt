@@ -192,7 +192,7 @@ extension SoundingSelection {
         case .numberOfSoundingsAgo(let soundingsAgo):
             let interval = TimeInterval(soundingsAgo * type.hourInterval) * 60.0 * 60.0
             
-            return Date.now.addingTimeInterval(-interval)
+            return Date.mostRecentSoundingTime().addingTimeInterval(-interval)
         }
     }
 }
