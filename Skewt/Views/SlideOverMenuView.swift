@@ -22,7 +22,7 @@ struct SlideOverMenuView: View {
                 
                 Text("Skew-T²")
                     .foregroundStyle(.menuTitle)
-                    .font(.title)
+                    .font(.shareTech(.title))
                     .fontWeight(.bold)
                     .shadow(color: .black, radius: 1, x: 1, y: 1)
                 
@@ -132,6 +132,6 @@ struct SlideOverMenuView: View {
         .padding(28)
         .background(Gradient(colors: [.menuBackgroundGradient1, .menuBackgroundGradient2]))
         .colorScheme(.dark)
-        .fontDesign(.monospaced)
+        .font(.shareTech(.body))
 }
 

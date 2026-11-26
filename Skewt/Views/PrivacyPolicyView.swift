@@ -47,7 +47,7 @@ struct PrivacyPolicyView: View {
                     Text("Privacy Policy")
                         .minimumScaleFactor(0.5)
                         .foregroundStyle(.menuTitle)
-                        .font(.title)
+                        .font(.shareTech(.title))
                         .fontWeight(.bold)
                         .shadow(color: .black, radius: 1, x: 1, y: 1)
                     
@@ -63,7 +63,7 @@ struct PrivacyPolicyView: View {
     
     private func sectionHeader(_ heading: String) -> some View {
         Text(heading)
-            .font(.title2)
+            .font(.shareTech(.title2))
             .foregroundStyle(.menuTitle)
             .shadow(color: .black, radius: 1, x: 1, y: 1)
     }

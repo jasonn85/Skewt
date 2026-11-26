@@ -101,7 +101,7 @@ struct WhatIsSkewtView: View {
                     Text("What is Skew‑T Log‑P?")
                         .minimumScaleFactor(0.5)
                         .foregroundStyle(.menuTitle)
-                        .font(.title)
+                        .font(.shareTech(.title))
                         .fontWeight(.bold)
                         .shadow(color: .black, radius: 1, x: 1, y: 1)
                     
@@ -131,7 +131,7 @@ struct WhatIsSkewtView: View {
     
     private func sectionHeader(_ heading: String) -> some View {
         Text(heading)
-            .font(.title2)
+            .font(.shareTech(.title2))
             .foregroundStyle(.menuTitle)
             .shadow(color: .black, radius: 1, x: 1, y: 1)
     }
@@ -188,7 +188,7 @@ struct WhatIsSkewtView: View {
                 
                 if let subtitle = link.subtitle {
                     Text(subtitle)
-                        .font(.footnote)
+                        .font(.shareTech(.footnote))
                         .foregroundStyle(.white.opacity(0.7))
                 }
             }
@@ -308,5 +308,5 @@ struct WhatIsSkewtView: View {
         WhatIsSkewtView()
     }
     .colorScheme(.dark)
-    .fontDesign(.monospaced)
+    .font(.shareTech(.body))
 }

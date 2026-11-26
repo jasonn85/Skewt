@@ -71,7 +71,8 @@ struct AnnotatedSkewtPlotView: View {
     }
     
     private var axisLabelFont: UIFont {
-        UIFont.systemFont(ofSize: 12.0)
+        let font = UIFont(name: "ShareTechMono-Regular", size: 12.0) ?? UIFont.systemFont(ofSize: 12.0)
+        return UIFontMetrics(forTextStyle: .caption1).scaledFont(for: font)
     }
     
     private var leftAxisLabelFont: UIFont {

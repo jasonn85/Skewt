@@ -160,11 +160,11 @@ struct SoundingTimeSelectView: View {
             .scenePadding(.horizontal)
             
             Text(valueDescription)
-                .font(.system(size: 12.0))
+                .font(.custom("ShareTechMono-Regular", size: 12, relativeTo: .caption))
                 .opacity(dragging ? 1.0 : 0.0)
             
             Text(valueRelativeDescription)
-                .font(.system(size: 11.0))
+                .font(.custom("ShareTechMono-Regular", size: 11, relativeTo: .caption2))
                 .opacity(0.7)
                 .opacity(dragging ? 1.0 : 0.0)
         }

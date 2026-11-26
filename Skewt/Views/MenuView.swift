@@ -112,7 +112,7 @@ struct MenuView: View {
                 Text("Locations")
                     .foregroundStyle(.menuTitle)
                     .shadow(color: .black, radius: 1, x: 1, y: 1)
-                    .font(.title3)
+                    .font(.shareTech(.title3))
                     .fontWeight(.bold)
             }
             
@@ -286,7 +286,7 @@ struct MenuView: View {
                     .padding([.horizontal])
                 Spacer()
                 Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption.weight(.semibold))
+                    .font(.shareTech(.caption).weight(.semibold))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -367,7 +367,7 @@ struct MenuView: View {
                 .lineLimit(1, reservesSpace: false)
                 .padding([.leading], 8)
         }
-        .font(.title3)
+        .font(.shareTech(.title3))
         .fontWeight(.semibold)
         .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
         .padding([.horizontal], 10)
@@ -429,17 +429,17 @@ struct MenuView: View {
             VStack(alignment: .leading) {
                 content()
                     .foregroundStyle(.menuTitle)
-                    .font(.title3)
+                    .font(.shareTech(.title3))
                 
                 subtitle()
-                    .font(.footnote)
+                    .font(.shareTech(.footnote))
             }
                 
             Spacer()
             
             if isChecked {
                 Image(systemName: "checkmark")
-                    .font(.title3)
+                    .font(.shareTech(.title3))
                     .foregroundStyle(.menuTitle)
                     .padding([.trailing], 4)
             }
@@ -600,10 +600,10 @@ struct MenuView: View {
     
     private func configurePickerTypography() {
         #if os(iOS)
-        let monospacedBody = UIFont.monospacedSystemFont(
-            ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize,
-            weight: .regular
-        )
+        let bodyFontSize = UIFont.preferredFont(forTextStyle: .body).pointSize
+        let bodyFont = UIFont(name: "ShareTechMono-Regular", size: bodyFontSize)
+            ?? UIFont.monospacedSystemFont(ofSize: bodyFontSize, weight: .regular)
+        let monospacedBody = UIFontMetrics(forTextStyle: .body).scaledFont(for: bodyFont)
         let textShadow = NSShadow()
         textShadow.shadowColor = UIColor.black
         textShadow.shadowBlurRadius = 1
