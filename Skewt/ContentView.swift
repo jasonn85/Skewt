@@ -278,7 +278,8 @@ struct ContentView: View {
                 soundingState: store.state.currentSoundingState,
                 plotOptions: store.state.plotOptions,
                 location: store.state.locationState.locationIfKnown,
-                time: store.state.currentSoundingState.selection.timeAsConcreteDate
+                time: store.state.currentSoundingState.resolvedSounding?.data.time
+                    ?? store.state.currentSoundingState.selection.timeAsConcreteDate
             )
             
             footer
