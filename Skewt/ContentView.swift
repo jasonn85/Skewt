@@ -117,7 +117,7 @@ struct ContentView: View {
         .overlay {
             slideOverMenu
         }
-        .fontDesign(.monospaced)
+        .font(.shareTech(.body))
         .colorScheme(.dark)
         .onAppear {
             guard appEnvironment.isLive else {
@@ -227,19 +227,19 @@ struct ContentView: View {
                     
                     Text(title)
                         .lineLimit(1)
-                        .font(.subheadline)
+                        .font(.shareTech(.subheadline))
                     
                     Text(title)
                 }
                 .foregroundStyle(.menuTitle)
-                .font(.title3)
+                .font(.shareTech(.title3))
                 .fontWeight(.bold)
                 
                 switch store.state.currentSoundingState.selection.type {
                 case .forecast(let model):
                     if model != .automatic {
                         Text("Model: \(model.description)")
-                            .font(.footnote)
+                            .font(.shareTech(.footnote))
                             .foregroundStyle(.white)
                             .opacity(0.7)
                     }
@@ -305,10 +305,10 @@ struct ContentView: View {
             
             Text(title)
                 .foregroundStyle(.menuTitle)
-                .font(.title)
+                .font(.shareTech(.title))
             
             Text(selection.type.subtitle)
-                .font(.subheadline)
+                .font(.shareTech(.subheadline))
         }
         .foregroundStyle(.white)
         .listRowBackground(Color.clear)
@@ -342,7 +342,7 @@ struct ContentView: View {
                     .rotationEffect(timeSelectionChevronRotation)
             }
         }
-        .font(.subheadline)
+        .font(.shareTech(.subheadline))
         .onTapGesture {
             withAnimation {
                 selectingTime.toggle()

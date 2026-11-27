@@ -106,7 +106,7 @@ struct HourlyTimeSelectView: View {
             .scenePadding(.horizontal)
             
             Text(valueDescription)
-                .font(.system(size: 12.0))
+                .font(.custom("ShareTechMono-Regular", size: 12, relativeTo: .caption))
                 .opacity(dragging ? 1.0 : 0.0)
         }
     }
